@@ -1,12 +1,3 @@
-[submodule "inf3995/argos3"]
-	path = inf3995/argos3
-	url = https://github.com/MISTLab/argos3.git
-[submodule "inf3995/argos3-examples"]
-	path = inf3995/argos3-examples
-	url = https://github.com/MISTLab/argos3-examples.git
-[submodule "crazyflie-firmware"]
-	path = crazyflie-firmware
-	url = https://github.com/bitcraze/crazyflie-firmware.git
 [submodule "simulation/argos3"]
 	path = simulation/argos3
 	url = https://github.com/MISTLab/argos3.git
