@@ -7,3 +7,9 @@
 [submodule "crazyflie-firmware"]
 	path = crazyflie-firmware
 	url = https://github.com/bitcraze/crazyflie-firmware.git
+[submodule "simulation/argos3"]
+	path = simulation/argos3
+	url = https://github.com/MISTLab/argos3.git
+[submodule "simulation/argos3-examples"]
+	path = simulation/argos3-examples
+	url = https://github.com/MISTLab/argos3-examples.git
