@@ -1,0 +1,7 @@
+{
+	"editor.formatOnSave": true,
+	"clang-format.fallbackStyle": "Google",
+	"C_Cpp.clang_format_fallbackStyle": "Google",
+	"C_Cpp.formatting": "clangFormat",
+	"C_Cpp.loggingLevel": "Warning"
+}
