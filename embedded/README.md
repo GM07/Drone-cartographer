@@ -33,7 +33,7 @@ Replace your devcontainer.json with the following
 		"editorconfig.editorconfig",
 		"mhutchie.git-graph"
 	],
-	"workspaceFolder": "/workspaces/INF3995",
+	"workspaceFolder": "/workspaces/INF3995-106/embedded",
 	"runArgs": [
 		"--gpus=all",
 		"-e", "DISPLAY=${env:DISPLAY}",
