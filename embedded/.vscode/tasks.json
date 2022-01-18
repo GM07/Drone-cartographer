@@ -9,8 +9,8 @@
 				"cwd": "${workspaceFolder}/argos3-examples"
 			},
 			"command": [
-				"if test -d argos3-examples/build; then rm -r argos3-examples/build; fi &&",
-				"cd argos3-examples && mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja"
+				"if test -d /build; then rm -r /build; fi &&",
+				"mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja"
 			]
 		},
 		{
