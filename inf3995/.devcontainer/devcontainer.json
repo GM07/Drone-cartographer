@@ -1,0 +1,24 @@
+{
+	"name": "INF3995 - Dream Team",
+	"dockerFile": "./Dockerfile",
+	"settings": {
+		"terminal.integrated.defaultProfile.linux": "zsh",
+	},
+	"extensions": [
+		"ms-vscode.cpptools",
+		"xaver.clang-format",
+		"visualstudioexptteam.vscodeintellicode",
+		"zixuanwang.linkerscript",
+		"cschlosser.doxdocgen",
+		"pkief.material-icon-theme",
+		"editorconfig.editorconfig",
+		"mhutchie.git-graph"
+	],
+	"workspaceFolder": "/workspaces/INF3995",
+	"runArgs": [
+		"--privileged",
+		"--net=host",
+		"-e", "DISPLAY=${env:DISPLAY}",
+	],
+	"initializeCommand": "xhost +local:docker"
+}
