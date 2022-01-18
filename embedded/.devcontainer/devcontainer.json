@@ -14,7 +14,7 @@
 		"editorconfig.editorconfig",
 		"mhutchie.git-graph"
 	],
-	"workspaceFolder": "/workspaces/INF3995",
+	"workspaceFolder": "/workspaces/INF3995/embedded",
 	"runArgs": [
 		"--privileged",
 		"--net=host",
