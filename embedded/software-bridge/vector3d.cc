@@ -5,31 +5,19 @@ Vector3D::Vector3D() : m_x(0), m_y(0), m_z(0) {}
 Vector3D::Vector3D(float x, float y, float z) : m_x(x), m_y(y), m_z(z) {}
 
 Vector3D Vector3D::operator+(const Vector3D& other) {
-  m_x += other.getX();
-  m_y + other.getY();
-  m_z + other.getZ();
-  return *this;
+  return Vector3D(m_x + other.getX(), m_y + other.getY(), m_z + other.getZ());
 }
 
 Vector3D Vector3D::operator-(const Vector3D& other) {
-  m_x -= other.getX();
-  m_y -= other.getY();
-  m_z -= other.getZ();
-  return *this;
+  return Vector3D(m_x - other.getX(), m_y - other.getY(), m_z - other.getZ());
 }
 
 Vector3D Vector3D::operator*(const float other) {
-  m_x *= other;
-  m_y *= other;
-  m_z *= other;
-  return *this;
+  return Vector3D(m_x * other, m_y * other, m_z * other);
 }
 
 Vector3D Vector3D::operator/(const float other) {
-  m_x /= other;
-  m_y /= other;
-  m_z /= other;
-  return *this;
+  return Vector3D(m_x / other, m_y / other, m_z / other);
 }
 
 Vector3D Vector3D::operator=(const Vector3D& other) { return *this; }
