@@ -1,9 +1,9 @@
 [submodule "embedded/crazyflie-firmware"]
 	path = embedded/crazyflie-firmware
-	url = https://github.com/zedfly/crazyflie-firmware.git
+	url = git@github.com:zedfly/crazyflie-firmware.git
 [submodule "embedded/argos3"]
 	path = embedded/argos3
-	url = https://github.com/zedfly/argos3.git
+	url = git@github.com:zedfly/argos3.git
 [submodule "embedded/argos3-examples"]
 	path = embedded/argos3-examples
-	url = https://github.com/zedfly/argos3-examples.git
+	url = git@github.com:zedfly/argos3-examples.git
