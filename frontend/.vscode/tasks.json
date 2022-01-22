@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Launch Vue App",
+			"type": "shell",
+            "options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"command": [ "npm run serve" ]
+		},
+    ]
+}

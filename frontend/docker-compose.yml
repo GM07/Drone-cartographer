@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  inf3995-vue-app:
+    image: dockerize-inf3995-vuejs-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: inf3995-vue-app
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - "8080:8080"

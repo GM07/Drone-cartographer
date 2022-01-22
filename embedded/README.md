@@ -5,66 +5,11 @@ Instructions for installing docker can be found here : https://docs.docker.com/e
 
 After installation make to follow the post installation steps : https://docs.docker.com/engine/install/linux-postinstall/
 
-## Cloning the repository
-
-```bash
-git clone git@gitlab.com:zedfly/inf3995-temp.git --recursive
-```
-
 ## Rendering GUI with NVDIA GPU (ONLY IF APPLICABLE) 
 To use NVDIA GPU with docker you need to install NVIDIA Container Toolkit  
-Follow the instructions presented here to do so : https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+Follow the instructions presented here to do so : https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html  
+Uncomment the '--gpus=all' line from the devcontainer.json  
 
-Replace your devcontainer.json with the following
-```json
-{
-	"name": "INF3995 - Dream Team",
-	"dockerFile": "./Dockerfile",
-	"settings": {
-		"terminal.integrated.defaultProfile.linux": "zsh",
-	},
-	"extensions": [
-		"ms-vscode.cpptools",
-		"xaver.clang-format",
-		"visualstudioexptteam.vscodeintellicode",
-		"zixuanwang.linkerscript",
-		"cschlosser.doxdocgen",
-		"pkief.material-icon-theme",
-		"editorconfig.editorconfig",
-		"mhutchie.git-graph"
-	],
-	"workspaceFolder": "/workspaces/INF3995-106/embedded",
-	"runArgs": [
-		"--gpus=all",
-		"-e", "DISPLAY=${env:DISPLAY}",
-	],
-	"mounts": [
-		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-	],
-	"remoteEnv": {
-		"QT_X11_NO_MITSHM": "1"
-	},
-	"initializeCommand": "xhost +local:docker"
-}
-```
-
-Add the following to your Dockerfile
-```docker
-# Allow usage of X11 and NVDIA GPU 
-# Dependencies for glvnd and X11.
-RUN apt-get update \
-  && apt-get install -y -qq --no-install-recommends \
-    libglvnd0 \
-    libgl1 \
-    libglx0 \
-    libegl1 \
-    libxext6 \
-    libx11-6 \
-  && rm -rf /var/lib/apt/lists/*
-# Env vars for the nvidia-container-runtime.
-ENV NVIDIA_VISIBLE_DEVICES all
-ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
-```
 ## Running the container
 1. Open the folder in VSCode  
 2. Make sure you have the remote container extension installed  
@@ -80,3 +25,41 @@ ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 2. ```bash
     argos3 -c experiments/crazyflie_sensing.argos
      ```
+
+# Working with GIT submodules
+
+## Rules for submodule
+THE SUBMODULES ON A BRANCH MUST POINT TO THE MAIN BRANCH OF THEIR RESPECTIVE REPOS
+
+## Submodule introduction
+Submodules are a way to have git projects inside your git project. They are basically pointers to a certain commit on another repository.
+Submodules allow you to compartimentalize your projects while still tracking them with git and beeing able to work on in one place.
+If you want to modify code contained in a specific submodule, you can simply navigate to that folder, do the modifications on a branch, and add them to git as if
+it was a normal single repository. Branches of the repo can have submodules pointers that point on various branch of the submodule repo. Not necessarily master.
+
+## Cloning the repository
+
+```bash
+git clone git@gitlab.com:zedfly/inf3995-temp.git --recursive
+```
+
+## Updating submodules from origin
+
+If you pull from a branch and want to update
+
+```bash
+git submodule update --recursive
+```
+
+## Merging code split across multiple submodules
+If your changes span across multiple repos you must.
+1. Go to the most nested submodule you changed
+2. Create an MR for the branch of that submodule
+3. Checkout this submodule to the master branch
+4. Navigate up to the next place you made a change
+5. Add and Commit your changes that made the submodule point back to master
+6. Rebase your history to clean it up from all the commits simply used to update submodules
+6. Create the MR for this branch
+7. Repeat procedure for other submodules/modules
+8. In the MR, indicate the order by which to merge by linking the other MRs (Merge submodules Submodule before modules)
+9. Before merging to master make sure all the submodules of your branch point to master!!!!!

@@ -18,7 +18,15 @@
 	"runArgs": [
 		"--privileged",
 		"--net=host",
-		"-e", "DISPLAY=${env:DISPLAY}",
+		//"--gpus=all", //Uncomment to use NVDIA GPU
+		"-e",
+		"DISPLAY=${env:DISPLAY}",
 	],
+	"mounts": [
+		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+	],
+	"remoteEnv": {
+		"QT_X11_NO_MITSHM": "1"
+	},
 	"initializeCommand": "xhost +local:docker"
 }
