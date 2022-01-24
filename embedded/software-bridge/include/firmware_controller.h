@@ -9,7 +9,6 @@ class FirmwareController : public AbstractController {
  public:
   FirmwareController(){/**/};
 
-  // No.
   FirmwareController(FirmwareController&& other) = delete;
   FirmwareController operator=(FirmwareController&& other) = delete;
   FirmwareController(FirmwareController& other) = delete;

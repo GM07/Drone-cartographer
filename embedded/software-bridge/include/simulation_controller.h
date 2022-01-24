@@ -10,7 +10,6 @@ class SimulationController : public AbstractController {
   SimulationController(void* controller)
       : m_ccrazyflieSensing(controller){/**/};
 
-  // No.
   SimulationController(SimulationController&& other) = delete;
   SimulationController operator=(SimulationController&& other) = delete;
   SimulationController(SimulationController& other) = delete;

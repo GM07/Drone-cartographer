@@ -12,7 +12,7 @@ class CommunicationManager {
   bool getMessage(void* buffer);
 
   /**
-   * @brief Sends a message to the crazyflie radio
+   * @brief Sends a message to the crazyRadio PA
    *
    * @param message A pointer to the message to send. Should be null terminated
    * The max size of the message is 60 bytes
