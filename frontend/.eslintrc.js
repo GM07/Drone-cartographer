@@ -4,7 +4,7 @@ module.exports = {
     node: true,
   },
   extends: [
-    'plugin:vue/vue3-essential',
+    'plugin:vue/essential',
     'eslint:recommended',
     '@vue/typescript/recommended',
     '@vue/prettier',
@@ -51,7 +51,7 @@ module.exports = {
         '**/__tests__/*.{j,t}s?(x)',
         '**/tests/unit/**/*.spec.{j,t}s?(x)',
       ],
-      parser: '@typescript-eslint/parser',
+      parser: 'vue-eslint-parser',
       extends: ['plugin:@typescript-eslint/recommended'],
       rules: {
         '@typescript-eslint/no-non-null-assertion': 'off',
@@ -72,6 +72,7 @@ module.exports = {
         'require-atomic-updates': 'off',
       },
       parserOptions: {
+        parser: '@typescript-eslint/parser',
         ecmaVersion: 2018,
         sourceType: 'module',
       },
