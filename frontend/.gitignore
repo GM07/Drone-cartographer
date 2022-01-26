@@ -3,6 +3,10 @@ node_modules
 /dist
 
 
+# tests
+.nyc_output
+/coverage
+
 # local env files
 .env.local
 .env.*.local
