@@ -7,3 +7,6 @@
 [submodule "embedded/argos3-examples"]
 	path = embedded/argos3-examples
 	url = git@github.com:zedfly/argos3-examples.git
+[submodule "embedded/crazyflie-clients-python"]
+	path = embedded/crazyflie-clients-python
+	url = git@github.com:bitcraze/crazyflie-clients-python.git

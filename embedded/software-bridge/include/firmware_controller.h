@@ -1,7 +1,7 @@
 #ifndef FIRMWARE_CONTROLLER_H
 #define FIRMWARE_CONTROLLER_H
 
-#include "abstractController.h"
+#include "abstract_controller.h"
 
 namespace bridge {
 

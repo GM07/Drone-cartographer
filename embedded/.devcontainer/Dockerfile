@@ -71,8 +71,9 @@ RUN apt-get update && apt-get install -y \
     ninja-build \
     && rm -rf /var/lib/apt/lists/*
 
-# Install tools required to build crazyflie firmware
+# Install tools required to build crazyflie firmware and flash
 RUN add-apt-repository -y ppa:team-gcc-arm-embedded/ppa && \
     apt-get update &&\
     apt install -y gcc-arm-embedded \
-    rake
+    rake \
+		openocd

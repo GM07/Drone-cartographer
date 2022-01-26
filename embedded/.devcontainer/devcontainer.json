@@ -24,6 +24,7 @@
 	],
 	"mounts": [
 		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+		"source=/dev/bus/usb, target=/dev/bus/usb",
 	],
 	"remoteEnv": {
 		"QT_X11_NO_MITSHM": "1"

@@ -3,5 +3,26 @@
 	"clang-format.fallbackStyle": "Google",
 	"C_Cpp.clang_format_fallbackStyle": "Google",
 	"C_Cpp.formatting": "clangFormat",
-	"C_Cpp.loggingLevel": "Warning"
+	"C_Cpp.loggingLevel": "Warning",
+	"files.associations": {
+		"*.COBOL*": "cobol",
+		"*.COB*": "cobol",
+		"*.COBCOPY*": "cobol",
+		"*.COPYBOOK*": "cobol",
+		"*.COPY*": "cobol",
+		"*.PL1*": "pl1",
+		"*.PLI*": "pl1",
+		"*.INC*": "pl1",
+		"*.INCLUDE*": "pl1",
+		"*.JCL*": "jcl",
+		"*.ASM*": "hlasm",
+		"*.ASSEMBLE*": "hlasm",
+		"*.HLASM*": "hlasm",
+		"*.HLA*": "hlasm",
+		"memory_resource": "cpp",
+		"unordered_map": "cpp",
+		"list": "cpp",
+		"optional": "cpp",
+		"chrono": "c"
+	}
 }
