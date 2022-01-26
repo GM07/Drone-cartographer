@@ -1,1 +1,1 @@
-#include "include/sensorManager.h"
+#include "include/sensor_manager.h"

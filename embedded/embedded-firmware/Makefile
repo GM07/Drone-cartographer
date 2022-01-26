@@ -4,11 +4,13 @@ APP=1
 APP_STACKSIZE=300
 
 VPATH += src/
-PROJ_OBJ += commandsHandler.o communicationManager.o firmwareController.o navigationSystem.o sensorManager.o
+PROJ_OBJ += commands_handler.o communication_manager.o firmware_controller.o navigation_system.o sensor_manager.o
 
 CRAZYFLIE_BASE=../crazyflie-firmware
 
 CXXFLAGS+=-I../software-bridge/include
 CXXFLAGS+=-I../crazyflie-firmware/src/modules/interface/
+CLOAD_CMDS = -w radio://0/80/2M/E7E7E7E761
+
 
 include $(CRAZYFLIE_BASE)/Makefile
