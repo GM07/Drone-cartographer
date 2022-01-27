@@ -18,13 +18,13 @@
 	"runArgs": [
 		"--privileged",
 		"--net=host",
+		"--device=/dev/ttyUSB0",
 		//"--gpus=all", //Uncomment to use NVDIA GPU
 		"-e",
 		"DISPLAY=${env:DISPLAY}",
 	],
 	"mounts": [
 		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-		"source=/dev/bus/usb, target=/dev/bus/usb",
 	],
 	"remoteEnv": {
 		"QT_X11_NO_MITSHM": "1"
