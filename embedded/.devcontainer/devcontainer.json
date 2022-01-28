@@ -18,6 +18,7 @@
 	"runArgs": [
 		"--privileged",
 		"--net=host",
+		"--device=/dev/ttyUSB0",
 		//"--gpus=all", //Uncomment to use NVDIA GPU
 		"-e",
 		"DISPLAY=${env:DISPLAY}",
