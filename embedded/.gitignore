@@ -1,1 +1,10 @@
 *.o
+*.bin
+*.dfu
+*.elf
+*.hex
+*.map
+
+**bin/
+
+embedded-firmware/version.c
