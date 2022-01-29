@@ -8,3 +8,5 @@
 **bin/
 
 embedded-firmware/version.c
+
+**simulation/build/
