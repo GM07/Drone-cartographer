@@ -17,7 +17,7 @@ class SimulationController : public AbstractController {
 
   Vector3D& getCurrentLocation() override{/**/};
 
-  void setLEDState(bool isOn, uint32_t color) override{/**/};
+  void setLEDState(int8_t red, uint8_t green, uint8_t blue, bool blink) override{/**/};
 
   void goTo(const Vector3D& location, float yaw, float pitch,
             bool isRelative) override{/**/};
@@ -28,9 +28,9 @@ class SimulationController : public AbstractController {
   float getDistance(Direction direction) override{/**/};
   float getBatteryLevel() override{/**/};
 
-  void sendRadioMessage(void* message) override{/**/};
   void sendP2PMessage(void* message) override{/**/};
-  size_t receiveMessage(void* buffer) override{/**/};
+  void initCommunicationManager() override{/**/};
+	size_t receiveMessage(void* message, size_t size) override{/**/}
 
   void log(const std::string&& message) override{/**/};
 

@@ -1,21 +1,18 @@
 #include <memory>
 
-// TODO doit être enlevé lorsque le controlleur sera implémenté
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
-#include "firmware_controller.h"
-#pragma GCC diagnostic pop
-
 extern "C" {
 #include "commander.h"
 #include "FreeRTOS.h"
 #include "task.h"
 }
 
-std::unique_ptr<bridge::AbstractController> getController() {
-  return std::make_unique<bridge::FirmwareController>();
-}
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
+#include "firmware_controller.h"
+#include "abstract_controller.h"
+#pragma GCC diagnostic pop
 
+/////////////////////////////////////////////////////////////////////////
 void setHoverSetpoint(setpoint_t *setpoint, float x, float y, float z,
                       float yawrate) {
   setpoint->mode.z = modeAbs;
@@ -32,9 +29,14 @@ void setHoverSetpoint(setpoint_t *setpoint, float x, float y, float z,
   setpoint->velocity_body = true;
 }
 
-extern "C" void appMain() {
-  std::unique_ptr<bridge::AbstractController> controller = getController();
+/////////////////////////////////////////////////////////////////////////
+std::shared_ptr<bridge::AbstractController> bridge::AbstractController::getController(){
+	static std::shared_ptr<bridge::AbstractController> controller = std::make_unique<bridge::FirmwareController>();
+  return controller;
+}
 
+/////////////////////////////////////////////////////////////////////////
+extern "C" void appMain() {
   vTaskDelay(M2T(3000));
   setpoint_t point;
   setHoverSetpoint(&point, 0.0f, 0.0f, 1.0f, 0.0f);
