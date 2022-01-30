@@ -13,21 +13,25 @@ extern "C" {
 }
 
 /////////////////////////////////////////////////////////////////////////
-std::shared_ptr<bridge::AbstractController>
-bridge::AbstractController::getController() {
-  static std::shared_ptr<bridge::AbstractController> controller =
-      std::make_unique<bridge::FirmwareController>();
+std::shared_ptr<AbstractController> AbstractController::getController() {
+  static std::shared_ptr<AbstractController> controller =
+      std::make_unique<FirmwareController>();
   return controller;
 }
 
 ///////////////////////////////////////
-size_t bridge::FirmwareController::receiveMessage(void* message, size_t size) {
+size_t FirmwareController::receiveMessage(void* message, size_t size) {
   return appchannelReceiveDataPacket(message, sizeof(size), 0);
 }
 
 ///////////////////////////////////////
-void bridge::FirmwareController::setLEDState(uint8_t red, uint8_t green,
-                                             uint8_t blue, bool blink) {
+void FirmwareController::sendMessage(void* message, size_t size) {
+  appchannelSendDataPacket(message, sizeof(size));
+}
+
+///////////////////////////////////////
+void FirmwareController::setLEDState(uint8_t red, uint8_t green, uint8_t blue,
+                                     bool blink) {
   static ledseqStep_t seq_blink[] = {
       {true, LEDSEQ_WAITMS(500)},
       {0, LEDSEQ_LOOP},

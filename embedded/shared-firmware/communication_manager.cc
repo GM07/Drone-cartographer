@@ -11,11 +11,14 @@ static uint8_t messageRX[MESSAGE_MAX_SIZE];
 /////////////////////////////////////////////////////////////////////////
 void CommunicationManager::communicationManagerTask(void* parameters) {
   while (true) {
-    if (bridge::AbstractController::getController()->receiveMessage(
+    if (AbstractController::getController()->receiveMessage(
             &messageRX, sizeof(messageRX))) {
-      CommandsHandler::getCommandsHandler()->handleCommand(
-          static_cast<Command>(messageRX[0]), &messageRX[1],
-          sizeof(messageRX) - 1u);
+      bool successfulCommand =
+          CommandsHandler::getCommandsHandler()->handleCommand(
+              static_cast<Command>(messageRX[0]), &messageRX[1],
+              sizeof(messageRX) - 1u);
+      AbstractController::getController()->sendMessage(
+          &successfulCommand, sizeof(successfulCommand));
     }
 
     Delay::waitMS(50);

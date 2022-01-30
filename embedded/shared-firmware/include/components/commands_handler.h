@@ -11,10 +11,7 @@ enum Command : uint8_t {
 
 class CommandsHandler {
  public:
-  static std::shared_ptr<CommandsHandler> getCommandsHandler() {
-    struct make_shared_enabler : public CommandsHandler {};
-    return instance ? instance : std::make_shared<make_shared_enabler>();
-  }
+  static std::shared_ptr<CommandsHandler> getCommandsHandler();
 
   /**
    * @brief Handles commands received from CommunicationManager
@@ -22,7 +19,7 @@ class CommandsHandler {
    * @param command The command
    * @param extraArgs A pointer to an object containing the arguments
    */
-  void handleCommand(Command command, const void* extraArgs,
+  bool handleCommand(Command command, const void* extraArgs,
                      const size_t extraArgsLength);
 
  private:

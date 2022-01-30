@@ -7,8 +7,6 @@
 #include "../utils/directions.h"
 #include "../utils/vector3d.h"
 
-namespace bridge {
-
 class AbstractController {
  public:
   virtual ~AbstractController() = default;
@@ -30,6 +28,7 @@ class AbstractController {
   virtual void sendP2PMessage(void* message) = 0;
   virtual void initCommunicationManager() = 0;
   virtual size_t receiveMessage(void* message, size_t size) = 0;
+  virtual void sendMessage(void* message, size_t size) = 0;
 
   virtual void log(const std::string&& message) = 0;
 
@@ -37,7 +36,5 @@ class AbstractController {
 
   static std::shared_ptr<AbstractController> getController();
 };
-
-}  // namespace bridge
 
 #endif
