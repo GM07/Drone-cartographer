@@ -1,38 +1,45 @@
 // TODO doit être enlevé lorsque le controlleur sera implémenté
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-type"
-#include "firmware_controller.h"
+#include "controllers/firmware_controller.h"
+
+#include "controllers/abstract_controller.h"
 #pragma GCC diagnostic pop
 
-extern "C" 
-{
-	#include "app_channel.h"
-	#include "ledseq.h"
-	#include "led.h"
+extern "C" {
+#include "app_channel.h"
+#include "led.h"
+#include "ledseq.h"
 }
 
-
-///////////////////////////////////////
-size_t bridge::FirmwareController::receiveMessage(void* message, size_t size)
-{
-	return appchannelReceiveDataPacket(message, sizeof(size), 0);
+/////////////////////////////////////////////////////////////////////////
+std::shared_ptr<bridge::AbstractController>
+bridge::AbstractController::getController() {
+  static std::shared_ptr<bridge::AbstractController> controller =
+      std::make_unique<bridge::FirmwareController>();
+  return controller;
 }
 
 ///////////////////////////////////////
-void bridge::FirmwareController::setLEDState(uint8_t red, uint8_t green, uint8_t blue, bool blink)
-{
-	static ledseqStep_t seq_blink[] = {
-  	{ true, LEDSEQ_WAITMS(500)},
-  	{    0, LEDSEQ_LOOP},
-	};
+size_t bridge::FirmwareController::receiveMessage(void* message, size_t size) {
+  return appchannelReceiveDataPacket(message, sizeof(size), 0);
+}
 
-	static ledseqContext_t seqLED = {
-  	sequence : seq_blink,
-		nextContext : nullptr,
-		state: 0,
-  	led : LED_GREEN_R,
-	};
+///////////////////////////////////////
+void bridge::FirmwareController::setLEDState(uint8_t red, uint8_t green,
+                                             uint8_t blue, bool blink) {
+  static ledseqStep_t seq_blink[] = {
+      {true, LEDSEQ_WAITMS(500)},
+      {0, LEDSEQ_LOOP},
+  };
 
-	ledseqRegisterSequence(&seqLED);
-	ledseqRunBlocking(&seqLED);
+  static ledseqContext_t seqLED = {
+    sequence : seq_blink,
+    nextContext : nullptr,
+    state : 0,
+    led : LED_GREEN_R,
+  };
+
+  ledseqRegisterSequence(&seqLED);
+  ledseqRunBlocking(&seqLED);
 }
