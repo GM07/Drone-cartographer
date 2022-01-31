@@ -15,5 +15,5 @@ module.exports = {
     },
   },
   moduleFileExtensions: ['js', 'ts', 'vue'],
-  setupFiles: ['./tests/unit/index.ts'],
+  setupFiles: ['./tests/unit/setutp_tests.ts'],
 };
