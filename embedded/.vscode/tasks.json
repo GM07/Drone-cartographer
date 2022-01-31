@@ -9,7 +9,7 @@
 				"cwd": "${workspaceFolder}/argos3-examples"
 			},
 			"command": [
-				"if test -d /build; then rm -r /build; fi &&",
+				"if test -d build; then rm -rf build; fi &&",
 				"mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja"
 			]
 		},
@@ -44,7 +44,16 @@
 			"command": "chmod +x build_simulator/argos_post_install.sh && ./build_simulator/argos_post_install.sh && echo '\nsource ${workspaceFolder}/argos3/build_simulator/setup_env.sh\n' >> /.bashrc"
 		},
 		{
-			"label": "Setup Argos3",
+			"label": "Install Argos3 Package",
+			"type": "shell",
+			"detail": "Install argos3 from .deb package",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"command": "dpkg -i argos3*.deb"
+		},
+		{
+			"label": "Setup Argos3 from sources",
 			"dependsOn": [
 				"Build Argos3",
 				"Install Argos3",
@@ -55,10 +64,18 @@
 		{
 			"label": "Setup Simulation",
 			"dependsOn": [
-				"Setup Argos3",
+				"Install Argos3 Package",
 				"Compile Argos Examples"
 			],
-			"dependsOrder": "sequence",
+			"dependsOrder": "sequence"
+		},
+		{
+			"label": "Flash embedded firmware",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}/embedded-firmware"
+			},
+			"command": "make clean && make -j`nproc` && make cload"
 		},
 		{
 			"label": "Compile Embedded Firmware",
