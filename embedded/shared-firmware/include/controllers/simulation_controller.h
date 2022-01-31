@@ -15,7 +15,7 @@ class SimulationController : public AbstractController {
 
   Vector3D& getCurrentLocation() override{/**/};
 
-  void setLEDState(int8_t red, uint8_t green, uint8_t blue,
+  void setLEDState(LEDColor color, Side side, bool enable,
                    bool blink) override{/**/};
 
   void goTo(const Vector3D& location, float yaw, float pitch,

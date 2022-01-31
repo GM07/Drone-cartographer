@@ -5,6 +5,7 @@
 #include <string>
 
 #include "../utils/directions.h"
+#include "../utils/led.h"
 #include "../utils/vector3d.h"
 
 class AbstractController {
@@ -13,7 +14,7 @@ class AbstractController {
 
   virtual Vector3D& getCurrentLocation() = 0;
 
-  virtual void setLEDState(uint8_t red, uint8_t green, uint8_t blue,
+  virtual void setLEDState(LEDColor color, Side side, bool enable,
                            bool blink) = 0;
 
   virtual void goTo(const Vector3D& location, float yaw, float pitch,

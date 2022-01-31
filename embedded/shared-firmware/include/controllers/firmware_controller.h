@@ -14,8 +14,7 @@ class FirmwareController : public AbstractController {
 
   Vector3D& getCurrentLocation() override{/**/};
 
-  void setLEDState(uint8_t red, uint8_t green, uint8_t blue,
-                   bool blink) override;
+  void setLEDState(LEDColor color, Side side, bool enable, bool blink) override;
 
   void goTo(const Vector3D& location, float yaw, float pitch,
             bool isRelative) override{/**/};

@@ -2,14 +2,18 @@
 
 #include "include/components/commands_handler.h"
 #include "include/controllers/abstract_controller.h"
+#include "include/utils/led.h"
 #include "include/utils/timer.h"
+#include "system.h"
 
 #define MESSAGE_MAX_SIZE 60
 
-static uint8_t messageRX[MESSAGE_MAX_SIZE];
+static std::array<uint8_t, MESSAGE_MAX_SIZE> messageRX;
 
 /////////////////////////////////////////////////////////////////////////
 void CommunicationManager::communicationManagerTask(void* parameters) {
+  Timer::delayMs(3000);
+
   while (true) {
     if (AbstractController::getController()->receiveMessage(
             &messageRX, sizeof(messageRX))) {
