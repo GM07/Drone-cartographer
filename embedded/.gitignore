@@ -5,6 +5,9 @@
 *.hex
 *.map
 
+*.a
+*.so
+
 **bin/
 
 embedded-firmware/version.c
