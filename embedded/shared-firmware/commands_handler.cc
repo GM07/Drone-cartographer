@@ -15,7 +15,7 @@ std::shared_ptr<CommandsHandler> CommandsHandler::getCommandsHandler() {
 bool CommandsHandler::handleCommand(Command command, const void* extraArgs,
                                     const size_t extraArgsLength) {
   switch (command) {
-    case kIdentify:
+    case Command::kIdentify:
       AbstractController::getController()->setLEDState(0xFF, 0x1A, 0xFF, true);
       break;
     default:

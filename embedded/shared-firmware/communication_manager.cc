@@ -2,7 +2,7 @@
 
 #include "include/components/commands_handler.h"
 #include "include/controllers/abstract_controller.h"
-#include "include/utils/delay.h"
+#include "include/utils/timer.h"
 
 #define MESSAGE_MAX_SIZE 60
 
@@ -16,11 +16,11 @@ void CommunicationManager::communicationManagerTask(void* parameters) {
       bool successfulCommand =
           CommandsHandler::getCommandsHandler()->handleCommand(
               static_cast<Command>(messageRX[0]), &messageRX[1],
-              sizeof(messageRX) - 1u);
+              sizeof(messageRX) - sizeof(Command));
       AbstractController::getController()->sendMessage(
           &successfulCommand, sizeof(successfulCommand));
     }
 
-    Delay::waitMS(50);
+    Timer::waitMs(50);
   }
 }

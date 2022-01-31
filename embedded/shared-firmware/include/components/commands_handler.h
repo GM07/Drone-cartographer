@@ -3,10 +3,10 @@
 
 #include <memory>
 
-enum Command : uint8_t {
+enum class Command : uint8_t {
   kIdentify = 0x01,
-  kCommand2 = 0x02,
-  kCommand3 = 0x03
+  kTakeoff = 0x02,
+  kLand = 0x03
 };  // Example commands
 
 class CommandsHandler {

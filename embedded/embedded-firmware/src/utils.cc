@@ -3,7 +3,7 @@ extern "C" {
 #include "task.h"
 }
 
-#include "utils/delay.h"
+#include "utils/timer.h"
 
 ///////////////////////
-void Delay::waitMS(uint32_t delayMS) { vTaskDelay(M2T(delayMS)); }
+void Timer::waitMs(uint32_t delayMS) { vTaskDelay(M2T(delayMS)); }

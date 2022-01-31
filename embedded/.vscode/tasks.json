@@ -5,7 +5,7 @@
 			"label": "Compile Argos Examples",
 			"type": "shell",
 			"detail": "Clone and compile argos examples in workspace folder ",
-            "options": {
+			"options": {
 				"cwd": "${workspaceFolder}/argos3-examples"
 			},
 			"command": [
@@ -21,7 +21,7 @@
 				"cwd": "${workspaceFolder}/argos3"
 			},
 			"command": [
-				"if test -d build_simulator; then rm -r build_simulator; fi &&", 
+				"if test -d build_simulator; then rm -r build_simulator; fi &&",
 				"mkdir build_simulator && cd build_simulator && cmake -GNinja ../src -DCMAKE_BUILD_TYPE=Debug -DARGOS_BUILD_FOR=simulator -DARGOS_THREADSAFE_LOG=ON -DARGOS_DYNAMIC_LOADING=ON && ninja"
 			]
 		},
@@ -45,13 +45,29 @@
 		},
 		{
 			"label": "Setup Argos3",
-			"dependsOn": ["Build Argos3", "Install Argos3", "Post install Argos3 script"],
+			"dependsOn": [
+				"Build Argos3",
+				"Install Argos3",
+				"Post install Argos3 script"
+			],
 			"dependsOrder": "sequence",
 		},
 		{
 			"label": "Setup Simulation",
-			"dependsOn": ["Setup Argos3", "Compile Argos Examples"],
+			"dependsOn": [
+				"Setup Argos3",
+				"Compile Argos Examples"
+			],
 			"dependsOrder": "sequence",
+		},
+		{
+			"label": "Compile Embedded Firmware",
+			"type": "shell",
+			"detail": "Clean and compile embedded firmware",
+			"options": {
+				"cwd": "${workspaceFolder}/embedded-firmware"
+			},
+			"command": "make clean && make -j`nproc`"
 		},
 	]
 }

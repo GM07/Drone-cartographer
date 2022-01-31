@@ -21,12 +21,12 @@ std::shared_ptr<AbstractController> AbstractController::getController() {
 
 ///////////////////////////////////////
 size_t FirmwareController::receiveMessage(void* message, size_t size) {
-  return appchannelReceiveDataPacket(message, sizeof(size), 0);
+  return appchannelReceiveDataPacket(message, size, 0);
 }
 
 ///////////////////////////////////////
 void FirmwareController::sendMessage(void* message, size_t size) {
-  appchannelSendDataPacket(message, sizeof(size));
+  appchannelSendDataPacket(message, size);
 }
 
 ///////////////////////////////////////
