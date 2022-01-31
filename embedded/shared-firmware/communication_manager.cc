@@ -21,6 +21,6 @@ void CommunicationManager::communicationManagerTask(void* parameters) {
           &successfulCommand, sizeof(successfulCommand));
     }
 
-    Timer::waitMs(50);
+    Timer::delayMs(50);
   }
 }

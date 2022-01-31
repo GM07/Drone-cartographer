@@ -2,7 +2,7 @@
 #define TIMER_H
 
 namespace Timer {
-void waitMs(uint32_t delayMS);
+void delayMs(uint32_t delayMS);
 }
 
 #endif
