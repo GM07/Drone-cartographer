@@ -3,17 +3,30 @@ module.exports = {
   env: {
     node: true,
   },
+  plugins: ['import', 'unicorn'],
   extends: [
     'plugin:vue/essential',
     'eslint:recommended',
     '@vue/typescript/recommended',
     '@vue/prettier',
     '@vue/prettier/@typescript-eslint',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
   ],
   parserOptions: {
     ecmaVersion: 2020,
   },
   rules: {
+    'import/no-unresolved': 'error',
+    'import/no-default-export': 'error',
+    'import/no-relative-packages': 'warn',
+    'import/no-named-as-default-member': 'off',
+    'unicorn/filename-case': [
+      'error',
+      {
+        case: 'snakeCase',
+      },
+    ],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'prettier/prettier': [
@@ -44,6 +57,72 @@ module.exports = {
         property: 'only',
       },
     ],
+    'vue/attributes-order': [
+      'warn',
+      {
+        order: [
+          'DEFINITION',
+          'LIST_RENDERING',
+          'CONDITIONALS',
+          'RENDER_MODIFIERS',
+          'GLOBAL',
+          ['UNIQUE', 'SLOT'],
+          'TWO_WAY_BINDING',
+          'OTHER_DIRECTIVES',
+          'OTHER_ATTR',
+          'EVENTS',
+          'CONTENT',
+        ],
+        alphabetical: true,
+      },
+    ],
+    'vue/component-tags-order': [
+      'warn',
+      {
+        order: [['script', 'template'], 'style'],
+      },
+    ],
+    '@typescript-eslint/member-ordering': 'warn',
+    '@typescript-eslint/naming-convention': [
+      'error',
+      {
+        selector: 'variableLike',
+        format: ['camelCase'],
+      },
+      {
+        selector: 'variable',
+        modifiers: ['const'],
+        format: ['UPPER_CASE'],
+      },
+      {
+        selector: 'classProperty',
+        format: ['camelCase'],
+      },
+      {
+        selector: 'classProperty',
+        modifiers: ['readonly'],
+        format: ['UPPER_CASE'],
+      },
+      {
+        selector: 'method',
+        format: ['camelCase'],
+      },
+      {
+        selector: 'typeLike',
+        format: ['PascalCase'],
+      },
+    ],
+  },
+  settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+        project: 'tsconfig.json',
+      },
+    },
   },
   overrides: [
     {
@@ -54,6 +133,7 @@ module.exports = {
       parser: 'vue-eslint-parser',
       extends: ['plugin:@typescript-eslint/recommended'],
       rules: {
+        '@typescript-eslint/member-ordering': 'warn',
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/no-warning-comments': 'off',
@@ -77,7 +157,19 @@ module.exports = {
         sourceType: 'module',
       },
       env: {
-        mocha: true,
+        jest: true,
+      },
+    },
+    {
+      files: ['*.vue', '*.d.ts', '**/plugins/**/*.ts'],
+      rules: {
+        'import/no-default-export': 'off',
+      },
+    },
+    {
+      files: ['*.d.ts', '**/plugins/**/*.ts'],
+      rules: {
+        'unicorn/filename-case': 'off',
       },
     },
   ],
