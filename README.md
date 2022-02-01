@@ -44,7 +44,7 @@ The project can be launched by executing the bash script inside the root of the 
 ```
 ./start.sh
 ```
-If you are unable to start the script please run this command from the root
+If you are unable to start the script please run this command from the root of the project
 ```
 chmod +wx start.sh
 ```
