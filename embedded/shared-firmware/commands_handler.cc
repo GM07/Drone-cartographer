@@ -17,7 +17,7 @@ bool CommandsHandler::handleCommand(Command command, const void* extraArgs,
                                     const size_t extraArgsLength) {
   switch (command) {
     case Command::kIdentify:
-      AbstractController::getController()->setLEDState(LED::LED_GREEN_LEFT, true, true);
+      AbstractController::getController()->setLEDState(LED::kLedGreenLeft, true, true);
       break;
     default:
       return false;
