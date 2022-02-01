@@ -48,3 +48,4 @@ If you are unable to start the script please run this command from the root
 ```
 chmod +wx start.sh
 ```
+Once the containers are done being created the web application will be accessible from http://localhost:8080/ 
