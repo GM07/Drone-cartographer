@@ -2,10 +2,21 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Compile Simulation Code",
+			"label": "Compile Simulation Firmware",
 			"type": "shell",
 			"options": {
 				"cwd": "${workspaceFolder}/simulation"
+			},
+			"command": [
+				"if test -d build; then rm -rf build; fi &&",
+				"mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug ../../ && ninja"
+			]
+		},
+		{
+			"label": "Compile Shared Firmware",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}/shared-firmware"
 			},
 			"command": [
 				"if test -d build; then rm -rf build; fi &&",

@@ -1,4 +1,4 @@
-#include "include/vector3d.h"
+#include "utils/vector3d.h"
 
 Vector3D::Vector3D() : m_x(0), m_y(0), m_z(0) {}
 

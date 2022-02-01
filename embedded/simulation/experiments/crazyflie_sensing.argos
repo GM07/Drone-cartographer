@@ -24,7 +24,7 @@
   <controllers>
 
     <crazyflie_sensing_controller id="ssc"
-                                 library="build/crazyflie/libcrazyflie_sensing">
+                                 library="build/simulation/crazyflie/libcrazyflie_sensing">
       <actuators>
         <range_and_bearing  implementation="default" />
         <quadrotor_position implementation="default" />

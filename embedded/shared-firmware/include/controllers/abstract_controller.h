@@ -4,9 +4,9 @@
 #include <memory>
 #include <string>
 
-#include "../utils/directions.h"
-#include "../utils/led.h"
-#include "../utils/vector3d.h"
+#include "utils/directions.h"
+#include "utils/led.h"
+#include "utils/vector3d.h"
 
 class AbstractController {
  public:

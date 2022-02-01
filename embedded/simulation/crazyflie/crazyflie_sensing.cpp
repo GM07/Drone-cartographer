@@ -9,6 +9,7 @@
 
 /* Socket Communication */
 #include <boost/asio.hpp>
+#include "components/communication_manager.h"
 
 /****************************************/
 /****************************************/
@@ -29,9 +30,11 @@ CCrazyflieSensing::CCrazyflieSensing() :
 void CCrazyflieSensing::Init(TConfigurationNode& t_node) { 
    // Connect to socket
    // Server must be launched before simulation to accept connection
-   boost::asio::io_service io_service;
-   m_socket = std::make_unique<boost::asio::local::stream_protocol::socket>(io_service);
-   m_socket->connect("/tmp/socket");
+   // boost::asio::io_service io_service;
+   // m_socket = std::make_unique<boost::asio::local::stream_protocol::socket>(io_service);
+   // m_socket->connect("/tmp/socket");
+
+   m_communicationThread = std::make_unique<std::thread>(CommunicationManager::communicationManagerTask, nullptr);
 
    try {
       /*
@@ -69,30 +72,30 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
 /****************************************/
 
 void CCrazyflieSensing::ControlStep() {
-   char data[1024] = {};
-   std::size_t n = 0;
-   // Check if data is available (Polling)
-   if (m_socket->available() != 0) {
-      //Read the data
-      n = m_socket->receive(boost::asio::buffer(data));
-   }
+   // char data[1024] = {};
+   // std::size_t n = 0;
+   // // Check if data is available (Polling)
+   // if (m_socket->available() != 0) {
+   //    //Read the data
+   //    n = m_socket->receive(boost::asio::buffer(data));
+   // }
 
-   // Convert command to string and output it
-   std::string command(data, n);
+   // // Convert command to string and output it
+   // std::string command(data, n);
 
-   // Takeoff
-   if ( command == "TAKEOFF" ) {
-      TakeOff();
-      m_cInitialPosition = m_pcPos->GetReading().Position;
-      LOG << "TAKING OFF" << std::endl;
-   } 
-   else if ( command == "LAND" ) {
-      Land();
-      LOG << "LANDING" << std::endl;
-   }   
-   else if (n != 0) {
-         LOG << "Invalid command : " << command << std::endl;
-   }
+   // // Takeoff
+   // if ( command == "TAKEOFF" ) {
+   //    TakeOff();
+   //    m_cInitialPosition = m_pcPos->GetReading().Position;
+   //    LOG << "TAKING OFF" << std::endl;
+   // } 
+   // else if ( command == "LAND" ) {
+   //    Land();
+   //    LOG << "LANDING" << std::endl;
+   // }   
+   // else if (n != 0) {
+   //       LOG << "Invalid command : " << command << std::endl;
+   // }
 
    m_uiCurrentStep++;
 }

@@ -1,7 +1,7 @@
 #ifndef SIMULATION_CONTROLLER_H
 #define SIMULATION_CONTROLLER_H
 
-#include "abstractController.h"
+#include "controllers/abstract_controller.h"
 
 class SimulationController : public AbstractController {
  public:
@@ -15,8 +15,8 @@ class SimulationController : public AbstractController {
 
   Vector3D& getCurrentLocation() override{/**/};
 
-  void setLEDState(LEDColor color, Side side, bool enable,
-                   bool blink) override{/**/};
+  void setLEDState(LED led, bool enable,
+                   bool blink) override;
 
   void goTo(const Vector3D& location, float yaw, float pitch,
             bool isRelative) override{/**/};
@@ -29,10 +29,8 @@ class SimulationController : public AbstractController {
 
   void sendP2PMessage(void* message) override{/**/};
   void initCommunicationManager() override{/**/};
-  size_t receiveMessage(void* message, size_t size) override { /**/
-  }
-  void sendMessage(void* message, size_t size) override { /**/
-  }
+  size_t receiveMessage(void* message, size_t size) override;
+  void sendMessage(void* message, size_t size) override;
 
   void log(const std::string&& message) override{/**/};
 

@@ -1,4 +1,4 @@
-#include "include/components/navigation_system.h"
+#include "components/navigation_system.h"
 
 void Navigation::step() {
   // Do something

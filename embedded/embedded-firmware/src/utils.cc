@@ -6,4 +6,4 @@ extern "C" {
 #include "utils/timer.h"
 
 ///////////////////////
-void Timer::delayMs(uint32_t delayMS) { vTaskDelay(M2T(delayMS)); }
+void Timer::delayMs(unsigned int delayMS) { vTaskDelay(M2T(delayMS)); }

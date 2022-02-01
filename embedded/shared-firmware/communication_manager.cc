@@ -1,10 +1,9 @@
-#include "include/components/communication_manager.h"
+#include "components/communication_manager.h"
 
-#include "include/components/commands_handler.h"
-#include "include/controllers/abstract_controller.h"
-#include "include/utils/led.h"
-#include "include/utils/timer.h"
-#include "system.h"
+#include "components/commands_handler.h"
+#include "controllers/abstract_controller.h"
+#include "utils/led.h"
+#include "utils/timer.h"
 
 #define MESSAGE_MAX_SIZE 60
 
@@ -17,10 +16,12 @@ void CommunicationManager::communicationManagerTask(void* parameters) {
   while (true) {
     if (AbstractController::getController()->receiveMessage(
             &messageRX, sizeof(messageRX))) {
+
       bool successfulCommand =
           CommandsHandler::getCommandsHandler()->handleCommand(
               static_cast<Command>(messageRX[0]), &messageRX[1],
               sizeof(messageRX) - sizeof(Command));
+              
       AbstractController::getController()->sendMessage(
           &successfulCommand, sizeof(successfulCommand));
     }

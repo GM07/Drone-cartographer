@@ -1,7 +1,7 @@
-#include "include/components/commands_handler.h"
+#include "components/commands_handler.h"
 
-#include "include/controllers/abstract_controller.h"
-#include "include/utils/led.h"
+#include "controllers/abstract_controller.h"
+#include "utils/led.h"
 
 std::shared_ptr<CommandsHandler> CommandsHandler::instance = nullptr;
 void blinkLED();

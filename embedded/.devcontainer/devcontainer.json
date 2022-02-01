@@ -20,10 +20,10 @@
 	],
 	"workspaceFolder": "/workspaces/INF3995-106/embedded",
 	"runArgs": [
-		"--privileged",
-		"--net=host",
-		"--device=/dev/ttyUSB0",
-		//"--gpus=all", //Uncomment to use NVDIA GPU
+		//"--privileged",
+		//"--net=host",
+		//"--device=/dev/ttyUSB0",
+		"--gpus=all", //Uncomment to use NVDIA GPU
 		"-e",
 		"DISPLAY=${env:DISPLAY}",
 	],

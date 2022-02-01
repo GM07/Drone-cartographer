@@ -1,7 +1,7 @@
 #ifndef FIRMWARE_CONTROLLER_H
 #define FIRMWARE_CONTROLLER_H
 
-#include "abstract_controller.h"
+#include "controllers/abstract_controller.h"
 
 class FirmwareController : public AbstractController {
  public:
