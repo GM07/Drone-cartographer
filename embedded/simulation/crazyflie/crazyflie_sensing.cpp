@@ -10,6 +10,7 @@
 /* Socket Communication */
 #include <boost/asio.hpp>
 #include "components/communication_manager.h"
+#include "controllers/abstract_controller.h"
 
 /****************************************/
 /****************************************/
@@ -28,14 +29,11 @@ CCrazyflieSensing::CCrazyflieSensing() :
 /****************************************/
 
 void CCrazyflieSensing::Init(TConfigurationNode& t_node) { 
-   // Connect to socket
-   // Server must be launched before simulation to accept connection
-   // boost::asio::io_service io_service;
-   // m_socket = std::make_unique<boost::asio::local::stream_protocol::socket>(io_service);
-   // m_socket->connect("/tmp/socket");
-
+   // Start socket connection
+   AbstractController::getController()->initCommunicationManager();
+   // Run Thread managing communication
    m_communicationThread = std::make_unique<std::thread>(CommunicationManager::communicationManagerTask, nullptr);
-
+   
    try {
       /*
        * Initialize sensors/actuators

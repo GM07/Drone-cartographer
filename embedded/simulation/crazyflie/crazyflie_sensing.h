@@ -117,8 +117,7 @@ private:
     
    /* Initial Position */ 
    CVector3 m_cInitialPosition;
-
-   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
+   
    std::unique_ptr<std::thread> m_communicationThread;
 };
 

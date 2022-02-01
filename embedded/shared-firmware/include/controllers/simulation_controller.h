@@ -2,11 +2,11 @@
 #define SIMULATION_CONTROLLER_H
 
 #include "controllers/abstract_controller.h"
+#include <boost/asio.hpp>
 
 class SimulationController : public AbstractController {
  public:
-  SimulationController(void* controller)
-      : m_ccrazyflieSensing(controller){/**/};
+  SimulationController() {/**/};
 
   SimulationController(SimulationController&& other) = delete;
   SimulationController operator=(SimulationController&& other) = delete;
@@ -28,16 +28,17 @@ class SimulationController : public AbstractController {
   float getBatteryLevel() override{/**/};
 
   void sendP2PMessage(void* message) override{/**/};
-  void initCommunicationManager() override{/**/};
+  void initCommunicationManager() override;
   size_t receiveMessage(void* message, size_t size) override;
   void sendMessage(void* message, size_t size) override;
 
-  void log(const std::string&& message) override{/**/};
+  void log(const std::string& message) override;
 
   void delay(const uint32_t ticks) override{/**/};
 
  private:
   void* m_ccrazyflieSensing;
+  std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
 };
 
 #endif

@@ -30,7 +30,7 @@ class FirmwareController : public AbstractController {
   size_t receiveMessage(void* message, size_t size) override;
   void sendMessage(void* message, size_t size) override;
 
-  void log(const std::string&& message) override{/**/};
+  void log(const std::string& message) override{/**/};
 
   void delay(const uint32_t ticks) override{/**/};
 };
