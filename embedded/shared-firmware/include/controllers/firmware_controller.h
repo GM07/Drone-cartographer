@@ -3,8 +3,6 @@
 
 #include "abstract_controller.h"
 
-namespace bridge {
-
 class FirmwareController : public AbstractController {
  public:
   FirmwareController(){/**/};
@@ -16,7 +14,7 @@ class FirmwareController : public AbstractController {
 
   Vector3D& getCurrentLocation() override{/**/};
 
-  void setLEDState(bool isOn, uint32_t color) override{/**/};
+  void setLEDState(LED led, bool enable, bool blink) override;
 
   void goTo(const Vector3D& location, float yaw, float pitch,
             bool isRelative) override{/**/};
@@ -27,15 +25,13 @@ class FirmwareController : public AbstractController {
   float getDistance(Direction direction) override{/**/};
   float getBatteryLevel() override{/**/};
 
-  void sendRadioMessage(void* message) override{/**/};
   void sendP2PMessage(void* message) override{/**/};
-  size_t receiveMessage(void* buffer) override{/**/};
+  void initCommunicationManager() override{/**/};
+  size_t receiveMessage(void* message, size_t size) override;
+  void sendMessage(void* message, size_t size) override;
 
   void log(const std::string&& message) override{/**/};
 
   void delay(const uint32_t ticks) override{/**/};
 };
-
-}  // namespace bridge
-
 #endif
