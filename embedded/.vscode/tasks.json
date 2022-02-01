@@ -37,5 +37,14 @@
 			},
 			"command": "make clean && make -j`nproc` && make cload"
 		},
+		{
+			"label": "Compile Embedded Firmware",
+			"type": "shell",
+			"detail": "Clean and compile embedded firmware",
+			"options": {
+				"cwd": "${workspaceFolder}/embedded-firmware"
+			},
+			"command": "make clean && make -j`nproc`"
+		},
 	]
 }
