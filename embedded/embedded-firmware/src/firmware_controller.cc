@@ -32,43 +32,16 @@ void FirmwareController::sendMessage(void* message, size_t size) {
 }
 
 ///////////////////////////////////////
-void FirmwareController::setLEDState(LEDColor color, Side side, bool enable,
+void FirmwareController::setLEDState(LED led, bool enable,
                                      bool blink) {
+
   static ledseqStep_t ledStep[] = {{enable, LEDSEQ_WAITMS(500)},
                                    {!blink, LEDSEQ_WAITMS(500)},
                                    {0, LEDSEQ_LOOP}};
 
-  led_t led;
-
-  if (side == Side::kLeft) {
-    switch (color) {
-      case LEDColor::kRed:
-        led = led_t::LED_RED_L;
-        break;
-      case LEDColor::kBlue:
-        led = led_t::LED_BLUE_L;
-        break;
-      case LEDColor::kGreen:
-        led = led_t::LED_GREEN_L;
-        break;
-    }
-  } else {
-    switch (color) {
-      case LEDColor::kRed:
-        led = led_t::LED_RED_R;
-        break;
-      case LEDColor::kBlue:
-        led = led_t::LED_BLUE_NRF;
-        break;
-      case LEDColor::kGreen:
-        led = led_t::LED_GREEN_R;
-        break;
-    }
-  }
-
   static ledseqContext_t seqLED = {
     sequence : ledStep,
-    led : led,
+    led : (led_t)led,
   };
 
   ledseqRegisterSequence(&seqLED);

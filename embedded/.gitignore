@@ -10,4 +10,6 @@
 
 **bin/
 
+**simulation/build/
+
 embedded-firmware/version.c

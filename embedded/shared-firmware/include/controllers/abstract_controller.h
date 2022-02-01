@@ -14,7 +14,7 @@ class AbstractController {
 
   virtual Vector3D& getCurrentLocation() = 0;
 
-  virtual void setLEDState(LEDColor color, Side side, bool enable,
+  virtual void setLEDState(LED led, bool enable,
                            bool blink) = 0;
 
   virtual void goTo(const Vector3D& location, float yaw, float pitch,
