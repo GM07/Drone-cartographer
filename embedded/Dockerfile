@@ -1,5 +1,6 @@
 FROM mcr.microsoft.com/vscode/devcontainers/cpp:focal
 
+
 # Install all dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends\
@@ -28,14 +29,24 @@ RUN apt-get update \
     libxext6 \
     libx11-6
 
-# Set env variable for 
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y  --no-install-recommends\
     libnewlib-arm-none-eabi \
 	python3-apt \
 	python3-pip \
     openocd \
 	&& pip3 install --upgrade pip \
     && pip3 install cfclient
+
+COPY  ./argos3_simulator-1.0.0-x86_64-DreamTeam.deb ./
+COPY  ./argos3-examples ./argos3-examples
+
+RUN sudo dpkg -i argos3*.deb
+
+COPY ./crazyflie-firmware  ./crazyflie-firmware
+COPY ./embedded-firmware ./embedded-firmware
+COPY ./software-bridge ./software-bridge
+
+RUN cd argos3-examples && if test -d build; then rm -rf build; fi && mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja
