@@ -59,7 +59,7 @@ export default class Mission extends Vue {
     ServerCommunication.getConnectedDrones()
       .then(resp => resp.json())
       .then(data => {
-        this.droneList += data;
+        this.droneList.push(...data);
       })
       .catch(error => {
         console.error(error);
