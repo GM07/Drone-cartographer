@@ -27,7 +27,7 @@ You can then test it with this command
 ```
 sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
 ```
-To get a detailed explanation of these steps please visit the official nvidia documentation : https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+To get a detailed explanation of these steps please visit the official [Nvidia documentation](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
 ### Docker-compose:
 You must also install docker-compose
@@ -36,7 +36,7 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-
 ```
 The minimum required version of docker-composed is 1.25.* unless you are using nvidia-docker then you must at least install version 1.29.* 
 
-Here is the documentation for the installation : https://docs.docker.com/compose/install/
+Additional information about the installation is provided:[Docker-Compose documentation](https://docs.docker.com/compose/install/)
 
 ## Launching the project 
 
@@ -46,6 +46,6 @@ The project can be launched by executing the bash script inside the root of the 
 ```
 If you are unable to start the script please run this command from the root of the project
 ```
-chmod +wx start.sh
+chmod u+x  start.sh
 ```
-Once the containers are done being created the web application will be accessible from http://localhost:8080/ 
+Once the containers are done being created the web application will be accessible from [http://localhost:8080/](http://localhost:8080/)
