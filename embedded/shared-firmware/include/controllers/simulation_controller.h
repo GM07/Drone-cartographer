@@ -1,12 +1,14 @@
 #ifndef SIMULATION_CONTROLLER_H
 #define SIMULATION_CONTROLLER_H
 
-#include "controllers/abstract_controller.h"
 #include <boost/asio.hpp>
+
+#include "controllers/abstract_controller.h"
+#include "crazyflie_sensing.h"
 
 class SimulationController : public AbstractController {
  public:
-  SimulationController() {/**/};
+  SimulationController(){/**/};
 
   SimulationController(SimulationController&& other) = delete;
   SimulationController operator=(SimulationController&& other) = delete;
@@ -15,14 +17,13 @@ class SimulationController : public AbstractController {
 
   Vector3D& getCurrentLocation() override{/**/};
 
-  void setLEDState(LED led, bool enable,
-                   bool blink) override;
+  void setLEDState(LED led, bool enable, bool blink) override;
 
   void goTo(const Vector3D& location, float yaw, float pitch,
             bool isRelative) override{/**/};
   void goTo(const Vector3D& location, bool isRelative) override{/**/};
-  void takeoff(float height) override{/**/};
-  void land() override{/**/};
+  void takeoff(float height) override;
+  void land() override;
 
   float getDistance(Direction direction) override{/**/};
   float getBatteryLevel() override{/**/};
@@ -36,8 +37,10 @@ class SimulationController : public AbstractController {
 
   void delay(const uint32_t ticks) override{/**/};
 
+  void setSimulationDroneInstance(CCrazyflieSensing* ccrazyflieSensing);
+
  private:
-  void* m_ccrazyflieSensing;
+  CCrazyflieSensing* m_ccrazyflieSensing;
   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
 };
 

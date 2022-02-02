@@ -43,82 +43,69 @@ using namespace argos;
  * A controller is simply an implementation of the CCI_Controller class.
  */
 class CCrazyflieSensing : public CCI_Controller {
+ public:
+  /* Class constructor. */
+  CCrazyflieSensing();
+  /* Class destructor. */
+  virtual ~CCrazyflieSensing() {}
 
-public:
+  /*
+   * This function initializes the controller.
+   * The 't_node' variable points to the <parameters> section in the XML
+   * file in the <controllers><footbot_foraging_controller> section.
+   */
+  virtual void Init(TConfigurationNode& t_node);
 
-   /* Class constructor. */
-   CCrazyflieSensing();
-   /* Class destructor. */
-   virtual ~CCrazyflieSensing() {}
+  /*
+   * This function is called once every time step.
+   * The length of the time step is set in the XML file.
+   */
+  virtual void ControlStep();
 
-   /*
-    * This function initializes the controller.
-    * The 't_node' variable points to the <parameters> section in the XML
-    * file in the <controllers><footbot_foraging_controller> section.
-    */
-   virtual void Init(TConfigurationNode& t_node);
+  /*
+   * This function resets the controller to its state right after the
+   * Init().
+   * It is called when you press the reset button in the GUI.
+   */
+  virtual void Reset();
 
-   /*
-    * This function is called once every time step.
-    * The length of the time step is set in the XML file.
-    */
-   virtual void ControlStep();
+  /*
+   * Called to cleanup what done by Init() when the experiment finishes.
+   * In this example controller there is no need for clean anything up,
+   * so the function could have been omitted. It's here just for
+   * completeness.
+   */
+  virtual void Destroy() {}
 
-   /*
-    * This function resets the controller to its state right after the
-    * Init().
-    * It is called when you press the reset button in the GUI.
-    */
-   virtual void Reset();
+ public:
+  /* Pointer to the crazyflie distance sensor */
+  CCI_CrazyflieDistanceScannerSensor* m_pcDistance;
 
-   /*
-    * Called to cleanup what done by Init() when the experiment finishes.
-    * In this example controller there is no need for clean anything up,
-    * so the function could have been omitted. It's here just for
-    * completeness.
-    */
-   virtual void Destroy() {}
+  /* Pointer to the position actuator */
+  CCI_QuadRotorPositionActuator* m_pcPropellers;
 
-   /*
-    * This function lifts the drone from the ground
-    */
-   bool TakeOff();
+  /* Pointer to the range and bearing actuator */
+  CCI_RangeAndBearingActuator* m_pcRABA;
 
-   /*
-    * This function returns the drone to the ground
-    */
-   bool Land();
+  /* Pointer to the range and bearing sensor */
+  CCI_RangeAndBearingSensor* m_pcRABS;
 
-private:
+  /* Pointer to the positioning sensor */
+  CCI_PositioningSensor* m_pcPos;
 
-   /* Pointer to the crazyflie distance sensor */
-   CCI_CrazyflieDistanceScannerSensor* m_pcDistance;
+  /* Pointer to the battery sensor */
+  CCI_BatterySensor* m_pcBattery;
 
-    /* Pointer to the position actuator */
-   CCI_QuadRotorPositionActuator* m_pcPropellers;
-   
-   /* Pointer to the range and bearing actuator */
-   CCI_RangeAndBearingActuator*  m_pcRABA;
+  /* The random number generator */
+  CRandom::CRNG* m_pcRNG;
 
-   /* Pointer to the range and bearing sensor */
-   CCI_RangeAndBearingSensor* m_pcRABS;
+  /* Current step */
+  uint m_uiCurrentStep;
 
-   /* Pointer to the positioning sensor */
-   CCI_PositioningSensor* m_pcPos;
+  /* Initial Position */
+  CVector3 m_cInitialPosition;
 
-   /* Pointer to the battery sensor */
-   CCI_BatterySensor* m_pcBattery;
-
-   /* The random number generator */
-   CRandom::CRNG* m_pcRNG;
-
-   /* Current step */
-   uint m_uiCurrentStep;
-    
-   /* Initial Position */ 
-   CVector3 m_cInitialPosition;
-   
-   std::unique_ptr<std::thread> m_communicationThread;
+  std::unique_ptr<std::thread> m_communicationThread;
 };
 
 #endif

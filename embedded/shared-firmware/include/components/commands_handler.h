@@ -3,11 +3,7 @@
 
 #include <memory>
 
-enum class Command : uint8_t {
-  kIdentify = 0x01,
-  kTakeoff = 0x02,
-  kLand = 0x03
-};  // Example commands
+#include "utils/commands.h"
 
 class CommandsHandler {
  public:

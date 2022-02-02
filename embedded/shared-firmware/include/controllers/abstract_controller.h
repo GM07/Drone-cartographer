@@ -6,6 +6,7 @@
 
 #include "utils/directions.h"
 #include "utils/led.h"
+#include "utils/state.h"
 #include "utils/vector3d.h"
 
 class AbstractController {
@@ -14,8 +15,7 @@ class AbstractController {
 
   virtual Vector3D& getCurrentLocation() = 0;
 
-  virtual void setLEDState(LED led, bool enable,
-                           bool blink) = 0;
+  virtual void setLEDState(LED led, bool enable, bool blink) = 0;
 
   virtual void goTo(const Vector3D& location, float yaw, float pitch,
                     bool isRelative) = 0;
@@ -36,6 +36,8 @@ class AbstractController {
   virtual void delay(const uint32_t ticks) = 0;
 
   static std::shared_ptr<AbstractController> getController();
+
+  State state = State::kIdle;
 };
 
 #endif
