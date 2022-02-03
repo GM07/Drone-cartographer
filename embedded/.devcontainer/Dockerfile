@@ -34,8 +34,8 @@ ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 
 RUN apt-get update && apt-get install -y \
     libnewlib-arm-none-eabi \
-	python3-apt \
-	python3-pip \
+	  python3-apt \
+	  python3-pip \
     openocd \
-	&& pip3 install --upgrade pip \
+	  && pip3 install --upgrade pip \
     && pip3 install cfclient
