@@ -16,12 +16,11 @@ void CommunicationManager::communicationManagerTask(void* parameters) {
   while (true) {
     if (AbstractController::getController()->receiveMessage(
             &messageRX, sizeof(messageRX))) {
-
       bool successfulCommand =
           CommandsHandler::getCommandsHandler()->handleCommand(
               static_cast<Command>(messageRX[0]), &messageRX[1],
               sizeof(messageRX) - sizeof(Command));
-              
+
       AbstractController::getController()->sendMessage(
           &successfulCommand, sizeof(successfulCommand));
     }

@@ -22,9 +22,11 @@ bool CommandsHandler::handleCommand(Command command, const void* extraArgs,
       break;
     case Command::kTakeoff:
       AbstractController::getController()->state = State::kTakingOff;
+      AbstractController::getController()->log("TAKEOFF");
       break;
     case Command::kLand:
       AbstractController::getController()->state = State::kLanding;
+      AbstractController::getController()->log("LANDING");
       break;
     default:
       AbstractController::getController()->log("Unknown Command");

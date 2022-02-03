@@ -46,7 +46,7 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="10, 10, 2" center="0,0,0">
+  <arena size="10, 10, 10" center="0,0,5">
 
     <box id="wall_north" size="5,0.001,2" movable="false">
       <body position="0,2.5,0" orientation="0,0,0" />

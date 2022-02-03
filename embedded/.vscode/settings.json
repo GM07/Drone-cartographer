@@ -9,6 +9,9 @@
     "*.cc": "cpp",
     "*.cpp": "cpp",
     "*.h": "cpp",
+    "*.ipp": "cpp",
+    "bitset": "cpp",
+    "string_view": "cpp"
   },
   "editor.tabSize": 2,
   "editor.detectIndentation": false,

@@ -10,6 +10,8 @@
 
 #include "utils/led.h"
 
+#define ALMOST_THERE 0.01
+
 /////////////////////////////////////////////////////////////////////////
 std::shared_ptr<AbstractController> AbstractController::getController() {
   static std::shared_ptr<AbstractController> controller =
@@ -60,7 +62,7 @@ void SimulationController::setSimulationDroneInstance(
 void SimulationController::takeoff(float height) {
   CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
 
-  if (cPos.GetZ() == height) {
+  if (cPos.GetZ() + ALMOST_THERE >= height) {
     state = State::kIdle;
     return;
   }
@@ -72,11 +74,11 @@ void SimulationController::takeoff(float height) {
 void SimulationController::land() {
   CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
 
-  if (cPos.GetZ() == 0.1f) {
+  if (cPos.GetZ() - ALMOST_THERE <= 0.0) {
     state = State::kIdle;
     return;
   }
 
-  cPos.SetZ(0.1f);
+  cPos.SetZ(0.0f);
   m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(cPos);
 }
