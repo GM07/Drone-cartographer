@@ -1,5 +1,7 @@
 #include "components/commands_handler.h"
 
+#include <string>
+
 #include "controllers/abstract_controller.h"
 #include "utils/led.h"
 
@@ -31,7 +33,8 @@ bool CommandsHandler::handleCommand(Command command, const void* extraArgs,
       AbstractController::getController(id)->log("LANDING");
       break;
     default:
-      AbstractController::getController(id)->log("Unknown Command");
+      AbstractController::getController(id)->log(
+          std::to_string(static_cast<uint8_t>(command)));
       return false;
       break;
   }
