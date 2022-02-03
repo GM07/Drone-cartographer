@@ -8,15 +8,20 @@
 
 #include <argos3/core/utility/logging/argos_log.h>
 
+#include <unordered_map>
+
 #include "utils/led.h"
 
 #define ALMOST_THERE 0.01
 
+std::unordered_map<std::string, std::shared_ptr<AbstractController>>
+    controllers;
+
 /////////////////////////////////////////////////////////////////////////
-std::shared_ptr<AbstractController> AbstractController::getController() {
-  static std::shared_ptr<AbstractController> controller =
-      std::make_unique<SimulationController>();
-  return controller;
+std::shared_ptr<AbstractController> AbstractController::getController(
+    std::string id) {
+  auto pair = controllers.emplace(id, std::make_shared<SimulationController>());
+  return pair.first->second;
 }
 
 ///////////////////////////////////////

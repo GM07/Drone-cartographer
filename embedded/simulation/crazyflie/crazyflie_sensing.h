@@ -47,7 +47,7 @@ class CCrazyflieSensing : public CCI_Controller {
   /* Class constructor. */
   CCrazyflieSensing();
   /* Class destructor. */
-  virtual ~CCrazyflieSensing() {}
+  ~CCrazyflieSensing();
 
   /*
    * This function initializes the controller.
