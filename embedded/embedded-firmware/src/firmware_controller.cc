@@ -15,7 +15,8 @@ extern "C" {
 }
 
 /////////////////////////////////////////////////////////////////////////
-std::shared_ptr<AbstractController> AbstractController::getController() {
+std::shared_ptr<AbstractController> AbstractController::getController(
+    std::string id) {
   static std::shared_ptr<AbstractController> controller =
       std::make_unique<FirmwareController>();
   return controller;
@@ -32,9 +33,7 @@ void FirmwareController::sendMessage(void* message, size_t size) {
 }
 
 ///////////////////////////////////////
-void FirmwareController::setLEDState(LED led, bool enable,
-                                     bool blink) {
-
+void FirmwareController::setLEDState(LED led, bool enable, bool blink) {
   static ledseqStep_t ledStep[] = {{enable, LEDSEQ_WAITMS(500)},
                                    {!blink, LEDSEQ_WAITMS(500)},
                                    {0, LEDSEQ_LOOP}};

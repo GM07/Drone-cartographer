@@ -14,22 +14,23 @@ std::shared_ptr<CommandsHandler> CommandsHandler::getCommandsHandler() {
 
 /////////////////////////////////////////////////////////////////////////
 bool CommandsHandler::handleCommand(Command command, const void* extraArgs,
-                                    const size_t extraArgsLength) {
+                                    const size_t extraArgsLength,
+                                    std::string id) {
   switch (command) {
     case Command::kIdentify:
-      AbstractController::getController()->setLEDState(LED::kLedGreenLeft, true,
-                                                       true);
+      AbstractController::getController(id)->setLEDState(LED::kLedGreenLeft,
+                                                         true, true);
       break;
     case Command::kTakeoff:
-      AbstractController::getController()->state = State::kTakingOff;
-      AbstractController::getController()->log("TAKEOFF");
+      AbstractController::getController(id)->state = State::kTakingOff;
+      AbstractController::getController(id)->log("TAKEOFF");
       break;
     case Command::kLand:
-      AbstractController::getController()->state = State::kLanding;
-      AbstractController::getController()->log("LANDING");
+      AbstractController::getController(id)->state = State::kLanding;
+      AbstractController::getController(id)->log("LANDING");
       break;
     default:
-      AbstractController::getController()->log("Unknown Command");
+      AbstractController::getController(id)->log("Unknown Command");
       return false;
       break;
   }

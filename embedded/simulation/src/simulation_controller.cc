@@ -47,7 +47,7 @@ void SimulationController::setLEDState(LED led, bool enable, bool blink) {
 void SimulationController::initCommunicationManager() {
   boost::asio::io_service io_service;
   m_socket =
-      std::make_unique<boost::asio::local::stream_protocol::socket>(io_service);
+      std::make_shared<boost::asio::local::stream_protocol::socket>(io_service);
   m_socket->connect("/tmp/socket");
 }
 

@@ -13,8 +13,10 @@ static std::array<uint8_t, MESSAGE_MAX_SIZE> messageRX;
 void CommunicationManager::communicationManagerTask(void* parameters) {
   Timer::delayMs(3000);
 
+  std::string id(*(static_cast<std::string*>(parameters)));
+
   while (true) {
-    if (AbstractController::getController()->receiveMessage(
+    if (AbstractController::getController(id)->receiveMessage(
             &messageRX, sizeof(messageRX))) {
       bool successfulCommand =
           CommandsHandler::getCommandsHandler()->handleCommand(
@@ -23,6 +25,10 @@ void CommunicationManager::communicationManagerTask(void* parameters) {
 
       AbstractController::getController()->sendMessage(
           &successfulCommand, sizeof(successfulCommand));
+    }
+
+    if (AbstractController::getController(id)->state == State::kDead) {
+      break;
     }
 
     Timer::delayMs(50);

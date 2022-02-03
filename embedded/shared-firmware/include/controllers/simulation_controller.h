@@ -41,7 +41,7 @@ class SimulationController : public AbstractController {
 
  private:
   CCrazyflieSensing* m_ccrazyflieSensing;
-  std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
+  std::shared_ptr<boost::asio::local::stream_protocol::socket> m_socket;
 };
 
 #endif

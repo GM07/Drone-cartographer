@@ -41,14 +41,15 @@ CCrazyflieSensing::CCrazyflieSensing()
 void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
   // Provide drone instance to the controller
   std::dynamic_pointer_cast<SimulationController>(
-      AbstractController::getController())
+      AbstractController::getController(m_strId))
       ->setSimulationDroneInstance(this);
 
   // Start socket connection
-  AbstractController::getController()->initCommunicationManager();
+  AbstractController::getController(m_strId)->initCommunicationManager();
   // Run Thread managing communication
   std::thread communicationThread(
-      CommunicationManager::communicationManagerTask, nullptr);
+      CommunicationManager::communicationManagerTask,
+      static_cast<void*>(&m_strId));
   communicationThread.detach();
 
   try {
@@ -91,7 +92,7 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
 /****************************************/
 
 void CCrazyflieSensing::ControlStep() {
-  Navigation::step();
+  Navigation::step(m_strId);
 
   m_uiCurrentStep++;
 }

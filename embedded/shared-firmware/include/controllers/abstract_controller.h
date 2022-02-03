@@ -35,7 +35,7 @@ class AbstractController {
 
   virtual void delay(const uint32_t ticks) = 0;
 
-  static std::shared_ptr<AbstractController> getController();
+  static std::shared_ptr<AbstractController> getController(std::string id = "");
 
   State state = State::kIdle;
 };

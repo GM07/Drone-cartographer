@@ -16,7 +16,7 @@ class CommandsHandler {
    * @param extraArgs A pointer to an object containing the arguments
    */
   bool handleCommand(Command command, const void* extraArgs,
-                     const size_t extraArgsLength);
+                     const size_t extraArgsLength, std::string id = "");
 
  private:
   static std::shared_ptr<CommandsHandler> instance;

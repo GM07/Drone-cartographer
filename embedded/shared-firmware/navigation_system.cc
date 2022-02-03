@@ -4,15 +4,15 @@
 
 #define HEIGHT 2.0f
 
-void Navigation::step() {
-  switch (AbstractController::getController()->state) {
+void Navigation::step(std::string id) {
+  switch (AbstractController::getController(id)->state) {
     case State::kIdle:
       break;
     case State::kTakingOff:
-      AbstractController::getController()->takeoff(HEIGHT);
+      AbstractController::getController(id)->takeoff(HEIGHT);
       break;
     case State::kLanding:
-      AbstractController::getController()->land();
+      AbstractController::getController(id)->land();
       break;
     default:
       break;
