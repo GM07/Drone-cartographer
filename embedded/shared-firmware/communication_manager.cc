@@ -25,6 +25,10 @@ void CommunicationManager::communicationManagerTask(void* parameters) {
           &successfulCommand, sizeof(successfulCommand));
     }
 
+    // Don't know where this should happen. It's here for now but maybe it would
+    // be better in the step function ?
+    CommandsHandler::getCommandsHandler()->tick();
+
     Timer::delayMs(50);
   }
 }
