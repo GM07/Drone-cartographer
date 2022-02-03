@@ -1,0 +1,17 @@
+{
+  "name": "INF3995 - Backend",
+  "dockerFile": "./Dockerfile",
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "python.defaultInterpreterPath": "/usr/local/bin/python",
+  },
+  "workspaceFolder": "/workspaces/INF3995-106/backend",
+  "extensions": [
+    "ms-python.python"
+  ],
+  "forwardPorts": [5000],
+  "runArgs": [
+    "--privileged",
+    "--device=/dev/ttyUSB0"
+  ],
+}
