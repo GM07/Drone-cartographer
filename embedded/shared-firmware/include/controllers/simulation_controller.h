@@ -6,6 +6,9 @@
 #include "controllers/abstract_controller.h"
 #include "crazyflie_sensing.h"
 
+inline std::stringstream logBuffer;
+inline std::mutex logBufferMutex;
+
 class SimulationController : public AbstractController {
  public:
   SimulationController(){/**/};
@@ -41,7 +44,7 @@ class SimulationController : public AbstractController {
 
  private:
   CCrazyflieSensing* m_ccrazyflieSensing;
-  std::shared_ptr<boost::asio::local::stream_protocol::socket> m_socket;
+  std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
 };
 
 #endif

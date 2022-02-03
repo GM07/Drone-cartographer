@@ -47,9 +47,9 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
   // Start socket connection
   AbstractController::getController(m_strId)->initCommunicationManager();
   // Run Thread managing communication
-  std::thread connectionManager(CommunicationManager::communicationManagerTask,
-                                static_cast<void*>(&m_strId));
-  connectionManager.detach();
+  m_communicationThread = std::make_unique<std::thread>(
+      CommunicationManager::communicationManagerTask,
+      static_cast<void*>(&m_strId));
 
   try {
     /*
@@ -93,6 +93,8 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
 void CCrazyflieSensing::ControlStep() {
   Navigation::step(m_strId);
 
+  printLogs();
+
   m_uiCurrentStep++;
 }
 
@@ -104,8 +106,15 @@ void CCrazyflieSensing::Reset() {}
 /****************************************/
 /****************************************/
 
+void CCrazyflieSensing::printLogs() {
+  std::lock_guard<std::mutex> logMutex(logBufferMutex);
+  LOG << logBuffer.str();
+  logBuffer.str(std::string());
+}
+
 CCrazyflieSensing::~CCrazyflieSensing() {
   AbstractController::getController(m_strId)->state = State::kDead;
+  m_communicationThread->join();
 }
 /*
  * This statement notifies ARGoS of the existence of the controller.

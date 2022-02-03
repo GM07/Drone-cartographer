@@ -8,16 +8,26 @@ class Commands:
   kTakeoff = 0x02
   kLand = 0x03
 
+nConnections = 8
+identifier = "s"
 
-if os.path.exists("/tmp/socket"):
-  os.remove("/tmp/socket")
+servers = []
+clients = []
 
-server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-server.bind("/tmp/socket")
+for i in range(nConnections):
+  file_name = "/tmp/socket/{}{}".format(identifier, i)
+  if os.path.exists(file_name):
+    os.remove(file_name)
+  server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+  server.bind(file_name)
+  servers.append(server)
 
-#Wait for connection
-server.listen(1)
-conn, addr = server.accept()
+for server in servers:
+  server.listen(1)
+  client, addr = server.accept()
+  clients.append(client)
+
+
 while True:
   command = input("Send message through socket ")
   data = 0
@@ -29,5 +39,6 @@ while True:
   elif command == "IDENTIFY":
     data = [Commands.kIdentify]
 
-  conn.send(bytearray(data))
+  for client in clients:
+    client.send(bytearray(data))
   

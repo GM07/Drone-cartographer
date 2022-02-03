@@ -1,5 +1,7 @@
 #include "components/communication_manager.h"
 
+#include <unordered_map>
+
 #include "components/commands_handler.h"
 #include "controllers/abstract_controller.h"
 #include "utils/led.h"

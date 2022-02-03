@@ -77,6 +77,8 @@ class CCrazyflieSensing : public CCI_Controller {
    */
   virtual void Destroy() {}
 
+  void printLogs();
+
  public:
   /* Pointer to the crazyflie distance sensor */
   CCI_CrazyflieDistanceScannerSensor* m_pcDistance;
