@@ -81,5 +81,7 @@ def connection():
     return 'Connected'
 
 if __name__ == '__main__':
+    print('The backend is running on port 5000')
     SOCKETIO.run(APP, debug=False)
+    
   

@@ -1,14 +1,17 @@
 version: "2.2"
 
 services:
-  inf3995-vue-app:
-    image: dockerize-inf3995-vuejs-app
+  inf3995-backend:
+    image: dockerize-inf3995-backend
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: inf3995-vue-app
+    container_name: inf3995-backend
+    tty: true
     volumes:
       - ./:/app
       - /app/node_modules
+      - /dev:/dev
     network_mode: host
+    
     
