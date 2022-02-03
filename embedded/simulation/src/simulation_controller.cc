@@ -13,6 +13,7 @@
 #include "utils/led.h"
 
 #define ALMOST_THERE 0.01
+#define assertmsg(x, msg) assert(((void)msg, x))
 
 std::unordered_map<std::string, std::shared_ptr<AbstractController>>
     controllers;
@@ -20,6 +21,7 @@ std::unordered_map<std::string, std::shared_ptr<AbstractController>>
 /////////////////////////////////////////////////////////////////////////
 std::shared_ptr<AbstractController> AbstractController::getController(
     std::string id) {
+  assertmsg(!id.empty(), "Always pass the id to get the controller");
   auto pair = controllers.emplace(id, std::make_shared<SimulationController>());
   return pair.first->second;
 }

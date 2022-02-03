@@ -21,14 +21,14 @@ void CommunicationManager::communicationManagerTask(void* parameters) {
       bool successfulCommand =
           CommandsHandler::getCommandsHandler()->handleCommand(
               static_cast<Command>(messageRX[0]), &messageRX[1],
-              sizeof(messageRX) - sizeof(Command));
+              sizeof(messageRX) - sizeof(Command), id);
 
-      AbstractController::getController()->sendMessage(
+      AbstractController::getController(id)->sendMessage(
           &successfulCommand, sizeof(successfulCommand));
     }
 
     if (AbstractController::getController(id)->state == State::kDead) {
-      break;
+      return;
     }
 
     Timer::delayMs(50);
