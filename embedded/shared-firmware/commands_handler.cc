@@ -17,7 +17,9 @@ bool CommandsHandler::handleCommand(Command command, const void* extraArgs,
                                     const size_t extraArgsLength) {
   switch (command) {
     case Command::kIdentify:
-      AbstractController::getController()->setLEDState(LED::kLedGreenLeft, true, true);
+      AbstractController::getController()->setLEDState(LED::kLedGreenLeft, true,
+                                                       true);
+      identifyCommandBegin = std::chrono::steady_clock::now();
       break;
     default:
       return false;
@@ -25,4 +27,14 @@ bool CommandsHandler::handleCommand(Command command, const void* extraArgs,
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////////////////////////////
+void CommandsHandler::tick() {
+  if (std::chrono::duration_cast<std::chrono::seconds>(
+          std::chrono::steady_clock::now() - identifyCommandBegin)
+          .count() > 2) {
+    AbstractController::getController()->setLEDState(LED::kLedGreenLeft, false,
+                                                     false);
+  }
 }

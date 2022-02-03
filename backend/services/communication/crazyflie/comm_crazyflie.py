@@ -1,6 +1,5 @@
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
-from numpy import number
 
 class CommCrazyflie: 
 
