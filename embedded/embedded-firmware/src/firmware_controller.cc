@@ -35,7 +35,7 @@ void FirmwareController::sendMessage(void* message, size_t size) {
 ///////////////////////////////////////
 void FirmwareController::setLEDState(LED led, bool enable, bool blink) {
   static ledseqStep_t ledStep[] = {{enable, LEDSEQ_WAITMS(500)},
-                                   {!blink, LEDSEQ_WAITMS(500)},
+                                   {(enable && !blink), LEDSEQ_WAITMS(500)},
                                    {0, LEDSEQ_LOOP}};
 
   static ledseqContext_t seqLED = {
@@ -44,5 +44,9 @@ void FirmwareController::setLEDState(LED led, bool enable, bool blink) {
   };
 
   ledseqRegisterSequence(&seqLED);
-  ledseqRun(&seqLED);
+
+  if (enable)
+    ledseqRun(&seqLED);
+  else
+    ledseqStop(&seqLED);
 }
