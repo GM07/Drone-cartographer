@@ -43,7 +43,7 @@ void SimulationController::sendMessage(void* message, size_t size) { return; }
 
 ///////////////////////////////////////
 void SimulationController::setLEDState(LED led, bool enable, bool blink) {
-  log("Identify :" + m_ccrazyflieSensing->GetId());
+  if (enable) log("Identify :" + m_ccrazyflieSensing->GetId());
 }
 
 ///////////////////////////////////////////////////
