@@ -18,5 +18,5 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /tmp/socket
-      
+    network_mode: host
       

@@ -47,6 +47,6 @@ RUN sudo dpkg -i argos3*.deb
 
 COPY ./crazyflie-firmware  ./crazyflie-firmware
 COPY ./embedded-firmware ./embedded-firmware
-COPY ./software-bridge ./software-bridge
+COPY ./shared-firmware ./shared-firmware
 
 RUN cd argos3-examples && if test -d build; then rm -rf build; fi && mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja
