@@ -15,17 +15,21 @@ export class ServerCommunication {
     });
   }
 
-  public static launchMission(isMissionSimulated: boolean): Promise<Response> {
-    return fetch(SERVER_CONSTANTS.LAUNCH_MISSION_ADDRESS, {
+  public static launchMission(): Promise<Response> {
+    return fetch(SERVER_CONSTANTS.LAUNCH_MISSION_ADDRESS);
+  }
+
+  public static terminateMission(): Promise<Response> {
+    return fetch(SERVER_CONSTANTS.TERMINATE_MISSION_ADDRESS);
+  }
+
+  public static specifyMissionType(isMissionSimulated: boolean): Promise<Response> {
+    return fetch(SERVER_CONSTANTS.SPECIFY_MISSION_TYPE_ADDRESS, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(isMissionSimulated),
     });
-  }
-
-  public static terminateMission(): Promise<Response> {
-    return fetch(SERVER_CONSTANTS.TERMINATE_MISSION_ADDRESS);
   }
 }
