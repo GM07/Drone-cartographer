@@ -8,6 +8,7 @@
 #include "utils/timer.h"
 
 #define MESSAGE_MAX_SIZE 60
+#define ID_SIZE 2
 
 static std::array<uint8_t, MESSAGE_MAX_SIZE> messageRX;
 
@@ -15,7 +16,7 @@ static std::array<uint8_t, MESSAGE_MAX_SIZE> messageRX;
 void CommunicationManager::communicationManagerTask(void* parameters) {
   Timer::delayMs(3000);
 
-  std::string id(*(static_cast<std::string*>(parameters)));
+  std::string id((static_cast<char*>(parameters)), ID_SIZE);
 
   while (true) {
     if (AbstractController::getController(id)->receiveMessage(
