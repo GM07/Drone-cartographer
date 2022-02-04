@@ -1,3 +1,6 @@
+# Demonstration of the requirements
+R.F.1 : https://youtu.be/0blojlENKxA
+R.F.2 : https://youtu.be/TizYuNy4m-8
 # Project Configuration for Ubuntu
 
 ## Cloning project
@@ -38,14 +41,86 @@ The minimum required version of docker-composed is 1.25.* unless you are using n
 
 Additional information about the installation is provided:[Docker-Compose documentation](https://docs.docker.com/compose/install/)
 
-## Launching the project 
+### Graphic Card Configuration (OPTIONAL)
+If you are using an NVIDIA GPU you must install additionnal software for the simulation to display properly in the container
 
-The project can be launched by executing the bash script inside the root of the project
+Follow the instructions provided here : https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html (NOTE it is not necessary to reinstall Docker)
+
+You also need to modify the `devcontainer.json` file located in `INF3995-106/embedded/.devcontainer/` by replacing the `runArgs` section with the following
+
+```json
+"runArgs": [
+	  	//"--privileged",
+	    //"--net=host",
+		"--device=/dev/ttyUSB0",
+		"--gpus=all", //Uncomment to use NVDIA GPU
+		"-e",
+		"DISPLAY=${env:DISPLAY}",
+	],
 ```
-./start.sh
+
+
+## Lauching the project
+To launch all the components of the project, you need the folders `backend`, `frontend` and `embedded` opened in vscode. Then using the Remote-Explorer extension from vscode, re-open all three folders in their respective container.
+
+### Launching the Client
+In the devcontainer for the `frontend` directory. Once the container is built, open a terminal window inside vscode and run the command
+
+```bash
+npm run serve
 ```
-If you are unable to start the script please run this command from the root of the project
+
+Once the compilation is done, the client can now be accessed in a web-browser at `http://localhost:8080`
+
+### Lauching the Server
+In the devcontainer for the `frontend` directory. Once the container is built, open a terminal widow inside vscode and run the command
+
+```bash
+python3 server.py
 ```
-chmod u+x  start.sh
+This will start the server and allow the client to connect to it.
+
+### Launching the simulation
+In the devcontainer for the `embedded` directory.
+
+Once the container is built, hit `CTRL-SHIFT-P`, select `Tasks: Run Task` and run the `Install Argos3 Package` Task
+
+Afterwards, the same way as above, run the `Compile Simulation Firmware` Task
+
+Then make sure the server and client are in their inital state (i.e. Have just been launched)
+
+On the client, check the `Simulation Toggle` and press the `Démarrer mission` button
+
+In the `embedded` devcontainer open a terminal inside vscode and run the commands 
+```bash
+cd simulation
+argos3 -c experiments/crazyflie_sensing.argos
 ```
-Once the containers are done being created the web application will be accessible from [http://localhost:8080/](http://localhost:8080/)
+
+A simulation window should pop-up
+
+You can now start the simulation using the `Play` button and send commands to the drone with the `Lancer Mission` and `Terminer mission` buttons on the client.
+
+### Flashing the Drone
+Make sure the CrazyRadio is connected to your computer.
+
+In the devcontainer for the `embedded` directory, hit `CTRL-SHIFT-P` and select `Remote-Containers: Rebuild Container`
+
+Once the container is re-built, hit `CTRL-SHIFT-P`, select `Tasks: Run Task` and run the `Flash embedded firmware` Task
+
+The drones should now be flashed
+
+### Sending commands to the physical drones
+Make sure the CrazyRadio is connected to your computer.
+
+In the devcontainer for the `server` directory, hit `CTRL-SHIFT-P` and select `Remote-Containers: Rebuild Container`
+
+Launch the client (See Launching the Client)
+Launch the server (See Launching the Server)
+
+Make sure the drones have been flashed (See Flashing the Drone) and are powered on
+
+On the client, do not check the `Simulation Toggle` button and press the `Démarrer mission` button
+
+You should be able to select drone radio addresses in the top bar of the UI on the client. Selecting a Drone will allow you to send the identify command which will make its LED blink.
+
