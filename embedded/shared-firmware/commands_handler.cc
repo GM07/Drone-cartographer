@@ -1,7 +1,9 @@
-#include "include/components/commands_handler.h"
+#include "components/commands_handler.h"
 
-#include "include/controllers/abstract_controller.h"
-#include "include/utils/led.h"
+#include <string>
+
+#include "controllers/abstract_controller.h"
+#include "utils/led.h"
 
 std::shared_ptr<CommandsHandler> CommandsHandler::instance = nullptr;
 void blinkLED();
@@ -14,27 +16,25 @@ std::shared_ptr<CommandsHandler> CommandsHandler::getCommandsHandler() {
 
 /////////////////////////////////////////////////////////////////////////
 bool CommandsHandler::handleCommand(Command command, const void* extraArgs,
-                                    const size_t extraArgsLength) {
+                                    const size_t extraArgsLength,
+                                    std::string id) {
   switch (command) {
     case Command::kIdentify:
-      AbstractController::getController()->setLEDState(LED::kLedGreenLeft, true,
-                                                       true);
-      identifyCommandBegin = std::chrono::steady_clock::now();
+      AbstractController::getController(id)->state = State::kIdentify;
+      break;
+    case Command::kTakeoff:
+      AbstractController::getController(id)->state = State::kTakingOff;
+      AbstractController::getController(id)->log("TAKEOFF");
+      break;
+    case Command::kLand:
+      AbstractController::getController(id)->state = State::kLanding;
+      AbstractController::getController(id)->log("LANDING");
       break;
     default:
+      /*AbstractController::getController(id)->log(
+          std::to_string(static_cast<uint8_t>(command)));*/
       return false;
-      break;
   }
 
   return true;
-}
-
-/////////////////////////////////////////////////////////////////////////
-void CommandsHandler::tick() {
-  if (std::chrono::duration_cast<std::chrono::seconds>(
-          std::chrono::steady_clock::now() - identifyCommandBegin)
-          .count() > 2) {
-    AbstractController::getController()->setLEDState(LED::kLedGreenLeft, false,
-                                                     false);
-  }
 }

@@ -12,12 +12,13 @@ extern "C" {
 #include "components/navigation_system.h"
 
 static bool isInit = false;
+static std::string dummy("s1");
 
 /////////////////////////////////////////////////////////////////////////
 void communicationManagerInit() {
   xTaskCreate(CommunicationManager::communicationManagerTask,
-              "COMMUNICATION_MANAGER_NAME", configMINIMAL_STACK_SIZE, nullptr,
-              0, nullptr);
+              "COMMUNICATION_MANAGER_NAME", configMINIMAL_STACK_SIZE,
+              static_cast<void*>(&dummy), 0, nullptr);
   isInit = true;
 }
 

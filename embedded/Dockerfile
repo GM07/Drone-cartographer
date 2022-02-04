@@ -34,19 +34,21 @@ ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 
 RUN apt-get update && apt-get install -y  --no-install-recommends\
     libnewlib-arm-none-eabi \
-	python3-apt \
-	python3-pip \
+	  python3-apt \
+	  python3-pip \
     openocd \
-	&& pip3 install --upgrade pip \
+	  && pip3 install --upgrade pip \
     && pip3 install cfclient
 
-COPY  ./argos3_simulator-1.0.0-x86_64-DreamTeam.deb ./
-COPY  ./argos3-examples ./argos3-examples
+COPY  ./argos3_simulator-3.0.0-x86_64-beta56.deb ./
 
 RUN sudo dpkg -i argos3*.deb
 
 COPY ./crazyflie-firmware  ./crazyflie-firmware
 COPY ./embedded-firmware ./embedded-firmware
 COPY ./shared-firmware ./shared-firmware
+COPY ./simulation ./simulation
 
-RUN cd argos3-examples && if test -d build; then rm -rf build; fi && mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja
+RUN g++ -v
+RUN cd ./embedded-firmware && make clean && make -j`nproc`
+RUN cd ./simulation if test -d build; then rm -rf build; fi && mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug ../../ && ninja

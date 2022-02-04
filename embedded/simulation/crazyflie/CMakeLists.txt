@@ -1,0 +1,8 @@
+add_library(crazyflie_sensing SHARED crazyflie_sensing.h crazyflie_sensing.cpp)
+target_compile_features(crazyflie_sensing PRIVATE cxx_std_17)
+target_link_libraries(crazyflie_sensing
+  argos3core_simulator
+  argos3plugin_simulator_crazyflie
+  argos3plugin_simulator_genericrobot
+  shared_firmware
+  simulation_firmware)

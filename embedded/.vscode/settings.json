@@ -1,8 +1,17 @@
 {
-	"editor.formatOnSave": true,
-	"clang-format.fallbackStyle": "Google",
-	"C_Cpp.clang_format_fallbackStyle": "Google",
-	"C_Cpp.formatting": "clangFormat",
-	"C_Cpp.loggingLevel": "Warning",
-	"cmake.configureOnOpen": false
+  "editor.formatOnSave": true,
+  "clang-format.fallbackStyle": "Google",
+  "C_Cpp.clang_format_fallbackStyle": "Google",
+  "C_Cpp.formatting": "clangFormat",
+  "C_Cpp.loggingLevel": "Warning",
+  "cmake.configureOnOpen": false,
+  "files.associations": {
+    "*.cc": "cpp",
+    "*.cpp": "cpp",
+    "*.h": "cpp",
+  },
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.defaultFormatter": "xaver.clang-format",
+  "editor.formatOnSaveMode": "file",
 }

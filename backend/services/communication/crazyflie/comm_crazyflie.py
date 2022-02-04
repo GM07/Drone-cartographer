@@ -10,5 +10,6 @@ class CommCrazyflie:
     def send_command(self, command, link_uri):
         self.crazyflie.open_link(link_uri)
         packet = bytearray(command) # Command must be an array of numbers
+        print(packet)
         self.crazyflie.appchannel.send_packet(packet)
         self.crazyflie.close_link()

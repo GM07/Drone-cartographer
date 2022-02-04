@@ -14,4 +14,8 @@
     "--privileged",
     "--device=/dev/ttyUSB0"
   ],
+  "mounts": [
+    "source=/tmp/socket/,target=/tmp/socket/,type=bind",
+	],
+  "initializeCommand": "mkdir /tmp/socket/ &> /dev/null"
 }

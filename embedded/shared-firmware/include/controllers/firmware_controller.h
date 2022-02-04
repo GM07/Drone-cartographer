@@ -1,7 +1,7 @@
 #ifndef FIRMWARE_CONTROLLER_H
 #define FIRMWARE_CONTROLLER_H
 
-#include "abstract_controller.h"
+#include "controllers/abstract_controller.h"
 
 class FirmwareController : public AbstractController {
  public:
@@ -30,7 +30,7 @@ class FirmwareController : public AbstractController {
   size_t receiveMessage(void* message, size_t size) override;
   void sendMessage(void* message, size_t size) override;
 
-  void log(const std::string&& message) override{/**/};
+  void log(const std::string& message) override{/**/};
 
   void delay(const uint32_t ticks) override{/**/};
 };

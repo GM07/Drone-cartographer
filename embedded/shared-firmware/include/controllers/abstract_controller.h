@@ -4,9 +4,10 @@
 #include <memory>
 #include <string>
 
-#include "../utils/directions.h"
-#include "../utils/led.h"
-#include "../utils/vector3d.h"
+#include "utils/directions.h"
+#include "utils/led.h"
+#include "utils/state.h"
+#include "utils/vector3d.h"
 
 class AbstractController {
  public:
@@ -14,8 +15,7 @@ class AbstractController {
 
   virtual Vector3D& getCurrentLocation() = 0;
 
-  virtual void setLEDState(LED led, bool enable,
-                           bool blink) = 0;
+  virtual void setLEDState(LED led, bool enable, bool blink) = 0;
 
   virtual void goTo(const Vector3D& location, float yaw, float pitch,
                     bool isRelative) = 0;
@@ -31,11 +31,13 @@ class AbstractController {
   virtual size_t receiveMessage(void* message, size_t size) = 0;
   virtual void sendMessage(void* message, size_t size) = 0;
 
-  virtual void log(const std::string&& message) = 0;
+  virtual void log(const std::string& message) = 0;
 
   virtual void delay(const uint32_t ticks) = 0;
 
-  static std::shared_ptr<AbstractController> getController();
+  static std::shared_ptr<AbstractController> getController(std::string id = "");
+
+  State state = State::kIdle;
 };
 
 #endif

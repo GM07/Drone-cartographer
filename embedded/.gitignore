@@ -4,12 +4,5 @@
 *.elf
 *.hex
 *.map
-
 *.a
 *.so
-
-**bin/
-
-**simulation/build/
-
-embedded-firmware/version.c

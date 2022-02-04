@@ -6,7 +6,9 @@
           <div class="switch-center">
             <v-switch v-model="simulatedMission" label="Simulation"> </v-switch>
           </div>
-          <v-btn large primary to="/Mission">Démarrer mission</v-btn>
+          <v-btn large primary v-on:click="onClick()">
+            Démarrer mission
+          </v-btn>
         </v-col>
       </div>
       <div v-else>
@@ -25,6 +27,8 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import {ACCESSOR} from '@/store';
+import {ServerCommunication} from '@/communication/server_communication';
+import {ROUTER} from '@/router';
 
 @Component({})
 export default class Home extends Vue {
@@ -35,6 +39,14 @@ export default class Home extends Vue {
 
   get simulatedMission(): boolean {
     return ACCESSOR.missionStatus.isMissionSimulated;
+  }
+
+  onClick(): void {
+    console.log("Initialize Mission")
+    ServerCommunication.specifyMissionType(
+      ACCESSOR.missionStatus.isMissionSimulated
+    );
+    ROUTER.push("/Mission")
   }
 }
 </script>
