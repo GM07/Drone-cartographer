@@ -33,9 +33,6 @@ void CommunicationManager::communicationManagerTask(void* parameters) {
     if (AbstractController::getController(id)->state == State::kDead) {
       return;
     }
-    // Don't know where this should happen. It's here for now but maybe it would
-    // be better in the step function ?
-    CommandsHandler::getCommandsHandler()->tick(id);
 
     Timer::delayMs(50);
   }

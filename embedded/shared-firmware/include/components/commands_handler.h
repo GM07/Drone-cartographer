@@ -19,13 +19,9 @@ class CommandsHandler {
   bool handleCommand(Command command, const void* extraArgs,
                      const size_t extraArgsLength, std::string id = "");
 
-  void tick(std::string id = "");
-
  private:
   static std::shared_ptr<CommandsHandler> instance;
   CommandsHandler(){};
-
-  std::chrono::time_point<std::chrono::steady_clock> identifyCommandBegin;
 };
 
 #endif
