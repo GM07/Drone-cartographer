@@ -20,8 +20,7 @@ bool CommandsHandler::handleCommand(Command command, const void* extraArgs,
                                     std::string id) {
   switch (command) {
     case Command::kIdentify:
-      AbstractController::getController(id)->setLEDState(LED::kLedGreenLeft,
-                                                         true, true);
+      AbstractController::getController(id)->state = State::kIdentify;
       break;
     case Command::kTakeoff:
       AbstractController::getController(id)->state = State::kTakingOff;
@@ -32,10 +31,9 @@ bool CommandsHandler::handleCommand(Command command, const void* extraArgs,
       AbstractController::getController(id)->log("LANDING");
       break;
     default:
-      AbstractController::getController(id)->log(
-          std::to_string(static_cast<uint8_t>(command)));
+      /*AbstractController::getController(id)->log(
+          std::to_string(static_cast<uint8_t>(command)));*/
       return false;
-      break;
   }
 
   return true;

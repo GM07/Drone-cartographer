@@ -14,6 +14,11 @@ void Navigation::step(std::string id) {
     case State::kLanding:
       AbstractController::getController(id)->land();
       break;
+    case State::kIdentify:
+      AbstractController::getController(id)->setLEDState(LED::kLedRedLeft, true,
+                                                         true);
+      AbstractController::getController(id)->state = State::kIdle;
+      break;
     default:
       break;
   }

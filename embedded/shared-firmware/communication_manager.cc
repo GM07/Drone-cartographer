@@ -16,7 +16,8 @@ static std::array<uint8_t, MESSAGE_MAX_SIZE> messageRX;
 void CommunicationManager::communicationManagerTask(void* parameters) {
   Timer::delayMs(3000);
 
-  std::string id((static_cast<char*>(parameters)), ID_SIZE);
+  std::string id;
+  // std::string id((static_cast<char*>(parameters)), ID_SIZE);
 
   while (true) {
     if (AbstractController::getController(id)->receiveMessage(
