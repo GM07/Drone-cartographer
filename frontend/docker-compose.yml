@@ -1,4 +1,4 @@
-version: "2.2"
+version: "2.3"
 
 services:
   inf3995-vue-app:

@@ -4,24 +4,25 @@ services:
 
   mongo:
     extends:
-      file: ./database/docker-compose.yml
+      file: ../database/docker-compose.yml
       service: mongo
     container_name: mongo
 
   vue:
     extends:
-      file: ./frontend/docker-compose.yml
+      file: ../frontend/docker-compose.yml
       service: inf3995-vue-app
     container_name: vue
   
   flask:
     extends:
-      file: ./backend/docker-compose.yml
+      file: ../backend/docker-compose.yml
       service: inf3995-backend
     container_name: backend
-
-  basic_embedded:
+      
+  nvidia_embedded:
     extends:
-      file : ./embedded/docker-compose.yml
+      file : ../embedded/nvidia-docker/docker-compose.yml
       service: embedded    
     container_name: embedded
+    
