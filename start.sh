@@ -15,11 +15,12 @@ export COMPOSE_HTTP_TIMEOUT=240
 
 if  ! command -v nvidia-docker &> /dev/null
 then
-    docker-compose --profile basic up --build     
+    docker-compose  up --build    
 else 
     if  docker-compose --version | grep  "1.29.*" ; then
         
-        docker-compose --profile nvidia up --build 
+        
+        cd ./nvidia-docker-compose &&   docker-compose  up --build  
     
     else 
         echo "Please install docker-compose 1.29"

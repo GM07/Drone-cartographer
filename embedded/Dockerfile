@@ -1,6 +1,5 @@
 FROM mcr.microsoft.com/vscode/devcontainers/cpp:focal
 
-
 # Install all dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends\
@@ -27,28 +26,30 @@ RUN apt-get update \
     libglx0 \
     libegl1 \
     libxext6 \
-    libx11-6
-
+    libx11-6 
+    
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 
 RUN apt-get update && apt-get install -y  --no-install-recommends\
     libnewlib-arm-none-eabi \
-	  python3-apt \
-	  python3-pip \
+    libstdc++-arm-none-eabi-newlib \
+	python3-apt \
+	python3-pip \
     openocd \
-	  && pip3 install --upgrade pip \
+	&& pip3 install --upgrade pip \
     && pip3 install cfclient
 
-COPY  ./argos3_simulator-3.0.0-x86_64-beta56.deb ./
+COPY  ./argos3*.deb ./
+COPY ./CMakeLists.txt ./
 
-RUN sudo dpkg -i argos3*.deb
+RUN  dpkg -i argos3*.deb
 
 COPY ./crazyflie-firmware  ./crazyflie-firmware
 COPY ./embedded-firmware ./embedded-firmware
 COPY ./shared-firmware ./shared-firmware
 COPY ./simulation ./simulation
+COPY ./ServerStub.py ./
 
-RUN g++ -v
 RUN cd ./embedded-firmware && make clean && make -j`nproc`
-RUN cd ./simulation if test -d build; then rm -rf build; fi && mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug ../../ && ninja
+RUN cd ./simulation && if test -d build; then rm -rf build; fi && mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug ../../ && ninja

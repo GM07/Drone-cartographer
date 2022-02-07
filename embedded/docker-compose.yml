@@ -1,4 +1,4 @@
-version: "2.2"
+version: "2.3"
 
 services:
   embedded:
@@ -17,6 +17,5 @@ services:
       
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - /tmp/socket
+      - /tmp/socket:/tmp/socket
     network_mode: host
-      
