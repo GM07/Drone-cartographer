@@ -107,6 +107,9 @@ class CCrazyflieSensing : public CCI_Controller {
   /* Initial Position */
   CVector3 m_cInitialPosition;
 
+ private:
+  void attemptSocketConnection();
+
   std::unique_ptr<std::thread> m_communicationThread;
 };
 
