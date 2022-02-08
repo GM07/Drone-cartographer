@@ -36,12 +36,13 @@ export default class MissionCommands extends Vue {
     if (ACCESSOR.missionStatus.isMissionStarted) return;
     this.isLaunchMissionSelected = true;
 
-    ServerCommunication.launchMission()
+    ServerCommunication.launchMission(ACCESSOR.missionStatus.isMissionSimulated)
       .then(response => {
         if (response.status === HTTP_OK) {
           ACCESSOR.missionStatus.isMissionStarted = true;
         }
       })
+      .catch(error => console.error(error))
       .finally(() => {
         this.isLaunchMissionSelected = false;
       });
