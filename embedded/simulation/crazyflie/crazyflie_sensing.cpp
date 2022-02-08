@@ -1,7 +1,6 @@
 // TODO doit être enlevé lorsque le controlleur sera implémenté
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-type"
-#include "controllers/abstract_controller.h"
 #include "controllers/simulation_controller.h"
 #pragma GCC diagnostic pop
 
@@ -17,11 +16,6 @@
 /* Communication */
 #include <boost/asio.hpp>
 
-#include "components/communication_manager.h"
-
-/* Navigation */
-#include "components/navigation_system.h"
-
 /****************************************/
 /****************************************/
 
@@ -34,18 +28,14 @@ CCrazyflieSensing::CCrazyflieSensing()
       m_pcPos(NULL),
       m_pcBattery(NULL),
       m_uiCurrentStep(0),
+      m_drone(std::make_shared<SimulationController>(this)),
       m_communicationThread(nullptr) {}
 
 /****************************************/
 /****************************************/
 
 void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
-  // Provide drone instance to the controller
-  std::dynamic_pointer_cast<SimulationController>(
-      AbstractController::getController(m_strId))
-      ->setSimulationDroneInstance(this);
-
-  // Start socket connection
+  // Try to connect through socket
   attemptSocketConnection();
 
   try {
@@ -89,7 +79,7 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
 
 void CCrazyflieSensing::ControlStep() {
   if (!m_communicationThread) attemptSocketConnection();
-  if (m_communicationThread) Navigation::step(m_strId);
+  if (m_communicationThread) m_drone.step();
 
   printLogs();
 
@@ -112,18 +102,16 @@ void CCrazyflieSensing::printLogs() {
 
 void CCrazyflieSensing::attemptSocketConnection() {
   try {
-    AbstractController::getController(m_strId)->initCommunicationManager();
-    // Run Thread managing communication
+    m_drone.getController()->initCommunicationManager();
     m_communicationThread = std::make_unique<std::thread>(
-        CommunicationManager::communicationManagerTask,
-        static_cast<void*>(&m_strId));
+        &Drone::communicationManagerTask, m_drone);
   } catch (const boost::system::system_error& error) {
     LOG << "Socket connection failed for " << m_strId << std::endl;
   }
 }
 
 CCrazyflieSensing::~CCrazyflieSensing() {
-  AbstractController::getController(m_strId)->state = State::kDead;
+  m_drone.getController()->state = State::kDead;
   if (m_communicationThread) m_communicationThread->join();
 }
 /*

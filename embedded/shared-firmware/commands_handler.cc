@@ -1,37 +1,23 @@
-#include "components/commands_handler.h"
-
-#include <string>
-
-#include "controllers/abstract_controller.h"
-#include "utils/led.h"
-
-std::shared_ptr<CommandsHandler> CommandsHandler::instance = nullptr;
-void blinkLED();
+#include "components/drone.h"
+#include "utils/commands.h"
 
 /////////////////////////////////////////////////////////////////////////
-std::shared_ptr<CommandsHandler> CommandsHandler::getCommandsHandler() {
-  struct make_shared_enabler : public CommandsHandler {};
-  return instance ? instance : std::make_shared<make_shared_enabler>();
-}
-
-/////////////////////////////////////////////////////////////////////////
-bool CommandsHandler::handleCommand(Command command, const void* extraArgs,
-                                    const size_t extraArgsLength,
-                                    std::string id) {
+bool Drone::handleCommand(Command command, const void* extraArgs,
+                          const size_t extraArgsLength) {
   switch (command) {
     case Command::kIdentify:
-      AbstractController::getController(id)->state = State::kIdentify;
+      m_controller->state = State::kIdentify;
       break;
-    case Command::kTakeoff:
-      AbstractController::getController(id)->state = State::kTakingOff;
-      AbstractController::getController(id)->log("TAKEOFF");
+    case Command::kTakeOff:
+      m_controller->state = State::kTakingOff;
+      m_controller->log("TAKEOFF");
       break;
     case Command::kLand:
-      AbstractController::getController(id)->state = State::kLanding;
-      AbstractController::getController(id)->log("LANDING");
+      m_controller->state = State::kLanding;
+      m_controller->log("LANDING");
       break;
     default:
-      /*AbstractController::getController(id)->log(
+      /*m_controller->log(
           std::to_string(static_cast<uint8_t>(command)));*/
       return false;
   }

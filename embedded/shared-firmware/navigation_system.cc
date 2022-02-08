@@ -1,23 +1,20 @@
-#include "components/navigation_system.h"
-
-#include "controllers/abstract_controller.h"
+#include "components/drone.h"
 
 #define HEIGHT 2.0f
 
-void Navigation::step(std::string id) {
-  switch (AbstractController::getController(id)->state) {
+void Drone::step() {
+  switch (m_controller->state) {
     case State::kIdle:
       break;
     case State::kTakingOff:
-      AbstractController::getController(id)->takeoff(HEIGHT);
+      m_controller->takeOff(HEIGHT);
       break;
     case State::kLanding:
-      AbstractController::getController(id)->land();
+      m_controller->land();
       break;
     case State::kIdentify:
-      AbstractController::getController(id)->setLEDState(LED::kLedRedLeft, true,
-                                                         true);
-      AbstractController::getController(id)->state = State::kIdle;
+      m_controller->setLEDState(LED::kLedRedLeft, true, true);
+      m_controller->state = State::kIdle;
       break;
     default:
       break;

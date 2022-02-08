@@ -14,14 +14,6 @@ extern "C" {
 #include "ledseq.h"
 }
 
-/////////////////////////////////////////////////////////////////////////
-std::shared_ptr<AbstractController> AbstractController::getController(
-    std::string id) {
-  static std::shared_ptr<AbstractController> controller =
-      std::make_unique<FirmwareController>();
-  return controller;
-}
-
 ///////////////////////////////////////
 size_t FirmwareController::receiveMessage(void* message, size_t size) {
   return appchannelReceiveDataPacket(message, size, 0);

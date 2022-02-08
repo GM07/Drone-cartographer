@@ -20,7 +20,7 @@ class AbstractController {
   virtual void goTo(const Vector3D& location, float yaw, float pitch,
                     bool isRelative) = 0;
   virtual void goTo(const Vector3D& location, bool isRelative) = 0;
-  virtual void takeoff(float height) = 0;
+  virtual void takeOff(float height) = 0;
   virtual void land() = 0;
 
   virtual float getDistance(Direction direction) = 0;
@@ -34,8 +34,6 @@ class AbstractController {
   virtual void log(const std::string& message) = 0;
 
   virtual void delay(const uint32_t ticks) = 0;
-
-  static std::shared_ptr<AbstractController> getController(std::string id = "");
 
   State state = State::kIdle;
 };
