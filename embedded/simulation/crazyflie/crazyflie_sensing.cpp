@@ -104,11 +104,9 @@ void CCrazyflieSensing::printLogs() {
 
 void CCrazyflieSensing::attemptSocketConnection() {
   try {
-    AbstractController::getController(m_strId)->initCommunicationManager();
-    // Run Thread managing communication
+    m_drone.getController()->initCommunicationManager();
     m_communicationThread = std::make_unique<std::thread>(
-        CommunicationManager::communicationManagerTask,
-        static_cast<void*>(&m_strId));
+        &Drone::communicationManagerTask, m_drone);
   } catch (const boost::system::system_error& error) {
     LOG << "Socket connection failed for " << m_strId << std::endl;
   }
