@@ -35,9 +35,7 @@ CCrazyflieSensing::CCrazyflieSensing()
 /****************************************/
 
 void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
-  // Start socket connection
-  m_drone.getController()->initCommunicationManager();
-  // Run Thread managing communication
+  // Try to connect through socket
   attemptSocketConnection();
 
   try {
