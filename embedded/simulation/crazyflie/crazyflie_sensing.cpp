@@ -28,7 +28,8 @@ CCrazyflieSensing::CCrazyflieSensing()
       m_pcPos(NULL),
       m_pcBattery(NULL),
       m_uiCurrentStep(0),
-      m_drone(std::make_shared<SimulationController>(this)) {}
+      m_drone(std::make_shared<SimulationController>(this)),
+      m_communicationThread(nullptr) {}
 
 /****************************************/
 /****************************************/
@@ -37,8 +38,7 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
   // Start socket connection
   m_drone.getController()->initCommunicationManager();
   // Run Thread managing communication
-  m_communicationThread =
-      std::make_unique<std::thread>(&Drone::communicationManagerTask, m_drone);
+  attemptSocketConnection();
 
   try {
     /*
@@ -80,7 +80,8 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
 /****************************************/
 
 void CCrazyflieSensing::ControlStep() {
-  m_drone.step();
+  if (!m_communicationThread) attemptSocketConnection();
+  if (m_communicationThread) m_drone.step();
 
   printLogs();
 
@@ -101,9 +102,21 @@ void CCrazyflieSensing::printLogs() {
   logBuffer.str(std::string());
 }
 
+void CCrazyflieSensing::attemptSocketConnection() {
+  try {
+    AbstractController::getController(m_strId)->initCommunicationManager();
+    // Run Thread managing communication
+    m_communicationThread = std::make_unique<std::thread>(
+        CommunicationManager::communicationManagerTask,
+        static_cast<void*>(&m_strId));
+  } catch (const boost::system::system_error& error) {
+    LOG << "Socket connection failed for " << m_strId << std::endl;
+  }
+}
+
 CCrazyflieSensing::~CCrazyflieSensing() {
   m_drone.getController()->state = State::kDead;
-  m_communicationThread->join();
+  if (m_communicationThread) m_communicationThread->join();
 }
 /*
  * This statement notifies ARGoS of the existence of the controller.

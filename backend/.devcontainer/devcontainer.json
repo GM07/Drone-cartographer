@@ -9,7 +9,6 @@
   "extensions": [
     "ms-python.python"
   ],
-  "forwardPorts": [5000],
   "runArgs": [
     "--privileged",
     "--device=/dev/ttyUSB0"
