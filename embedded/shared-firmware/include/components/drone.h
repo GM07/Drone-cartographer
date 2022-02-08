@@ -10,9 +10,12 @@
 
 class Drone {
  public:
-  Drone(std::shared_ptr<AbstractController> controller);
+  Drone(std::shared_ptr<AbstractController> controller)
+      : m_controller(controller) {}
 
-  std::shared_ptr<AbstractController> getController();
+  inline std::shared_ptr<AbstractController> getController() {
+    return m_controller;
+  };
 
   // Command Manager
   /**
