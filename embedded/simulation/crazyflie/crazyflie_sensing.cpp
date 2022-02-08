@@ -1,7 +1,6 @@
 // TODO doit être enlevé lorsque le controlleur sera implémenté
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-type"
-#include "controllers/abstract_controller.h"
 #include "controllers/simulation_controller.h"
 #pragma GCC diagnostic pop
 
@@ -17,11 +16,6 @@
 /* Communication */
 #include <boost/asio.hpp>
 
-#include "components/communication_manager.h"
-
-/* Navigation */
-#include "components/navigation_system.h"
-
 /****************************************/
 /****************************************/
 
@@ -33,23 +27,18 @@ CCrazyflieSensing::CCrazyflieSensing()
       m_pcRABS(NULL),
       m_pcPos(NULL),
       m_pcBattery(NULL),
-      m_uiCurrentStep(0) {}
+      m_uiCurrentStep(0),
+      m_drone(std::make_shared<SimulationController>(this)) {}
 
 /****************************************/
 /****************************************/
 
 void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
-  // Provide drone instance to the controller
-  std::dynamic_pointer_cast<SimulationController>(
-      AbstractController::getController(m_strId))
-      ->setSimulationDroneInstance(this);
-
   // Start socket connection
-  AbstractController::getController(m_strId)->initCommunicationManager();
+  m_drone.getController()->initCommunicationManager();
   // Run Thread managing communication
-  m_communicationThread = std::make_unique<std::thread>(
-      CommunicationManager::communicationManagerTask,
-      static_cast<void*>(&m_strId));
+  m_communicationThread =
+      std::make_unique<std::thread>(&Drone::communicationManagerTask, m_drone);
 
   try {
     /*
@@ -91,7 +80,7 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
 /****************************************/
 
 void CCrazyflieSensing::ControlStep() {
-  Navigation::step(m_strId);
+  m_drone.step();
 
   printLogs();
 
@@ -113,7 +102,7 @@ void CCrazyflieSensing::printLogs() {
 }
 
 CCrazyflieSensing::~CCrazyflieSensing() {
-  AbstractController::getController(m_strId)->state = State::kDead;
+  m_drone.getController()->state = State::kDead;
   m_communicationThread->join();
 }
 /*

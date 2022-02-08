@@ -8,17 +8,20 @@ extern "C" {
 #include "task.h"
 }
 
-#include "components/communication_manager.h"
-#include "components/navigation_system.h"
+#include "components/drone.h"
+#include "controllers/firmware_controller.h"
 
 static bool isInit = false;
-static std::string dummy("s1");
+static Drone drone(std::make_shared<FirmwareController>());
+
+void communicationManagerTaskWrapper(void* parameter) {
+  static_cast<Drone*>(parameter)->communicationManagerTask();
+}
 
 /////////////////////////////////////////////////////////////////////////
 void communicationManagerInit() {
-  xTaskCreate(CommunicationManager::communicationManagerTask,
-              "COMMUNICATION_MANAGER_NAME", configMINIMAL_STACK_SIZE,
-              static_cast<void*>(&dummy), 0, nullptr);
+  xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
+              configMINIMAL_STACK_SIZE, &drone, 0, nullptr);
   isInit = true;
 }
 
@@ -28,6 +31,6 @@ bool communicationManagerTest() { return isInit; }
 /////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
   while (true) {
-    Navigation::step();
+    drone.step();
   }
 }

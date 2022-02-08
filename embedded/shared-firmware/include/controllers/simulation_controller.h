@@ -11,7 +11,7 @@ inline std::mutex logBufferMutex;
 
 class SimulationController : public AbstractController {
  public:
-  SimulationController(){/**/};
+  SimulationController(CCrazyflieSensing* ccrazyflieSensing);
 
   SimulationController(SimulationController&& other) = delete;
   SimulationController operator=(SimulationController&& other) = delete;

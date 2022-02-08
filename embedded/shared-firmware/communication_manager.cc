@@ -1,35 +1,21 @@
-#include "components/communication_manager.h"
-
-#include <unordered_map>
-
-#include "components/commands_handler.h"
-#include "controllers/abstract_controller.h"
-#include "utils/led.h"
+#include "components/drone.h"
+#include "utils/commands.h"
 #include "utils/timer.h"
 
-#define MESSAGE_MAX_SIZE 60
-
-static std::array<uint8_t, MESSAGE_MAX_SIZE> messageRX;
-
 /////////////////////////////////////////////////////////////////////////
-void CommunicationManager::communicationManagerTask(void* parameters) {
+void Drone::communicationManagerTask() {
   Timer::delayMs(3000);
 
-  std::string id(*(static_cast<std::string*>(parameters)));
-
   while (true) {
-    if (AbstractController::getController(id)->receiveMessage(
-            &messageRX, sizeof(messageRX))) {
+    if (m_controller->receiveMessage(&m_messageRX, sizeof(m_messageRX))) {
       bool successfulCommand =
-          CommandsHandler::getCommandsHandler()->handleCommand(
-              static_cast<Command>(messageRX[0]), &messageRX[1],
-              sizeof(messageRX) - sizeof(Command), id);
+          handleCommand(static_cast<Command>(m_messageRX[0]), &m_messageRX[1],
+                        sizeof(m_messageRX) - sizeof(Command));
 
-      AbstractController::getController(id)->sendMessage(
-          &successfulCommand, sizeof(successfulCommand));
+      m_controller->sendMessage(&successfulCommand, sizeof(successfulCommand));
     }
 
-    if (AbstractController::getController(id)->state == State::kDead) {
+    if (m_controller->state == State::kDead) {
       return;
     }
 
