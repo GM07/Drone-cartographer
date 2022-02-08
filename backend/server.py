@@ -56,8 +56,8 @@ def launch():
     if in_simulation:
         COMM_SIMULATION.send_command(COMMANDS.LAUNCH.value)
     else:
+        COMM_CRAZYFLIE.send_command(COMMANDS.LAUNCH.value, URI[0])
         COMM_CRAZYFLIE.send_command(COMMANDS.LAUNCH.value, URI[1])
-        COMM_CRAZYFLIE.send_command(COMMANDS.LAUNCH.value, URI[2])
     return 'Launched'
 
 # Terminate mission
@@ -67,8 +67,8 @@ def terminate():
     if in_simulation:
         COMM_SIMULATION.send_command(COMMANDS.LAND.value)
     else:
+        COMM_CRAZYFLIE.send_command(COMMANDS.LAND.value, URI[0])
         COMM_CRAZYFLIE.send_command(COMMANDS.LAND.value, URI[1])
-        COMM_CRAZYFLIE.send_command(COMMANDS.LAND.value, URI[2])
     return ''
 
 

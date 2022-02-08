@@ -38,6 +38,9 @@ class Drone {
  private:
   std::shared_ptr<AbstractController> m_controller;
   std::array<uint8_t, MESSAGE_MAX_SIZE> m_messageRX;
+
+ public:
+  static Drone& getEmbeddedDrone();
 };
 
 #endif

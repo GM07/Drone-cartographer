@@ -17,16 +17,20 @@ extern "C" {
 #pragma GCC diagnostic pop
 
 static bool isInit = false;
-static Drone drone(std::make_shared<FirmwareController>());
+
+Drone& Drone::getEmbeddedDrone() {
+  static Drone drone(std::make_shared<FirmwareController>());
+  return drone;
+}
 
 void communicationManagerTaskWrapper(void* parameter) {
-  static_cast<Drone*>(parameter)->communicationManagerTask();
+  Drone::getEmbeddedDrone().communicationManagerTask();
 }
 
 /////////////////////////////////////////////////////////////////////////
 void communicationManagerInit() {
   xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
-              configMINIMAL_STACK_SIZE, &drone, 0, nullptr);
+              configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
   isInit = true;
 }
 
@@ -36,6 +40,6 @@ bool communicationManagerTest() { return isInit; }
 /////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
   while (true) {
-    drone.step();
+    Drone::getEmbeddedDrone().step();
   }
 }

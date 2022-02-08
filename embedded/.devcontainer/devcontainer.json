@@ -22,14 +22,14 @@
 	"runArgs": [
 	  "--privileged",
 		"--net=host",
-		"--device=/dev/ttyUSB0",
+		"--device=/dev/",
 		//"--gpus=all", //Uncomment to use NVDIA GPU
 		"-e",
 		"DISPLAY=${env:DISPLAY}",
 	],
 	"mounts": [
 		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-    	"source=/tmp/socket/,target=/tmp/socket/,type=bind",
+    "source=/tmp/socket/,target=/tmp/socket/,type=bind",
 	],
 	"remoteEnv": {
 		"QT_X11_NO_MITSHM": "1"
