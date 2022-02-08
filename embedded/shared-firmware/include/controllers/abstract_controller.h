@@ -20,7 +20,7 @@ class AbstractController {
   virtual void goTo(const Vector3D& location, float yaw, float pitch,
                     bool isRelative) = 0;
   virtual void goTo(const Vector3D& location, bool isRelative) = 0;
-  virtual void takeoff(float height) = 0;
+  virtual void takeOff(float height) = 0;
   virtual void land() = 0;
 
   virtual float getDistance(Direction direction) = 0;

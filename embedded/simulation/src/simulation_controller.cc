@@ -57,7 +57,7 @@ void SimulationController::setSimulationDroneInstance(
   m_ccrazyflieSensing = ccrazyflieSensing;
 }
 
-void SimulationController::takeoff(float height) {
+void SimulationController::takeOff(float height) {
   CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
 
   if (cPos.GetZ() + ALMOST_THERE >= height) {

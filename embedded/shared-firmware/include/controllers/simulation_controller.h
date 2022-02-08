@@ -25,7 +25,7 @@ class SimulationController : public AbstractController {
   void goTo(const Vector3D& location, float yaw, float pitch,
             bool isRelative) override{/**/};
   void goTo(const Vector3D& location, bool isRelative) override{/**/};
-  void takeoff(float height) override;
+  void takeOff(float height) override;
   void land() override;
 
   float getDistance(Direction direction) override{/**/};

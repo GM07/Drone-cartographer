@@ -8,7 +8,7 @@ bool Drone::handleCommand(Command command, const void* extraArgs,
     case Command::kIdentify:
       m_controller->state = State::kIdentify;
       break;
-    case Command::kTakeoff:
+    case Command::kTakeOff:
       m_controller->state = State::kTakingOff;
       m_controller->log("TAKEOFF");
       break;
