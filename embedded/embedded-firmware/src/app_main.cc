@@ -9,7 +9,12 @@ extern "C" {
 }
 
 #include "components/drone.h"
+
+// TODO doit être enlevé lorsque le controlleur sera implémenté
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "controllers/firmware_controller.h"
+#pragma GCC diagnostic pop
 
 static bool isInit = false;
 static Drone drone(std::make_shared<FirmwareController>());
