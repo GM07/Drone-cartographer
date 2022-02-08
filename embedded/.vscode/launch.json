@@ -28,28 +28,32 @@
         "program": "ServerStub.py",
         "console": "integratedTerminal"
       },
-      // {
-      //   "name": "Embedded",
-      //   "cwd": "${workspaceRoot}",
-      //   "executable": "./cf2.elf",
-      //   "request": "launch",
-      //   "type": "cortex-debug",
-      //   "device": "STM32F405",
-      //   "svdFile": "STM32F405.svd",
-      //   "servertype": "openocd",
-      //   "configFiles": ["interface/stlink-v2.cfg", "target/stm32f4x.cfg"],
-      //   "runToMain": true,
-      //   "preLaunchCommands": [
-      //     "set mem inaccessible-by-default off",
-      //     "enable breakpoint",
-      //     "monitor reset"
-      //   ]
-      // }
+      {
+        "name": "Embedded",
+        "cwd": "${workspaceRoot}",
+        "executable": "${workspaceFolder}/embedded-firmware/cf2.elf",
+        "request": "launch",
+        "type": "cortex-debug",
+        "device": "STM32F405",
+        "svdFile": "${workspaceFolder}/embedded-firmware/STM32F405.svd",
+        "servertype": "openocd",
+        "configFiles": ["${workspaceFolder}/embedded-firmware/stlink-v2.cfg"],
+        "runToMain": true,
+        "preLaunchCommands": [
+          "set mem inaccessible-by-default off",
+          "enable breakpoint",
+          "monitor reset"
+        ]
+      }
     ],
     "compounds": [
       {
         "name": "Debug Simulation",
         "configurations": ["Argos", "Stub Server"]
+      },
+      {
+        "name": "Debug Embedded",
+        "configurations": ["Embedded", "Stub Server"]
       }
     ],
     "inputs": [
