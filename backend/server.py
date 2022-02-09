@@ -23,8 +23,7 @@ APP.config['SECRET_KEY'] = 'dev'
 
 # Socketio instance to communicate with frontend
 ASYNC_MODE = None
-SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, path="/getMissionStatus", 
-                    cors_allowed_origins=['http://localhost:8080'])
+SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, path="/getMissionStatus", cors_allowed_origins='*')
 
 # Objects to communicate with Crazyflie
 URI = ['radio://0/80/2M/E7E7E7E761', 'radio://0/80/2M/E7E7E7E762']
@@ -33,8 +32,8 @@ URI = ['radio://0/80/2M/E7E7E7E761', 'radio://0/80/2M/E7E7E7E762']
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
 in_simulation = False
-COMM_SIMULATION = None
-COMM_CRAZYFLIE = None
+COMM_SIMULATION = CommSimulation()
+COMM_CRAZYFLIE = CommCrazyflie()
 
 # Get drone addresses
 @APP.route('/getDrones')
@@ -49,15 +48,16 @@ def identify_drone():
     return 'Identified drone'
 
 # Launch mission
-@APP.route('/launch')
+@APP.route('/launch', methods=['POST'])
 def launch():
     global in_simulation
-    print("lauch")
+    in_simulation = request.get_json()
+    print("launch")
     if in_simulation:
         COMM_SIMULATION.send_command(COMMANDS.LAUNCH.value)
     else:
+        COMM_CRAZYFLIE.send_command(COMMANDS.LAUNCH.value, URI[0])
         COMM_CRAZYFLIE.send_command(COMMANDS.LAUNCH.value, URI[1])
-        COMM_CRAZYFLIE.send_command(COMMANDS.LAUNCH.value, URI[2])
     return 'Launched'
 
 # Terminate mission
@@ -67,21 +67,8 @@ def terminate():
     if in_simulation:
         COMM_SIMULATION.send_command(COMMANDS.LAND.value)
     else:
+        COMM_CRAZYFLIE.send_command(COMMANDS.LAND.value, URI[0])
         COMM_CRAZYFLIE.send_command(COMMANDS.LAND.value, URI[1])
-        COMM_CRAZYFLIE.send_command(COMMANDS.LAND.value, URI[2])
-    return ''
-
-@APP.route('/missionType', methods=['POST'])
-def initCommunication():
-    global in_simulation
-    in_simulation = request.get_json()
-    print("missionType")
-    if in_simulation:
-        global COMM_SIMULATION
-        COMM_SIMULATION = CommSimulation()
-    else:
-        global COMM_CRAZYFLIE
-        COMM_CRAZYFLIE = CommCrazyflie()
     return ''
 
 

@@ -4,6 +4,8 @@
   "C_Cpp.clang_format_fallbackStyle": "Google",
   "C_Cpp.formatting": "clangFormat",
   "C_Cpp.loggingLevel": "Warning",
+  "C_Cpp.clang_format_style": "Google",
+  "clang-format.style": "Google",
   "cmake.configureOnOpen": false,
   "files.associations": {
     "*.cc": "cpp",

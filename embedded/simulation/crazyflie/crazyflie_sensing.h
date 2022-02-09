@@ -33,6 +33,8 @@
 
 #include <boost/asio.hpp>
 
+#include "components/drone.h"
+
 /*
  * All the ARGoS stuff in the 'argos' namespace.
  * With this statement, you save typing argos:: every time.
@@ -107,7 +109,11 @@ class CCrazyflieSensing : public CCI_Controller {
   /* Initial Position */
   CVector3 m_cInitialPosition;
 
+ private:
+  void attemptSocketConnection();
+
   std::unique_ptr<std::thread> m_communicationThread;
+  Drone m_drone;
 };
 
 #endif

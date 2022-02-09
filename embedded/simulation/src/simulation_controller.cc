@@ -2,8 +2,6 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-type"
 #include "controllers/simulation_controller.h"
-
-#include "controllers/abstract_controller.h"
 #pragma GCC diagnostic pop
 
 #include <argos3/core/utility/logging/argos_log.h>
@@ -14,18 +12,10 @@
 #include "utils/led.h"
 
 #define ALMOST_THERE 0.01
-#define assertmsg(x, msg) assert(((void)msg, x))
 
-std::unordered_map<std::string, std::shared_ptr<AbstractController>>
-    controllers;
-
-/////////////////////////////////////////////////////////////////////////
-std::shared_ptr<AbstractController> AbstractController::getController(
-    std::string id) {
-  assertmsg(!id.empty(), "Always pass the id to get the controller");
-  auto pair = controllers.emplace(id, std::make_shared<SimulationController>());
-  return pair.first->second;
-}
+//////////////////////////////////////////
+SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
+    : m_ccrazyflieSensing(ccrazyflieSensing) {}
 
 ///////////////////////////////////////
 size_t SimulationController::receiveMessage(void* message, size_t size) {
@@ -67,7 +57,7 @@ void SimulationController::setSimulationDroneInstance(
   m_ccrazyflieSensing = ccrazyflieSensing;
 }
 
-void SimulationController::takeoff(float height) {
+void SimulationController::takeOff(float height) {
   CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
 
   if (cPos.GetZ() + ALMOST_THERE >= height) {

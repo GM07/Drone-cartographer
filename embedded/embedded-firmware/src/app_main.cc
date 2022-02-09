@@ -8,17 +8,29 @@ extern "C" {
 #include "task.h"
 }
 
-#include "components/communication_manager.h"
-#include "components/navigation_system.h"
+#include "components/drone.h"
+
+// TODO doit être enlevé lorsque le controlleur sera implémenté
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
+#include "controllers/firmware_controller.h"
+#pragma GCC diagnostic pop
 
 static bool isInit = false;
-static std::string dummy("s1");
+
+Drone& Drone::getEmbeddedDrone() {
+  static Drone drone(std::make_shared<FirmwareController>());
+  return drone;
+}
+
+void communicationManagerTaskWrapper(void* parameter) {
+  Drone::getEmbeddedDrone().communicationManagerTask();
+}
 
 /////////////////////////////////////////////////////////////////////////
 void communicationManagerInit() {
-  xTaskCreate(CommunicationManager::communicationManagerTask,
-              "COMMUNICATION_MANAGER_NAME", configMINIMAL_STACK_SIZE,
-              static_cast<void*>(&dummy), 0, nullptr);
+  xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
+              configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
   isInit = true;
 }
 
@@ -28,6 +40,6 @@ bool communicationManagerTest() { return isInit; }
 /////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
   while (true) {
-    Navigation::step();
+    Drone::getEmbeddedDrone().step();
   }
 }

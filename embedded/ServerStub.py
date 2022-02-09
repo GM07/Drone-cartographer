@@ -5,7 +5,7 @@ import os, os.path
 @dataclass
 class Commands:
   kIdentify = 0x01
-  kTakeoff = 0x02
+  kTakeOff = 0x02
   kLand = 0x03
 
 nConnections = 8
@@ -33,7 +33,7 @@ while True:
   data = 0
 
   if command == "TAKEOFF":
-    data = [Commands.kTakeoff]
+    data = [Commands.kTakeOff]
   elif command == "LAND":
     data = [Commands.kLand]
   elif command == "IDENTIFY":
