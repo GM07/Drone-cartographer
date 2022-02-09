@@ -39,7 +39,7 @@
 				"Compile Simulation Firmware"
 			],
 			"dependsOrder": "sequence",
-      "runOptions": { "runOn": "folderOpen" }
+			"runOptions": { "runOn": "folderOpen" }
 		},
 		{
 			"label": "Flash embedded firmware",
