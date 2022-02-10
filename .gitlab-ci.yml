@@ -4,8 +4,13 @@ stages:
 frontend:
   stage: triggers
   trigger:
-    include: frontend/.gitlab-ci.yml
+    include: 
+      - local: '/frontend/.gitlab-ci.yml'
     strategy: depend
   rules:
-  - changes:
-    - frontend/**/*
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - frontend/**/*
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - frontend/**/*
