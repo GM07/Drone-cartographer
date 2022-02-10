@@ -1,0 +1,77 @@
+image: node:16.13.2-alpine3.14
+
+variables:
+  WORKING_DIRECTORY: "frontend"
+
+workflow:
+  rules:
+    - changes:
+      - $WORKING_DIRECTORY/**/*
+
+stages:
+  - install_dependencies
+  - lint_test
+  - build
+
+.cache_template: &cache_configuration  # Hidden yaml configuration that defines an anchor named 'cache_configuration'
+  cache: 
+    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
+    paths:
+      - $WORKING_DIRECTORY/node_modules/
+    policy: pull
+
+prepare:
+  stage: .pre
+  script:
+    - cd $WORKING_DIRECTORY
+    - if [[ ! -d node_modules ]];
+      then
+        npm ci;
+      fi
+  cache: 
+    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
+    paths:
+      - $WORKING_DIRECTORY/node_modules/
+
+install_dependencies:
+  stage: install_dependencies
+  cache: 
+    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
+    paths:
+      - $WORKING_DIRECTORY/node_modules/
+  script:
+    - cd $WORKING_DIRECTORY
+    - npm ci --cache
+  only:
+    changes:
+      - $WORKING_DIRECTORY/package-lock.json
+      - $WORKING_DIRECTORY/package.json
+
+lint:
+  stage: lint_test
+  <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
+  script:
+    - cd $WORKING_DIRECTORY
+    - npm run lint
+
+test:
+  stage: lint_test
+  <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
+  script:
+    - cd $WORKING_DIRECTORY
+    - npm run test
+  artifacts:
+    name: "$CI_JOB_NAME"
+    paths:
+      - $WORKING_DIRECTORY/coverage/
+
+build:
+  stage: build
+  <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
+  script:
+    - cd $WORKING_DIRECTORY
+    - npm run build
+  artifacts:
+    name: "$CI_JOB_NAME"
+    paths:
+      - $WORKING_DIRECTORY/build/

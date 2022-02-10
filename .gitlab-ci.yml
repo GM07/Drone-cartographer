@@ -1,0 +1,11 @@
+stages:
+- triggers
+
+frontend:
+  stage: triggers
+  trigger:
+    include: frontend/.gitlab-ci.yml
+    strategy: depend
+  rules:
+  - changes:
+    - frontend/**/*
