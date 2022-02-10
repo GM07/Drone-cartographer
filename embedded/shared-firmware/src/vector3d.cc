@@ -22,6 +22,10 @@ Vector3D Vector3D::operator/(const float other) {
 
 Vector3D Vector3D::operator=(const Vector3D& other) { return *this; }
 
+bool Vector3D::operator==(const Vector3D& other) const {
+  return m_x == other.getX() && m_y == other.getY() && m_z == other.getZ();
+}
+
 float Vector3D::getX() const { return m_x; }
 float Vector3D::getY() const { return m_y; }
 float Vector3D::getZ() const { return m_z; }
