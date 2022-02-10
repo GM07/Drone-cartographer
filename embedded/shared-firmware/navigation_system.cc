@@ -13,7 +13,7 @@ void Drone::step() {
       m_controller->land();
       break;
     case State::kIdentify:
-      m_controller->setLEDState(LED::kLedRedLeft, true, true);
+      m_controller->blinkLED(LED::kLedRedLeft);
       m_controller->state = State::kIdle;
       break;
     default:

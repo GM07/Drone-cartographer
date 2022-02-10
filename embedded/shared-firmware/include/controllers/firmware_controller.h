@@ -3,9 +3,13 @@
 
 #include "controllers/abstract_controller.h"
 
+extern "C" {
+#include "ledseq.h"
+}
+
 class FirmwareController : public AbstractController {
  public:
-  FirmwareController(){/**/};
+  FirmwareController();
 
   FirmwareController(FirmwareController&& other) = delete;
   FirmwareController operator=(FirmwareController&& other) = delete;
@@ -14,13 +18,13 @@ class FirmwareController : public AbstractController {
 
   Vector3D& getCurrentLocation() override{/**/};
 
-  void setLEDState(LED led, bool enable, bool blink) override;
+  void blinkLED(LED led) override;
 
   void goTo(const Vector3D& location, float yaw, float pitch,
             bool isRelative) override{/**/};
   void goTo(const Vector3D& location, bool isRelative) override{/**/};
-  void takeOff(float height) override{/**/};
-  void land() override{/**/};
+  void takeOff(float height) override;
+  void land() override;
 
   float getDistance(Direction direction) override{/**/};
   float getBatteryLevel() override{/**/};
@@ -33,5 +37,8 @@ class FirmwareController : public AbstractController {
   void log(const std::string& message) override{/**/};
 
   void delay(const uint32_t ticks) override{/**/};
+
+ private:
+  ledseqContext_t m_seqLED;
 };
 #endif
