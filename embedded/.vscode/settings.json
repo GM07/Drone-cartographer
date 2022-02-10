@@ -13,7 +13,8 @@
     "*.h": "cpp",
   },
   "editor.tabSize": 2,
-  "editor.detectIndentation": true,
+  "editor.detectIndentation": false,
+  "editor.insertSpaces": true,
   "editor.defaultFormatter": "xaver.clang-format",
   "editor.formatOnSaveMode": "file",
 }
