@@ -31,7 +31,7 @@ const ACTIONS = actionTree(
   {
     // socket-specific methods
     /* eslint-disable @typescript-eslint/naming-convention */
-    socket_mission_status(state, missionStatus) {
+    socket_update_status(state, missionStatus) {
       state.commit('setMissionStatus', missionStatus as MissionStatus);
     },
 
