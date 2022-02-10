@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(embedded_firmware)
 
-# GoogleTest requires at least C++11
 set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
@@ -14,18 +13,16 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
+FILE(
+	GLOB
+	PROJECT_SRC
+	src/*.cc
+	../src/*.cc
+	../../shared-firmware/*.cc)
+
 add_executable(
   embedded_firmware
-  src/validate_app_main.cc
-	src/mockFunctions.cc
-	src/validate_embedded_firmware.cc
-	src/validate_timer.cc
-	../src/app_main.cc
-	../src/timer.cc
-	../src/firmware_controller.cc
-	../../shared-firmware/communication_manager.cc
-	../../shared-firmware/navigation_system.cc
-	../../shared-firmware/commands_handler.cc
+  ${PROJECT_SRC}
 )
 
 target_link_libraries(
