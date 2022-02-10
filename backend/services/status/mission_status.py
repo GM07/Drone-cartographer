@@ -1,6 +1,9 @@
 is_mission_simulated = False
 is_mission_started = False
 
+# TODO : Discuter si c'est vraiment necessaire d'avoir ces fonctions
+#        puisque les variables sont globales
+
 def set_mission_started(started):
     global is_mission_started
     is_mission_started = started
