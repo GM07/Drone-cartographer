@@ -8,7 +8,6 @@ extern "C" {
 #include "mock_functions.h"
 
 using ::testing::_;
-using ::testing::An;
 
 TEST(ValidateAppMain, CommunicationManagerInitShouldCreateTask) {
   mock = new FunctionsMock;

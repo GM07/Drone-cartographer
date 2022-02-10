@@ -9,6 +9,7 @@ extern "C" {
 
 FunctionsMock* mock;
 
+///////////////////////////////////////////////////////////////
 BaseType_t xTaskCreate(TaskFunction_t pxTaskCode, const char* const pcName,
                        const configSTACK_DEPTH_TYPE usStackDepth,
                        void* const pvParameters, UBaseType_t uxPriority,
@@ -17,9 +18,20 @@ BaseType_t xTaskCreate(TaskFunction_t pxTaskCode, const char* const pcName,
                            uxPriority, pxCreatedTask);
 }
 
-void vTaskDelay(const TickType_t xTicksToDelay) {}
-void ledseqRegisterSequence(ledseqContext_t* context) {}
-bool ledseqRun(ledseqContext_t* context) { return true; }
+///////////////////////////////////////////////////////////////
+void ledseqRegisterSequence(ledseqContext_t* context) {
+  return mock->ledseqRegisterSequence(context);
+}
+
+///////////////////////////////////////////////////////////////
+bool ledseqRun(ledseqContext_t* context) { return mock->ledseqRun(context); }
+
+////////////////////////////////////////////////////////////////
+void vTaskDelay(const TickType_t xTicksToDelay) {
+  return mock->vTaskDelay(xTicksToDelay);
+}
+
+////////////////////////////////////////////////////////////////
 size_t appchannelReceiveDataPacket(void* buffer, size_t max_length,
                                    int timeout_ms) {
   return 0;

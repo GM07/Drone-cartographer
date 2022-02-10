@@ -16,8 +16,10 @@ enable_testing()
 
 add_executable(
   embedded_firmware
-  validate_app_main.cc
-	mockFunctions.cc
+  src/validate_app_main.cc
+	src/mockFunctions.cc
+	src/validate_embedded_firmware.cc
+	src/validate_timer.cc
 	../src/app_main.cc
 	../src/timer.cc
 	../src/firmware_controller.cc
@@ -34,6 +36,8 @@ target_link_libraries(
 
 add_compile_definitions(STM32F40_41xxx)
 add_compile_definitions(STM32F4XX)
+
+set(CMAKE_CXX_FLAGS "-Wno-int-to-pointer-cast -Wno-return-type")
 
 
 target_include_directories(
