@@ -1,6 +1,6 @@
 #include "components/drone.h"
 
-#define HEIGHT 2.0f
+#define HEIGHT 0.5f
 
 void Drone::step() {
   switch (m_controller->state) {

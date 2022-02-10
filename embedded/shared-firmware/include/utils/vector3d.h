@@ -12,11 +12,6 @@ class Vector3D {
   Vector3D operator/(const float factor);
   Vector3D operator=(const Vector3D& other);
 
-  float getX() const;
-  float getY() const;
-  float getZ() const;
-
- private:
   float m_x, m_y, m_z;
 };
 
