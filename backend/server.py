@@ -33,7 +33,9 @@ URI = ['radio://0/80/2M/E7E7E7E761', 'radio://0/80/2M/E7E7E7E762']
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
-COMM: AbstractComm = CommSimulation()
+COMM_SIMULATION = CommSimulation()
+COMM_EMBEDDED = CommCrazyflie(URI)
+COMM: AbstractComm = COMM_EMBEDDED
 
 # Get drone addresses
 @APP.route('/getDrones')
@@ -57,9 +59,9 @@ def launch():
     is_simulated = request.get_json()
 
     if is_simulated:
-        COMM = CommSimulation()
+        COMM = COMM_SIMULATION
     else:
-        COMM = CommCrazyflie(URI)
+        COMM = COMM_EMBEDDED
 
     COMM.send_command(COMMANDS.LAUNCH.value)
 

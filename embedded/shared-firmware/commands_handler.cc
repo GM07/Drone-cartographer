@@ -12,7 +12,7 @@ bool Drone::handleCommand(Command command, const void* extraArgs,
     case Command::kTakeOff:
       m_controller->state = State::kTakingOff;
       m_controller->log("TAKEOFF");
-      m_controller->sendMessage(&message, sizeof(message));
+      // m_controller->sendMessage(&message, sizeof(message));
       break;
     case Command::kLand:
       m_controller->state = State::kLanding;

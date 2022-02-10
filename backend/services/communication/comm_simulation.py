@@ -12,7 +12,7 @@ identifier = "s"
 
 class CommSimulation(AbstractComm): 
 
-    INIT_TIMEOUT = 1
+    INIT_TIMEOUT = 0.000001
     DELAY_RECEIVER_MS = 1000
 
     def __init__(self):
@@ -42,14 +42,14 @@ class CommSimulation(AbstractComm):
     def attemptSocketConnection(self, timeout: float = 0.5):
         success = True
         self.connections = []
-        for server in self.servers:
+        for index, server in enumerate(self.servers):
             try:
                 server.listen(1)
-                # server.settimeout(timeout if timeout > 0 else None)
-                conn, _ = server.accept()
+                server.settimeout(timeout if timeout > 0 else None)
+                conn, addr = server.accept()
                 self.connections.append(conn)
             except socket.timeout as err:
-                print('Error with socket : ', err)
+                print('Error with socket ', index, ': ', err)
                 success = False
         
         print('Connection accepted')
@@ -57,11 +57,12 @@ class CommSimulation(AbstractComm):
 
 
     def send_command(self, command):
-        print('Sending command ', command, ' to simulation')
 
         if not self.isConnected:
             self.attemptSocketConnection(-1)
-        else:
+        
+        if self.isConnected:
+            print('Sending command ', command, ' to simulation')
             for conn in self.connections:
                 conn.send(bytearray(command))
 

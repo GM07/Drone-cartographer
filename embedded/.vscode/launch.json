@@ -12,7 +12,6 @@
         ],
         "cwd": "${workspaceFolder}/simulation",
         "MIMode": "gdb",
-        "preLaunchTask": "Setup Simulation",
         "setupCommands": 
         [
           {
