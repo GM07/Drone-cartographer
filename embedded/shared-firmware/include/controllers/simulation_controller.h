@@ -18,7 +18,7 @@ class SimulationController : public AbstractController {
   SimulationController(SimulationController& other) = delete;
   SimulationController operator=(SimulationController& other) = delete;
 
-  Vector3D& getCurrentLocation() override{/**/};
+  Vector3D getCurrentLocation() override{/**/};
 
   void blinkLED(LED led) override;
 

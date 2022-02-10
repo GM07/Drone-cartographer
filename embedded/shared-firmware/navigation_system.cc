@@ -12,10 +12,11 @@ void Drone::step() {
     case State::kLanding:
       m_controller->land();
       break;
-    case State::kIdentify:
-      m_controller->blinkLED(LED::kLedRedLeft);
-      m_controller->state = State::kIdle;
-      break;
+    case State::kHover: {
+      Vector3D pos = m_controller->getCurrentLocation();
+      pos.m_z = HEIGHT;
+      m_controller->goTo(pos, true);
+    } break;
     default:
       break;
   }

@@ -35,7 +35,6 @@ clients = []
 # For Drones
 URI = ['radio://0/80/2M/E7E7E7E761', 'radio://0/80/2M/E7E7E7E762']
 # CHANGE TO PROPER DRONE ADDRESS
-drone_address = URI[1]
 COMM_CRAZYFLIE = CommCrazyflie()
 
 if is_simulation:
@@ -68,5 +67,6 @@ while True:
     for client in clients:
       client.send(bytearray(data))
   else:
-    COMM_CRAZYFLIE.send_command(data, drone_address)
+    for uri in URI:
+      COMM_CRAZYFLIE.send_command(data, uri)
   

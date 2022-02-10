@@ -11,11 +11,19 @@
 extern "C" {
 #include "app_channel.h"
 #include "commander.h"
+#include "estimator_kalman.h"
 #include "led.h"
 #include "ledseq.h"
 }
 
 FirmwareController::FirmwareController() : m_seqLED({}) {}
+
+////////////////////////////////////////////////
+Vector3D FirmwareController::getCurrentLocation() {
+  point_t point;
+  estimatorKalmanGetEstimatedPos(&point);
+  return Vector3D(point.x, point.y, point.z);
+}
 
 /////////////////////////////
 void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
@@ -32,15 +40,17 @@ void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
 
 ////////////////////////////////
 void FirmwareController::takeOff(float height) {
-  goTo(Vector3D(0, 0, height), true);
-  blinkLED(LED::kLedGreenRight);
-  state = State::kIdle;
+  Vector3D position = getCurrentLocation();
+  position.m_z = height;
+  goTo(position, true);
+  state = State::kHover;
 }
 
 ///////////////////////////////
 void FirmwareController::land() {
-  goTo(Vector3D(0, 0, 0), true);
-  blinkLED(LED::kLedBlueRight);
+  Vector3D position = getCurrentLocation();
+  position.m_z = 0;
+  goTo(position, true);
   state = State::kIdle;
 }
 

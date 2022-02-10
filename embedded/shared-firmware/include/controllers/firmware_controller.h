@@ -16,7 +16,7 @@ class FirmwareController : public AbstractController {
   FirmwareController(FirmwareController& other) = delete;
   FirmwareController operator=(FirmwareController& other) = delete;
 
-  Vector3D& getCurrentLocation() override{/**/};
+  Vector3D getCurrentLocation() override;
 
   void blinkLED(LED led) override;
 

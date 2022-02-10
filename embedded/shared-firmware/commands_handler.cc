@@ -6,7 +6,7 @@ bool Drone::handleCommand(Command command, const void* extraArgs,
                           const size_t extraArgsLength) {
   switch (command) {
     case Command::kIdentify:
-      m_controller->state = State::kIdentify;
+      m_controller->blinkLED(LED::kLedRedLeft);
       break;
     case Command::kTakeOff:
       m_controller->state = State::kTakingOff;

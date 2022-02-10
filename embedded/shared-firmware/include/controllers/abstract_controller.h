@@ -13,7 +13,7 @@ class AbstractController {
  public:
   virtual ~AbstractController() = default;
 
-  virtual Vector3D& getCurrentLocation() = 0;
+  virtual Vector3D getCurrentLocation() = 0;
 
   virtual void blinkLED(LED led) = 0;
 
