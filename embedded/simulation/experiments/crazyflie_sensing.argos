@@ -60,7 +60,7 @@
     <box id="wall_west" size="0.001,5,2" movable="false">
       <body position="-2.5,0,0" orientation="0,0,0" />
     </box>
-
+      
     <crazyflie id="s0">
       <controller config="ssc" />
       <battery model="time_motion" delta="1e-3" pos_delta="1e-3"  orient_delta="1e-3"/>
@@ -101,6 +101,7 @@
       <battery model="time_motion" delta="1e-3" pos_delta="1e-3"  orient_delta="1e-3"/>
       <body position="-1,-1,0" orientation="0,0,0"/>
     </crazyflie>
+
 
   </arena>
 

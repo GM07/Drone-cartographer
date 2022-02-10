@@ -113,6 +113,7 @@ void CCrazyflieSensing::attemptSocketConnection() {
 CCrazyflieSensing::~CCrazyflieSensing() {
   m_drone.getController()->state = State::kDead;
   if (m_communicationThread) m_communicationThread->join();
+  LOG << m_strId << std::endl;
 }
 /*
  * This statement notifies ARGoS of the existence of the controller.

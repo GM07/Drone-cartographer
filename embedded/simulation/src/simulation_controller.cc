@@ -29,7 +29,10 @@ size_t SimulationController::receiveMessage(void* message, size_t size) {
 }
 
 ///////////////////////////////////////
-void SimulationController::sendMessage(void* message, size_t size) { return; }
+void SimulationController::sendMessage(void* message, size_t size) {
+  LOG << size << std::endl;
+  m_socket->send(boost::asio::buffer(message, size));
+}
 
 ///////////////////////////////////////
 void SimulationController::setLEDState(LED led, bool enable, bool blink) {

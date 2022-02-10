@@ -12,6 +12,7 @@
         ],
         "cwd": "${workspaceFolder}/simulation",
         "MIMode": "gdb",
+        "preLaunchTask": "Setup Simulation",
         "setupCommands": 
         [
           {
@@ -51,7 +52,6 @@
       {
         "name": "Debug Simulation",
         "configurations": ["Argos", "Stub Server"],
-        "preLaunchTask": "Setup Simulation",
         "stopAll": true,
         "presentation": {
           "hidden": false,

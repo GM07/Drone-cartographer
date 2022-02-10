@@ -24,7 +24,7 @@
 	  "--privileged",
 		"--net=host",
 		"--device=/dev/",
-		// "--gpus=all", //Uncomment to use NVDIA GPU
+		"--gpus=all", //Uncomment to use NVDIA GPU
 		"-e",
 		"DISPLAY=${env:DISPLAY}",
 	],

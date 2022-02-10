@@ -4,6 +4,7 @@
 /////////////////////////////////////////////////////////////////////////
 bool Drone::handleCommand(Command command, const void* extraArgs,
                           const size_t extraArgsLength) {
+  static std::string message = "Message";
   switch (command) {
     case Command::kIdentify:
       m_controller->state = State::kIdentify;
@@ -11,6 +12,7 @@ bool Drone::handleCommand(Command command, const void* extraArgs,
     case Command::kTakeOff:
       m_controller->state = State::kTakingOff;
       m_controller->log("TAKEOFF");
+      m_controller->sendMessage(&message, sizeof(message));
       break;
     case Command::kLand:
       m_controller->state = State::kLanding;
