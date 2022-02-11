@@ -27,10 +27,6 @@ export class ServerCommunication {
     });
   }
 
-  public static returnToBase(): Promise<Response> {
-    return fetch(SERVER_CONSTANTS.RETURN_TO_BASE_ADDRESS);
-  }
-
   public static terminateMission(): Promise<Response> {
     return fetch(SERVER_CONSTANTS.TERMINATE_MISSION_ADDRESS);
   }
