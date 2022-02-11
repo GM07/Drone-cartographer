@@ -10,11 +10,10 @@
 using ::testing::_;
 
 TEST(validateCommunicationManager, shouldReturnIfDead) {
-  Drone drone(std::dynamic_pointer_cast<AbstractController>(
-      std::make_shared<StubController>()));
-  EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              receiveMessage(_, _))
-      .Times(1);
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
+  EXPECT_CALL(*controller, receiveMessage(_, _)).Times(1);
   drone.getController()->state = State::kDead;
   auto asyncFuture = std::async(std::launch::async,
                                 [&drone] { drone.communicationManagerTask(); });
@@ -24,14 +23,12 @@ TEST(validateCommunicationManager, shouldReturnIfDead) {
 }
 
 TEST(validateCommunicationManager, shouldNotHandleCommandIfNoMessage) {
-  Drone drone(std::dynamic_pointer_cast<AbstractController>(
-      std::make_shared<StubController>()));
-  EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              sendMessage(_, _))
-      .Times(0);
-  EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              receiveMessage(_, _))
-      .Times(testing::AtLeast(1));
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
+
+  EXPECT_CALL(*controller, sendMessage(_, _)).Times(0);
+  EXPECT_CALL(*controller, receiveMessage(_, _)).Times(testing::AtLeast(1));
 
   auto asyncFuture = std::async(std::launch::async,
                                 [&drone] { drone.communicationManagerTask(); });
