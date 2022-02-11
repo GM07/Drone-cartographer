@@ -38,7 +38,8 @@
 				"Install Argos3 Package",
 				"Compile Simulation Firmware"
 			],
-			"dependsOrder": "sequence"
+			"dependsOrder": "sequence",
+			"runOptions": { "runOn": "folderOpen" }
 		},
 		{
 			"label": "Flash embedded firmware",

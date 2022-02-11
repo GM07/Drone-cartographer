@@ -111,6 +111,7 @@ class CCrazyflieSensing : public CCI_Controller {
 
  private:
   void attemptSocketConnection();
+  void threadTasksWrapper();
 
   std::unique_ptr<std::thread> m_communicationThread;
   Drone m_drone;

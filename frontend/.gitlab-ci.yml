@@ -24,9 +24,10 @@ prepare:
   stage: .pre
   script:
     - cd $WORKING_DIRECTORY
+    - npm --version
     - if [[ ! -d node_modules ]];
       then
-        npm ci;
+        npm ci --cache .npm --prefer-offline;
       fi
   cache: 
     key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
@@ -41,7 +42,7 @@ install_dependencies:
       - $WORKING_DIRECTORY/node_modules/
   script:
     - cd $WORKING_DIRECTORY
-    - npm ci --cache
+    - npm ci --cache .npm --prefer-offline
   only:
     changes:
       - $WORKING_DIRECTORY/package-lock.json
