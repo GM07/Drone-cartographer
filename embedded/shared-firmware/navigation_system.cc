@@ -1,7 +1,5 @@
 #include "components/drone.h"
 
-#define HEIGHT 0.5f
-
 void Drone::step() {
   switch (m_controller->state) {
     case State::kIdle:

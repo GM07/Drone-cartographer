@@ -7,7 +7,9 @@
 #include "utils/commands.h"
 
 #define MESSAGE_MAX_SIZE 60
-#define SPEED 1.0f
+#define TAKEOFF_TIME 1.0f
+#define LANDING_TIME 2.0f
+#define HEIGHT 0.3f
 
 class Drone {
  public:

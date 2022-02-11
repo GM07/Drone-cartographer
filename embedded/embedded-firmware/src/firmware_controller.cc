@@ -27,25 +27,15 @@ Vector3D FirmwareController::getCurrentLocation() {
   return Vector3D(point.x, point.y, point.z);
 }
 
-/////////////////////////////
-void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
-  point_t pos;
-  estimatorKalmanGetEstimatedPos(&pos);
-  float distance = location.distanceTo(Vector3D(pos.x, pos.y, pos.z));
-  float time = distance / SPEED;
-  crtpCommanderHighLevelGoTo(location.m_x, location.m_y, location.m_z, 0.0,
-                             time, false);
-}
-
 ////////////////////////////////
 void FirmwareController::takeOff(float height) {
-  crtpCommanderHighLevelTakeoffWithVelocity(height, SPEED, false);
+  crtpCommanderHighLevelTakeoff(height, TAKEOFF_TIME);
   state = State::kIdle;
 }
 
 ///////////////////////////////
 void FirmwareController::land() {
-  crtpCommanderHighLevelLandWithVelocity(0, SPEED, false);
+  crtpCommanderHighLevelLand(0, LANDING_TIME);
   state = State::kIdle;
 }
 
