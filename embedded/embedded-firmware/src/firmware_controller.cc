@@ -6,11 +6,13 @@
 #include "controllers/abstract_controller.h"
 #pragma GCC diagnostic pop
 
+#include "components/drone.h"
 #include "utils/led.h"
 
 extern "C" {
 #include "app_channel.h"
 #include "commander.h"
+#include "crtp_commander_high_level.h"
 #include "estimator_kalman.h"
 #include "led.h"
 #include "ledseq.h"
@@ -27,30 +29,23 @@ Vector3D FirmwareController::getCurrentLocation() {
 
 /////////////////////////////
 void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
-  static setpoint_t setpoint;
-  setpoint.mode.x = modeAbs;
-  setpoint.mode.y = modeAbs;
-  setpoint.mode.z = modeAbs;
-  setpoint.position.x = location.m_x;
-  setpoint.position.y = location.m_y;
-  setpoint.position.z = location.m_z;
-
-  commanderSetSetpoint(&setpoint, 3);
+  point_t pos;
+  estimatorKalmanGetEstimatedPos(&pos);
+  float distance = location.distanceTo(Vector3D(pos.x, pos.y, pos.z));
+  float time = distance / SPEED;
+  crtpCommanderHighLevelGoTo(location.m_x, location.m_y, location.m_z, 0.0,
+                             time, false);
 }
 
 ////////////////////////////////
 void FirmwareController::takeOff(float height) {
-  Vector3D position = getCurrentLocation();
-  position.m_z = height;
-  goTo(position, true);
-  state = State::kHover;
+  crtpCommanderHighLevelTakeoffWithVelocity(height, SPEED, false);
+  state = State::kIdle;
 }
 
 ///////////////////////////////
 void FirmwareController::land() {
-  Vector3D position = getCurrentLocation();
-  position.m_z = 0;
-  goTo(position, true);
+  crtpCommanderHighLevelLandWithVelocity(0, SPEED, false);
   state = State::kIdle;
 }
 

@@ -4,6 +4,7 @@ extern "C" {
 #include "components/ccommunication_manager.h"
 #include "config.h"
 #include "debug.h"
+#include "param_logic.h"
 #include "static_mem.h"
 #include "task.h"
 }
@@ -39,6 +40,11 @@ bool communicationManagerTest() { return isInit; }
 
 /////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
+  // Enables HighLevel Commander
+  paramVarId_t paramIdCommanderEnHighLevel =
+      paramGetVarId("commander", "enHighLevel");
+  paramSetInt(paramIdCommanderEnHighLevel, 1);
+
   while (true) {
     Drone::getEmbeddedDrone().step();
   }

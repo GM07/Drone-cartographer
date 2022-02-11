@@ -7,6 +7,7 @@
 #include "utils/commands.h"
 
 #define MESSAGE_MAX_SIZE 60
+#define SPEED 1.0f
 
 class Drone {
  public:

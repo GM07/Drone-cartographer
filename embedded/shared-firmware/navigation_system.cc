@@ -12,11 +12,6 @@ void Drone::step() {
     case State::kLanding:
       m_controller->land();
       break;
-    case State::kHover: {
-      Vector3D pos = m_controller->getCurrentLocation();
-      pos.m_z = HEIGHT;
-      m_controller->goTo(pos, true);
-    } break;
     default:
       break;
   }
