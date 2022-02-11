@@ -6,6 +6,7 @@ import os, os.path
 import threading
 
 from services.communication.abstract_comm import AbstractComm
+from services.data.drone_data import DroneData
 
 nConnections = 8
 identifier = "s"
@@ -33,7 +34,7 @@ class CommSimulation(AbstractComm):
         self.attemptSocketConnection(self.INIT_TIMEOUT)
 
         print("Is connected: ", self.isConnected)
-        # self.receive_thread.start()
+        self.receive_thread.start()
 
 
     def __del__(self):
@@ -52,7 +53,6 @@ class CommSimulation(AbstractComm):
                 print('Error with socket ', index, ': ', err)
                 success = False
         
-        print('Connection accepted')
         self.isConnected = success
 
 
@@ -70,11 +70,12 @@ class CommSimulation(AbstractComm):
         print('Receiving thread started')
         while not self.stopThreads:
 
-            print('Drone data receiver running every ', CommSimulation.DELAY_RECEIVER_MS, ' ms, isConnected', self.isConnected)
+            # print('Drone data receiver running every ', CommSimulation.DELAY_RECEIVER_MS, ' ms, isConnected', self.isConnected)
             if self.isConnected:
                 for conn in self.connections:
-                    pass
-                    # data:bytes = conn.recv(32)
-                    # print(data.decode())
+                    received = conn.recv(32)
+                    if (len(received) > 4):
+                        data = DroneData(received)
+                        print(data)
             sleep(CommSimulation.DELAY_RECEIVER_MS / 1000)
 

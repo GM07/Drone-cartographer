@@ -9,6 +9,19 @@
 #include "utils/state.h"
 #include "utils/vector3d.h"
 
+// packs the bytes
+struct __attribute__((__packed__)) ControllerData {
+ public:
+  float front;
+  float left;
+  float back;
+  float right;
+  float posX;
+  float posY;
+  float batteryLevel;
+  int state;
+};
+
 class AbstractController {
  public:
   virtual ~AbstractController() = default;
@@ -35,6 +48,7 @@ class AbstractController {
 
   virtual void delay(const uint32_t ticks) = 0;
 
+  ControllerData data{1.0, 4.0, 10.0, 5.0, 8.0, 9.0, 2.0, 3};
   State state = State::kIdle;
 };
 

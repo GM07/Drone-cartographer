@@ -23,5 +23,3 @@ class CommCrazyflie(AbstractComm):
             print(packet)
             self.crazyflie.appchannel.send_packet(packet)
             self.crazyflie.close_link()
-
-        self.links = self.links_backup

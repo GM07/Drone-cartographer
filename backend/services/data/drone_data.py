@@ -1,4 +1,6 @@
 from enum import Enum
+import pprint
+from services.communication.byte_decoder import ByteDecoder
 
 
 class DroneSensors:
@@ -23,17 +25,39 @@ class DroneState(Enum):
 
 class DroneData:
 
-    @staticmethod
-    def fromDataPacket(packet: bytearray) -> DroneData:
-        pass
-
-    def __init__(self, sensors: DroneSensors, position: Point2D, state: DroneState):
+    def __init__(self, sensors: DroneSensors, position: Point2D, battery_level: float, state: DroneState):
         self.sensors = sensors
         self.position = position
+        self.battery_level = battery_level
         self.state = state
 
-    def updateWithHeightPacket(packet: bytearray):
-        pass
+    def __init__(self, data: bytes):
+        self.__from_bytes(data)
+
+    def __from_bytes(self, data: bytes):
+        decoder: ByteDecoder = ByteDecoder(data, ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'i'])
+        values = decoder.get_values()
+        self.sensors = DroneSensors(values[0], values[1], values[2], values[3])
+        self.position = Point2D(values[4], values[5])
+        self.battery_level = values[6]
+        self.state = DroneState(values[7])
+
+
+    def __str__(self) -> str:
+        return "Drone Information :\n Sensor (f, l, b, r) : " \
+            + str(self.sensors.front) + ", "\
+            + str(self.sensors.left) + ", " \
+            + str(self.sensors.back) + ", " \
+            + str(self.sensors.right) + ", " \
+            + " \nPosition (x, y, z) : " \
+            + str(self.position.x) + ", " \
+            + str(self.position.y) + ", " \
+            + str(self.position.z) + ", " \
+            + " \nBattery level " \
+            + str(self.battery_level) \
+            + " \nState " \
+            + str(self.state.name) \
+            + "\n\n"
 
 """
 Drone GetData (0x04)
