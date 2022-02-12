@@ -1,5 +1,15 @@
 <template>
   <v-list dense nav>
+    <div class="switch-center">
+      <v-switch
+        v-model="simulatedMission"
+        dense
+        :disabled="this.$store.state.missionStatus.isMissionStarted"
+        label="Simulation"
+      >
+      </v-switch>
+    </div>
+
     <v-list-item
       :disabled="
         this.$store.state.missionStatus.isMissionStarted ||
@@ -31,6 +41,15 @@ import {HTTP_OK} from '@/communication/server_constants';
 export default class MissionCommands extends Vue {
   public isLaunchMissionSelected = false;
   public isTerminateMissionSelected = false;
+
+  set simulatedMission(isSimulated: boolean) {
+    if (!ACCESSOR.missionStatus.isMissionStarted)
+      ACCESSOR.missionStatus.isMissionSimulated = isSimulated;
+  }
+
+  get simulatedMission(): boolean {
+    return ACCESSOR.missionStatus.isMissionSimulated;
+  }
 
   public launchMission(): void {
     if (ACCESSOR.missionStatus.isMissionStarted) return;
@@ -64,3 +83,10 @@ export default class MissionCommands extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.switch-center {
+  display: flex;
+  justify-content: center;
+}
+</style>

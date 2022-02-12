@@ -83,10 +83,10 @@ def terminate():
     return ''
 
 
-# Communication with frontend using socketio (example)
+# Communication with frontend using socketio
 @SOCKETIO.on('connect')
 def connection():
-    update_status()
+    SOCKETIO.emit('update_status', get_mission_status(), room=request.sid)
     return ''
 
 @SOCKETIO.on('update_status')
