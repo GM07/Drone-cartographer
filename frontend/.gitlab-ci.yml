@@ -24,6 +24,7 @@ prepare:
   stage: .pre
   script:
     - cd $WORKING_DIRECTORY
+    - npm --version
     - if [[ ! -d node_modules ]];
       then
         npm ci;
@@ -41,7 +42,7 @@ install_dependencies:
       - $WORKING_DIRECTORY/node_modules/
   script:
     - cd $WORKING_DIRECTORY
-    - npm ci --cache
+    - npm ci
   only:
     changes:
       - $WORKING_DIRECTORY/package-lock.json

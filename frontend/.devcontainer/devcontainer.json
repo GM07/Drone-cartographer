@@ -1,14 +1,16 @@
 {
-	"name": "INF3995 - Frontend",
-	"dockerFile": "./Dockerfile.devcontainer",
-	"settings": {
-		"terminal.integrated.defaultProfile.linux": "zsh",
-	},
-	"workspaceFolder": "/workspaces/INF3995-106/frontend",
-	"extensions": [
-		"dbaeumer.vscode-eslint",
-		"octref.vetur"
-	],
-	"forwardPorts": [8080],
-	"postAttachCommand": "npm install",
+  "name": "INF3995 - Frontend",
+  "dockerFile": "./Dockerfile.devcontainer",
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "zsh",
+  },
+  "workspaceFolder": "/workspaces/INF3995-106/frontend",
+  "extensions": [
+    "dbaeumer.vscode-eslint",
+    "octref.vetur"
+  ],
+  "postAttachCommand": "npm install",
+  "runArgs": [
+    "--network=host",
+  ],
 }

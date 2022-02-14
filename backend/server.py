@@ -6,6 +6,7 @@ from flask_pymongo import PyMongo
 from flask_cors import CORS
 from services.communication.crazyflie.comm_crazyflie import CommCrazyflie
 from services.communication.simulation.comm_simulation import CommSimulation
+from services.status.mission_status import *
 
 # Max timeout for the connection with the simulation
 MAX_TIMEOUT = 10
@@ -31,7 +32,6 @@ URI = ['radio://0/80/2M/E7E7E7E761', 'radio://0/80/2M/E7E7E7E762']
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
-in_simulation = False
 COMM_SIMULATION = CommSimulation()
 COMM_CRAZYFLIE = CommCrazyflie()
 
@@ -50,35 +50,53 @@ def identify_drone():
 # Launch mission
 @APP.route('/launch', methods=['POST'])
 def launch():
-    global in_simulation
-    in_simulation = request.get_json()
+    if(get_mission_started()):
+        return ''
+
+    is_simulated = request.get_json()
     print("launch")
-    if in_simulation:
+    if is_simulated:
         COMM_SIMULATION.send_command(COMMANDS.LAUNCH.value)
     else:
         COMM_CRAZYFLIE.send_command(COMMANDS.LAUNCH.value, URI[0])
         COMM_CRAZYFLIE.send_command(COMMANDS.LAUNCH.value, URI[1])
+    
+    set_mission_simulated(is_simulated)
+    set_mission_started(True)
+    update_status()
     return 'Launched'
 
 # Terminate mission
 @APP.route('/terminate')
 def terminate():
-    global in_simulation
-    if in_simulation:
+    if(not get_mission_started()):
+        return ''
+
+    if get_mission_simulated():
         COMM_SIMULATION.send_command(COMMANDS.LAND.value)
     else:
         COMM_CRAZYFLIE.send_command(COMMANDS.LAND.value, URI[0])
         COMM_CRAZYFLIE.send_command(COMMANDS.LAND.value, URI[1])
+
+    set_mission_started(False)
+    update_status()
     return ''
 
 
-# Communication with frontend using socketio (example)
-@SOCKETIO.on('connected')
+# Communication with frontend using socketio
+@SOCKETIO.on('connect')
 def connection():
-    return 'Connected'
+    SOCKETIO.emit('update_status', get_mission_status(), room=request.sid)
+    return ''
+
+@SOCKETIO.on('update_status')
+def update_status():
+    SOCKETIO.emit('update_status', get_mission_status(), broadcast=True, include_self=False, skip_sid=True)
+    return ''
+
 
 if __name__ == '__main__':
     print('The backend is running on port 5000')
-    SOCKETIO.run(APP, debug=False)
+    SOCKETIO.run(APP, debug=False, host='0.0.0.0', port=5000)
     
   
