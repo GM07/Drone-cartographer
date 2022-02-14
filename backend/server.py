@@ -1,4 +1,3 @@
-from enum import Enum
 from pickle import NONE
 from flask import jsonify, Flask, request
 from flask_socketio import SocketIO
@@ -7,14 +6,7 @@ from flask_cors import CORS
 from services.communication.crazyflie.comm_crazyflie import CommCrazyflie
 from services.communication.simulation.comm_simulation import CommSimulation
 from services.status.mission_status import *
-
-# Max timeout for the connection with the simulation
-MAX_TIMEOUT = 10
-
-class COMMANDS(Enum):
-    IDENTIFY = 0x1,
-    LAUNCH = 0x2,
-    LAND = 0x3,
+from constants import MAX_TIMEOUT, COMMANDS, URI
 
 # Flask application
 APP = Flask(__name__)
@@ -25,9 +17,6 @@ APP.config['SECRET_KEY'] = 'dev'
 # Socketio instance to communicate with frontend
 ASYNC_MODE = None
 SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, path="/getMissionStatus", cors_allowed_origins='*')
-
-# Objects to communicate with Crazyflie
-URI = ['radio://0/80/2M/E7E7E7E761', 'radio://0/80/2M/E7E7E7E762']
 
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
