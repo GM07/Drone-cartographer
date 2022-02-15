@@ -39,5 +39,3 @@ size_t appchannelReceiveDataPacket(void* buffer, size_t max_length,
   return 0;
 }
 int appchannelSendDataPacket(void* data, size_t length) { return 0; }
-void Drone::communicationManagerTask() {}
-void Drone::step(){};
