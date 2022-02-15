@@ -18,8 +18,10 @@ TEST(validateCommunicationManager, shouldReturnIfDead) {
   auto asyncFuture = std::async(std::launch::async,
                                 [&drone] { drone.communicationManagerTask(); });
 
-  EXPECT_TRUE(asyncFuture.wait_for(std::chrono::milliseconds(100)) !=
-              std::future_status::timeout);
+  const int64_t kRandomThreadDelay = 100;
+
+  EXPECT_TRUE(asyncFuture.wait_for(std::chrono::milliseconds(
+                  kRandomThreadDelay)) != std::future_status::timeout);
 }
 
 TEST(validateCommunicationManager, shouldNotHandleCommandIfNoMessage) {
@@ -32,8 +34,10 @@ TEST(validateCommunicationManager, shouldNotHandleCommandIfNoMessage) {
 
   auto asyncFuture = std::async(std::launch::async,
                                 [&drone] { drone.communicationManagerTask(); });
-  EXPECT_TRUE(asyncFuture.wait_for(std::chrono::milliseconds(100)) ==
-              std::future_status::timeout);
+
+  const int64_t kRandomThreadDelay = 100;
+  EXPECT_TRUE(asyncFuture.wait_for(std::chrono::milliseconds(
+                  kRandomThreadDelay)) == std::future_status::timeout);
 
   drone.getController()->state = State::kDead;
 }

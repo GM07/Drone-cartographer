@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(embedded_firmware)
+project(shared_firmware)
 
 set(CMAKE_CXX_STANDARD 17)
 
