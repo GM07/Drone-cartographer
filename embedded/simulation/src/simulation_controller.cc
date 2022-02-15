@@ -76,4 +76,6 @@ Vector3D SimulationController::getCurrentLocation() {
   return Vector3D(cPos.GetX(), cPos.GetY(), cPos.GetZ());
 }
 
-bool finishedTrajectory() { return True; }
+bool SimulationController::finishedTrajectory() {
+  return getCurrentLocation().isAlmostEqual(objective);
+}

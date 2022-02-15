@@ -1,6 +1,8 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
 
+#define ALMOST_EQUAL_THRESHOLD 0.01
+
 class Vector3D {
  public:
   Vector3D();
@@ -13,6 +15,7 @@ class Vector3D {
   Vector3D operator/(const float factor);
   Vector3D operator=(const Vector3D& other);
   bool operator==(const Vector3D& other) const;
+  bool isAlmostEqual(const Vector3D& other) const;
 
   float m_x, m_y, m_z;
 };
