@@ -5,10 +5,12 @@ void Drone::step() {
     case State::kIdle:
       break;
     case State::kTakingOff:
-      if (m_controller->finishedTrajectory()) State::kIdle;
+      if (m_controller->finishedTrajectory())
+        m_controller->state = State::kIdle;
       break;
     case State::kLanding:
-      if (m_controller->finishedTrajectory()) State::kIdle;
+      if (m_controller->finishedTrajectory())
+        m_controller->state = State::kIdle;
       break;
     default:
       break;

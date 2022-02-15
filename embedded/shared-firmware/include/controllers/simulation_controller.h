@@ -46,7 +46,7 @@ class SimulationController : public AbstractController {
   void sendP2PMessage(void* message) override{/**/};
   void initCommunicationManager() override;
   size_t receiveMessage(void* message, size_t size) override;
-  void sendMessage(void* message, size_t size) override;
+  void sendMessage(void* message, size_t size) override{/**/};
 
   void log(const std::string& message) override;
 

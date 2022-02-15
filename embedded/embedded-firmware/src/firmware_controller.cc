@@ -21,7 +21,9 @@ extern "C" {
 FirmwareController::FirmwareController() : m_seqLED({}) {}
 
 /////////////////////////
-bool finishedTrajectory(){return crtpCommanderHighLevelIsTrajectoryFinished()}
+bool FirmwareController::finishedTrajectory() {
+  return crtpCommanderHighLevelIsTrajectoryFinished();
+}
 
 ////////////////////////////////////////////////
 Vector3D FirmwareController::getCurrentLocation() {

@@ -24,14 +24,14 @@
 CCrazyflieSensing::CCrazyflieSensing()
     : m_pcDistance(NULL),
       m_pcPropellers(NULL),
-      m_pcRNG(NULL),
       m_pcRABA(NULL),
       m_pcRABS(NULL),
       m_pcPos(NULL),
       m_pcBattery(NULL),
+      m_pcRNG(NULL),
       m_uiCurrentStep(0),
-      m_drone(std::make_shared<SimulationController>(this)),
-      m_communicationThread(nullptr) {}
+      m_communicationThread(nullptr),
+      m_drone(std::make_shared<SimulationController>(this)) {}
 
 /****************************************/
 /****************************************/

@@ -22,16 +22,14 @@ Vector3D Vector3D::operator/(const float other) {
   return Vector3D(m_x / other, m_y / other, m_z / other);
 }
 
-Vector3D Vector3D::operator=(const Vector3D& other) { return *this; }
-
 bool Vector3D::operator==(const Vector3D& other) const {
   return m_x == other.m_x && m_y == other.m_y && m_z == other.m_z;
 }
 
-bool isAlmostEqual(const Vector3D& other) const {
+bool Vector3D::isAlmostEqual(const Vector3D& other) const {
   float distance =
       std::sqrt(std::pow(m_x - other.m_x, 2) + std::pow(m_y - other.m_y, 2) +
                 std::pow(m_z - other.m_z, 2));
 
-  return distance < ALMOST_EQUAL_THRESHOLD;
+  return distance <= ALMOST_EQUAL_THRESHOLD;
 }

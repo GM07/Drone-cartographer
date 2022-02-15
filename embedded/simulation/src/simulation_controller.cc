@@ -20,16 +20,13 @@ SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
 ///////////////////////////////////////
 size_t SimulationController::receiveMessage(void* message, size_t size) {
   size_t n;
-
-  if (n = m_socket->available()) {
+  n = m_socket->available();
+  if (n) {
     m_socket->receive(boost::asio::buffer(message, size));
   }
 
   return n;
 }
-
-///////////////////////////////////////
-void SimulationController::sendMessage(void* message, size_t size) { return; }
 
 ///////////////////////////////////////
 void SimulationController::blinkLED(LED led) {
