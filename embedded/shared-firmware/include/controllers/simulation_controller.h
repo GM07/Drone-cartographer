@@ -22,6 +22,7 @@ inline boost::asio::io_service io_service;
 class SimulationController : public AbstractController {
  public:
   SimulationController(CCrazyflieSensing* ccrazyflieSensing);
+  virtual ~SimulationController() = default;
 
   SimulationController(SimulationController&& other) = delete;
   SimulationController operator=(SimulationController&& other) = delete;

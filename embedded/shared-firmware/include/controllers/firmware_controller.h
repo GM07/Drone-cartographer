@@ -3,9 +3,10 @@
 
 #include "controllers/abstract_controller.h"
 
-class FirmwareController : public AbstractController {
+class FirmwareController : public virtual AbstractController {
  public:
-  FirmwareController(){/**/};
+  FirmwareController() = default;
+  virtual ~FirmwareController() = default;
 
   FirmwareController(FirmwareController&& other) = delete;
   FirmwareController operator=(FirmwareController&& other) = delete;

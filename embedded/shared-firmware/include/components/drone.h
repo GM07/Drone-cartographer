@@ -13,6 +13,8 @@ class Drone {
   Drone(std::shared_ptr<AbstractController> controller)
       : m_controller(controller) {}
 
+  virtual ~Drone() = default;
+
   inline std::shared_ptr<AbstractController> getController() {
     return m_controller;
   };
