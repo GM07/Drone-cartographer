@@ -9,6 +9,16 @@
 inline std::stringstream logBuffer;
 inline std::mutex logBufferMutex;
 
+/***
+ * This variable must absolutely stay inline here
+ * Since the sockets are created using multiple threads
+ * We need to make sure that this object stays alive
+ * for as long as possible. Otherwise we end up with the
+ * destructor of this object called before the destructor
+ * of the threads hence a core dump.
+ */
+inline boost::asio::io_service io_service;
+
 class SimulationController : public AbstractController {
  public:
   SimulationController(CCrazyflieSensing* ccrazyflieSensing);

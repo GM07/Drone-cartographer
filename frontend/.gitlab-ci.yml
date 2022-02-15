@@ -24,6 +24,7 @@ prepare:
   stage: .pre
   script:
     - cd $WORKING_DIRECTORY
+    - npm --version
     - if [[ ! -d node_modules ]];
       then
         npm ci;

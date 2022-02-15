@@ -16,6 +16,8 @@
 /* Communication */
 #include <boost/asio.hpp>
 
+#include "utils/timer.h"
+
 /****************************************/
 /****************************************/
 
@@ -35,8 +37,9 @@ CCrazyflieSensing::CCrazyflieSensing()
 /****************************************/
 
 void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
-  // Try to connect through socket
-  attemptSocketConnection();
+  // Start socket connection
+  m_communicationThread = std::make_unique<std::thread>(
+      &CCrazyflieSensing::threadTasksWrapper, this);
 
   try {
     /*
@@ -93,7 +96,6 @@ void CCrazyflieSensing::Reset() {}
 
 /****************************************/
 /****************************************/
-
 void CCrazyflieSensing::printLogs() {
   std::lock_guard<std::mutex> logMutex(logBufferMutex);
   LOG << logBuffer.str();
@@ -101,12 +103,17 @@ void CCrazyflieSensing::printLogs() {
 }
 
 void CCrazyflieSensing::attemptSocketConnection() {
-  try {
-    m_drone.getController()->initCommunicationManager();
-    m_communicationThread = std::make_unique<std::thread>(
-        &Drone::communicationManagerTask, m_drone);
-  } catch (const boost::system::system_error& error) {
-    LOG << "Socket connection failed for " << m_strId << std::endl;
+  while (true) {
+    try {
+      if (m_drone.getController()->state != State::kDead) {
+        m_drone.getController()->initCommunicationManager();
+      }
+      return;
+    } catch (const boost::system::system_error& error) {
+      // We try to connect to socket 4 times per second
+      // Don't need to try more
+      Timer::delayMs(250);
+    }
   }
 }
 
@@ -115,6 +122,13 @@ CCrazyflieSensing::~CCrazyflieSensing() {
   if (m_communicationThread) m_communicationThread->join();
   LOG << m_strId << std::endl;
 }
+
+/****************************************/
+void CCrazyflieSensing::threadTasksWrapper() {
+  attemptSocketConnection();
+  m_drone.communicationManagerTask();
+}
+
 /*
  * This statement notifies ARGoS of the existence of the controller.
  * It binds the class passed as first argument to the string passed as

@@ -1,5 +1,15 @@
 <template>
   <v-list dense nav>
+    <div class="switch-center">
+      <v-switch
+        v-model="simulatedMission"
+        dense
+        :disabled="this.$store.state.missionStatus.isMissionStarted"
+        label="Simulation"
+      >
+      </v-switch>
+    </div>
+
     <v-list-item
       :disabled="
         this.$store.state.missionStatus.isMissionStarted ||
@@ -8,6 +18,15 @@
       v-on:click="launchMission()"
     >
       <v-list-item-title class="title">Lancer la mission</v-list-item-title>
+    </v-list-item>
+    <v-list-item
+      :disabled="
+        !this.$store.state.missionStatus.isMissionStarted ||
+        isTerminateMissionSelected
+      "
+      v-on:click="returnToBase()"
+    >
+      <v-list-item-title class="title">Retourner à la base</v-list-item-title>
     </v-list-item>
     <v-list-item
       :disabled="
@@ -31,6 +50,16 @@ import {HTTP_OK} from '@/communication/server_constants';
 export default class MissionCommands extends Vue {
   public isLaunchMissionSelected = false;
   public isTerminateMissionSelected = false;
+  public isReturnToBaseSelected = false;
+
+  set simulatedMission(isSimulated: boolean) {
+    if (!ACCESSOR.missionStatus.isMissionStarted)
+      ACCESSOR.missionStatus.isMissionSimulated = isSimulated;
+  }
+
+  get simulatedMission(): boolean {
+    return ACCESSOR.missionStatus.isMissionSimulated;
+  }
 
   public launchMission(): void {
     if (ACCESSOR.missionStatus.isMissionStarted) return;
@@ -45,6 +74,21 @@ export default class MissionCommands extends Vue {
       .catch(error => console.error(error))
       .finally(() => {
         this.isLaunchMissionSelected = false;
+      });
+  }
+
+  public returnToBase(): void {
+    if (!ACCESSOR.missionStatus.isMissionStarted) return;
+    this.isReturnToBaseSelected = true;
+
+    ServerCommunication.returnToBase()
+      .then(response => {
+        if (response.status === HTTP_OK) {
+          ACCESSOR.missionStatus.isMissionStarted = false;
+        }
+      })
+      .finally(() => {
+        this.isReturnToBaseSelected = false;
       });
   }
 
@@ -64,3 +108,10 @@ export default class MissionCommands extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.switch-center {
+  display: flex;
+  justify-content: center;
+}
+</style>
