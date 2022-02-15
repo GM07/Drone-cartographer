@@ -19,13 +19,13 @@ SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
 
 ///////////////////////////////////////
 size_t SimulationController::receiveMessage(void* message, size_t size) {
-  size_t n;
+  size_t messageSize = m_socket->available();
 
-  if (n = m_socket->available()) {
+  if (messageSize != 0) {
     m_socket->receive(boost::asio::buffer(message, size));
   }
 
-  return n;
+  return messageSize;
 }
 
 ///////////////////////////////////////
@@ -44,17 +44,19 @@ void SimulationController::initCommunicationManager() {
   m_socket->connect("/tmp/socket/" + m_ccrazyflieSensing->GetId());
 }
 
-//////////////////////////////
+///////////////////////////////////////////////////
 void SimulationController::log(const std::string& message) {
   std::lock_guard<std::mutex> logMutex(logBufferMutex);
   logBuffer << message << std::endl;
 }
 
+///////////////////////////////////////////////////
 void SimulationController::setSimulationDroneInstance(
     CCrazyflieSensing* ccrazyflieSensing) {
   m_ccrazyflieSensing = ccrazyflieSensing;
 }
 
+///////////////////////////////////////////////////
 void SimulationController::takeOff(float height) {
   CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
 
@@ -67,6 +69,7 @@ void SimulationController::takeOff(float height) {
   m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(cPos);
 }
 
+///////////////////////////////////////////////////
 void SimulationController::land() {
   CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
 
