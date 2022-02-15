@@ -14,9 +14,7 @@ Vue.config.productionTip = false;
 Vue.use(
   new VueSocketIO({
     debug: false,
-    connection: SocketIO(SERVER_ADDRESS, {
-      path: GET_MISSION_STATUS_PATH,
-    }),
+    connection: SocketIO(SERVER_ADDRESS + GET_MISSION_STATUS_PATH),
     vuex: {
       store: STORE,
       actionPrefix: 'socket_',
