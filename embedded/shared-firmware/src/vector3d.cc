@@ -24,8 +24,6 @@ Vector3D Vector3D::operator/(const float other) {
 
 Vector3D Vector3D::operator=(const Vector3D& other) { return *this; }
 
-float Vector3D::distanceTo(const Vector3D& other) const {
-  return std::sqrt(std::pow(std::abs(m_x - other.m_x), 2.0f) +
-                   std::pow(std::abs(m_y - other.m_y), 2.0f) +
-                   std::pow(std::abs(m_z - other.m_z), 2.0f));
+bool Vector3D::operator==(const Vector3D& other) const {
+  return m_x == other.m_x && m_y == other.m_y && m_z == other.m_z;
 }

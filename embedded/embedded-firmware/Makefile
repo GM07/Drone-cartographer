@@ -11,6 +11,7 @@ CRAZYFLIE_BASE=../crazyflie-firmware
 
 CXXFLAGS+=-I../crazyflie-firmware/src/modules/
 CXXFLAGS+=-I../shared-firmware/include/
+CXXFLAGS+=-Iinclude/
 
 
 include $(CRAZYFLIE_BASE)/Makefile

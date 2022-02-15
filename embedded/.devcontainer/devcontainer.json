@@ -17,13 +17,14 @@
 		"ms-python.python",
 		"visualstudioexptteam.vscodeintellicode",
 		"jeff-hykin.better-cpp-syntax",
+		"marus25.cortex-debug"
 	],
 	"workspaceFolder": "/workspaces/INF3995-106/embedded",
 	"runArgs": [
 	  "--privileged",
 		"--net=host",
 		"--device=/dev/",
-		//"--gpus=all", //Uncomment to use NVDIA GPU
+		// "--gpus=all", //Uncomment to use NVDIA GPU
 		"-e",
 		"DISPLAY=${env:DISPLAY}",
 	],

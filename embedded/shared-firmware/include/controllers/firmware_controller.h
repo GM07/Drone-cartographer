@@ -10,6 +10,7 @@ extern "C" {
 class FirmwareController : public AbstractController {
  public:
   FirmwareController();
+  virtual ~FirmwareController() = default;
 
   FirmwareController(FirmwareController&& other) = delete;
   FirmwareController operator=(FirmwareController&& other) = delete;

@@ -10,6 +10,7 @@
     "ms-python.python"
   ],
   "runArgs": [
+    "--network=host",
     "--privileged",
     "--device=/dev/ttyUSB0"
   ],
