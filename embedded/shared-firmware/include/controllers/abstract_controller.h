@@ -23,6 +23,8 @@ class AbstractController {
   virtual void takeOff(float height) = 0;
   virtual void land() = 0;
 
+  virtual bool finishedTrajectory() = 0;
+
   virtual float getDistance(Direction direction) = 0;
   virtual float getBatteryLevel() = 0;
 

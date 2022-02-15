@@ -58,25 +58,24 @@ void SimulationController::setSimulationDroneInstance(
 }
 
 void SimulationController::takeOff(float height) {
-  CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
-
-  if (cPos.GetZ() + ALMOST_THERE >= height) {
-    state = State::kIdle;
-    return;
-  }
-
-  cPos.SetZ(height);
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(cPos);
+  Vector3D pos = getCurrentLocation();
+  pos.m_z = height;
+  objective = pos;
+  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(
+      CVector3(pos.m_x, pos.m_y, pos.m_z));
 }
 
 void SimulationController::land() {
-  CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
-
-  if (cPos.GetZ() - ALMOST_THERE <= 0.0) {
-    state = State::kIdle;
-    return;
-  }
-
-  cPos.SetZ(0.0f);
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(cPos);
+  Vector3D pos = getCurrentLocation();
+  pos.m_z = 0.0;
+  objective = pos;
+  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(
+      CVector3(pos.m_x, pos.m_y, pos.m_z));
 }
+
+Vector3D SimulationController::getCurrentLocation() {
+  CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
+  return Vector3D(cPos.GetX(), cPos.GetY(), cPos.GetZ());
+}
+
+bool finishedTrajectory() { return True; }

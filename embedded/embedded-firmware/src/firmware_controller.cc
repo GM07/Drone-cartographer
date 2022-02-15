@@ -20,6 +20,9 @@ extern "C" {
 
 FirmwareController::FirmwareController() : m_seqLED({}) {}
 
+/////////////////////////
+bool finishedTrajectory(){return crtpCommanderHighLevelIsTrajectoryFinished()}
+
 ////////////////////////////////////////////////
 Vector3D FirmwareController::getCurrentLocation() {
   point_t point;
@@ -30,14 +33,10 @@ Vector3D FirmwareController::getCurrentLocation() {
 ////////////////////////////////
 void FirmwareController::takeOff(float height) {
   crtpCommanderHighLevelTakeoff(height, TAKEOFF_TIME);
-  state = State::kIdle;
 }
 
 ///////////////////////////////
-void FirmwareController::land() {
-  crtpCommanderHighLevelLand(0, LANDING_TIME);
-  state = State::kIdle;
-}
+void FirmwareController::land() { crtpCommanderHighLevelLand(0, LANDING_TIME); }
 
 ///////////////////////////////////////
 size_t FirmwareController::receiveMessage(void* message, size_t size) {

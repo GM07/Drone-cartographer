@@ -18,7 +18,7 @@ class SimulationController : public AbstractController {
   SimulationController(SimulationController& other) = delete;
   SimulationController operator=(SimulationController& other) = delete;
 
-  Vector3D getCurrentLocation() override{/**/};
+  Vector3D getCurrentLocation() override;
 
   void blinkLED(LED led) override;
 
@@ -27,6 +27,7 @@ class SimulationController : public AbstractController {
   void goTo(const Vector3D& location, bool isRelative) override{/**/};
   void takeOff(float height) override;
   void land() override;
+  bool finishedTrajectory() override;
 
   float getDistance(Direction direction) override{/**/};
   float getBatteryLevel() override{/**/};
@@ -45,6 +46,7 @@ class SimulationController : public AbstractController {
  private:
   CCrazyflieSensing* m_ccrazyflieSensing;
   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
+  Vector3D objective;
 };
 
 #endif
