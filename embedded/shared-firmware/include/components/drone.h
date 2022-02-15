@@ -10,6 +10,7 @@
 #define TAKEOFF_TIME 1.0f
 #define LANDING_TIME 2.0f
 #define HEIGHT 0.3f
+#define SPEED 0.5f
 
 class Drone {
  public:
@@ -43,6 +44,7 @@ class Drone {
  private:
   std::shared_ptr<AbstractController> m_controller;
   std::array<uint8_t, MESSAGE_MAX_SIZE> m_messageRX;
+  Direction explorationDirection = Direction::kFront;
 
  public:
   static Drone& getEmbeddedDrone();

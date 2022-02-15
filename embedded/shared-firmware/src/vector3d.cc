@@ -27,9 +27,10 @@ bool Vector3D::operator==(const Vector3D& other) const {
 }
 
 bool Vector3D::isAlmostEqual(const Vector3D& other) const {
-  float distance =
-      std::sqrt(std::pow(m_x - other.m_x, 2) + std::pow(m_y - other.m_y, 2) +
-                std::pow(m_z - other.m_z, 2));
+  return distanceTo(other) <= ALMOST_EQUAL_THRESHOLD;
+}
 
-  return distance <= ALMOST_EQUAL_THRESHOLD;
+float Vector3D::distanceTo(const Vector3D& other) const {
+  return std::sqrt(std::pow(m_x - other.m_x, 2) + std::pow(m_y - other.m_y, 2) +
+                   std::pow(m_z - other.m_z, 2));
 }

@@ -81,9 +81,7 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
 /****************************************/
 
 void CCrazyflieSensing::ControlStep() {
-  if (!m_communicationThread) attemptSocketConnection();
-  if (m_communicationThread) m_drone.step();
-
+  m_drone.step();
   printLogs();
 
   m_uiCurrentStep++;

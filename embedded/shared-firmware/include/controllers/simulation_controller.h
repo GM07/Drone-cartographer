@@ -35,7 +35,7 @@ class SimulationController : public AbstractController {
 
   void goTo(const Vector3D& location, float yaw, float pitch,
             bool isRelative) override{/**/};
-  void goTo(const Vector3D& location, bool isRelative) override{/**/};
+  void goTo(const Vector3D& location, bool isRelative) override;
   void takeOff(float height) override;
   void land() override;
   bool finishedTrajectory() override;
@@ -53,11 +53,13 @@ class SimulationController : public AbstractController {
   void delay(const uint32_t ticks) override{/**/};
 
   void setSimulationDroneInstance(CCrazyflieSensing* ccrazyflieSensing);
+  void setInitialPosition(Vector3D& position);
 
  private:
   CCrazyflieSensing* m_ccrazyflieSensing;
   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
   Vector3D objective;
+  Vector3D initialPosition;
 };
 
 #endif

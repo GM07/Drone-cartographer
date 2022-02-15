@@ -68,3 +68,13 @@ void FirmwareController::blinkLED(LED led) {
   ledseqRegisterSequence(&m_seqLED);
   ledseqRun(&m_seqLED);
 }
+
+void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
+  float speed;
+  if (isRelative)
+    speed = location.distanceTo(getCurrentLocation()) / SPEED;
+  else
+    speed = location.distanceTo(Vector3D(0, 0, 0));
+  crtpCommanderHighLevelGoTo(location.m_x, location.m_y, location.m_z, 0.0,
+                             speed, isRelative);
+}
