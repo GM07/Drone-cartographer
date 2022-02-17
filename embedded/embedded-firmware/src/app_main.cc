@@ -4,6 +4,7 @@ extern "C" {
 #include "components/ccommunication_manager.h"
 #include "config.h"
 #include "debug.h"
+#include "log.h"
 #include "static_mem.h"
 #include "task.h"
 }
@@ -39,6 +40,10 @@ bool communicationManagerTest() { return isInit; }
 
 /////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
+  LOG_GROUP_START(custom)
+  LOG_ADD(LOG_UINT8, state, &Drone::getEmbeddedDrone().getController()->state)
+  LOG_GROUP_STOP(custom)
+
   while (true) {
     Drone::getEmbeddedDrone().step();
   }
