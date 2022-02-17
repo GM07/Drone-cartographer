@@ -36,14 +36,9 @@ Vector3D FirmwareController::getCurrentLocation() {
 
 ////////////////////////////////
 void FirmwareController::takeOff(float height) {
-  resetKalmanFilter();
+  // TODO - RESET KALMAN FILTER POSITION
   takeOffPosition = Vector3D(0, 0, 0);
   crtpCommanderHighLevelTakeoff(height, TAKEOFF_TIME);
-}
-
-void FirmwareController::resetKalmanFilter() {
-  paramSetInt(paramGetVarId("kalman", "resetEstimation"), 1);
-  Timer::delayMs(5000);
 }
 
 ///////////////////////////////
