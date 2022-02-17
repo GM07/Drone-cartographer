@@ -47,8 +47,6 @@ extern "C" void appMain() {
       paramGetVarId("commander", "enHighLevel");
   paramSetInt(paramIdCommanderEnHighLevel, 1);
 
-  // Drone Takes off at position 0,0,0
-  Drone::getEmbeddedDrone().m_controller->takeOffPosition = Vector3D(0, 0, 0);
   while (true) {
     Drone::getEmbeddedDrone().step();
   }

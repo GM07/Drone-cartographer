@@ -5,8 +5,11 @@ void Drone::step() {
     case State::kIdle:
       break;
     case State::kTakingOff:
-      if (m_controller->finishedTrajectory())
+      if (m_controller->finishedTrajectory()) {
+        // DEBUG ONLY REMOVE AFTER
+        explorationDirection = Direction::kFront;
         m_controller->state = State::kExploring;
+      }
       break;
     case State::kLanding:
       if (m_controller->finishedTrajectory())

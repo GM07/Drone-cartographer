@@ -39,6 +39,7 @@ class FirmwareController : public AbstractController {
   void log(const std::string& message) override{/**/};
 
   void delay(const uint32_t ticks) override{/**/};
+  void resetKalmanFilter();
 
  private:
   ledseqContext_t m_seqLED;

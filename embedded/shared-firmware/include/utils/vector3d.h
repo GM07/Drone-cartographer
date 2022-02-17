@@ -15,6 +15,7 @@ class Vector3D {
   Vector3D operator/(const float factor);
   Vector3D& operator+=(const Vector3D& other);
   bool operator==(const Vector3D& other) const;
+  bool operator!=(const Vector3D& other) const;
   float distanceTo(const Vector3D& other) const;
   bool isAlmostEqual(const Vector3D& other) const;
 

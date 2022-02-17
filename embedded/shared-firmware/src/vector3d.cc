@@ -26,6 +26,10 @@ bool Vector3D::operator==(const Vector3D& other) const {
   return m_x == other.m_x && m_y == other.m_y && m_z == other.m_z;
 }
 
+bool Vector3D::operator!=(const Vector3D& other) const {
+  return !(*this == other);
+}
+
 bool Vector3D::isAlmostEqual(const Vector3D& other) const {
   return distanceTo(other) <= ALMOST_EQUAL_THRESHOLD;
 }
