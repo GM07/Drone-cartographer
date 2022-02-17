@@ -59,7 +59,6 @@ class SimulationController : public AbstractController {
   CCrazyflieSensing* m_ccrazyflieSensing;
   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
   Vector3D objective;
-  Vector3D initialPosition;
 };
 
 #endif

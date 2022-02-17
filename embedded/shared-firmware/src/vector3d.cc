@@ -34,3 +34,10 @@ float Vector3D::distanceTo(const Vector3D& other) const {
   return std::sqrt(std::pow(m_x - other.m_x, 2) + std::pow(m_y - other.m_y, 2) +
                    std::pow(m_z - other.m_z, 2));
 }
+
+Vector3D& Vector3D::operator+=(const Vector3D& other) {
+  m_x += other.m_x;
+  m_y += other.m_y;
+  m_z += other.m_z;
+  return *this;
+}

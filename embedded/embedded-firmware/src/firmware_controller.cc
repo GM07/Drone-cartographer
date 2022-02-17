@@ -8,6 +8,7 @@
 
 #include "components/drone.h"
 #include "utils/led.h"
+#include "utils/timer.h"
 
 extern "C" {
 #include "app_channel.h"
@@ -16,6 +17,7 @@ extern "C" {
 #include "estimator_kalman.h"
 #include "led.h"
 #include "ledseq.h"
+#include "param_logic.h"
 }
 
 FirmwareController::FirmwareController() : m_seqLED({}) {}
@@ -70,11 +72,12 @@ void FirmwareController::blinkLED(LED led) {
 }
 
 void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
-  float speed;
+  float time;
   if (isRelative)
-    speed = location.distanceTo(getCurrentLocation()) / SPEED;
+    time = location.distanceTo(Vector3D(0, 0, 0)) / SPEED;
   else
-    speed = location.distanceTo(Vector3D(0, 0, 0));
+    time = location.distanceTo(getCurrentLocation()) / SPEED;
+
   crtpCommanderHighLevelGoTo(location.m_x, location.m_y, location.m_z, 0.0,
-                             speed, isRelative);
+                             time, isRelative);
 }

@@ -10,7 +10,7 @@
 #define TAKEOFF_TIME 1.0f
 #define LANDING_TIME 2.0f
 #define HEIGHT 0.3f
-#define SPEED 0.5f
+#define SPEED 0.1f
 
 class Drone {
  public:
@@ -38,16 +38,19 @@ class Drone {
 
   // Navigation Manager
   void step();
+  void squareTrajectory(float sideLength, bool relative);
 
   // Sensor Manager
 
  private:
-  std::shared_ptr<AbstractController> m_controller;
   std::array<uint8_t, MESSAGE_MAX_SIZE> m_messageRX;
+
+  // DEBUG VARIABLES
   Direction explorationDirection = Direction::kFront;
 
  public:
   static Drone& getEmbeddedDrone();
+  std::shared_ptr<AbstractController> m_controller;
 };
 
 #endif

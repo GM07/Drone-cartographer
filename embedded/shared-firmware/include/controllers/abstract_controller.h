@@ -38,6 +38,7 @@ class AbstractController {
   virtual void delay(const uint32_t ticks) = 0;
 
   State state = State::kIdle;
+  Vector3D takeOffPosition;
 };
 
 #endif

@@ -54,9 +54,7 @@ void SimulationController::setSimulationDroneInstance(
 
 void SimulationController::takeOff(float height) {
   Vector3D pos = getCurrentLocation();
-
-  // TODO - Init position at the start
-  initialPosition = pos;
+  takeOffPosition = pos;
 
   pos.m_z = height;
   objective = pos;
@@ -85,7 +83,7 @@ void SimulationController::goTo(const Vector3D& location, bool isRelative) {
   if (isRelative)
     objective = getCurrentLocation() + location;
   else
-    objective = initialPosition + location;
+    objective = takeOffPosition + location;
   m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(
       CVector3(objective.m_x, objective.m_y, objective.m_z));
 }

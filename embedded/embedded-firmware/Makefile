@@ -13,5 +13,6 @@ CXXFLAGS+=-I../crazyflie-firmware/src/modules/
 CXXFLAGS+=-I../shared-firmware/include/
 CXXFLAGS+=-Iinclude/
 
+CLOAD_CMDS = -w $(radio)
 
 include $(CRAZYFLIE_BASE)/Makefile
