@@ -31,7 +31,14 @@
 /* Definitions for random number generation */
 #include <argos3/core/utility/math/rng.h>
 
+#ifdef GTEST
+#include "socket.h"
+#else
 #include <boost/asio.hpp>
+#endif
+
+#include <mutex>
+#include <thread>
 
 #include "components/drone.h"
 
@@ -49,7 +56,7 @@ class CCrazyflieSensing : public CCI_Controller {
   /* Class constructor. */
   CCrazyflieSensing();
   /* Class destructor. */
-  ~CCrazyflieSensing();
+  virtual ~CCrazyflieSensing();
 
   /*
    * This function initializes the controller.
@@ -109,7 +116,9 @@ class CCrazyflieSensing : public CCI_Controller {
   /* Initial Position */
   CVector3 m_cInitialPosition;
 
+#ifndef GTEST
  private:
+#endif
   void attemptSocketConnection();
   void threadTasksWrapper();
 
