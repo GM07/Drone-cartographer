@@ -22,9 +22,9 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, path="/getMissionStatus", cors_a
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
-COMM_SIMULATION = CommSimulation()
-COMM_EMBEDDED = CommCrazyflie(URI)
-COMM: AbstractComm = COMM_EMBEDDED
+# COMM_SIMULATION = CommSimulation()
+# COMM_EMBEDDED = CommCrazyflie(URI)
+COMM: AbstractComm = CommCrazyflie(URI)
 
 # Get drone addresses
 @APP.route('/getDrones')
@@ -35,8 +35,7 @@ def get_drones():
 @APP.route('/identifyDrone', methods=['POST'])
 def identify_drone():
     drone_addr = request.get_json()
-    comm = CommCrazyflie(drone_addr)
-    comm.send_command(COMMANDS.IDENTIFY.value)
+    COMM.with_addr([drone_addr]).send_command(COMMANDS.IDENTIFY.value)
     return 'Identified drone'
 
 # Launch mission
@@ -48,9 +47,9 @@ def launch():
     is_simulated = request.get_json()
 
     if is_simulated:
-        COMM = COMM_SIMULATION
+        COMM = CommSimulation()
     else:
-        COMM = COMM_EMBEDDED
+        COMM = CommCrazyflie(URI)
 
     COMM.send_command(COMMANDS.LAUNCH.value)
 

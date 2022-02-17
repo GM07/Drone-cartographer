@@ -4,6 +4,7 @@ from time import sleep
 import socket
 import os, os.path
 import threading
+from constants import COMMANDS
 
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
@@ -14,14 +15,12 @@ identifier = "s"
 class CommSimulation(AbstractComm): 
 
     INIT_TIMEOUT = 0.000001
-    DELAY_RECEIVER_MS = 1000
 
     def __init__(self):
         self.isConnected = False
         self.servers: list[socket.socket] = []
         self.connections: list[socket.socket] = []
-        self.receive_thread = threading.Thread(target=self.__receive)
-        self.stopThreads = False
+        self.receive_thread = threading.Thread(target=self.__receive, daemon=True, name='[Simulation] Receiving thread')
 
         for i in range(nConnections):
             file_name = "/tmp/socket/{}{}".format(identifier, i)
@@ -35,10 +34,6 @@ class CommSimulation(AbstractComm):
 
         print("Is connected: ", self.isConnected)
         self.receive_thread.start()
-
-
-    def __del__(self):
-        self.stopThreads = True
 
     def attemptSocketConnection(self, timeout: float = 0.5):
         success = True
@@ -56,7 +51,7 @@ class CommSimulation(AbstractComm):
         self.isConnected = success
 
 
-    def send_command(self, command):
+    def send_command(self, command: COMMANDS):
 
         if not self.isConnected:
             self.attemptSocketConnection(-1)
@@ -68,14 +63,14 @@ class CommSimulation(AbstractComm):
 
     def __receive(self):
         print('Receiving thread started')
-        while not self.stopThreads:
+        while True:
 
-            # print('Drone data receiver running every ', CommSimulation.DELAY_RECEIVER_MS, ' ms, isConnected', self.isConnected)
             if self.isConnected:
                 for conn in self.connections:
+                    self.send_command(COMMANDS.LOGS.value)
                     received = conn.recv(32)
                     if (len(received) > 4):
                         data = DroneData(received)
                         print(data)
-            sleep(CommSimulation.DELAY_RECEIVER_MS / 1000)
+            sleep(AbstractComm.DELAY_RECEIVER_MS / 1000)
 

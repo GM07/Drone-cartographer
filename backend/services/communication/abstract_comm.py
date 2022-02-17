@@ -1,5 +1,10 @@
 
 
+from constants import COMMANDS
+
+
 class AbstractComm:
-    def send_command(self, command) -> None:
+    DELAY_RECEIVER_MS = 1000
+
+    def send_command(self, command: COMMANDS) -> None:
         pass

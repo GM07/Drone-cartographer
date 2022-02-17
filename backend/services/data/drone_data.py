@@ -42,7 +42,6 @@ class DroneData:
         self.battery_level = values[6]
         self.state = DroneState(values[7])
 
-
     def __str__(self) -> str:
         return "Drone Information :\n Sensor (f, l, b, r) : " \
             + str(self.sensors.front) + ", "\
@@ -58,6 +57,9 @@ class DroneData:
             + " \nState " \
             + str(self.state.name) \
             + "\n\n"
+
+def log_entry_to_drone_data(log_entry):
+    pass
 
 """
 Drone GetData (0x04)
