@@ -4,7 +4,7 @@ APP=1
 APP_STACKSIZE=300
 
 VPATH += src/
-VPATH += ../shared-firmware/
+VPATH += ../shared-firmware/src/
 PROJ_OBJ += commands_handler.o communication_manager.o firmware_controller.o navigation_system.o timer.o app_main.o
 
 CRAZYFLIE_BASE=../crazyflie-firmware
