@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Lint all services",
+            "type": "shell",
+            "command": "pylint services --rcfile pylintrc"
+        },
+        {
+            "label": "Lint all tests",
+            "type": "shell",
+            "command": "pylint test --rcfile pylintrc"
+        },
+        {
+            "label": "Run tests",
+            "type": "shell",
+            "command": "pytest"
+        }
+    ]
+
+}
