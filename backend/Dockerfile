@@ -7,6 +7,8 @@ COPY ./services ./services
 
 COPY ./server.py ./server.py
 
+COPY ./constants.py ./constants.py
+
 EXPOSE 5000
 
 CMD python3 server.py
