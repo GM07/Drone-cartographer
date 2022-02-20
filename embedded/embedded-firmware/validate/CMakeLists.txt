@@ -18,7 +18,7 @@ FILE(
 	PROJECT_SRC
 	src/*.cc
 	../src/*.cc
-	../../shared-firmware/*.cc)
+	../../shared-firmware/src/*.cc)
 
 add_executable(
   embedded_firmware

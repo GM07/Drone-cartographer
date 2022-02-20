@@ -1,8 +1,9 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
 
-#define ALMOST_EQUAL_THRESHOLD 0.05
 #include "string"
+
+constexpr float kTreshold = 0.05;
 
 class Vector3D {
  public:
@@ -18,8 +19,7 @@ class Vector3D {
   bool operator==(const Vector3D& other) const;
   bool operator!=(const Vector3D& other) const;
   float distanceTo(const Vector3D& other) const;
-  bool isAlmostEqual(const Vector3D& other,
-                     float threshold = ALMOST_EQUAL_THRESHOLD) const;
+  bool isAlmostEqual(const Vector3D& other, float threshold = kTreshold) const;
 
   std::string toString() const;
 
