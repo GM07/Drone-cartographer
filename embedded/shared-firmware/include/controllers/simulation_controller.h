@@ -1,7 +1,11 @@
 #ifndef SIMULATION_CONTROLLER_H
 #define SIMULATION_CONTROLLER_H
 
+#ifdef GTEST
+#include "socket.h"
+#else
 #include <boost/asio.hpp>
+#endif
 
 #include "controllers/abstract_controller.h"
 #include "crazyflie_sensing.h"
@@ -49,7 +53,9 @@ class SimulationController : public AbstractController {
 
   void delay(const uint32_t ticks) override{/**/};
 
+#ifndef GTEST
  private:
+#endif
   CCrazyflieSensing* m_ccrazyflieSensing;
   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
 };

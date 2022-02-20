@@ -41,7 +41,7 @@ void SimulationController::initCommunicationManager() {
   m_socket->connect("/tmp/socket/" + m_ccrazyflieSensing->GetId());
 }
 
-//////////////////////////////
+///////////////////////////////////////////////////
 void SimulationController::log(const std::string& message) {
   std::lock_guard<std::mutex> logMutex(logBufferMutex);
   logBuffer << message << std::endl;
@@ -57,6 +57,7 @@ void SimulationController::takeOff(float height) {
   goTo(Vector3D(0, 0, height), false);
 }
 
+///////////////////////////////////////////////////
 void SimulationController::land() {
   Vector3D pos = getCurrentLocation();
   pos.m_z = 0.0;

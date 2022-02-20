@@ -42,7 +42,7 @@ class Drone {
 
   // Sensor Manager
 
- private:
+ protected:
   std::shared_ptr<AbstractController> m_controller;
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
 

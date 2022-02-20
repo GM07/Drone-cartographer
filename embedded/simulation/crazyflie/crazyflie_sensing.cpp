@@ -13,9 +13,6 @@
 /* Logging */
 #include <argos3/core/utility/logging/argos_log.h>
 
-/* Communication */
-#include <boost/asio.hpp>
-
 #include "utils/timer.h"
 
 /****************************************/
@@ -82,6 +79,7 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
 
 void CCrazyflieSensing::ControlStep() {
   m_drone.step();
+
   printLogs();
 
   m_uiCurrentStep++;
@@ -96,7 +94,7 @@ void CCrazyflieSensing::Reset() {}
 /****************************************/
 void CCrazyflieSensing::printLogs() {
   std::lock_guard<std::mutex> logMutex(logBufferMutex);
-  LOG << logBuffer.str();
+  argos::LOG << logBuffer.str();
   logBuffer.str(std::string());
 }
 
