@@ -35,16 +35,16 @@ Vector3D FirmwareController::getCurrentLocation() {
 ////////////////////////////////
 void FirmwareController::takeOff(float height) {
   m_takeOffPosition = getCurrentLocation() + m_takeOffPosition;
-  m_objective = Vector3D(0, 0, height);
-  float time = m_objective.distanceTo(getCurrentLocation()) / kTakeOffSpeed;
+  m_targetPosition = Vector3D(0, 0, height);
+  float time = m_targetPosition.distanceTo(getCurrentLocation()) / kTakeOffSpeed;
   crtpCommanderHighLevelTakeoff(height, time);
 }
 
 ///////////////////////////////
 void FirmwareController::land() {
-  m_objective = getCurrentLocation();
-  m_objective.m_z = 0;
-  float time = m_objective.distanceTo(getCurrentLocation()) / kLandingSpeed;
+  m_targetPosition = getCurrentLocation();
+  m_targetPosition.m_z = 0;
+  float time = m_targetPosition.distanceTo(getCurrentLocation()) / kLandingSpeed;
   crtpCommanderHighLevelLand(0, time);
 }
 
@@ -80,13 +80,13 @@ void FirmwareController::blinkLED(LED led) {
 void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
   float time;
   if (isRelative) {
-    m_objective = location;
-    time = m_objective.distanceTo(Vector3D(0, 0, 0)) / kSpeed;
+    m_targetPosition = location;
+    time = m_targetPosition.distanceTo(Vector3D(0, 0, 0)) / kSpeed;
   } else {
-    m_objective = m_takeOffPosition + location;
+    m_targetPosition = m_takeOffPosition + location;
     time = location.distanceTo(getCurrentLocation()) / kSpeed;
   }
 
-  crtpCommanderHighLevelGoTo(m_objective.m_x, m_objective.m_y, m_objective.m_z,
+  crtpCommanderHighLevelGoTo(m_targetPosition.m_x, m_targetPosition.m_y, m_targetPosition.m_z,
                              0.0, time, isRelative);
 }

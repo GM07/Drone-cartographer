@@ -73,17 +73,17 @@ Vector3D SimulationController::getCurrentLocation() {
 }
 
 bool SimulationController::isTrajectoryFinished() {
-  return getCurrentLocation().isAlmostEqual(m_objective);
+  return getCurrentLocation().isAlmostEqual(m_targetPosition);
 }
 
 void SimulationController::goTo(const Vector3D& location, bool isRelative) {
   if (isRelative) {
-    m_objective = getCurrentLocation() + location;
+    m_targetPosition = getCurrentLocation() + location;
   } else {
-    m_objective = location;
+    m_targetPosition = location;
   }
 
-  Vector3D simulationPosition = m_takeOffPosition + m_objective;
+  Vector3D simulationPosition = m_takeOffPosition + m_targetPosition;
   m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(CVector3(
       simulationPosition.m_x, simulationPosition.m_y, simulationPosition.m_z));
 }
