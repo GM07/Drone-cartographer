@@ -33,7 +33,7 @@ servers = []
 clients = []
 
 # For Drones
-URI = ['radio://0/80/2M/E7E7E7E761', 'radio://0/80/2M/E7E7E7E762']
+URI = ['radio://0/80/2M/E7E7E7E761']
 # CHANGE TO PROPER DRONE ADDRESS
 COMM_CRAZYFLIE = CommCrazyflie()
 

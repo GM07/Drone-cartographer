@@ -19,11 +19,13 @@ extern "C" {
 
 static bool isInit = false;
 
+/////////////////////////////////////////////////////////////////////////
 Drone& Drone::getEmbeddedDrone() {
   static Drone drone(std::make_shared<FirmwareController>());
   return drone;
 }
 
+/////////////////////////////////////////////////////////////////////////
 void communicationManagerTaskWrapper(void* parameter) {
   Drone::getEmbeddedDrone().communicationManagerTask();
 }

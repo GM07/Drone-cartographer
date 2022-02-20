@@ -8,6 +8,7 @@
 
 #include "components/drone.h"
 #include "utils/led.h"
+#include "utils/timer.h"
 
 extern "C" {
 #include "app_channel.h"
@@ -16,9 +17,15 @@ extern "C" {
 #include "estimator_kalman.h"
 #include "led.h"
 #include "ledseq.h"
+#include "param_logic.h"
 }
 
 FirmwareController::FirmwareController() : m_seqLED({}) {}
+
+/////////////////////////
+bool FirmwareController::finishedTrajectory() {
+  return crtpCommanderHighLevelIsTrajectoryFinished();
+}
 
 ////////////////////////////////////////////////
 Vector3D FirmwareController::getCurrentLocation() {
@@ -29,15 +36,12 @@ Vector3D FirmwareController::getCurrentLocation() {
 
 ////////////////////////////////
 void FirmwareController::takeOff(float height) {
+  takeOffPosition = getCurrentLocation();
   crtpCommanderHighLevelTakeoff(height, TAKEOFF_TIME);
-  state = State::kIdle;
 }
 
 ///////////////////////////////
-void FirmwareController::land() {
-  crtpCommanderHighLevelLand(0, LANDING_TIME);
-  state = State::kIdle;
-}
+void FirmwareController::land() { crtpCommanderHighLevelLand(0, LANDING_TIME); }
 
 ///////////////////////////////////////
 size_t FirmwareController::receiveMessage(void* message, size_t size) {
@@ -66,4 +70,18 @@ void FirmwareController::blinkLED(LED led) {
 
   ledseqRegisterSequence(&m_seqLED);
   ledseqRun(&m_seqLED);
+}
+
+void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
+  float time;
+  Vector3D objective = location;
+  if (isRelative) {
+    time = objective.distanceTo(Vector3D(0, 0, 0)) / SPEED;
+  } else {
+    objective += takeOffPosition;
+    time = objective.distanceTo(getCurrentLocation()) / SPEED;
+  }
+
+  crtpCommanderHighLevelGoTo(objective.m_x, objective.m_y, objective.m_z, 0.0,
+                             time, isRelative);
 }

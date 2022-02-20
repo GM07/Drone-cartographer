@@ -23,6 +23,8 @@ class AbstractController {
   virtual void takeOff(float height) = 0;
   virtual void land() = 0;
 
+  virtual bool finishedTrajectory() = 0;
+
   virtual float getDistance(Direction direction) = 0;
   virtual float getBatteryLevel() = 0;
 
@@ -36,6 +38,7 @@ class AbstractController {
   virtual void delay(const uint32_t ticks) = 0;
 
   State state = State::kIdle;
+  Vector3D takeOffPosition;
 };
 
 #endif

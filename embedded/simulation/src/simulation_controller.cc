@@ -20,16 +20,13 @@ SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
 ///////////////////////////////////////
 size_t SimulationController::receiveMessage(void* message, size_t size) {
   size_t n;
-
-  if (n = m_socket->available()) {
+  n = m_socket->available();
+  if (n) {
     m_socket->receive(boost::asio::buffer(message, size));
   }
 
   return n;
 }
-
-///////////////////////////////////////
-void SimulationController::sendMessage(void* message, size_t size) { return; }
 
 ///////////////////////////////////////
 void SimulationController::blinkLED(LED led) {
@@ -56,25 +53,38 @@ void SimulationController::setSimulationDroneInstance(
 }
 
 void SimulationController::takeOff(float height) {
-  CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
+  Vector3D pos = getCurrentLocation();
+  takeOffPosition = pos;
 
-  if (cPos.GetZ() + ALMOST_THERE >= height) {
-    state = State::kIdle;
-    return;
-  }
-
-  cPos.SetZ(height);
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(cPos);
+  pos.m_z = height;
+  objective = pos;
+  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(
+      CVector3(pos.m_x, pos.m_y, pos.m_z));
 }
 
 void SimulationController::land() {
+  Vector3D pos = getCurrentLocation();
+  pos.m_z = 0.0;
+  objective = pos;
+  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(
+      CVector3(pos.m_x, pos.m_y, pos.m_z));
+}
+
+Vector3D SimulationController::getCurrentLocation() {
   CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
+  return Vector3D(cPos.GetX(), cPos.GetY(), cPos.GetZ());
+}
 
-  if (cPos.GetZ() - ALMOST_THERE <= 0.0) {
-    state = State::kIdle;
-    return;
+bool SimulationController::finishedTrajectory() {
+  return getCurrentLocation().isAlmostEqual(objective);
+}
+
+void SimulationController::goTo(const Vector3D& location, bool isRelative) {
+  if (isRelative) {
+    objective = getCurrentLocation() + location;
+  } else {
+    objective = takeOffPosition + location;
   }
-
-  cPos.SetZ(0.0f);
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(cPos);
+  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(
+      CVector3(objective.m_x, objective.m_y, objective.m_z));
 }

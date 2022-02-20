@@ -10,6 +10,7 @@ extern "C" {
 class FirmwareController : public AbstractController {
  public:
   FirmwareController();
+  virtual ~FirmwareController() = default;
 
   FirmwareController(FirmwareController&& other) = delete;
   FirmwareController operator=(FirmwareController&& other) = delete;
@@ -22,9 +23,10 @@ class FirmwareController : public AbstractController {
 
   void goTo(const Vector3D& location, float yaw, float pitch,
             bool isRelative) override{/**/};
-  void goTo(const Vector3D& location, bool isRelative) override{/**/};
+  void goTo(const Vector3D& location, bool isRelative) override;
   void takeOff(float height) override;
   void land() override;
+  bool finishedTrajectory() override;
 
   float getDistance(Direction direction) override{/**/};
   float getBatteryLevel() override{/**/};
@@ -37,6 +39,7 @@ class FirmwareController : public AbstractController {
   void log(const std::string& message) override{/**/};
 
   void delay(const uint32_t ticks) override{/**/};
+  void resetKalmanFilter();
 
  private:
   ledseqContext_t m_seqLED;
