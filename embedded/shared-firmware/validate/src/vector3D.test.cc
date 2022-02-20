@@ -69,6 +69,7 @@ TEST(validateVector3D, isAlmostEqual) {
 }
 
 TEST(validateVector3D, distanceTo) {
-  Vector3D vec1 = Vector3D(kDefaultX, kDefaultY, kDefaultZ);
+  Vector3D vec1 = Vector3D(0.0f, 3.0f, 4.0f);
   Vector3D vec2 = Vector3D(0.0f, 0.0f, 0.0f);
+  EXPECT_EQ(vec1.distanceTo(vec2), 5.0f);
 }
