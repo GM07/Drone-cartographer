@@ -30,8 +30,8 @@ bool Vector3D::operator!=(const Vector3D& other) const {
   return !(*this == other);
 }
 
-bool Vector3D::isAlmostEqual(const Vector3D& other) const {
-  return distanceTo(other) <= ALMOST_EQUAL_THRESHOLD;
+bool Vector3D::isAlmostEqual(const Vector3D& other, float threshold) const {
+  return distanceTo(other) <= threshold;
 }
 
 float Vector3D::distanceTo(const Vector3D& other) const {
@@ -44,4 +44,9 @@ Vector3D& Vector3D::operator+=(const Vector3D& other) {
   m_y += other.m_y;
   m_z += other.m_z;
   return *this;
+}
+
+std::string Vector3D::toString() const {
+  return "x: " + std::to_string(m_x) + " y: " + std::to_string(m_y) +
+         " z: " + std::to_string(m_z);
 }

@@ -41,11 +41,15 @@ void communicationManagerInit() {
 bool communicationManagerTest() { return isInit; }
 
 /////////////////////////////////////////////////////////////////////////
-extern "C" void appMain() {
-  // Enables HighLevel Commander
+void enableCrtpHighLevelCommander() {
   paramVarId_t paramIdCommanderEnHighLevel =
       paramGetVarId("commander", "enHighLevel");
   paramSetInt(paramIdCommanderEnHighLevel, 1);
+}
+
+/////////////////////////////////////////////////////////////////////////
+extern "C" void appMain() {
+  enableCrtpHighLevelCommander();
 
   while (true) {
     Drone::getEmbeddedDrone().step();

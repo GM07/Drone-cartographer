@@ -19,13 +19,13 @@ SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
 
 ///////////////////////////////////////
 size_t SimulationController::receiveMessage(void* message, size_t size) {
-  size_t n;
-  n = m_socket->available();
-  if (n) {
+  size_t messageSize = m_socket->available();
+
+  if (messageSize > 0) {
     m_socket->receive(boost::asio::buffer(message, size));
   }
 
-  return n;
+  return messageSize;
 }
 
 ///////////////////////////////////////
@@ -47,44 +47,42 @@ void SimulationController::log(const std::string& message) {
   logBuffer << message << std::endl;
 }
 
-void SimulationController::setSimulationDroneInstance(
-    CCrazyflieSensing* ccrazyflieSensing) {
-  m_ccrazyflieSensing = ccrazyflieSensing;
-}
-
 void SimulationController::takeOff(float height) {
-  Vector3D pos = getCurrentLocation();
-  takeOffPosition = pos;
+  // Since getCurrentLocation() is relative to the old m_takeOffPosition
+  // We need to add the old m_takeOffPosition to get the new one.
+  m_takeOffPosition = getCurrentLocation() + m_takeOffPosition;
 
-  pos.m_z = height;
-  objective = pos;
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(
-      CVector3(pos.m_x, pos.m_y, pos.m_z));
+  // We takeOff using absolute position to prevent multiple takeOff from
+  // stacking one on top of the other
+  goTo(Vector3D(0, 0, height), false);
 }
 
 void SimulationController::land() {
   Vector3D pos = getCurrentLocation();
   pos.m_z = 0.0;
-  objective = pos;
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(
-      CVector3(pos.m_x, pos.m_y, pos.m_z));
+  goTo(pos, false);
 }
 
+// All positions are relative to takeOff position
 Vector3D SimulationController::getCurrentLocation() {
   CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
-  return Vector3D(cPos.GetX(), cPos.GetY(), cPos.GetZ());
+  Vector3D pos = Vector3D(cPos.GetX(), cPos.GetY(), cPos.GetZ());
+
+  return pos - m_takeOffPosition;
 }
 
-bool SimulationController::finishedTrajectory() {
-  return getCurrentLocation().isAlmostEqual(objective);
+bool SimulationController::isTrajectoryFinished() {
+  return getCurrentLocation().isAlmostEqual(m_objective);
 }
 
 void SimulationController::goTo(const Vector3D& location, bool isRelative) {
   if (isRelative) {
-    objective = getCurrentLocation() + location;
+    m_objective = getCurrentLocation() + location;
   } else {
-    objective = takeOffPosition + location;
+    m_objective = location;
   }
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(
-      CVector3(objective.m_x, objective.m_y, objective.m_z));
+
+  Vector3D simulationPosition = m_takeOffPosition + m_objective;
+  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(CVector3(
+      simulationPosition.m_x, simulationPosition.m_y, simulationPosition.m_z));
 }

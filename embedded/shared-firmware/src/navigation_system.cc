@@ -5,25 +5,26 @@ void Drone::step() {
     case State::kIdle:
       break;
     case State::kTakingOff:
-      if (m_controller->finishedTrajectory()) {
+      if (m_controller->isTrajectoryFinished()) {
         // DEBUG ONLY REMOVE AFTER
         explorationDirection = Direction::kFront;
         m_controller->state = State::kExploring;
       }
       break;
     case State::kLanding:
-      if (m_controller->finishedTrajectory())
+      if (m_controller->isTrajectoryFinished())
         m_controller->state = State::kIdle;
       break;
+    // DEBUG ONLY REMOVE AFTER
     case State::kExploring:
-      squareTrajectory(0.5, false);
+      squareTrajectory(0.5, true);
     default:
       break;
   }
 }
 
 void Drone::squareTrajectory(float sideLength, bool relative) {
-  if (m_controller->finishedTrajectory()) {
+  if (m_controller->isTrajectoryFinished()) {
     Vector3D destination;
     switch (explorationDirection) {
       case Direction::kFront:
@@ -47,9 +48,8 @@ void Drone::squareTrajectory(float sideLength, bool relative) {
         break;
     }
 
-    if (!relative)
-      destination +=
-          m_controller->getCurrentLocation() - m_controller->takeOffPosition;
+    // Absolute position are relative to m_takeOffPosition
+    if (!relative) destination += m_controller->getCurrentLocation();
 
     m_controller->goTo(destination, relative);
   }

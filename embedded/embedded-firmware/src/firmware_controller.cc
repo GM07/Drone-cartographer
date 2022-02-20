@@ -20,10 +20,8 @@ extern "C" {
 #include "param_logic.h"
 }
 
-FirmwareController::FirmwareController() : m_seqLED({}) {}
-
 /////////////////////////
-bool FirmwareController::finishedTrajectory() {
+bool FirmwareController::isTrajectoryFinished() {
   return crtpCommanderHighLevelIsTrajectoryFinished();
 }
 
@@ -31,17 +29,24 @@ bool FirmwareController::finishedTrajectory() {
 Vector3D FirmwareController::getCurrentLocation() {
   point_t point;
   estimatorKalmanGetEstimatedPos(&point);
-  return Vector3D(point.x, point.y, point.z);
+  return Vector3D(point.x, point.y, point.z) - m_takeOffPosition;
 }
 
 ////////////////////////////////
 void FirmwareController::takeOff(float height) {
-  takeOffPosition = getCurrentLocation();
-  crtpCommanderHighLevelTakeoff(height, TAKEOFF_TIME);
+  m_takeOffPosition = getCurrentLocation() + m_takeOffPosition;
+  m_objective = Vector3D(0, 0, height);
+  float time = m_objective.distanceTo(getCurrentLocation()) / kTakeOffSpeed;
+  crtpCommanderHighLevelTakeoff(height, time);
 }
 
 ///////////////////////////////
-void FirmwareController::land() { crtpCommanderHighLevelLand(0, LANDING_TIME); }
+void FirmwareController::land() {
+  m_objective = getCurrentLocation();
+  m_objective.m_z = 0;
+  float time = m_objective.distanceTo(getCurrentLocation()) / kLandingSpeed;
+  crtpCommanderHighLevelLand(0, time);
+}
 
 ///////////////////////////////////////
 size_t FirmwareController::receiveMessage(void* message, size_t size) {
@@ -66,7 +71,7 @@ void FirmwareController::blinkLED(LED led) {
                                    {0, LEDSEQ_STOP}};
 
   m_seqLED.sequence = ledStep;
-  m_seqLED.led = (led_t)led;
+  m_seqLED.led = static_cast<led_t>(led);
 
   ledseqRegisterSequence(&m_seqLED);
   ledseqRun(&m_seqLED);
@@ -74,14 +79,14 @@ void FirmwareController::blinkLED(LED led) {
 
 void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
   float time;
-  Vector3D objective = location;
   if (isRelative) {
-    time = objective.distanceTo(Vector3D(0, 0, 0)) / SPEED;
+    m_objective = location;
+    time = m_objective.distanceTo(Vector3D(0, 0, 0)) / kSpeed;
   } else {
-    objective += takeOffPosition;
-    time = objective.distanceTo(getCurrentLocation()) / SPEED;
+    m_objective = m_takeOffPosition + location;
+    time = location.distanceTo(getCurrentLocation()) / kSpeed;
   }
 
-  crtpCommanderHighLevelGoTo(objective.m_x, objective.m_y, objective.m_z, 0.0,
-                             time, isRelative);
+  crtpCommanderHighLevelGoTo(m_objective.m_x, m_objective.m_y, m_objective.m_z,
+                             0.0, time, isRelative);
 }

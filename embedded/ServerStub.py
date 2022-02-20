@@ -27,14 +27,14 @@ nConnections = 8
 identifier = "s"
 
 # CHANGE TO FALSE TO CONTROL REAL DRONE
-is_simulation = False
+is_simulation = True
 
 servers = []
 clients = []
 
 # For Drones
-URI = ['radio://0/80/2M/E7E7E7E761']
 # CHANGE TO PROPER DRONE ADDRESS
+URI = ['radio://0/80/2M/E7E7E7E761']
 COMM_CRAZYFLIE = CommCrazyflie()
 
 if is_simulation:
@@ -50,7 +50,6 @@ if is_simulation:
     server.listen(1)
     client, addr = server.accept()
     clients.append(client)
-
 
 while True:
   command = input("Send message through socket ")

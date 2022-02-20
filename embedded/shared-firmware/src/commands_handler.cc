@@ -9,7 +9,7 @@ bool Drone::handleCommand(Command command, const void* extraArgs,
       m_controller->blinkLED(LED::kLedRedLeft);
       break;
     case Command::kTakeOff:
-      m_controller->takeOff(HEIGHT);
+      m_controller->takeOff(kHeight);
       m_controller->state = State::kTakingOff;
       break;
     case Command::kLand:
