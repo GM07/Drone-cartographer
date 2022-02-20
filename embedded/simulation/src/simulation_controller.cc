@@ -80,10 +80,11 @@ bool SimulationController::finishedTrajectory() {
 }
 
 void SimulationController::goTo(const Vector3D& location, bool isRelative) {
-  if (isRelative)
+  if (isRelative) {
     objective = getCurrentLocation() + location;
-  else
+  } else {
     objective = takeOffPosition + location;
+  }
   m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(
       CVector3(objective.m_x, objective.m_y, objective.m_z));
 }

@@ -36,8 +36,7 @@ Vector3D FirmwareController::getCurrentLocation() {
 
 ////////////////////////////////
 void FirmwareController::takeOff(float height) {
-  // TODO - RESET KALMAN FILTER POSITION
-  takeOffPosition = Vector3D(0, 0, 0);
+  takeOffPosition = getCurrentLocation();
   crtpCommanderHighLevelTakeoff(height, TAKEOFF_TIME);
 }
 
@@ -75,11 +74,14 @@ void FirmwareController::blinkLED(LED led) {
 
 void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
   float time;
-  if (isRelative)
-    time = location.distanceTo(Vector3D(0, 0, 0)) / SPEED;
-  else
-    time = location.distanceTo(getCurrentLocation()) / SPEED;
+  Vector3D objective = location;
+  if (isRelative) {
+    time = objective.distanceTo(Vector3D(0, 0, 0)) / SPEED;
+  } else {
+    objective += takeOffPosition;
+    time = objective.distanceTo(getCurrentLocation()) / SPEED;
+  }
 
-  crtpCommanderHighLevelGoTo(location.m_x, location.m_y, location.m_z, 0.0,
+  crtpCommanderHighLevelGoTo(objective.m_x, objective.m_y, objective.m_z, 0.0,
                              time, isRelative);
 }
