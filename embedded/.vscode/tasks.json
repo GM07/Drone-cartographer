@@ -31,7 +31,9 @@
 				"cwd": "${workspaceFolder}"
 			},
 			"command": "dpkg -i argos3*.deb",
-      "runOptions": { "runOn": "folderOpen" }
+      "runOptions": { 
+        "runOn": "folderOpen" 
+      }
 		},
 		{
 			"label": "Flash embedded firmware",
