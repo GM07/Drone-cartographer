@@ -9,9 +9,12 @@ describe('Communication.ts', () => {
 
   it('Should get the current drones', async () => {
     const MESSAGE = ['droneid1', 'droneid2', 'droneid2'];
-    const EXPECTED_CALL = [SERVER_CONSTANTS.GET_DRONES_ADDRESS, {
-      method: 'GET'
-    }];
+    const EXPECTED_CALL = [
+      SERVER_CONSTANTS.GET_DRONES_ADDRESS,
+      {
+        method: 'GET',
+      },
+    ];
 
     fetchMock.mockResponse(JSON.stringify(MESSAGE), {
       status: SERVER_CONSTANTS.HTTP_OK,

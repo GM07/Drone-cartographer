@@ -12,6 +12,11 @@
             "command": "pylint test --rcfile pylintrc"
         },
         {
+            "label": "Lint server",
+            "type": "shell",
+            "command": "pylint server.py --rcfile pylintrc"
+        },
+        {
             "label": "Run tests",
             "type": "shell",
             "command": "pytest"

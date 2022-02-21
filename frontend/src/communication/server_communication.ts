@@ -34,4 +34,8 @@ export class ServerCommunication {
   public static terminateMission(): Promise<Response> {
     return fetch(SERVER_CONSTANTS.TERMINATE_MISSION_ADDRESS);
   }
+
+  public static getCompleted(): Promise<Response> {
+    return fetch(SERVER_CONSTANTS.GET_COMPLETED_MISSIONS);
+  }
 }

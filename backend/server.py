@@ -7,6 +7,7 @@ from services.communication.crazyflie.comm_crazyflie import CommCrazyflie
 from services.communication.simulation.comm_simulation import CommSimulation
 from services.status.mission_status import *
 from constants import MAX_TIMEOUT, COMMANDS, URI
+from services.communication.database.mongo_interface import Database
 
 # Flask application
 APP = Flask(__name__)
@@ -71,7 +72,12 @@ def terminate():
     update_status()
     return ''
 
-
+# Get Completed mission logs
+@APP.route('/getCompletedMissions')
+def retrieve_missions():
+    database_connection = Database()
+    return database_connection.get_all_missions_time_stamps()
+    
 # Communication with frontend using socketio
 @SOCKETIO.on('connect', namespace="/getMissionStatus")
 def connection():
