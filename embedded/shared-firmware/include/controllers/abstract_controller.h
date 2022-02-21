@@ -17,8 +17,8 @@ class AbstractController {
   virtual void takeOff(float height) = 0;
   virtual void land() = 0;
 
-  virtual Vector3D getCurrentLocation() = 0;
-  virtual bool isTrajectoryFinished() = 0;
+  virtual Vector3D getCurrentLocation() const = 0;
+  virtual bool isTrajectoryFinished() const = 0;
 
   virtual float getDistance(Direction direction) = 0;
   virtual float getBatteryLevel() = 0;

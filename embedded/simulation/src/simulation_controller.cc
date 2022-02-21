@@ -65,14 +65,14 @@ void SimulationController::land() {
 }
 
 // All positions are relative to takeOff position
-Vector3D SimulationController::getCurrentLocation() {
+Vector3D SimulationController::getCurrentLocation() const {
   CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
   Vector3D pos = Vector3D(cPos.GetX(), cPos.GetY(), cPos.GetZ());
 
   return pos - m_takeOffPosition;
 }
 
-bool SimulationController::isTrajectoryFinished() {
+bool SimulationController::isTrajectoryFinished() const {
   return getCurrentLocation().isAlmostEqual(m_targetPosition);
 }
 

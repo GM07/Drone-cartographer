@@ -46,8 +46,7 @@ target_include_directories(
 	"../../crazyflie-firmware/vendor/FreeRTOS/portable/oWatcom/16BitDOS/PC/"
 	"../../crazyflie-firmware/src/utils/interface/lighthouse/"
 	"../../crazyflie-firmware/src/lib/CMSIS/STM32F4xx/Include/"
-	"../../crazyflie-firmware/vendor/CMSIS/CMSIS/Core/Include/"
-	)
+	"../../crazyflie-firmware/vendor/CMSIS/CMSIS/Core/Include/")
 
 set(CMAKE_CXX_FLAGS "-Wno-return-type")
 

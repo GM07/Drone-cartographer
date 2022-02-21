@@ -37,8 +37,8 @@ class SimulationController : public AbstractController {
   void takeOff(float height) override;
   void land() override;
 
-  Vector3D getCurrentLocation() override;
-  bool isTrajectoryFinished() override;
+  Vector3D getCurrentLocation() const override;
+  bool isTrajectoryFinished() const override;
 
   float getDistance(Direction direction) override{/**/};
   float getBatteryLevel() override{/**/};
