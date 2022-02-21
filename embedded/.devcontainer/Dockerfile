@@ -12,7 +12,6 @@ RUN apt-get update \
     liblua5.3-dev \
     lua5.3 \
     libga-dev \
-    gcc-arm-none-eabi \
     ninja-build \
     libboost-system-dev \
     libboost-thread-dev \
@@ -39,3 +38,16 @@ RUN apt-get update && apt-get install -y \
     openocd \
 	  && pip3 install --upgrade pip \
     && pip3 install cfclient
+
+RUN apt-get update && apt-get install -y libncurses5
+
+RUN apt-get install -y gcc-arm-none-eabi gdb-multiarch
+RUN sudo ln -s /usr/bin/gdb-multiarch /usr/local/bin/arm-none-eabi-gdb
+
+# If sudo apt-get gdb-multiarch doesn't work : 
+# ARG GNU_ARM_VERSION=10-2020-q4-major
+# ARG GNU_ARM_DIRECTORY=/opt/toolchains
+# RUN mkdir -p ${GNU_ARM_DIRECTORY} && \
+#     wget -qO- "https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-${GNU_ARM_VERSION}-x86_64-linux.tar.bz2" | tar -xj -C "${GNU_ARM_DIRECTORY}"
+
+# ENV PATH="${GNU_ARM_DIRECTORY}/gcc-arm-none-eabi-${GNU_ARM_VERSION}/bin:$PATH"

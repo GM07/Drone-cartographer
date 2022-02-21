@@ -31,21 +31,20 @@
       },
       {
         "name": "Embedded",
-        "cwd": "${workspaceRoot}",
-        "executable": "${workspaceFolder}/embedded-firmware/cf2.elf",
+        "cwd": "${workspaceFolder}",
+        "executable": "embedded-firmware/cf2.elf",
         "request": "launch",
         "type": "cortex-debug",
         "device": "STM32F405",
-        "svdFile": "${workspaceFolder}/embedded-firmware/STM32F405.svd",
+        "svdFile": "embedded-firmware/STM32F405.svd",
         "servertype": "openocd",
-        "configFiles": ["${workspaceFolder}/embedded-firmware/stlink-v2.cfg"],
-        "armToolchainPath": "usr/",
-        "runToMain": true,
+        "configFiles": ["interface/stlink-v2.cfg", "target/stm32f4x.cfg"],
+        "runToEntryPoint": "main",
         "preLaunchCommands": [
           "set mem inaccessible-by-default off",
           "enable breakpoint",
           "monitor reset"
-        ]
+        ],
       }
     ],
     "compounds": [
