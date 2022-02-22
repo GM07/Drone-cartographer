@@ -7,7 +7,7 @@
 #include "utils/commands.h"
 
 constexpr float kSpeed = 0.1f;
-constexpr float kTakeOffSpeed = 0.25f;
+constexpr float kTakeOffSpeed = 1.0f;
 constexpr float kLandingSpeed = 0.25f;
 constexpr float kHeight = 0.5f;
 constexpr int kMessageMaxSize = 60;

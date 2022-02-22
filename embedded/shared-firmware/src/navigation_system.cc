@@ -17,7 +17,7 @@ void Drone::step() {
       break;
     // DEBUG ONLY REMOVE AFTER
     case State::kExploring:
-      squareTrajectory(0.5, true);
+      squareTrajectory(0.5, false);
     default:
       break;
   }
