@@ -7,6 +7,7 @@ from services.communication.crazyflie.comm_crazyflie import CommCrazyflie
 from services.communication.simulation.comm_simulation import CommSimulation
 from services.status.mission_status import *
 from constants import MAX_TIMEOUT, COMMANDS, URI
+import os
 
 # Flask application
 APP = Flask(__name__)
@@ -45,6 +46,7 @@ def launch():
     is_simulated = request.get_json()
     print("launch")
     if is_simulated:
+        os.system("docker exec -d embedded /bin/bash -c \"echo 'IyEvYmluL2Jhc2gKQVJHT1NfTE9DPSQoZmluZCAvIC1pbmFtZSAiY3JhenlmbGllX3NlbnNpbmcuYXJnb3MiIDI+IC9kZXYvbnVsbCkKYXJnb3MzIC1jICRBUkdPU19MT0MK' | base64 -d | /bin/bash\"")
         COMM_SIMULATION.send_command(COMMANDS.LAUNCH.value)
     else:
         COMM_CRAZYFLIE.send_command(COMMANDS.LAUNCH.value, URI[0])
