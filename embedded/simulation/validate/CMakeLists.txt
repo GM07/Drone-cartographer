@@ -20,7 +20,7 @@ FILE(
 	src/*.cc
 	../src/*.cc
   ../crazyflie/*.cpp
-	../../shared-firmware/*.cc)
+	../../shared-firmware/src/*.cc)
 
 add_executable(
   simulation_firmware

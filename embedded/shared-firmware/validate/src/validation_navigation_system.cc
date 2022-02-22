@@ -11,7 +11,7 @@ TEST(ValidateNavigationSystem, stepTakingOff) {
       std::make_shared<StubController>()));
   drone.getController()->state = State::kTakingOff;
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              takeOff(_))
+              isTrajectoryFinished())
       .Times(1);
   drone.step();
 }
@@ -21,17 +21,7 @@ TEST(ValidateNavigationSystem, stepLanding) {
       std::make_shared<StubController>()));
   drone.getController()->state = State::kLanding;
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              land())
-      .Times(1);
-  drone.step();
-}
-
-TEST(ValidateNavigationSystem, stepIdentify) {
-  Drone drone(std::dynamic_pointer_cast<AbstractController>(
-      std::make_shared<StubController>()));
-  drone.getController()->state = State::kIdentify;
-  EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              setLEDState(_, true, _))
+              isTrajectoryFinished())
       .Times(1);
   drone.step();
 }
@@ -47,7 +37,7 @@ TEST(ValidateNavigationSystem, stateIdle) {
               land())
       .Times(0);
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              setLEDState(_, _, _))
+              blinkLED(_))
       .Times(0);
   drone.step();
 }

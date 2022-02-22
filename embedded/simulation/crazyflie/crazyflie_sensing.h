@@ -113,9 +113,6 @@ class CCrazyflieSensing : public CCI_Controller {
   /* Current step */
   uint m_uiCurrentStep;
 
-  /* Initial Position */
-  CVector3 m_cInitialPosition;
-
 #ifndef GTEST
  private:
 #endif

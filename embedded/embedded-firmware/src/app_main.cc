@@ -4,6 +4,7 @@ extern "C" {
 #include "components/ccommunication_manager.h"
 #include "config.h"
 #include "debug.h"
+#include "param_logic.h"
 #include "static_mem.h"
 #include "task.h"
 }
@@ -40,7 +41,16 @@ void communicationManagerInit() {
 bool communicationManagerTest() { return isInit; }
 
 /////////////////////////////////////////////////////////////////////////
+void enableCrtpHighLevelCommander() {
+  paramVarId_t paramIdCommanderEnHighLevel =
+      paramGetVarId("commander", "enHighLevel");
+  paramSetInt(paramIdCommanderEnHighLevel, 1);
+}
+
+/////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
+  enableCrtpHighLevelCommander();
+
   while (true) {
     Drone::getEmbeddedDrone().step();
   }
