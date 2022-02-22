@@ -20,7 +20,7 @@
             "text": "-enable-pretty-printing",
             "ignoreFailures": true
           }
-        ]
+      ]
       },
       {
         "name": "Stub Server",
@@ -32,14 +32,15 @@
       {
         "name": "Embedded",
         "cwd": "${workspaceFolder}",
-        "executable": "embedded-firmware/cf2.elf",
+        "executable": "${workspaceFolder}/embedded-firmware/cf2.elf",
         "request": "launch",
         "type": "cortex-debug",
         "device": "STM32F405",
-        "svdFile": "embedded-firmware/STM32F405.svd",
+        "svdFile": "${workspaceFolder}/embedded-firmware/STM32F405.svd",
         "servertype": "openocd",
-        "configFiles": ["interface/stlink-v2.cfg", "target/stm32f4x.cfg"],
+        "configFiles": ["interface/stlink-v2-1.cfg", "target/stm32f4x.cfg"],
         "runToEntryPoint": "main",
+        "gdbPath": "/usr/bin/gdb-multiarch",
         "preLaunchCommands": [
           "set mem inaccessible-by-default off",
           "enable breakpoint",
