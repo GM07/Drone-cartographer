@@ -36,8 +36,8 @@ class AbstractController {
   State state = State::kIdle;
 
  protected:
-  Vector3D m_takeOffPosition = Vector3D(0, 0, 0);
-  Vector3D m_targetPosition = Vector3D(0, 0, 0);
+  Vector3D m_takeOffPosition;
+  Vector3D m_targetPosition;
 };
 
 #endif

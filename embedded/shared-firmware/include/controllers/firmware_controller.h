@@ -38,6 +38,6 @@ class FirmwareController : public AbstractController {
   void delay(const uint32_t ticks) override{/**/};
 
  private:
-  ledseqContext_t m_seqLED = {};
+  ledseqContext_t m_seqLED{};
 };
 #endif
