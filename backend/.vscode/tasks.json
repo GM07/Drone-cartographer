@@ -2,19 +2,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Lint all services",
+            "label": "Lint Backend Server",
             "type": "shell",
-            "command": "pylint services --rcfile pylintrc"
-        },
-        {
-            "label": "Lint all tests",
-            "type": "shell",
-            "command": "pylint test --rcfile pylintrc"
-        },
-        {
-            "label": "Lint server",
-            "type": "shell",
-            "command": "pylint server.py --rcfile pylintrc"
+            "command": "pylint * --rcfile pylintrc"
         },
         {
             "label": "Run tests",
