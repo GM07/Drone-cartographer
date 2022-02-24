@@ -32,19 +32,14 @@ size_t SimulationController::receiveMessage(void* message, size_t size) {
 }
 
 ///////////////////////////////////////
-<<<<<<< HEAD
 void SimulationController::sendMessage(void* message, size_t size_bytes) {
   // LOG << size << std::endl;
   m_socket->send(boost::asio::buffer(message, size_bytes));
 }
 
 ///////////////////////////////////////
-void SimulationController::setLEDState(LED led, bool enable, bool blink) {
-  if (enable) log("Identify :" + m_ccrazyflieSensing->GetId());
-=======
 void SimulationController::blinkLED(LED led) {
   log("Identify :" + m_ccrazyflieSensing->GetId());
->>>>>>> 41dceeb79f1823b5213a9da31229d4f6e7029823
 }
 
 ///////////////////////////////////////////////////

@@ -30,22 +30,10 @@
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},
-<<<<<<< HEAD
-			"command": "dpkg -i argos3*.deb"
-		},
-		{
-			"label": "Setup Simulation",
-			"dependsOn": [
-				"Install Argos3 Package",
-				"Compile Simulation Firmware"
-			],
-			"dependsOrder": "sequence",
-=======
 			"command": "dpkg -i argos3*.deb",
       "runOptions": { 
         "runOn": "folderOpen" 
       }
->>>>>>> 41dceeb79f1823b5213a9da31229d4f6e7029823
 		},
 		{
 			"label": "Flash embedded firmware",
