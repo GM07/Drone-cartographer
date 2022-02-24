@@ -21,7 +21,8 @@ class CommCrazyflie(AbstractComm):
         self.initialized_drivers = False
         self.setup_log()
 
-        self.receive_thread = threading.Thread(target=self.__receive, name='[Embedded] Receiving thread', args=[self.links])
+        self.receive_thread = threading.Thread(
+            target=self.__receive, name='[Embedded] Receiving thread', args=[self.links])
         self.receive_thread.start()
         self.sending_commands_links = set()
 
@@ -34,9 +35,9 @@ class CommCrazyflie(AbstractComm):
         self.log_config.add_variable('range.left', 'uint16_t')
         self.log_config.add_variable('range.right', 'uint16_t')
         self.log_config.add_variable('range.back', 'uint16_t')
-        self.log_config.add_variable('ctrltarget.x', 'float')
-        self.log_config.add_variable('ctrltarget.y', 'float')
-        self.log_config.add_variable('ctrltarget.z', 'float')
+        self.log_config.add_variable('kalman.stateX', 'float')
+        self.log_config.add_variable('kalman.stateY', 'float')
+        self.log_config.add_variable('kalman.stateZ', 'float')
         self.log_config.add_variable('pm.batteryLevel', 'uint8_t')
         self.log_config.add_variable('custom.state', 'uint8_t')
 
@@ -66,6 +67,7 @@ class CommCrazyflie(AbstractComm):
             # Iterate through every radio address
             for link in links:
                 try:
+                    #pylint: disable=line-too-long
                     with SyncCrazyflie(link, cf=self.crazyflie) as sync_crazyflie:
                         with SyncLogger(sync_crazyflie, self.log_config) as logger:
 
@@ -80,6 +82,7 @@ class CommCrazyflie(AbstractComm):
                                 break
                         logger.disconnect()
                     sync_crazyflie.close_link()
+                    #pylint: enable=line-too-long
                 except Exception as e:
                     print('Error when logging : ', e)
 

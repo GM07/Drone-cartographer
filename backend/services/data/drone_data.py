@@ -45,20 +45,20 @@ class DroneData:
         self.state = DroneState(values[7])
 
     def __str__(self) -> str:
-        return "Drone Information :\n Sensor (f, l, b, r) : " \
-            + str(self.sensors.front) + ", "\
-            + str(self.sensors.left) + ", " \
-            + str(self.sensors.back) + ", " \
-            + str(self.sensors.right) + ", " \
-            + " \nPosition (x, y, z) : " \
-            + str(self.position.x) + ", " \
-            + str(self.position.y) + ", " \
-            + str(self.position.z) + ", " \
-            + " \nBattery level " \
+        return 'Drone Information :\n Sensor (f, l, b, r) : ' \
+            + str(self.sensors.front) + ', '\
+            + str(self.sensors.left) + ', ' \
+            + str(self.sensors.back) + ', ' \
+            + str(self.sensors.right) + ', ' \
+            + ' \nPosition (x, y, z) : ' \
+            + str(self.position.x) + ', ' \
+            + str(self.position.y) + ', ' \
+            + str(self.position.z) + ', ' \
+            + ' \nBattery level ' \
             + str(self.battery_level) \
-            + " \nState " \
+            + ' \nState ' \
             + str(self.state.name) \
-            + "\n\n"
+            + '\n\n'
 
 def log_entry_to_drone_data(log_entry):
     pass

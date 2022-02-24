@@ -9,21 +9,22 @@ from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
 
-nConnections = 8
-identifier = "s"
+nb_connections = 8
+identifier = 's'
 
 class CommSimulation(AbstractComm):
 
     INIT_TIMEOUT = 0.000001
 
     def __init__(self):
-        self.isConnected = False
+        self.is_connected = False
         self.servers: list[socket.socket] = []
         self.connections: list[socket.socket] = []
-        self.receive_thread = threading.Thread(target=self.__receive, daemon=True, name='[Simulation] Receiving thread')
+        self.receive_thread = threading.Thread(
+            target=self.__receive, daemon=True, name='[Simulation] Receiving thread')
 
-        for i in range(nConnections):
-            file_name = "/tmp/socket/{}{}".format(identifier, i)
+        for i in range(nb_connections):
+            file_name = '/tmp/socket/{}{}'.format(identifier, i)
             if os.path.exists(file_name):
                 os.remove(file_name)
             server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -32,7 +33,7 @@ class CommSimulation(AbstractComm):
 
         self.attemptSocketConnection(self.INIT_TIMEOUT)
 
-        print("Is connected: ", self.isConnected)
+        print('Is connected: ', self.is_connected)
         self.receive_thread.start()
 
     def attemptSocketConnection(self, timeout: float = 0.5):
@@ -48,15 +49,15 @@ class CommSimulation(AbstractComm):
                 print('Error with socket ', index, ': ', err)
                 success = False
         
-        self.isConnected = success
+        self.is_connected = success
 
 
     def send_command(self, command: COMMANDS):
 
-        if not self.isConnected:
+        if not self.is_connected:
             self.attemptSocketConnection(-1)
         
-        if self.isConnected:
+        if self.is_connected:
             print('Sending command ', command, ' to simulation')
             for conn in self.connections:
                 conn.send(bytearray(command))
@@ -65,7 +66,7 @@ class CommSimulation(AbstractComm):
         print('Receiving thread started')
         while True:
 
-            if self.isConnected:
+            if self.is_connected:
                 for conn in self.connections:
                     self.send_command(COMMANDS.LOGS.value)
                     received = conn.recv(32)

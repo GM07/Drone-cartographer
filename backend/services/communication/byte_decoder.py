@@ -21,7 +21,7 @@ class ByteDecoder:
     def __init__(self, data:bytes, types: list):
         self.data = data
 
-        self.structure = list()
+        self.structure = []
         for type in types:
             if type in DEFAULT_SIZES_OF_TYPES:
                 self.structure.append((type, DEFAULT_SIZES_OF_TYPES[type]))
