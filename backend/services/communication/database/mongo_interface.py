@@ -20,12 +20,25 @@ class Point:
 
 @dataclass
 class Mission:
+    """This class has is a dataclass that holds all the parameters
+    needed to describe a mission"""
     time_stamp: str
     temps_de_vol: float
     nombre_de_drones: int
     est_simule: bool
     distance_totale: float
     cartes: List[List[Point]]
+
+    def __init__(self, temps_de_vol: float, nombre_de_drones: int,
+    est_simule: bool, distance_totale: float,
+    cartes: List[List[Point]], time_stamp=time.localtime()):
+        self.time_stamp = time_stamp
+        self.temps_de_vol = temps_de_vol
+        self.nombre_de_drones = nombre_de_drones
+        self.est_simule = est_simule
+        self.distance_totale = distance_totale
+        self.cartes = cartes
+
 
 class Database:
     """This class has methods that communicate with a mongoDb that
@@ -37,12 +50,11 @@ class Database:
         self.db = self.client['admin']
 
     def upload_mission_info(self, mission: Mission):
-        mission.time_stamp = time.localtime()
         return self.db.missions.insert_one(mission.__dict__).inserted_id
 
     def get_all_missions_time_stamps(self) -> list:
         return serialize_objectid_from_result(list(self.db.missions.aggregate(
-            [{'$project': {'time_stamp': 1,'est_simule':1}}])))
+            [{'$project': {'time_stamp': 1, 'est_simule': 1}}])))
 
     def get_mission_from_id(self, identifier: str):
         print(identifier)
@@ -53,16 +65,17 @@ class Database:
             {'_id': identifier}).deleted_count != 0
 
     def update_mission_info_from_id(self, mission: Mission,
-    identifier: str) -> bool:
+                                    identifier: str) -> bool:
         return self.db.missions.replace_one(
-            {'_id': identifier}, mission.__dict__).matched_count !=0        
+            {'_id': identifier}, mission.__dict__).matched_count != 0
 
     def test_connection(self):
         self.db.drop_collection('missions')
-        self.upload_mission_info(Mission('1',10,4,True,40,[[]]))
-        self.upload_mission_info(Mission('2',10,4,False,20,[[]]))
-        self.upload_mission_info(Mission('3',11,5,True,41,[[]]))
-        self.upload_mission_info(Mission('4',10,3,False,40,[[{'x':1,'y':2}]]))
+        self.upload_mission_info(Mission('1', 10, 4, True, 40, [[]]))
+        self.upload_mission_info(Mission('2', 10, 4, False, 20, [[]]))
+        self.upload_mission_info(Mission('3', 11, 5, True, 41, [[]]))
+        self.upload_mission_info(
+            Mission('4', 10, 3, False, 40, [[{'x': 1, 'y': 2}]]))
 
         result = self.get_all_missions_time_stamps()
 
