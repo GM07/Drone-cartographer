@@ -4,11 +4,8 @@ extern "C" {
 #include "components/ccommunication_manager.h"
 #include "config.h"
 #include "debug.h"
-<<<<<<< HEAD
 #include "log.h"
-=======
 #include "param_logic.h"
->>>>>>> 41dceeb79f1823b5213a9da31229d4f6e7029823
 #include "static_mem.h"
 #include "task.h"
 }
@@ -53,13 +50,10 @@ void enableCrtpHighLevelCommander() {
 
 /////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
-<<<<<<< HEAD
   LOG_GROUP_START(custom)
   LOG_ADD(LOG_UINT8, state, &Drone::getEmbeddedDrone().getController()->state)
   LOG_GROUP_STOP(custom)
-=======
   enableCrtpHighLevelCommander();
->>>>>>> 41dceeb79f1823b5213a9da31229d4f6e7029823
 
   while (true) {
     Drone::getEmbeddedDrone().step();

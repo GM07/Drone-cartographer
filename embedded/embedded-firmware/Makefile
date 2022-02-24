@@ -9,16 +9,11 @@ PROJ_OBJ += commands_handler.o communication_manager.o firmware_controller.o nav
 
 CRAZYFLIE_BASE=../crazyflie-firmware
 
-<<<<<<< HEAD
-CXXFLAGS += -I../crazyflie-firmware/src/modules/
-CXXFLAGS += -I../shared-firmware/include/
+CXXFLAGS +=-I../crazyflie-firmware/src/modules/
+CXXFLAGS +=-I../shared-firmware/include/
 CXXFLAGS += '-Wno-write-strings'
-=======
-CXXFLAGS+=-I../crazyflie-firmware/src/modules/
-CXXFLAGS+=-I../shared-firmware/include/
-CXXFLAGS+=-Iinclude/
+CXXFLAGS +=-Iinclude/
 
 CLOAD_CMDS = -w $(radio)
->>>>>>> 41dceeb79f1823b5213a9da31229d4f6e7029823
 
 include $(CRAZYFLIE_BASE)/Makefile
