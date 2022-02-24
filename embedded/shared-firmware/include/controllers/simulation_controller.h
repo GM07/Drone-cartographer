@@ -25,13 +25,13 @@ inline boost::asio::io_service io_service;
 
 class SimulationController : public AbstractController {
  public:
-  SimulationController(CCrazyflieSensing* ccrazyflieSensing);
-  virtual ~SimulationController() = default;
+  explicit SimulationController(CCrazyflieSensing* ccrazyflieSensing);
+  ~SimulationController() override = default;
 
   SimulationController(SimulationController&& other) = delete;
-  SimulationController operator=(SimulationController&& other) = delete;
-  SimulationController(SimulationController& other) = delete;
-  SimulationController operator=(SimulationController& other) = delete;
+  SimulationController& operator=(SimulationController&& other) = delete;
+  SimulationController(const SimulationController& other) = delete;
+  SimulationController& operator=(const SimulationController& other) = delete;
 
   void goTo(const Vector3D& location, bool isRelative) override;
   void takeOff(float height) override;
@@ -40,18 +40,15 @@ class SimulationController : public AbstractController {
   Vector3D getCurrentLocation() const override;
   bool isTrajectoryFinished() const override;
 
-  float getDistance(Direction direction) override{/**/};
-  float getBatteryLevel() override{/**/};
-
   void initCommunicationManager() override;
   size_t receiveMessage(void* message, size_t size) override;
-  void sendMessage(void* message, size_t size) override{/**/};
-  void sendP2PMessage(void* message) override{/**/};
+  void sendMessage(void* /*message*/, size_t /*size*/) override{/**/};
+  void sendP2PMessage(void* /*message*/) override{/**/};
 
   void log(const std::string& message) override;
   void blinkLED(LED led) override;
 
-  void delay(const uint32_t ticks) override{/**/};
+  void delay(uint32_t /*ticks*/) override{/**/};
 
 #ifndef GTEST
  private:

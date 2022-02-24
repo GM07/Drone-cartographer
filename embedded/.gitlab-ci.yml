@@ -1,0 +1,78 @@
+image: zedfly/inf3995:embedded
+
+variables:
+  WORKING_DIRECTORY: "embedded"
+
+workflow:
+  rules:
+    - changes:
+        - $WORKING_DIRECTORY/**/*
+
+stages:
+  - build
+  - test
+  - lint
+
+build_simulation:
+  stage: build
+  before_script:
+    - dpkg -i $WORKING_DIRECTORY/argos3*.deb
+  script:
+    - cd $WORKING_DIRECTORY/simulation
+    - mkdir build && cd build
+    - cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../../ && make -j`nproc`
+  artifacts:
+    name: "$CI_JOB_NAME"
+    paths:
+      - $WORKING_DIRECTORY/simulation/build/
+
+build_embedded:
+  stage: build
+  script:
+    - cd $WORKING_DIRECTORY && rm -r crazyflie-firmware && git clone --recursive https://github.com/zedfly/crazyflie-firmware.git 
+    - cd embedded-firmware
+    - make -j`nproc`
+
+test_embedded:
+  stage: test
+  script:
+    - cd $WORKING_DIRECTORY && rm -r crazyflie-firmware && git clone --recursive https://github.com/zedfly/crazyflie-firmware.git 
+    - cd embedded-firmware/validate
+    - mkdir build && cd build
+    - cmake ../ && make -j`nproc`
+    - ./embedded_firmware
+
+test_shared:
+  stage: test
+  script:
+    - cd $WORKING_DIRECTORY && rm -r crazyflie-firmware && git clone --recursive https://github.com/zedfly/crazyflie-firmware.git 
+    - cd shared-firmware/validate
+    - mkdir build && cd build
+    - cmake ../ && make -j`nproc`
+    - ./shared_firmware
+
+test_simulation:
+  stage: test
+  before_script:
+    - dpkg -i $WORKING_DIRECTORY/argos3*.deb
+  script:
+    - cd $WORKING_DIRECTORY/simulation/validate
+    - mkdir build && cd build
+    - cmake ../ && make -j`nproc`
+    - ./simulation_firmware
+
+lint_simulation:
+  stage: lint
+  before_script:
+    - dpkg -i $WORKING_DIRECTORY/argos3*.deb
+  script:
+    - cd $WORKING_DIRECTORY/simulation/build/
+    - ../../run-clang-tidy.py -checks="-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type"
+
+
+lint_embedded:
+  stage: lint
+  script:
+    - cd $WORKING_DIRECTORY/embedded-firmware
+    - ../run-clang-tidy.py -checks="-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type"
+    

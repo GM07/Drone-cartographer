@@ -1,12 +1,8 @@
-// TODO doit être enlevé lorsque le controlleur sera implémenté
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
+
 #include "controllers/firmware_controller.h"
 
-#include "controllers/abstract_controller.h"
-#pragma GCC diagnostic pop
-
 #include "components/drone.h"
+#include "controllers/abstract_controller.h"
 #include "utils/led.h"
 #include "utils/timer.h"
 
@@ -62,17 +58,19 @@ void FirmwareController::sendMessage(void* message, size_t size) {
 
 ///////////////////////////////////////
 void FirmwareController::blinkLED(LED led) {
-  static ledseqStep_t ledStep[] = {{true, LEDSEQ_WAITMS(500)},
-                                   {false, LEDSEQ_WAITMS(500)},
-                                   {true, LEDSEQ_WAITMS(500)},
-                                   {false, LEDSEQ_WAITMS(500)},
-                                   {true, LEDSEQ_WAITMS(500)},
-                                   {false, LEDSEQ_WAITMS(500)},
-                                   {true, LEDSEQ_WAITMS(500)},
-                                   {false, LEDSEQ_WAITMS(500)},
-                                   {0, LEDSEQ_STOP}};
+  constexpr size_t kNbLEDSteps = 9;
+  static std::array<ledseqStep_t, kNbLEDSteps> ledStep{
+      {{true, LEDSEQ_WAITMS(500)},
+       {false, LEDSEQ_WAITMS(500)},
+       {true, LEDSEQ_WAITMS(500)},
+       {false, LEDSEQ_WAITMS(500)},
+       {true, LEDSEQ_WAITMS(500)},
+       {false, LEDSEQ_WAITMS(500)},
+       {true, LEDSEQ_WAITMS(500)},
+       {false, LEDSEQ_WAITMS(500)},
+       {false, LEDSEQ_STOP}}};
 
-  m_seqLED.sequence = ledStep;
+  m_seqLED.sequence = ledStep.data();
   m_seqLED.led = static_cast<led_t>(led);
 
   ledseqRegisterSequence(&m_seqLED);
@@ -80,7 +78,7 @@ void FirmwareController::blinkLED(LED led) {
 }
 
 void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
-  float time;
+  float time = 0;
   if (isRelative) {
     m_targetPosition = location;
     time = m_targetPosition.distanceTo(Vector3D(0, 0, 0)) / kSpeed;

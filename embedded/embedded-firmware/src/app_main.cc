@@ -10,12 +10,7 @@ extern "C" {
 }
 
 #include "components/drone.h"
-
-// TODO doit être enlevé lorsque le controlleur sera implémenté
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "controllers/firmware_controller.h"
-#pragma GCC diagnostic pop
 
 static bool isInit = false;
 
@@ -26,7 +21,7 @@ Drone& Drone::getEmbeddedDrone() {
 }
 
 /////////////////////////////////////////////////////////////////////////
-void communicationManagerTaskWrapper(void* parameter) {
+void communicationManagerTaskWrapper(void* /*parameter*/) {
   Drone::getEmbeddedDrone().communicationManagerTask();
 }
 

@@ -43,7 +43,7 @@ TEST(validateSimulationController, logShouldAddSomethingToBuffer) {
 TEST(validateSimulationController, takeOffShouldDoSomethingIfValidHeight) {
   StubCCrazyflieSensing crazyflie;
   StubCCIQuadrotorPositionActuator propellers;
-  StubCCIPositioningSensor positionSensor;
+  argos::StubCCIPositioningSensor positionSensor;
   SimulationController controller(&crazyflie);
 
   crazyflie.m_pcPropellers = &propellers;
