@@ -7,31 +7,92 @@ export class ServerCommunication {
     });
   }
 
-  public static identifyDrone(droneId: string): Promise<Response> {
-    return fetch(SERVER_CONSTANTS.IDENTIFY_DRONE_ADDRESS, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(droneId),
-    });
+  public static identifyDrone(droneId: string): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.IDENTIFY_DRONE_ADDRESS,
+        droneId
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
-  public static launchMission(isMissionSimulated: boolean): Promise<Response> {
-    return fetch(SERVER_CONSTANTS.LAUNCH_MISSION_ADDRESS, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(isMissionSimulated),
-    });
+  public static takeMissionControl(): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.TAKE_CONTROL_ADDRESS
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
-  public static returnToBase(): Promise<Response> {
-    return fetch(SERVER_CONSTANTS.RETURN_TO_BASE_ADDRESS);
+  public static takeMissionControlTimeout(
+    timeout: number,
+    callback: () => void
+  ): void {
+    SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.timeout(timeout).emit(
+      SERVER_CONSTANTS.TAKE_CONTROL_ADDRESS,
+      callback
+    );
   }
 
-  public static terminateMission(): Promise<Response> {
-    return fetch(SERVER_CONSTANTS.TERMINATE_MISSION_ADDRESS);
+  public static revokeMissionControl(): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.REVOKE_CONTROL_ADDRESS
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
+  public static setMissionType(isMissionSimulated: boolean): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.SET_MISSION_TYPE_ADDRESS,
+        isMissionSimulated
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
+  public static launchMission(
+    isMissionSimulated: boolean,
+    callback: () => void
+  ): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.LAUNCH_MISSION_ADDRESS,
+        isMissionSimulated,
+        callback
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
+  public static returnToBase(callback: () => void): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.RETURN_TO_BASE_ADDRESS,
+        callback
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
+  public static terminateMission(callback: () => void): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.TERMINATE_MISSION_ADDRESS,
+        callback
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 }

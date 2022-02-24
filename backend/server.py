@@ -6,7 +6,8 @@ from flask_cors import CORS
 from services.communication.abstract_comm import AbstractComm
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
-from services.status.mission_status import *
+import services.status.access_status as AccessStatus
+import services.status.mission_status as MissionStatus
 from constants import MAX_TIMEOUT, COMMANDS, URI
 import os
 
@@ -33,60 +34,77 @@ def get_drones():
     return jsonify(URI)
 
 # Identifying drones
-@APP.route('/identifyDrone', methods=['POST'])
-def identify_drone():
-    drone_addr = request.get_json()
+@SOCKETIO.on('identify_drone', namespace="/limitedAccess")
+def identify_drone(drone_addr):
+    if not AccessStatus.is_request_valid(request):
+        return ''
+
     COMM.with_addr([drone_addr]).send_command(COMMANDS.IDENTIFY.value)
     return 'Identified drone'
 
 # Launch mission
-@APP.route('/launch', methods=['POST'])
-def launch():
-    # if(get_mission_started()):
-    #     return ''
+@SOCKETIO.on('launch', namespace="/limitedAccess")
+def launch(is_simulated: bool):
+    if(MissionStatus.get_mission_started() or not AccessStatus.is_request_valid(request)):
+        return ''
 
-    is_simulated = request.get_json()
-
+    print('launch')
     if is_simulated:
         os.system("docker exec -d embedded /bin/bash -c \"echo 'IyEvYmluL2Jhc2gKQVJHT1NfTE9DPSQoZmluZCAvIC1pbmFtZSAiY3JhenlmbGllX3NlbnNpbmcuYXJnb3MiIDI+IC9kZXYvbnVsbCkKYXJnb3MzIC1jICRBUkdPU19MT0MK' | base64 -d | /bin/bash\"")
+    COMM.send_command(COMMANDS.LAUNCH.value)
+    
+    MissionStatus.launch_mission(SOCKETIO)
+    return 'Launched'
+
+@SOCKETIO.on('set_mission_type', namespace="/limitedAccess")
+def set_mission_type(is_simulated: bool):
+    AccessStatus.set_mission_type(SOCKETIO, is_simulated, request.sid)
+    global COMM
+    if is_simulated:
         COMM = CommSimulation()
     else:
         COMM = CommCrazyflie(URI)
-
-    COMM.send_command(COMMANDS.LAUNCH.value)
-
-    set_mission_simulated(is_simulated)
-    set_mission_started(True)
-    update_status()
-    return 'Launched'
+    return ''
 
 # Terminate mission
-@APP.route('/terminate')
+@SOCKETIO.on('terminate', namespace="/limitedAccess")
 def terminate():
-    if(not get_mission_started()):
+    if(not MissionStatus.get_mission_started() or not AccessStatus.is_request_valid(request)):
         return ''
 
     COMM.send_command(COMMANDS.LAND.value)
 
-    set_mission_started(False)
-    update_status()
+    MissionStatus.terminate_mission(SOCKETIO)
+    return 'Terminated'
+
+@SOCKETIO.on('take_control', namespace="/limitedAccess")
+def request_control():
+    change = AccessStatus.take_control(SOCKETIO, request)
+    if change:
+        MissionStatus.update_all_clients(SOCKETIO)
     return ''
 
+@SOCKETIO.on('revoke_control', namespace="/limitedAccess")
+def revoke_control():
+    change = AccessStatus.revoke_controlling_client(SOCKETIO, request)
+    if change:
+        MissionStatus.update_all_clients(SOCKETIO)
+    return ''
 
-# Communication with frontend using socketio
+@SOCKETIO.on('disconnect', namespace="/limitedAccess")
+def disconnect():
+    change = AccessStatus.client_disconnected(SOCKETIO, request)
+    if change:
+        MissionStatus.update_all_clients(SOCKETIO)
+    return ''
+
 @SOCKETIO.on('connect', namespace="/getMissionStatus")
-def connection():
-    SOCKETIO.emit('update_status', get_mission_status(),namespace="/getMissionStatus", room=request.sid)
-    return ''
-
-@SOCKETIO.on('update_status', namespace="/getMissionStatus")
-def update_status():
-    SOCKETIO.emit('update_status', get_mission_status(), namespace="/getMissionStatus", broadcast=True, include_self=False, skip_sid=True)
+def MissionConnect():
+    MissionStatus.client_connected(SOCKETIO, request)
     return ''
 
 if __name__ == '__main__':
     print('The backend is running on port 5000')
 
     SOCKETIO.run(APP, debug=False, host='0.0.0.0', port=5000)
-    
-  
+

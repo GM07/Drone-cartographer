@@ -12,19 +12,21 @@ from services.data.drone_data import DroneData
 
 class CommCrazyflie(AbstractComm): 
 
-    def __init__(self, links: list, init_drivers: bool = True):
+    def __init__(self, links: list):
 
         print('Creating Embedded Crazyflie communication')
-        if init_drivers:
-            cflib.crtp.init_drivers()
         self.crazyflie = Crazyflie(rw_cache='./cache')
         self.links = links
         self.backup_links = links
+        self.initialized_drivers = False
         self.setup_log()
 
         self.receive_thread = threading.Thread(target=self.__receive, name='[Embedded] Receiving thread', args=[self.links])
         self.receive_thread.start()
         self.sending_commands_links = set()
+
+    def __init_drivers():
+        cflib.crtp.init_drivers()
 
     def setup_log(self):
         self.log_config = LogConfig(name='Stabilizer', period_in_ms=10)
@@ -43,6 +45,9 @@ class CommCrazyflie(AbstractComm):
         return self
 
     def send_command(self, command: COMMANDS) -> None:
+
+        if not self.initialized_drivers:
+            self.__init_drivers()
 
         for link in self.links:
             self.crazyflie.open_link(link)
