@@ -27,7 +27,6 @@
 		"--name=embedded",
 		//"--gpus=all", //Uncomment to use NVDIA GPU
 		"-e",
-<<<<<<< HEAD
 		"DISPLAY=${env:DISPLAY}",
 		"--device-cgroup-rule=a 166:* rwm",
 		"--device-cgroup-rule=a 189:* rwm",
@@ -36,13 +35,6 @@
 		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
     "source=/tmp/socket/,target=/tmp/socket/,type=bind",
 		"source=/etc/udev/rules.d,target=/etc/udev/rules.d,type=bind"
-=======
-		"DISPLAY=${env:DISPLAY}"
-	],
-	"mounts": [
-		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-		"source=/tmp/socket/,target=/tmp/socket/,type=bind"
->>>>>>> 41dceeb79f1823b5213a9da31229d4f6e7029823
 	],
 	"remoteEnv": {
 		"QT_X11_NO_MITSHM": "1"
