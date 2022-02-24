@@ -5,14 +5,17 @@ import Mission from '@/views/mission.vue';
 
 Vue.use(VueRouter);
 
+export const HOME_ROUTE = '/';
+export const MISSION_ROUTE = '/Mission';
+
 const ROUTES: Array<RouteConfig> = [
   {
-    path: '/',
+    path: HOME_ROUTE,
     name: 'Home',
     component: Home,
   },
   {
-    path: '/Mission',
+    path: MISSION_ROUTE,
     name: 'Mission',
     component: Mission,
   },
