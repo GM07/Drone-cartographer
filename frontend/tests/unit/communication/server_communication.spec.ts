@@ -25,12 +25,4 @@ describe('Communication.ts', () => {
     expect(OBTAINED_VALUES).toEqual(MESSAGE);
     expect(RESPONSE.status).toEqual(SERVER_CONSTANTS.HTTP_OK);
   });
-
-  it('Should identify a drone', async () => {
-    const INPUT = 'droneid1';
-
-    fetchMock.mockResponse('', {status: SERVER_CONSTANTS.HTTP_OK});
-    const RESPONSE = await ServerCommunication.identifyDrone(INPUT);
-    expect(RESPONSE.status).toEqual(SERVER_CONSTANTS.HTTP_OK);
-  });
 });

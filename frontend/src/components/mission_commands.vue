@@ -41,70 +41,68 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Prop, Vue} from 'vue-property-decorator';
 import {ACCESSOR} from '@/store';
 import {ServerCommunication} from '@/communication/server_communication';
-import {HTTP_OK} from '@/communication/server_constants';
+import {AccessStatus} from '@/communication/access_status';
 
 @Component({})
 export default class MissionCommands extends Vue {
+  @Prop() private accessStatus!: AccessStatus;
   public isLaunchMissionSelected = false;
   public isTerminateMissionSelected = false;
   public isReturnToBaseSelected = false;
 
   set simulatedMission(isSimulated: boolean) {
-    if (!ACCESSOR.missionStatus.isMissionStarted)
-      ACCESSOR.missionStatus.isMissionSimulated = isSimulated;
+    if (!ACCESSOR.missionStatus.isMissionStarted) {
+      this.accessStatus.isMissionSimulated = isSimulated;
+      ServerCommunication.setMissionType(isSimulated);
+    }
   }
 
   get simulatedMission(): boolean {
-    return ACCESSOR.missionStatus.isMissionSimulated;
+    return this.accessStatus.isMissionSimulated;
   }
 
   public launchMission(): void {
     if (ACCESSOR.missionStatus.isMissionStarted) return;
     this.isLaunchMissionSelected = true;
 
-    ServerCommunication.launchMission(ACCESSOR.missionStatus.isMissionSimulated)
-      .then(response => {
-        if (response.status === HTTP_OK) {
-          ACCESSOR.missionStatus.isMissionStarted = true;
-        }
-      })
-      .catch(error => console.error(error))
-      .finally(() => {
+    const COMMAND_SENT = ServerCommunication.launchMission(
+      this.accessStatus.isMissionSimulated,
+      () => {
         this.isLaunchMissionSelected = false;
-      });
+      }
+    );
+    if (!COMMAND_SENT) {
+      this.isLaunchMissionSelected = false;
+    }
   }
 
   public returnToBase(): void {
     if (!ACCESSOR.missionStatus.isMissionStarted) return;
     this.isReturnToBaseSelected = true;
 
-    ServerCommunication.returnToBase()
-      .then(response => {
-        if (response.status === HTTP_OK) {
-          ACCESSOR.missionStatus.isMissionStarted = false;
-        }
-      })
-      .finally(() => {
-        this.isReturnToBaseSelected = false;
-      });
+    const COMMAND_SENT = ServerCommunication.returnToBase(() => {
+      this.isReturnToBaseSelected = false;
+    });
+
+    if (!COMMAND_SENT) {
+      this.isReturnToBaseSelected = false;
+    }
   }
 
   public terminateMission(): void {
     if (!ACCESSOR.missionStatus.isMissionStarted) return;
     this.isTerminateMissionSelected = true;
 
-    ServerCommunication.terminateMission()
-      .then(response => {
-        if (response.status === HTTP_OK) {
-          ACCESSOR.missionStatus.isMissionStarted = false;
-        }
-      })
-      .finally(() => {
-        this.isTerminateMissionSelected = false;
-      });
+    const COMMAND_SENT = ServerCommunication.terminateMission(() => {
+      this.isTerminateMissionSelected = false;
+    });
+
+    if (!COMMAND_SENT) {
+      this.isTerminateMissionSelected = false;
+    }
   }
 }
 </script>

@@ -10,7 +10,7 @@ const STATE = () => ({
   isConnected: false,
   missionStatus: {
     isMissionStarted: false,
-    isMissionSimulated: false,
+    isSomeoneControlling: false,
   } as MissionStatus,
 });
 

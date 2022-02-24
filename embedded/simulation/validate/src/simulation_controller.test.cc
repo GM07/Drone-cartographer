@@ -40,20 +40,6 @@ TEST(validateSimulationController, logShouldAddSomethingToBuffer) {
   EXPECT_EQ(logBuffer.tellg(), sizeof("sup"));
 }
 
-TEST(validateSimulationController, takeOffShouldDoNothingIfInvalidHeight) {
-  StubCCrazyflieSensing crazyflie;
-  StubCCIQuadrotorPositionActuator propellers;
-  StubCCIPositioningSensor positionSensor;
-  SimulationController controller(&crazyflie);
-
-  crazyflie.m_pcPropellers = &propellers;
-  crazyflie.m_pcPos = &positionSensor;
-
-  EXPECT_CALL(propellers, SetAbsolutePosition(_)).Times(0);
-
-  controller.takeOff(0.0f);
-}
-
 TEST(validateSimulationController, takeOffShouldDoSomethingIfValidHeight) {
   StubCCrazyflieSensing crazyflie;
   StubCCIQuadrotorPositionActuator propellers;
@@ -66,18 +52,4 @@ TEST(validateSimulationController, takeOffShouldDoSomethingIfValidHeight) {
   EXPECT_CALL(propellers, SetAbsolutePosition(_)).Times(1);
 
   controller.takeOff(1.0f);
-}
-
-TEST(validateSimulationController, landShouldDoNithingIfAlreadyLand) {
-  StubCCrazyflieSensing crazyflie;
-  StubCCIQuadrotorPositionActuator propellers;
-  StubCCIPositioningSensor positionSensor;
-  SimulationController controller(&crazyflie);
-
-  crazyflie.m_pcPropellers = &propellers;
-  crazyflie.m_pcPos = &positionSensor;
-
-  EXPECT_CALL(propellers, SetAbsolutePosition(_)).Times(0);
-
-  controller.land();
 }

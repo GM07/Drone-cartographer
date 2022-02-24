@@ -71,11 +71,11 @@ class Database:
 
     def test_connection(self):
         self.db.drop_collection('missions')
-        self.upload_mission_info(Mission('1', 10, 4, True, 40, [[]]))
-        self.upload_mission_info(Mission('2', 10, 4, False, 20, [[]]))
-        self.upload_mission_info(Mission('3', 11, 5, True, 41, [[]]))
+        self.upload_mission_info(Mission( 10, 4, True, 40, [[]]))
+        self.upload_mission_info(Mission( 10, 4, False, 20, [[]]))
+        self.upload_mission_info(Mission( 11, 5, True, 41, [[]]))
         self.upload_mission_info(
-            Mission('4', 10, 3, False, 40, [[{'x': 1, 'y': 2}]]))
+            Mission( 10, 3, False, 40, [[{'x': 1, 'y': 2}]]))
 
         result = self.get_all_missions_time_stamps()
 
@@ -87,3 +87,6 @@ def serialize_objectid_from_result(result: list):
     for test in result:
         test['_id'] = str(test['_id'])
     return result
+
+database = Database()
+database.test_connection()

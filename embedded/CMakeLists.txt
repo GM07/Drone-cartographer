@@ -6,5 +6,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -O0")
 include_directories("${CMAKE_SOURCE_DIR}/shared-firmware/include/")
 include_directories("${CMAKE_SOURCE_DIR}/simulation/crazyflie/")
 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY /usr/local/lib/argos3/build/simulation/crazyflie/)
+
 add_subdirectory(shared-firmware)
 add_subdirectory(simulation)
