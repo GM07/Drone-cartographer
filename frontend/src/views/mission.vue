@@ -95,7 +95,6 @@ export default class Mission extends Vue {
   }
 
   private destroyed() {
-    //ServerCommunication.revokeMissionControl();
     SOCKETIO_LIMITED_ACCESS.removeAllListeners().close();
   }
 }
