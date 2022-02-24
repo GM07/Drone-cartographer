@@ -15,79 +15,59 @@ class CommCrazyflie(AbstractComm):
     def __init__(self, links: list):
 
         print('Creating Embedded Crazyflie communication')
-        self.crazyflie = Crazyflie(rw_cache='./cache')
+        self.crazyflies: list[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), links))
         self.links = links
-        self.backup_links = links
+        self.crazyflies_by_id = dict()
+        for link, crazyflie in zip(links, self.crazyflies):
+            self.crazyflies_by_id[link] = crazyflie 
         self.initialized_drivers = False
+        self.sync_crazyflies = []
+        self.__init_drivers()
         self.setup_log()
 
-        self.receive_thread = threading.Thread(
-            target=self.__receive, name='[Embedded] Receiving thread', args=[self.links])
-        self.receive_thread.start()
-        self.sending_commands_links = set()
+    def __del__(self):
+        for sync in self.sync_crazyflies:
+            sync.close_link()
 
-    def __init_drivers():
+    def __init_drivers(self):
         cflib.crtp.init_drivers()
 
     def setup_log(self):
-        self.log_config = LogConfig(name='Stabilizer', period_in_ms=10)
-        self.log_config.add_variable('range.front', 'uint16_t')
-        self.log_config.add_variable('range.left', 'uint16_t')
-        self.log_config.add_variable('range.right', 'uint16_t')
-        self.log_config.add_variable('range.back', 'uint16_t')
-        self.log_config.add_variable('kalman.stateX', 'float')
-        self.log_config.add_variable('kalman.stateY', 'float')
-        self.log_config.add_variable('kalman.stateZ', 'float')
-        self.log_config.add_variable('pm.batteryLevel', 'uint8_t')
-        self.log_config.add_variable('custom.state', 'uint8_t')
+        self.log_configs: list[LogConfig] = []
+        for crazyflie in self.crazyflies:
+            log_config = LogConfig(name='DroneData', period_in_ms=AbstractComm.DELAY_RECEIVER_MS)
+            log_config.add_variable('range.front', 'uint16_t')
+            log_config.add_variable('range.left', 'uint16_t')
+            log_config.add_variable('range.right', 'uint16_t')
+            log_config.add_variable('range.back', 'uint16_t')
+            log_config.add_variable('kalman.stateX', 'float')
+            log_config.add_variable('kalman.stateY', 'float')
+            log_config.add_variable('kalman.stateZ', 'float')
+            log_config.add_variable('pm.batteryLevel', 'uint8_t')
+            log_config.add_variable('custom.state', 'uint8_t')
+            log_config.cf = crazyflie
+            self.log_configs.append(log_config)
 
-    def with_addr(self, links: list) -> AbstractComm:
-        self.links = links
-        return self
 
-    def send_command(self, command: COMMANDS) -> None:
+        self.sync_crazyflies: list[SyncCrazyflie] = []
+        
+        for link, crazyflie in zip(self.links, self.crazyflies):
+            self.sync_crazyflies.append(SyncCrazyflie(link, cf=crazyflie))
 
-        if not self.initialized_drivers:
-            self.__init_drivers()
+        for sync, config in zip(self.sync_crazyflies, self.log_configs):
+            sync.open_link()
+            sync.cf.log.add_config(config)
+            config.data_received_cb.add_callback(self.__retrieve_log)
+            config.start()
 
-        for link in self.links:
-            self.crazyflie.open_link(link)
+    def send_command(self, command: COMMANDS, links = []) -> None:
+
+        sending_links = self.links if len(links) == 0 else links
+
+        for link in sending_links:
             packet = bytearray(command) # Command must be an array of numbers
             print('Sending packet : ', packet)
-            self.crazyflie.appchannel.send_packet(packet)
-            
-            self.crazyflie.close_link()
+            self.crazyflies_by_id[link].appchannel.send_packet(packet)
 
-        self.links = self.backup_links
-
-    def __receive(self, links: list):
-        print('Receiving thread started')
-
-        while True:
-            # Iterate through every radio address
-            for link in links:
-                try:
-                    #pylint: disable=line-too-long
-                    with SyncCrazyflie(link, cf=self.crazyflie) as sync_crazyflie:
-                        with SyncLogger(sync_crazyflie, self.log_config) as logger:
-
-                            for log_entry in logger:
-
-                                timestamp = log_entry[0]
-                                data = log_entry[1]
-                                logconf_name = log_entry[2]
-
-                                print('[%d][%s]: %s' % (timestamp, logconf_name, data))
-
-                                break
-                        logger.disconnect()
-                    sync_crazyflie.close_link()
-                    #pylint: enable=line-too-long
-                except Exception as e:
-                    print('Error when logging : ', e)
-
-            print(f'Waiting {AbstractComm.DELAY_RECEIVER_MS} ms')
-            sleep(AbstractComm.DELAY_RECEIVER_MS / 1000)
-
-
-            
+    def __retrieve_log(self, timestamp, data, logconf: LogConfig):
+        print('[%d][%s]: %s' % (timestamp, logconf.id, data))

@@ -27,20 +27,26 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 COMM: AbstractComm = CommCrazyflie(URI)
 
 # Get drone addresses
+
+
 @APP.route('/getDrones')
 def get_drones():
     return jsonify(URI)
 
 # Identifying drones
+
+
 @SOCKETIO.on('identify_drone', namespace="/limitedAccess")
 def identify_drone(drone_addr):
     if not AccessStatus.is_request_valid(request):
         return ''
 
-    COMM.with_addr([drone_addr]).send_command(COMMANDS.IDENTIFY.value)
+    COMM.send_command(COMMANDS.IDENTIFY.value, links=[drone_addr])
     return 'Identified drone'
 
 # Launch mission
+
+
 @SOCKETIO.on('launch', namespace="/limitedAccess")
 def launch(is_simulated: bool):
     if(MissionStatus.get_mission_started() or not AccessStatus.is_request_valid(request)):
@@ -50,9 +56,10 @@ def launch(is_simulated: bool):
     if is_simulated:
         os.system("docker exec -d embedded /bin/bash -c \"echo 'IyEvYmluL2Jhc2gKQVJHT1NfTE9DPSQoZmluZCAvIC1pbmFtZSAiY3JhenlmbGllX3NlbnNpbmcuYXJnb3MiIDI+IC9kZXYvbnVsbCkKYXJnb3MzIC1jICRBUkdPU19MT0MK' | base64 -d | /bin/bash\"")
     COMM.send_command(COMMANDS.LAUNCH.value)
-    
+
     MissionStatus.launch_mission(SOCKETIO)
     return 'Launched'
+
 
 @SOCKETIO.on('set_mission_type', namespace="/limitedAccess")
 def set_mission_type(is_simulated: bool):
@@ -65,6 +72,8 @@ def set_mission_type(is_simulated: bool):
     return ''
 
 # Terminate mission
+
+
 @SOCKETIO.on('terminate', namespace="/limitedAccess")
 def terminate():
     if(not MissionStatus.get_mission_started() or not AccessStatus.is_request_valid(request)):
@@ -75,12 +84,14 @@ def terminate():
     MissionStatus.terminate_mission(SOCKETIO)
     return 'Terminated'
 
+
 @SOCKETIO.on('take_control', namespace="/limitedAccess")
 def request_control():
     change = AccessStatus.take_control(SOCKETIO, request)
     if change:
         MissionStatus.update_all_clients(SOCKETIO)
     return ''
+
 
 @SOCKETIO.on('revoke_control', namespace="/limitedAccess")
 def revoke_control():
@@ -89,6 +100,7 @@ def revoke_control():
         MissionStatus.update_all_clients(SOCKETIO)
     return ''
 
+
 @SOCKETIO.on('disconnect', namespace="/limitedAccess")
 def disconnect():
     change = AccessStatus.client_disconnected(SOCKETIO, request)
@@ -96,13 +108,14 @@ def disconnect():
         MissionStatus.update_all_clients(SOCKETIO)
     return ''
 
+
 @SOCKETIO.on('connect', namespace="/getMissionStatus")
 def MissionConnect():
     MissionStatus.client_connected(SOCKETIO, request)
     return ''
 
+
 if __name__ == '__main__':
     print('The backend is running on port 5000')
 
     SOCKETIO.run(APP, debug=False, host='0.0.0.0', port=5000)
-
