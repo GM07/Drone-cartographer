@@ -13,25 +13,22 @@
 /* Logging */
 #include <argos3/core/utility/logging/argos_log.h>
 
-/* Communication */
-#include <boost/asio.hpp>
-
 #include "utils/timer.h"
 
 /****************************************/
 /****************************************/
 
 CCrazyflieSensing::CCrazyflieSensing()
-    : m_pcDistance(NULL),
-      m_pcPropellers(NULL),
-      m_pcRNG(NULL),
-      m_pcRABA(NULL),
-      m_pcRABS(NULL),
-      m_pcPos(NULL),
-      m_pcBattery(NULL),
+    : m_pcDistance(nullptr),
+      m_pcPropellers(nullptr),
+      m_pcRABA(nullptr),
+      m_pcRABS(nullptr),
+      m_pcPos(nullptr),
+      m_pcBattery(nullptr),
+      m_pcRNG(nullptr),
       m_uiCurrentStep(0),
-      m_drone(std::make_shared<SimulationController>(this)),
-      m_communicationThread(nullptr) {}
+      m_communicationThread(nullptr),
+      m_drone(std::make_shared<SimulationController>(this)) {}
 
 /****************************************/
 /****************************************/
@@ -81,8 +78,7 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
 /****************************************/
 
 void CCrazyflieSensing::ControlStep() {
-  if (!m_communicationThread) attemptSocketConnection();
-  if (m_communicationThread) m_drone.step();
+  m_drone.step();
 
   printLogs();
 
@@ -98,7 +94,7 @@ void CCrazyflieSensing::Reset() {}
 /****************************************/
 void CCrazyflieSensing::printLogs() {
   std::lock_guard<std::mutex> logMutex(logBufferMutex);
-  LOG << logBuffer.str();
+  argos::LOG << logBuffer.str();
   logBuffer.str(std::string());
 }
 

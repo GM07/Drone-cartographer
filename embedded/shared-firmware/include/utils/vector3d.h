@@ -1,22 +1,28 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
 
+#include "string"
+
+constexpr float kTreshold = 0.05;
+
 class Vector3D {
  public:
   Vector3D();
   Vector3D(float x, float y, float z);
+  virtual ~Vector3D() = default;
 
   Vector3D operator+(const Vector3D& other);
   Vector3D operator-(const Vector3D& other);
   Vector3D operator*(const float factor);
   Vector3D operator/(const float factor);
-  Vector3D operator=(const Vector3D& other);
+  Vector3D& operator+=(const Vector3D& other);
+  bool operator==(const Vector3D& other) const;
+  bool operator!=(const Vector3D& other) const;
+  float distanceTo(const Vector3D& other) const;
+  bool isAlmostEqual(const Vector3D& other, float threshold = kTreshold) const;
 
-  float getX() const;
-  float getY() const;
-  float getZ() const;
+  std::string toString() const;
 
- private:
   float m_x, m_y, m_z;
 };
 

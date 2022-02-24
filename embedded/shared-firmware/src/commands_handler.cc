@@ -6,22 +6,20 @@ bool Drone::handleCommand(Command command, const void* extraArgs,
                           const size_t extraArgsLength) {
   switch (command) {
     case Command::kIdentify:
-      m_controller->state = State::kIdentify;
+      m_controller->blinkLED(LED::kLedRedLeft);
       break;
     case Command::kTakeOff:
+      m_controller->takeOff(kHeight);
       m_controller->state = State::kTakingOff;
-      m_controller->log("TAKEOFF");
       break;
     case Command::kLand:
+      m_controller->land();
       m_controller->state = State::kLanding;
-      m_controller->log("LANDING");
       break;
     case Command::kLogs:
       m_controller->sendMessage(&m_controller->data, 32);
       break;
     default:
-      /*m_controller->log(
-          std::to_string(static_cast<uint8_t>(command)));*/
       return false;
   }
 

@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(simulation)
 
 # Find the ARGoS package, make sure to save the ARGoS prefix
 find_package(PkgConfig)
@@ -23,3 +22,4 @@ link_directories(${ARGOS_LIBRARY_DIRS})
 # Descend into subdirectories
 add_subdirectory(src)
 add_subdirectory(crazyflie)
+

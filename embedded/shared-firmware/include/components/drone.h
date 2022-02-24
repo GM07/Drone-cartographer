@@ -6,12 +6,18 @@
 #include "controllers/abstract_controller.h"
 #include "utils/commands.h"
 
-#define MESSAGE_MAX_SIZE 60
+constexpr float kSpeed = 0.1f;
+constexpr float kTakeOffSpeed = 0.25f;
+constexpr float kLandingSpeed = 0.25f;
+constexpr float kHeight = 0.5f;
+constexpr int kMessageMaxSize = 60;
 
 class Drone {
  public:
   Drone(std::shared_ptr<AbstractController> controller)
       : m_controller(controller) {}
+
+  virtual ~Drone() = default;
 
   inline std::shared_ptr<AbstractController> getController() {
     return m_controller;
@@ -32,12 +38,16 @@ class Drone {
 
   // Navigation Manager
   void step();
+  void squareTrajectory(float sideLength, bool relative);
 
   // Sensor Manager
 
- private:
+ protected:
   std::shared_ptr<AbstractController> m_controller;
-  std::array<uint8_t, MESSAGE_MAX_SIZE> m_messageRX;
+  std::array<uint8_t, kMessageMaxSize> m_messageRX;
+
+  // DEBUG VARIABLES
+  Direction explorationDirection = Direction::kFront;
 
  public:
   static Drone& getEmbeddedDrone();

@@ -30,6 +30,7 @@
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},
+<<<<<<< HEAD
 			"command": "dpkg -i argos3*.deb"
 		},
 		{
@@ -39,6 +40,12 @@
 				"Compile Simulation Firmware"
 			],
 			"dependsOrder": "sequence",
+=======
+			"command": "dpkg -i argos3*.deb",
+      "runOptions": { 
+        "runOn": "folderOpen" 
+      }
+>>>>>>> 41dceeb79f1823b5213a9da31229d4f6e7029823
 		},
 		{
 			"label": "Flash embedded firmware",
@@ -46,7 +53,7 @@
 			"options": {
 				"cwd": "${workspaceFolder}/embedded-firmware"
 			},
-			"command": "make clean && make -j`nproc` && make cload"
+			"command": "make clean && make -j`nproc` && make cload radio=${input:radio}",
 		},
 		{
 			"label": "Compile Embedded Firmware",
@@ -57,5 +64,17 @@
 			},
 			"command": "make clean && make -j`nproc`"
 		},
-	]
+	],
+  "inputs": [
+    {
+      "id": "radio",
+      "type": "pickString",
+      "default": "radio://0/80/2M/E7E7E7E761",
+      "description": "Radio adress to flash drone",
+      "options": [
+        "radio://0/80/2M/E7E7E7E761",
+        "radio://0/80/2M/E7E7E7E762",
+      ],
+    }
+  ]
 }

@@ -1,7 +1,11 @@
 #ifndef SIMULATION_CONTROLLER_H
 #define SIMULATION_CONTROLLER_H
 
+#ifdef GTEST
+#include "socket.h"
+#else
 #include <boost/asio.hpp>
+#endif
 
 #include "controllers/abstract_controller.h"
 #include "crazyflie_sensing.h"
@@ -22,37 +26,36 @@ inline boost::asio::io_service io_service;
 class SimulationController : public AbstractController {
  public:
   SimulationController(CCrazyflieSensing* ccrazyflieSensing);
+  virtual ~SimulationController() = default;
 
   SimulationController(SimulationController&& other) = delete;
   SimulationController operator=(SimulationController&& other) = delete;
   SimulationController(SimulationController& other) = delete;
   SimulationController operator=(SimulationController& other) = delete;
 
-  Vector3D& getCurrentLocation() override{/**/};
-
-  void setLEDState(LED led, bool enable, bool blink) override;
-
-  void goTo(const Vector3D& location, float yaw, float pitch,
-            bool isRelative) override{/**/};
-  void goTo(const Vector3D& location, bool isRelative) override{/**/};
+  void goTo(const Vector3D& location, bool isRelative) override;
   void takeOff(float height) override;
   void land() override;
+
+  Vector3D getCurrentLocation() const override;
+  bool isTrajectoryFinished() const override;
 
   float getDistance(Direction direction) override{/**/};
   float getBatteryLevel() override{/**/};
 
-  void sendP2PMessage(void* message) override{/**/};
   void initCommunicationManager() override;
   size_t receiveMessage(void* message, size_t size) override;
-  void sendMessage(void* message, size_t size) override;
+  void sendMessage(void* message, size_t size) override{/**/};
+  void sendP2PMessage(void* message) override{/**/};
 
   void log(const std::string& message) override;
+  void blinkLED(LED led) override;
 
   void delay(const uint32_t ticks) override{/**/};
 
-  void setSimulationDroneInstance(CCrazyflieSensing* ccrazyflieSensing);
-
+#ifndef GTEST
  private:
+#endif
   CCrazyflieSensing* m_ccrazyflieSensing;
   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
 };

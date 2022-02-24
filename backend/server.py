@@ -8,6 +8,7 @@ from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
 from services.status.mission_status import *
 from constants import MAX_TIMEOUT, COMMANDS, URI
+import os
 
 # Flask application
 APP = Flask(__name__)
@@ -17,7 +18,7 @@ APP.config['SECRET_KEY'] = 'dev'
 
 # Socketio instance to communicate with frontend
 ASYNC_MODE = None
-SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, path="/getMissionStatus", cors_allowed_origins='*')
+SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
@@ -47,6 +48,7 @@ def launch():
     is_simulated = request.get_json()
 
     if is_simulated:
+        os.system("docker exec -d embedded /bin/bash -c \"echo 'IyEvYmluL2Jhc2gKQVJHT1NfTE9DPSQoZmluZCAvIC1pbmFtZSAiY3JhenlmbGllX3NlbnNpbmcuYXJnb3MiIDI+IC9kZXYvbnVsbCkKYXJnb3MzIC1jICRBUkdPU19MT0MK' | base64 -d | /bin/bash\"")
         COMM = CommSimulation()
     else:
         COMM = CommCrazyflie(URI)
@@ -72,14 +74,14 @@ def terminate():
 
 
 # Communication with frontend using socketio
-@SOCKETIO.on('connect')
+@SOCKETIO.on('connect', namespace="/getMissionStatus")
 def connection():
-    SOCKETIO.emit('update_status', get_mission_status(), room=request.sid)
+    SOCKETIO.emit('update_status', get_mission_status(),namespace="/getMissionStatus", room=request.sid)
     return ''
 
-@SOCKETIO.on('update_status')
+@SOCKETIO.on('update_status', namespace="/getMissionStatus")
 def update_status():
-    SOCKETIO.emit('update_status', get_mission_status(), broadcast=True, include_self=False, skip_sid=True)
+    SOCKETIO.emit('update_status', get_mission_status(), namespace="/getMissionStatus", broadcast=True, include_self=False, skip_sid=True)
     return ''
 
 if __name__ == '__main__':
