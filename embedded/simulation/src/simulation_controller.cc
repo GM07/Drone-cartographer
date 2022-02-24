@@ -33,7 +33,6 @@ size_t SimulationController::receiveMessage(void* message, size_t size) {
 
 ///////////////////////////////////////
 void SimulationController::sendMessage(void* message, size_t size_bytes) {
-  // LOG << size << std::endl;
   m_socket->send(boost::asio::buffer(message, size_bytes));
 }
 
