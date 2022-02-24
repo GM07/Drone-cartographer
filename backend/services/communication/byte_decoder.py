@@ -10,8 +10,10 @@ DEFAULT_SIZE = 4
 class ByteDecoder:
 
     def __init__(self, data:bytes, structure: dict):
-        """ Structure has to follow the format {type: size}. Ex: {'f':4, 'f':4, 'i':4} 
-            which would represent a structure with 2 floats of 4 bytes and an integer of 4 bytes
+        """ Structure has to follow the format {type: size}.
+            Ex: {'f':4, 'f':4, 'i':4}
+            which would represent a structure with 2 floats of
+            4 bytes and an integer of 4 bytes
         """
         self.structure = structure
         self.data = data
@@ -25,7 +27,7 @@ class ByteDecoder:
                 self.structure.append((type, DEFAULT_SIZES_OF_TYPES[type]))
             else:
                 self.structure.append((type, DEFAULT_SIZE))
-    
+
     def get_values(self) -> list:
         values = []
         current_offset = 0

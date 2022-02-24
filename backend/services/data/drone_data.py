@@ -21,11 +21,12 @@ class DroneState(Enum):
     Landing = 1
     Exploration = 2
     TakingOff = 3
-    Crashed = 4    
+    Crashed = 4
 
 class DroneData:
 
-    def __init__(self, sensors: DroneSensors, position: Point2D, battery_level: float, state: DroneState):
+    def __init__(self, sensors: DroneSensors, position: Point2D,
+        battery_level: float, state: DroneState):
         self.sensors = sensors
         self.position = position
         self.battery_level = battery_level
@@ -35,7 +36,8 @@ class DroneData:
         self.__from_bytes(data)
 
     def __from_bytes(self, data: bytes):
-        decoder: ByteDecoder = ByteDecoder(data, ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'i'])
+        decoder: ByteDecoder = ByteDecoder(data,
+            ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'i'])
         values = decoder.get_values()
         self.sensors = DroneSensors(values[0], values[1], values[2], values[3])
         self.position = Point2D(values[4], values[5])

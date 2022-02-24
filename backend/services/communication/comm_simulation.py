@@ -12,7 +12,7 @@ from services.data.drone_data import DroneData
 nConnections = 8
 identifier = "s"
 
-class CommSimulation(AbstractComm): 
+class CommSimulation(AbstractComm):
 
     INIT_TIMEOUT = 0.000001
 

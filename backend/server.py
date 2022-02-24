@@ -24,8 +24,6 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
-# COMM_SIMULATION = CommSimulation()
-# COMM_EMBEDDED = CommCrazyflie(URI)
 COMM: AbstractComm = CommCrazyflie(URI)
 
 # Get drone addresses
