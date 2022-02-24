@@ -12,6 +12,11 @@
 class AbstractController {
  public:
   virtual ~AbstractController() = default;
+  AbstractController() = default;
+  AbstractController(AbstractController&& other) = delete;
+  AbstractController& operator=(AbstractController&& other) = delete;
+  AbstractController(const AbstractController& other) = delete;
+  AbstractController& operator=(const AbstractController& other) = delete;
 
   virtual void goTo(const Vector3D& location, bool isRelative) = 0;
   virtual void takeOff(float height) = 0;
@@ -19,9 +24,6 @@ class AbstractController {
 
   virtual Vector3D getCurrentLocation() const = 0;
   virtual bool isTrajectoryFinished() const = 0;
-
-  virtual float getDistance(Direction direction) = 0;
-  virtual float getBatteryLevel() = 0;
 
   virtual void initCommunicationManager() = 0;
   virtual size_t receiveMessage(void* message, size_t size) = 0;
@@ -31,7 +33,7 @@ class AbstractController {
   virtual void log(const std::string& message) = 0;
   virtual void blinkLED(LED led) = 0;
 
-  virtual void delay(const uint32_t ticks) = 0;
+  virtual void delay(uint32_t ticks) = 0;
 
   State state = State::kIdle;
 

@@ -43,40 +43,38 @@
 #include "components/drone.h"
 
 /*
- * All the ARGoS stuff in the 'argos' namespace.
- * With this statement, you save typing argos:: every time.
- */
-using namespace argos;
-
-/*
  * A controller is simply an implementation of the CCI_Controller class.
  */
-class CCrazyflieSensing : public CCI_Controller {
+class CCrazyflieSensing : public argos::CCI_Controller {
  public:
   /* Class constructor. */
   CCrazyflieSensing();
+  CCrazyflieSensing(const CCrazyflieSensing& other) = delete;
+  CCrazyflieSensing(CCrazyflieSensing&& other) = delete;
+  CCrazyflieSensing operator=(const CCrazyflieSensing& other) = delete;
+  CCrazyflieSensing operator=(CCrazyflieSensing&& other) = delete;
   /* Class destructor. */
-  virtual ~CCrazyflieSensing();
+  ~CCrazyflieSensing() override;
 
   /*
    * This function initializes the controller.
    * The 't_node' variable points to the <parameters> section in the XML
    * file in the <controllers><footbot_foraging_controller> section.
    */
-  virtual void Init(TConfigurationNode& t_node);
+  void Init(argos::TConfigurationNode& t_node) override;
 
   /*
    * This function is called once every time step.
    * The length of the time step is set in the XML file.
    */
-  virtual void ControlStep();
+  void ControlStep() override;
 
   /*
    * This function resets the controller to its state right after the
    * Init().
    * It is called when you press the reset button in the GUI.
    */
-  virtual void Reset();
+  void Reset() override;
 
   /*
    * Called to cleanup what done by Init() when the experiment finishes.
@@ -84,34 +82,33 @@ class CCrazyflieSensing : public CCI_Controller {
    * so the function could have been omitted. It's here just for
    * completeness.
    */
-  virtual void Destroy() {}
+  void Destroy() override {}
 
-  void printLogs();
+  static void printLogs();
 
- public:
   /* Pointer to the crazyflie distance sensor */
-  CCI_CrazyflieDistanceScannerSensor* m_pcDistance;
+  argos::CCI_CrazyflieDistanceScannerSensor* m_pcDistance{nullptr};
 
   /* Pointer to the position actuator */
-  CCI_QuadRotorPositionActuator* m_pcPropellers;
+  argos::CCI_QuadRotorPositionActuator* m_pcPropellers{nullptr};
 
   /* Pointer to the range and bearing actuator */
-  CCI_RangeAndBearingActuator* m_pcRABA;
+  argos::CCI_RangeAndBearingActuator* m_pcRABA{nullptr};
 
   /* Pointer to the range and bearing sensor */
-  CCI_RangeAndBearingSensor* m_pcRABS;
+  argos::CCI_RangeAndBearingSensor* m_pcRABS{nullptr};
 
   /* Pointer to the positioning sensor */
-  CCI_PositioningSensor* m_pcPos;
+  argos::CCI_PositioningSensor* m_pcPos{nullptr};
 
   /* Pointer to the battery sensor */
-  CCI_BatterySensor* m_pcBattery;
+  argos::CCI_BatterySensor* m_pcBattery{nullptr};
 
   /* The random number generator */
-  CRandom::CRNG* m_pcRNG;
+  argos::CRandom::CRNG* m_pcRNG{nullptr};
 
   /* Current step */
-  uint m_uiCurrentStep;
+  uint32_t m_uiCurrentStep{0};
 
 #ifndef GTEST
  private:
