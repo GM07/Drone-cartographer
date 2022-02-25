@@ -49,10 +49,16 @@ void enableCrtpHighLevelCommander() {
 }
 
 /////////////////////////////////////////////////////////////////////////
-extern "C" void appMain() {
+void addLoggingVariables() {
   LOG_GROUP_START(custom)
   LOG_ADD(LOG_UINT8, state, &Drone::getEmbeddedDrone().getController()->state)
   LOG_GROUP_STOP(custom)
+}
+
+/////////////////////////////////////////////////////////////////////////
+extern "C" void appMain() {
+  ledClearAll();
+  addLoggingVariables();
   enableCrtpHighLevelCommander();
 
   while (true) {
