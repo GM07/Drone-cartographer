@@ -4,8 +4,8 @@
 #define PACKET_SIZE 32
 
 /////////////////////////////////////////////////////////////////////////
-bool Drone::handleCommand(Command command, const void* extraArgs,
-                          const size_t extraArgsLength) {
+bool Drone::handleCommand(Command command, const void* /*extraArgs*/,
+                          size_t /*extraArgsLength*/) {
   switch (command) {
     case Command::kIdentify:
       m_controller->blinkLED(LED::kLedRedLeft);

@@ -2,24 +2,22 @@
 
 #include <cmath>
 
-Vector3D::Vector3D() : m_x(0), m_y(0), m_z(0) {}
-
 Vector3D::Vector3D(float x, float y, float z) : m_x(x), m_y(y), m_z(z) {}
 
-Vector3D Vector3D::operator+(const Vector3D& other) {
+Vector3D Vector3D::operator+(const Vector3D& other) const {
   return Vector3D(m_x + other.m_x, m_y + other.m_y, m_z + other.m_z);
 }
 
-Vector3D Vector3D::operator-(const Vector3D& other) {
+Vector3D Vector3D::operator-(const Vector3D& other) const {
   return Vector3D(m_x - other.m_x, m_y - other.m_y, m_z - other.m_z);
 }
 
-Vector3D Vector3D::operator*(const float other) {
-  return Vector3D(m_x * other, m_y * other, m_z * other);
+Vector3D Vector3D::operator*(const float factor) const {
+  return Vector3D(m_x * factor, m_y * factor, m_z * factor);
 }
 
-Vector3D Vector3D::operator/(const float other) {
-  return Vector3D(m_x / other, m_y / other, m_z / other);
+Vector3D Vector3D::operator/(const float factor) const {
+  return Vector3D(m_x / factor, m_y / factor, m_z / factor);
 }
 
 bool Vector3D::operator==(const Vector3D& other) const {
@@ -35,8 +33,8 @@ bool Vector3D::isAlmostEqual(const Vector3D& other, float threshold) const {
 }
 
 float Vector3D::distanceTo(const Vector3D& other) const {
-  return std::sqrt(std::pow(m_x - other.m_x, 2) + std::pow(m_y - other.m_y, 2) +
-                   std::pow(m_z - other.m_z, 2));
+  return std::sqrt(powf(m_x - other.m_x, 2) + powf(m_y - other.m_y, 2) +
+                   powf(m_z - other.m_z, 2));
 }
 
 Vector3D& Vector3D::operator+=(const Vector3D& other) {

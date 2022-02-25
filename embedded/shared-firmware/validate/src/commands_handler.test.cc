@@ -8,7 +8,8 @@
 using ::testing::_;
 
 TEST(ValidateCommandsHandler, handleCommandIdentify) {
-  Drone drone = Drone::getEmbeddedDrone();
+  Drone drone(std::dynamic_pointer_cast<AbstractController>(
+      std::make_shared<StubController>()));
   EXPECT_EQ(drone.handleCommand(Command::kIdentify, nullptr, 0), true);
 }
 
@@ -35,6 +36,7 @@ TEST(ValidateCommandsHandler, handleCommandLand) {
 }
 
 TEST(ValidateCommandsHandler, handleCommandInvalid) {
-  Drone drone = Drone::getEmbeddedDrone();
+  Drone drone(std::dynamic_pointer_cast<AbstractController>(
+      std::make_shared<StubController>()));
   EXPECT_EQ(drone.handleCommand(static_cast<Command>(0x00), nullptr, 0), false);
 }

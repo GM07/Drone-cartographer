@@ -24,9 +24,6 @@ class FirmwareController : public AbstractController {
   Vector3D getCurrentLocation() const override;
   bool isTrajectoryFinished() const override;
 
-  float getDistance(Direction direction) override{/**/};
-  float getBatteryLevel() override{/**/};
-
   void initCommunicationManager() override{/**/};
   size_t receiveMessage(void* message, size_t size) override;
   void sendMessage(void* message, size_t size) override;

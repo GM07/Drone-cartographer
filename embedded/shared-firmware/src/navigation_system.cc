@@ -1,6 +1,7 @@
 #include "components/drone.h"
 
 void Drone::step() {
+  constexpr float radius = 0.5;
   switch (m_controller->state) {
     case State::kIdle:
       break;
@@ -12,12 +13,13 @@ void Drone::step() {
       }
       break;
     case State::kLanding:
-      if (m_controller->isTrajectoryFinished())
+      if (m_controller->isTrajectoryFinished()) {
         m_controller->state = State::kIdle;
+      }
       break;
     // DEBUG ONLY REMOVE AFTER
     case State::kExploring:
-      squareTrajectory(0.5, true);
+      squareTrajectory(radius, false);
     default:
       break;
   }
@@ -49,8 +51,9 @@ void Drone::squareTrajectory(float sideLength, bool relative) {
     }
 
     // Absolute position are relative to m_takeOffPosition
-    if (!relative) destination += m_controller->getCurrentLocation();
-
+    if (!relative) {
+      destination += m_controller->getCurrentLocation();
+    }
     m_controller->goTo(destination, relative);
   }
 }

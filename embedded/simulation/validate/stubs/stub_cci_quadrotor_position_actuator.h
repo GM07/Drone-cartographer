@@ -2,6 +2,10 @@
 
 #include "gmock/gmock.h"
 
+using ::argos::CCI_QuadRotorPositionActuator;
+using ::argos::CRadians;
+using ::argos::CVector3;
+
 class StubCCIQuadrotorPositionActuator : public CCI_QuadRotorPositionActuator {
  public:
   virtual ~StubCCIQuadrotorPositionActuator(){};
