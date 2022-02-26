@@ -28,6 +28,20 @@
           v-if="isMissionCommandsEnabled()"
           :accessStatus="accessStatus"
         />
+        <v-list dense nav>
+          <v-list-item v-if="isConnected()">
+            <v-list-item-icon>
+              <v-icon color="blue">mdi-access-point-network</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Connecté</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-else>
+            <v-list-item-icon>
+              <v-icon color="red">mdi-access-point-network-off</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Déconnecté</v-list-item-title>
+          </v-list-item>
+        </v-list>
       </template>
     </v-navigation-drawer>
   </div>
@@ -71,6 +85,10 @@ export default class Mission extends Vue {
     return this.droneList[this.chosenOption];
   }
 
+  public isConnected(): boolean {
+    return SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
   private beforeCreate(): void {
     SOCKETIO_LIMITED_ACCESS.on(
       'update_status',
@@ -78,6 +96,10 @@ export default class Mission extends Vue {
         this.accessStatus = accessStatus;
       }
     );
+
+    SOCKETIO_LIMITED_ACCESS.on('disconnect', () => {
+      this.accessStatus.isUserControlling = false;
+    });
 
     SOCKETIO_LIMITED_ACCESS.open();
 
