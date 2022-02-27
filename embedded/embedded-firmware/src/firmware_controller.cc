@@ -3,6 +3,7 @@
 
 #include "components/drone.h"
 #include "controllers/abstract_controller.h"
+#include "sensors/firmware_sensor.h"
 #include "utils/led.h"
 #include "utils/timer.h"
 
@@ -14,6 +15,23 @@ extern "C" {
 #include "led.h"
 #include "ledseq.h"
 #include "param_logic.h"
+}
+
+FirmwareController::FirmwareController() {
+  m_abstractSensor = std::make_unique<FirmwareSensor>();
+}
+
+void FirmwareController::updateSensorData() {
+  data = {
+      m_abstractSensor->getFrontDistance(),
+      m_abstractSensor->getLeftDistance(),
+      m_abstractSensor->getBackDistance(),
+      m_abstractSensor->getRightDistance(),
+      m_abstractSensor->getPosX(),
+      m_abstractSensor->getPosY(),
+      m_abstractSensor->getBatteryLevel(),
+      static_cast<int>(state),
+  };
 }
 
 /////////////////////////

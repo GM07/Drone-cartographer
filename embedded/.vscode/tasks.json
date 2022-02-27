@@ -1,111 +1,111 @@
 {
 	"version": "2.0.0",
 	"tasks": [
-		{
-			"label": "Compile Simulation Firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/simulation"
-			},
-			"command": [
-				"if test -d build; then rm -rf build; fi &&",
-				"mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../../ && ninja"
-			]
-		},
-		{
-			"label": "Compile Shared Firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/shared-firmware"
-			},
-			"command": [
-				"if test -d build; then rm -rf build; fi &&",
-				"mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja"
-			]
-		},
-		{
-			"label": "Install Argos3 Package",
-			"type": "shell",
-			"detail": "Install argos3 from .deb package",
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"command": "dpkg -i argos3*.deb",
-			"runOptions": { 
-				"runOn": "folderOpen" 
-			}
-		},
-		{
-			"label": "Flash embedded firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/embedded-firmware"
-			},
-			"command": "make clean && make -j`nproc` && make cload radio=${input:radio}"
-		},
-		{
-			"label": "Compile Embedded Firmware",
-			"type": "shell",
-			"detail": "Clean and compile embedded firmware",
-			"options": {
-				"cwd": "${workspaceFolder}/embedded-firmware"
-			},
-			"command": "make clean && make -j`nproc`"
-		},
-		{
-			"label": "Test embedded firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/embedded-firmware/validate"
-			},
-			"command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./embedded_firmware"
-		},
-		{
-			"label": "Test shared firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/shared-firmware/validate"
-			},
-			"command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./shared_firmware"
-		},
-		{
-			"label": "Test simulation firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/simulation/validate"
-			},
-			"command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./simulation_firmware"
-		},
-		{
-			"label": "Test all",
-			"type": "shell",
-			"dependsOn": [
-				"Test embedded firmware",
-				"Test shared firmware",
-				"Test simulation firmware"
-			]
-		},
-		{
-			"label": "lint simulation firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/simulation/"
-			},
-			"dependsOn" : [
-				"Compile Simulation Firmware"
-			],
-			"command": "cd build && ../../run-clang-tidy.py -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type\""
-		},
-		
-		{
-			"label": "lint embedded firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/embedded-firmware/"
-			},
-			"command": "../run-clang-tidy.py -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type\""
-		}
-	],
+    {
+      "label": "Compile Simulation Firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/simulation"
+      },
+      "command": [
+        "if test -d build; then rm -rf build; fi &&",
+        "mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../../ && ninja"
+      ]
+    },
+    {
+      "label": "Compile Shared Firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/shared-firmware"
+      },
+      "command": [
+        "if test -d build; then rm -rf build; fi &&",
+        "mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja"
+      ]
+    },
+    {
+      "label": "Install Argos3 Package",
+      "type": "shell",
+      "detail": "Install argos3 from .deb package",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "command": "dpkg -i argos3*.deb",
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    },
+    {
+      "label": "Flash embedded firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/embedded-firmware"
+      },
+      "command": "make clean && make -j`nproc` && make cload radio=${input:radio}",
+      "problemMatcher": []
+    },
+    {
+      "label": "Compile Embedded Firmware",
+      "type": "shell",
+      "detail": "Clean and compile embedded firmware",
+      "options": {
+        "cwd": "${workspaceFolder}/embedded-firmware"
+      },
+      "command": "make clean && make -j`nproc`"
+    },
+    {
+      "label": "Test embedded firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/embedded-firmware/validate"
+      },
+      "command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./embedded_firmware"
+    },
+    {
+      "label": "Test shared firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/shared-firmware/validate"
+      },
+      "command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./shared_firmware"
+    },
+    {
+      "label": "Test simulation firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/simulation/validate"
+      },
+      "command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./simulation_firmware"
+    },
+    {
+      "label": "Test all",
+      "type": "shell",
+      "dependsOn": [
+        "Test embedded firmware",
+        "Test shared firmware",
+        "Test simulation firmware"
+      ]
+    },
+    {
+      "label": "lint simulation firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/simulation/"
+      },
+      "dependsOn": [
+        "Compile Simulation Firmware"
+      ],
+      "command": "cd build && ../../run-clang-tidy.py -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type\""
+    },
+    {
+      "label": "lint embedded firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/embedded-firmware/"
+      },
+      "command": "../run-clang-tidy.py -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type\""
+    }
+  ],
 	"inputs": [
 		{
 			"id": "radio",

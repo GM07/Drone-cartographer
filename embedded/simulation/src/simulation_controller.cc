@@ -5,6 +5,7 @@
 #include <mutex>
 #include <unordered_map>
 
+#include "sensors/simulation_sensor.h"
 #include "utils/led.h"
 
 using ::argos::CVector3;
@@ -12,8 +13,22 @@ using ::argos::CVector3;
 //////////////////////////////////////////
 SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
     : m_ccrazyflieSensing(ccrazyflieSensing) {
+  m_abstractSensor = std::make_unique<SimulationSensor>(ccrazyflieSensing);
   static int count = 1;
   data.front = count++;
+}
+
+void SimulationController::updateSensorData() {
+  data = {
+      m_abstractSensor->getFrontDistance(),
+      m_abstractSensor->getLeftDistance(),
+      m_abstractSensor->getBackDistance(),
+      m_abstractSensor->getRightDistance(),
+      m_abstractSensor->getPosX(),
+      m_abstractSensor->getPosY(),
+      m_abstractSensor->getBatteryLevel(),
+      static_cast<int>(state),
+  };
 }
 
 ///////////////////////////////////////
@@ -32,9 +47,24 @@ void SimulationController::sendMessage(void* message, size_t size_bytes) {
   m_socket->send(boost::asio::buffer(message, size_bytes));
 }
 
+void SimulationController::sendDroneDataToServer() {
+  if (!m_socket) return;
+
+  m_socket->send(boost::asio::buffer(&data, 32));
+}
+
 ///////////////////////////////////////
 void SimulationController::blinkLED(LED led) {
+  if (led == kLedBlueLeft) {
+  }
+
   log("Identify :" + m_ccrazyflieSensing->GetId());
+}
+
+///////////////////////////////////////
+void SimulationController::sendP2PMessage(void* message) {
+  if (message) {
+  }
 }
 
 ///////////////////////////////////////////////////

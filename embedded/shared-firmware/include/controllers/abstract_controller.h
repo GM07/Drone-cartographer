@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include "sensors/abstract_sensor.h"
 #include "utils/directions.h"
 #include "utils/led.h"
 #include "utils/state.h"
@@ -47,9 +48,11 @@ class AbstractController {
   virtual void blinkLED(LED led) = 0;
 
   virtual void delay(uint32_t ticks) = 0;
+  virtual void updateSensorData() = 0;
 
   ControllerData data{1.0, 4.0, 10.0, 5.0, 8.0, 9.0, 2.0, 3};
   State state = State::kIdle;
+  std::unique_ptr<AbstractSensor> m_abstractSensor;
 
  protected:
   Vector3D m_takeOffPosition;

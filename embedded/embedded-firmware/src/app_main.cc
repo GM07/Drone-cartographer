@@ -7,6 +7,7 @@ extern "C" {
 #include "log.h"
 #include "param_logic.h"
 #include "static_mem.h"
+#include "supervisor.h"
 #include "task.h"
 }
 
@@ -57,6 +58,12 @@ extern "C" void appMain() {
   enableCrtpHighLevelCommander();
 
   while (true) {
+    Drone::getEmbeddedDrone().updateSensorData();
+
+    if (supervisorIsTumbled()) {
+      Drone::getEmbeddedDrone().getController()->blinkLED(LED::kLedRedLeft);
+    }
+
     Drone::getEmbeddedDrone().step();
   }
 }

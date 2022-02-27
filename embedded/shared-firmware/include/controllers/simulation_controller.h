@@ -7,6 +7,8 @@
 #include <boost/asio.hpp>
 #endif
 
+#include <mutex>
+
 #include "controllers/abstract_controller.h"
 #include "crazyflie_sensing.h"
 
@@ -43,16 +45,20 @@ class SimulationController : public AbstractController {
   void initCommunicationManager() override;
   size_t receiveMessage(void* message, size_t size) override;
   void sendMessage(void* message, size_t size) override;
-  void sendP2PMessage(void* message) override{/**/};
+  void sendDroneDataToServer();
+  void sendP2PMessage(void* message) override;
 
   void log(const std::string& message) override;
   void blinkLED(LED led) override;
 
   void delay(uint32_t /*ticks*/) override{/**/};
+  void updateSensorData();
 
 #ifndef GTEST
  private:
 #endif
+
+  std::mutex m_controllerDataMutex;
   CCrazyflieSensing* m_ccrazyflieSensing;
   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
 };

@@ -46,6 +46,7 @@ class Drone {
   void squareTrajectory(float sideLength, bool relative);
 
   // Sensor Manager
+  void updateSensorData();
 
  protected:
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
