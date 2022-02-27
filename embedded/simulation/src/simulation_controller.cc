@@ -61,9 +61,10 @@ void SimulationController::sendMessage(void* message, size_t size_bytes) {
 }
 
 void SimulationController::sendDroneDataToServerThread() {
-  m_dataSocket =
-      std::make_unique<boost::asio::local::stream_protocol::socket>(io_service);
   while (true) {
+    m_dataSocket =
+        std::make_unique<boost::asio::local::stream_protocol::socket>(
+            io_service);
     while (true) {
       try {
         m_dataSocket->connect("/tmp/socket/data" +

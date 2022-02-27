@@ -17,11 +17,16 @@ if os.path.exists(file_name):
 server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 server.bind(file_name)
 
+print("bound")
 server.listen(1)
 conn, addr = server.accept()
-recieved = conn.recv(4)
 
-print("after", struct.unpack('f', recieved))
-print("afterrec ", conn.recv(4))
+print("accept")
+
+while(True):
+    received = conn.recv(32)
+    if (len(received) > 4):
+        data = DroneData(received)
+        print(data)
 
 

@@ -81,7 +81,7 @@ void CCrazyflieSensing::ControlStep() {
   // push data
   // signal data is available
 
-  logBuffer << m_drone.getController()->data.front << std::endl;
+  logBuffer << m_drone.getController()->data.batteryLevel << std::endl;
 
   printLogs();
 
