@@ -2,21 +2,26 @@
 
 #include <argos3/core/utility/logging/argos_log.h>
 
-#include <mutex>
 #include <unordered_map>
 
 #include "sensors/simulation_sensor.h"
 #include "utils/led.h"
+#include "utils/timer.h"
 
 using ::argos::CVector3;
 
 //////////////////////////////////////////
 SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
-    : m_ccrazyflieSensing(ccrazyflieSensing) {
+    : m_ccrazyflieSensing(ccrazyflieSensing),
+      m_controllerDataSem(std::make_unique<Semaphore>(1)),
+      m_sendDataThread(std::make_unique<std::thread>(
+          &SimulationController::sendDroneDataToServerThread, this)) {
   m_abstractSensor = std::make_unique<SimulationSensor>(ccrazyflieSensing);
   static int count = 1;
   data.front = count++;
 }
+
+SimulationController::~SimulationController() { m_sendDataThread->join(); }
 
 void SimulationController::updateSensorData() {
   data = {
@@ -29,6 +34,14 @@ void SimulationController::updateSensorData() {
       m_abstractSensor->getBatteryLevel(),
       static_cast<int>(state),
   };
+
+  bool success = m_serverDataQueue.push(data);
+  if (!success && m_controllerDataSem->tryAcquire()) {
+    ControllerData removedData;
+    m_serverDataQueue.pop(removedData);
+    m_serverDataQueue.push(data);
+  }
+  m_controllerDataSem->release();
 }
 
 ///////////////////////////////////////
@@ -47,10 +60,30 @@ void SimulationController::sendMessage(void* message, size_t size_bytes) {
   m_socket->send(boost::asio::buffer(message, size_bytes));
 }
 
-void SimulationController::sendDroneDataToServer() {
-  if (!m_socket) return;
-
-  m_socket->send(boost::asio::buffer(&data, 32));
+void SimulationController::sendDroneDataToServerThread() {
+  m_dataSocket =
+      std::make_unique<boost::asio::local::stream_protocol::socket>(io_service);
+  while (true) {
+    while (true) {
+      try {
+        m_dataSocket->connect("/tmp/socket/data" +
+                              m_ccrazyflieSensing->GetId());
+        break;
+      } catch (const boost::system::system_error& error) {
+        Timer::delayMs(50);
+      }
+    }
+    while (true) {
+      m_controllerDataSem->acquire();
+      ControllerData dataToSend;
+      m_serverDataQueue.pop(dataToSend);
+      try {
+        m_dataSocket->send(boost::asio::buffer(&dataToSend, 32));
+      } catch (const boost::system::system_error& error) {
+        break;
+      }
+    }
+  }
 }
 
 ///////////////////////////////////////
