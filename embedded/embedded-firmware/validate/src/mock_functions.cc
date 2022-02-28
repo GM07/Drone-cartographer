@@ -70,3 +70,5 @@ int crtpCommanderHighLevelGoTo(const float x, const float y, const float z,
                                const bool relative) {
   return 0;
 }
+
+void ledClearAll() {}
