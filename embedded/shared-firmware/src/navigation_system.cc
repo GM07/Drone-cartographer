@@ -1,5 +1,7 @@
 #include "components/drone.h"
 
+constexpr float MIN_DISTANCE_OBSTACLE = 20.0f;
+
 void Drone::step() {
   constexpr float radius = 0.5;
   switch (m_controller->state) {
@@ -22,6 +24,15 @@ void Drone::step() {
       squareTrajectory(radius, false);
     default:
       break;
+  }
+}
+
+void Drone::explore() {
+  static Vector3D direction = {0.0f, 1.0f, 0.0f};
+
+  m_controller->goToRelative(direction);
+
+  if (m_controller->data.front < MIN_DISTANCE_OBSTACLE) {
   }
 }
 
