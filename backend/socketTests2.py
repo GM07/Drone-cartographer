@@ -24,7 +24,11 @@ conn, addr = server.accept()
 print("accept")
 
 while(True):
+    print("waiting")
     received = conn.recv(32)
+    if len(received) == 0:
+        break
+    
     if (len(received) > 4):
         data = DroneData(received)
         print(data)

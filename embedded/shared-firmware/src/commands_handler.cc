@@ -18,9 +18,6 @@ bool Drone::handleCommand(Command command, const void* /*extraArgs*/,
       m_controller->land();
       m_controller->state = State::kLanding;
       break;
-    case Command::kLogs:
-      m_controller->sendMessage(&m_controller->data, PACKET_SIZE);
-      break;
     default:
       return false;
   }

@@ -88,17 +88,8 @@ void SimulationController::sendDroneDataToServerThread() {
 }
 
 ///////////////////////////////////////
-void SimulationController::blinkLED(LED led) {
-  if (led == kLedBlueLeft) {
-  }
-
+void SimulationController::blinkLED(LED /*led*/) {
   log("Identify :" + m_ccrazyflieSensing->GetId());
-}
-
-///////////////////////////////////////
-void SimulationController::sendP2PMessage(void* message) {
-  if (message) {
-  }
 }
 
 ///////////////////////////////////////////////////
