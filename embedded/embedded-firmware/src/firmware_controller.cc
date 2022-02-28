@@ -17,9 +17,8 @@ extern "C" {
 #include "param_logic.h"
 }
 
-FirmwareController::FirmwareController() {
-  m_abstractSensor = std::make_unique<FirmwareSensor>();
-}
+FirmwareController::FirmwareController()
+    : AbstractController(std::make_unique<FirmwareSensor>()) {}
 
 void FirmwareController::updateSensorData() {
   data = {

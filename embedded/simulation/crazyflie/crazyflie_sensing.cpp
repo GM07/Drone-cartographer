@@ -74,8 +74,6 @@ void CCrazyflieSensing::ControlStep() {
 
   m_drone.step();
 
-  logBuffer << m_drone.getController()->data.batteryLevel << std::endl;
-
   printLogs();
 
   ++m_uiCurrentStep;

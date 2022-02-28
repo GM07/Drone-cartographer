@@ -41,8 +41,7 @@
       "options": {
         "cwd": "${workspaceFolder}/embedded-firmware"
       },
-      "command": "make clean && make -j`nproc` && make cload radio=${input:radio}",
-      "problemMatcher": []
+      "command": "make clean && make -j`nproc` && make cload radio=${input:radio}"
     },
     {
       "label": "Compile Embedded Firmware",

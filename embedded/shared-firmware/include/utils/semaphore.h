@@ -19,10 +19,10 @@ class Semaphore {
   bool tryAcquire();
 
  private:
-  size_t m_count = 0;  // Initialized as locked.
+  size_t m_count;  // Initialized as locked.
   std::mutex m_mutex;
   std::condition_variable m_condition;
-  size_t m_maxSize = 0;
+  size_t m_maxSize;
 };
 
 #endif

@@ -27,6 +27,7 @@ class AbstractController {
  public:
   virtual ~AbstractController() = default;
   AbstractController() = default;
+  AbstractController(std::unique_ptr<AbstractSensor>&& m_abstractSensor);
   AbstractController(AbstractController&& other) = delete;
   AbstractController& operator=(AbstractController&& other) = delete;
   AbstractController(const AbstractController& other) = delete;

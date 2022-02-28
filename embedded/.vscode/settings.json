@@ -10,7 +10,7 @@
   "files.associations": {
     "*.cc": "cpp",
     "*.cpp": "cpp",
-    "*.h": "cpp",
+    "*.h": "cpp"
   },
   "editor.tabSize": 2,
   "editor.detectIndentation": false,

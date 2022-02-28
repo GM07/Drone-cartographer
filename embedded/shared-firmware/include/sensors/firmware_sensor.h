@@ -8,14 +8,14 @@ class FirmwareSensor : public AbstractSensor {
   FirmwareSensor() = default;
   virtual ~FirmwareSensor() = default;
 
-  float getFrontDistance() const override;
-  float getLeftDistance() const override;
-  float getRightDistance() const override;
-  float getBackDistance() const override;
-  float getPosX() const override;
-  float getPosY() const override;
-  float getPosZ() const override;
-  float getBatteryLevel() const override;
+  [[nodiscard]] float getFrontDistance() const override;
+  [[nodiscard]] float getLeftDistance() const override;
+  [[nodiscard]] float getRightDistance() const override;
+  [[nodiscard]] float getBackDistance() const override;
+  [[nodiscard]] float getPosX() const override;
+  [[nodiscard]] float getPosY() const override;
+  [[nodiscard]] float getPosZ() const override;
+  [[nodiscard]] float getBatteryLevel() const override;
 };
 
 #endif

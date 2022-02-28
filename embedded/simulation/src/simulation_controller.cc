@@ -12,11 +12,11 @@ using ::argos::CVector3;
 
 //////////////////////////////////////////
 SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
-    : m_ccrazyflieSensing(ccrazyflieSensing),
+    : AbstractController(std::make_unique<SimulationSensor>(ccrazyflieSensing)),
+      m_ccrazyflieSensing(ccrazyflieSensing),
       m_controllerDataSem(std::make_unique<Semaphore>(1)),
       m_sendDataThread(std::make_unique<std::thread>(
           &SimulationController::sendDroneDataToServerThread, this)) {
-  m_abstractSensor = std::make_unique<SimulationSensor>(ccrazyflieSensing);
   static int count = 1;
   data.front = count++;
 }
