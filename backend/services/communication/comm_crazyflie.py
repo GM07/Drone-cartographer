@@ -67,10 +67,8 @@ class CommCrazyflie(AbstractComm):
 
         for link in sending_links:
             packet = bytearray(command) # Command must be an array of numbers
-            self.crazyflies_by_id[link].open_link(link)
             print('Sending packet : ', packet)
             self.crazyflies_by_id[link].appchannel.send_packet(packet)
-            self.crazyflies_by_id[link].close_link()
 
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
