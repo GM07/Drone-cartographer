@@ -38,6 +38,13 @@ void communicationManagerInit() {
 bool communicationManagerTest() { return isInit; }
 
 /////////////////////////////////////////////////////////////////////////
+void updateCrashStatus() {
+  if (supervisorIsTumbled()) {
+    Drone::getEmbeddedDrone().getController()->state = State::kCrash;
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////
 void enableCrtpHighLevelCommander() {
   paramVarId_t paramIdCommanderEnHighLevel =
       paramGetVarId("commander", "enHighLevel");
@@ -59,6 +66,7 @@ extern "C" void appMain() {
 
   while (true) {
     Drone::getEmbeddedDrone().updateSensorData();
+    updateCrashStatus();
 
     Drone::getEmbeddedDrone().step();
   }

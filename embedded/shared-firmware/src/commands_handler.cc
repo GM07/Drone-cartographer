@@ -11,12 +11,17 @@ bool Drone::handleCommand(Command command, const void* /*extraArgs*/,
       m_controller->blinkLED(LED::kLedRedLeft);
       break;
     case Command::kTakeOff:
+      if (m_controller->state == State::kCrash) {
+        return false;
+      }
       m_controller->takeOff(kHeight);
       m_controller->state = State::kTakingOff;
       break;
     case Command::kLand:
       m_controller->land();
-      m_controller->state = State::kLanding;
+      if (m_controller->state != State::kCrash) {
+        m_controller->state = State::kLanding;
+      }
       break;
     default:
       return false;
