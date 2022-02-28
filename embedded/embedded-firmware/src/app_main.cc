@@ -60,10 +60,6 @@ extern "C" void appMain() {
   while (true) {
     Drone::getEmbeddedDrone().updateSensorData();
 
-    if (supervisorIsTumbled()) {
-      Drone::getEmbeddedDrone().getController()->blinkLED(LED::kLedRedLeft);
-    }
-
     Drone::getEmbeddedDrone().step();
   }
 }
