@@ -33,7 +33,7 @@ void SimulationController::sendMessage(void* message, size_t size_bytes) {
 }
 
 ///////////////////////////////////////
-void SimulationController::blinkLED(LED led) {
+void SimulationController::blinkLED(LED /*led*/) {
   log("Identify :" + m_ccrazyflieSensing->GetId());
 }
 
