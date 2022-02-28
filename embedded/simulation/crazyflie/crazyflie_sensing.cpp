@@ -71,15 +71,8 @@ void CCrazyflieSensing::Init(argos::TConfigurationNode& /*t_node*/) {
 
 void CCrazyflieSensing::ControlStep() {
   m_drone.updateSensorData();
-  // std::dynamic_pointer_cast<SimulationController>(m_drone.getController())
-  //    ->sendDroneDataToServerThread();
 
   m_drone.step();
-
-  // Attempt push
-
-  // push data
-  // signal data is available
 
   logBuffer << m_drone.getController()->data.batteryLevel << std::endl;
 
