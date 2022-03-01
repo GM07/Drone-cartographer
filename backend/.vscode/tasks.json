@@ -10,7 +10,13 @@
             "label": "Run tests",
             "type": "shell",
             "command": "pytest"
+        },
+        {
+            "label": "Start backend",
+            "type": "shell",
+            "command": "python3 server.py"
         }
+
     ]
 
 }

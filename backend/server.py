@@ -89,7 +89,6 @@ def request_control():
 @APP.route('/getCompletedMissions')
 def retrieve_missions():
     database_connection = Database()
-    print(database_connection.get_all_missions_time_stamps())
     return jsonify(database_connection.get_all_missions_time_stamps())
 
 @SOCKETIO.on('revoke_control', namespace="/limitedAccess")

@@ -1,6 +1,6 @@
 <template>
   <v-container fill-height fluid>
-    <v-row fluid class="full-height"  align="center" justify="center">
+    <v-row align="center" class="full-height" fluid justify="center">
       <v-col align-self="center" class="text-center">
         <div v-if="!this.$store.state.missionStatus.isSomeoneControlling">
           <v-btn class="ma-4" large primary @click="configureMission()">
@@ -10,8 +10,10 @@
         <div v-else>
           <v-btn class="ma-4" large primary to="/Mission">Mission</v-btn>
         </div>
-        
-        <v-btn class="ma-4" large primary to= "/History">Mission History </v-btn>
+
+        <v-btn class="ma-4" large primary to="/Historique"
+          >Historique de Mission
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>

@@ -9,7 +9,7 @@ database.upload_mission_info(mission_info)
 from dataclasses import dataclass
 from typing import List
 from pymongo import MongoClient
-import time
+from datetime import datetime
 
 
 @dataclass
@@ -23,21 +23,21 @@ class Mission:
     """This class has is a dataclass that holds all the parameters
     needed to describe a mission"""
     time_stamp: str
-    temps_de_vol: float
-    nombre_de_drones: int
-    est_simule: bool
-    distance_totale: float
-    cartes: List[List[Point]]
+    flight_duration: float
+    number_of_drones: int
+    is_simulated: bool
+    total_distance: float
+    maps: List[List[Point]]
 
-    def __init__(self, temps_de_vol: float, nombre_de_drones: int,
-    est_simule: bool, distance_totale: float,
-    cartes: List[List[Point]], time_stamp=time.localtime()):
+    def __init__(self, flight_duration: float, number_of_drones: int,
+    is_simulated: bool, total_distance: float,
+    maps: List[List[Point]], time_stamp=datetime.now()):
         self.time_stamp = time_stamp
-        self.temps_de_vol = temps_de_vol
-        self.nombre_de_drones = nombre_de_drones
-        self.est_simule = est_simule
-        self.distance_totale = distance_totale
-        self.cartes = cartes
+        self.flight_duration = flight_duration
+        self.number_of_drones = number_of_drones
+        self.is_simulated = is_simulated
+        self.total_distance = total_distance
+        self.maps = maps
 
 
 class Database:
@@ -54,10 +54,9 @@ class Database:
 
     def get_all_missions_time_stamps(self) -> list:
         return serialize_objectid_from_result(list(self.db.missions.aggregate(
-            [{'$project': {'time_stamp': 1, 'est_simule': 1}}])))
+            [{'$project': {'time_stamp': 1, 'is_simulated': 1}}])))
 
     def get_mission_from_id(self, identifier: str):
-        print(identifier)
         return self.db.missions.find_one({'_id': identifier})
 
     def remove_mission_from_id(self, identifier: str) -> bool:
@@ -88,5 +87,5 @@ def serialize_objectid_from_result(result: list):
         test['_id'] = str(test['_id'])
     return result
 
-database = Database()
+database =Database()
 database.test_connection()

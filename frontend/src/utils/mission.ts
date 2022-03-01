@@ -5,9 +5,9 @@ export interface Point {
 
 export interface Mission {
   time_stamp: string;
-  temps_de_vol: number;
-  nombre_de_drones: number;
-  est_simule: boolean;
-  distance_totale: number;
-  cartes: Point[][];
+  flight_duration: number;
+  number_of_drones: number;
+  is_simulated: boolean;
+  total_distance: number;
+  maps: [[Point]];
 }
