@@ -56,12 +56,15 @@
             <v-list-item-title v-if="!item.is_simulated" class="text-h6 mb-3">
               Mission Physique
             </v-list-item-title>
-            <div>
-              <v-list-item-title class="text-h6 mb-3">
-                Date de complétion: {{ item.time_stamp }}
-              </v-list-item-title>
-            </div>
-            <br />
+
+            <v-list-item-title class="text-h6 mb-3">
+              Date de complétion: {{ item.time_stamp }}
+            </v-list-item-title>
+
+            <v-list-item-title class="text-h7 mb-3">
+              <strong> Identifiant:</strong> {{ item._id }}
+            </v-list-item-title>
+
             <v-btn class="ma-2" color="indigo" outlined>
               Plus d'informations
             </v-btn>
