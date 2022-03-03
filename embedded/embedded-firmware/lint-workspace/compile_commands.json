@@ -6,11 +6,6 @@
         "-I../crazyflie-firmware/src/modules/",
         "-I../shared-firmware/include/",
         "-Iinclude/",
-        "-DCRAZYFLIE_FW",
-        "-DBLOBS_LOCK=\"../crazyflie-firmware/blobs/\"",
-        "-fno-math-errno",
-        "-DARM_MATH_CM4",
-        "-D__FPU_PRESENT=1",
         "-DSTM32F4XX",
         "-DSTM32F40_41xxx",
         "-DHSE_VALUE=8000000",
@@ -64,7 +59,7 @@
         "bin/firmware_controller.o",
         "src/firmware_controller.cc"
     ],
-    "directory": "embedded/embedded-firmware",
+    "directory": "/workspaces/INF3995-106/embedded/embedded-firmware",
     "file": "src/firmware_controller.cc"
   },
   {
@@ -132,7 +127,7 @@
         "bin/app_main.o",
         "src/app_main.cc"
     ],
-    "directory": "embedded/embedded-firmware",
+    "directory": "/workspaces/INF3995-106/embedded/embedded-firmware",
     "file": "src/app_main.cc"
   },
   {
@@ -200,7 +195,7 @@
         "bin/navigation_system.o",
         "../shared-firmware/src/navigation_system.cc"
     ],
-    "directory": "embedded/embedded-firmware",
+    "directory": "/workspaces/INF3995-106/embedded/embedded-firmware",
     "file": "../shared-firmware/src/navigation_system.cc"
   },
   {
@@ -268,7 +263,7 @@
         "bin/timer.o",
         "src/timer.cc"
     ],
-    "directory": "embedded/embedded-firmware",
+    "directory": "/workspaces/INF3995-106/embedded/embedded-firmware",
     "file": "src/timer.cc"
   },
   {
@@ -336,7 +331,7 @@
         "bin/communication_manager.o",
         "../shared-firmware/src/communication_manager.cc"
     ],
-    "directory": "embedded/embedded-firmware",
+    "directory": "/workspaces/INF3995-106/embedded/embedded-firmware",
     "file": "../shared-firmware/src/communication_manager.cc"
   },
   {
@@ -404,7 +399,7 @@
         "bin/commands_handler.o",
         "../shared-firmware/src/commands_handler.cc"
     ],
-    "directory": "embedded/embedded-firmware",
+    "directory": "/workspaces/INF3995-106/embedded/embedded-firmware",
     "file": "../shared-firmware/src/commands_handler.cc"
   },
   {
@@ -472,7 +467,7 @@
         "bin/vector3d.o",
         "../shared-firmware/src/vector3d.cc"
     ],
-    "directory": "embedded/embedded-firmware",
+    "directory": "/workspaces/INF3995-106/embedded/embedded-firmware",
     "file": "../shared-firmware/src/vector3d.cc"
   }
 ]
