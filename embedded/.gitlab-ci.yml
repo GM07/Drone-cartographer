@@ -73,6 +73,6 @@ lint_simulation:
 lint_embedded:
   stage: lint
   script:
-    - cd $WORKING_DIRECTORY/embedded-firmware
-    - ../run-clang-tidy.py -checks="-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type"
+    - cd $WORKING_DIRECTORY/embedded-firmware/lint-pipeline
+    - ../../run-clang-tidy.py -checks="-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type"
     
