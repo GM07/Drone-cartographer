@@ -44,6 +44,7 @@
         </v-list>
       </template>
     </v-navigation-drawer>
+    <Map />
   </div>
 </template>
 
@@ -53,11 +54,12 @@ import {ServerCommunication} from '@/communication/server_communication';
 import DroneCommands from '@/components/drone_commands.vue';
 import MissionCommands from '@/components/mission_commands.vue';
 import NavigationCommands from '@/components/navigation_commands.vue';
+import Map from '@/components/map.vue';
 import {SOCKETIO_LIMITED_ACCESS} from '@/communication/server_constants';
 import {AccessStatus} from '@/communication/access_status';
 
 @Component({
-  components: {DroneCommands, MissionCommands, NavigationCommands},
+  components: {DroneCommands, MissionCommands, NavigationCommands, Map},
 })
 export default class Mission extends Vue {
   public droneList = ['General'];

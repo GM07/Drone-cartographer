@@ -10,10 +10,14 @@
     "test": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "ag-charts-community": "^5.0.0",
+    "ag-charts-vue": "^5.0.0",
+    "chart.js": "^3.7.1",
     "core-js": "^3.6.5",
     "socket.io-client": "^4.4.1",
     "typed-vuex": "^0.2.0",
     "vue": "^2.6.11",
+    "vue-chartjs": "^3.5.1",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.2.0",
