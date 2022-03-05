@@ -7,8 +7,6 @@
         fade-img-on-scroll
         hide-on-scroll
       >
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
         <v-toolbar-title>Historique</v-toolbar-title>
 
         <v-spacer></v-spacer>
@@ -17,22 +15,8 @@
           <v-icon>mdi-magnify</v-icon>
         </v-btn>
 
-        <v-menu bottom left>
-          <template v-slot:activator="{on, attrs}">
-            <v-btn v-bind="attrs" color="yellow" icon v-on="on">
-              <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
-          </template>
-
-          <v-list>
-            <v-list-item v-for="(item, i) in items" :key="i">
-              <v-list-item-title>{{ item.title }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-
         <template v-slot:extension>
-          <v-tabs align-with-title>
+          <v-tabs>
             <v-tab @click="changeMode('all')">Tous</v-tab>
             <v-tab @click="changeMode('simulated')">Simulation</v-tab>
             <v-tab @click="changeMode('physical')">Embarqué</v-tab>
@@ -100,6 +84,7 @@ import {Mission} from '@/utils/mission';
 export default class CompletedMissions extends Vue {
   public missions: Mission[] = [];
   public mode = 'all';
+  public searchMode = false;
 
   public changeMode(mode: string): void {
     this.getCompletedMissions();
@@ -107,6 +92,7 @@ export default class CompletedMissions extends Vue {
   }
 
   public getFilteredMissions(): Mission[] {
+    console.log(this.missions);
     switch (this.mode) {
       case 'all':
         return this.missions;

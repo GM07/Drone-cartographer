@@ -31,7 +31,7 @@ class Mission:
 
     def __init__(self, flight_duration: float, number_of_drones: int,
     is_simulated: bool, total_distance: float,
-    maps: List[List[Point]], time_stamp=datetime.now()):
+    maps: List[List[Point]], time_stamp=datetime.now().isoformat()):
         self.time_stamp = time_stamp
         self.flight_duration = flight_duration
         self.number_of_drones = number_of_drones
