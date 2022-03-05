@@ -11,7 +11,10 @@ using ::argos::CVector3;
 
 //////////////////////////////////////////
 SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
-    : m_ccrazyflieSensing(ccrazyflieSensing) {}
+    : m_ccrazyflieSensing(ccrazyflieSensing) {
+  static uint32_t count = 1;
+  data.front = count++;
+}
 
 ///////////////////////////////////////
 size_t SimulationController::receiveMessage(void* message, size_t size) {
@@ -22,6 +25,11 @@ size_t SimulationController::receiveMessage(void* message, size_t size) {
   }
 
   return messageSize;
+}
+
+///////////////////////////////////////
+void SimulationController::sendMessage(void* message, size_t size_bytes) {
+  m_socket->send(boost::asio::buffer(message, size_bytes));
 }
 
 ///////////////////////////////////////

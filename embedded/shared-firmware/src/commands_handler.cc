@@ -1,6 +1,8 @@
 #include "components/drone.h"
 #include "utils/commands.h"
 
+size_t constexpr PACKET_SIZE = 32;
+
 /////////////////////////////////////////////////////////////////////////
 bool Drone::handleCommand(Command command, const void* /*extraArgs*/,
                           size_t /*extraArgsLength*/) {
@@ -15,6 +17,9 @@ bool Drone::handleCommand(Command command, const void* /*extraArgs*/,
     case Command::kLand:
       m_controller->land();
       m_controller->state = State::kLanding;
+      break;
+    case Command::kLogs:
+      m_controller->sendMessage(&m_controller->data, PACKET_SIZE);
       break;
     default:
       return false;

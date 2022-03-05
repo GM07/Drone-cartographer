@@ -26,6 +26,7 @@ class socket {
 
   inline size_t available() { return 0; }
   inline size_t receive(const int32_t) { return 0; }
+  inline size_t send(const int32_t) { return 0; }
   inline void connect(const std::string&) { return; }
 };
 }  // namespace local::stream_protocol
