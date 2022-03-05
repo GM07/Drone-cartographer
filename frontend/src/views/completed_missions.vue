@@ -10,19 +10,50 @@
         <v-toolbar-title>Historique</v-toolbar-title>
 
         <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <template>
+          <v-menu
+            ref="menu"
+            v-model="menu"
+            :close-on-content-click="false"
+            min-width="auto"
+            offset-y
+            :return-value.sync="date"
+            style="position: absolute; right: 0px"
+            transition="scale-transition"
+          >
+            <template v-slot:activator="{on, attrs}">
+              <v-text-field
+                v-model="date"
+                v-bind="attrs"
+                label="Picker in menu"
+                prepend-icon="mdi-calendar"
+                v-on="on"
+              ></v-text-field>
+            </template>
 
-        <v-btn icon>
-          <v-icon>mdi-magnify</v-icon>
-        </v-btn>
-
+            <v-date-picker v-model="date" no-title scrollable>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="menu = false">
+                Annuler
+              </v-btn>
+              <v-btn color="primary" text @click="filterByDate(date)">
+                Filtrer par date
+              </v-btn>
+            </v-date-picker>
+          </v-menu>
+        </template>
         <template v-slot:extension>
-          <v-tabs>
+          <v-tabs v-model="currentTab">
             <v-tab @click="changeMode('all')">Tous</v-tab>
             <v-tab @click="changeMode('simulated')">Simulation</v-tab>
             <v-tab @click="changeMode('physical')">Embarqué</v-tab>
+            <v-tab @click="changeMode('date')">Date</v-tab>
           </v-tabs>
         </template>
       </v-app-bar>
+
       <v-sheet
         id="scrolling-techniques-4"
         class="overflow-y-auto pa-4"
@@ -33,7 +64,7 @@
           :key="item._id"
           class="ma-5"
         >
-          <v-card class="pa-5" elevation="4" :loading="loading" outlined>
+          <v-card class="pa-5" elevation="4" outlined>
             <v-list-item-title v-if="item.is_simulated" class="text-h6 mb-3">
               Mission Simulé
             </v-list-item-title>
@@ -84,7 +115,13 @@ import {Mission} from '@/utils/mission';
 export default class CompletedMissions extends Vue {
   public missions: Mission[] = [];
   public mode = 'all';
-  public searchMode = false;
+  public menu = false;
+  public currentTab = 0;
+  public date: string = new Date(
+    Date.now() - new Date().getTimezoneOffset() * 60000
+  )
+    .toISOString()
+    .substr(0, 10);
 
   public changeMode(mode: string): void {
     this.getCompletedMissions();
@@ -92,7 +129,6 @@ export default class CompletedMissions extends Vue {
   }
 
   public getFilteredMissions(): Mission[] {
-    console.log(this.missions);
     switch (this.mode) {
       case 'all':
         return this.missions;
@@ -103,6 +139,12 @@ export default class CompletedMissions extends Vue {
       case 'physical':
         return this.missions.filter(
           (mission: Mission) => !mission.is_simulated
+        );
+
+      case 'date':
+        return this.missions.filter(
+          (mission: Mission) =>
+            mission.time_stamp.substring(0, 10) === this.date
         );
 
       default:
@@ -123,6 +165,11 @@ export default class CompletedMissions extends Vue {
       .then(data => {
         this.missions = data;
       });
+  }
+  private filterByDate(date: string): void {
+    this.currentTab = 3;
+    this.date = date;
+    this.changeMode('date');
   }
 }
 </script>
