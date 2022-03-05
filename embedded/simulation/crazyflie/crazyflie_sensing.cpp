@@ -1,8 +1,4 @@
-// TODO doit être enlevé lorsque le controlleur sera implémenté
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "controllers/simulation_controller.h"
-#pragma GCC diagnostic pop
 
 /* Include the controller definition */
 #include "crazyflie_sensing.h"
@@ -15,25 +11,20 @@
 
 #include "utils/timer.h"
 
+using ::argos::CARGoSException;
+using ::argos::CRandom;
+
 /****************************************/
 /****************************************/
 
 CCrazyflieSensing::CCrazyflieSensing()
-    : m_pcDistance(nullptr),
-      m_pcPropellers(nullptr),
-      m_pcRABA(nullptr),
-      m_pcRABS(nullptr),
-      m_pcPos(nullptr),
-      m_pcBattery(nullptr),
-      m_pcRNG(nullptr),
-      m_uiCurrentStep(0),
-      m_communicationThread(nullptr),
+    : m_communicationThread(nullptr),
       m_drone(std::make_shared<SimulationController>(this)) {}
 
 /****************************************/
 /****************************************/
 
-void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
+void CCrazyflieSensing::Init(argos::TConfigurationNode& /*t_node*/) {
   // Start socket connection
   m_communicationThread = std::make_unique<std::thread>(
       &CCrazyflieSensing::threadTasksWrapper, this);
@@ -42,19 +33,20 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
     /*
      * Initialize sensors/actuators
      */
-    m_pcDistance = GetSensor<CCI_CrazyflieDistanceScannerSensor>(
+    m_pcDistance = GetSensor<argos::CCI_CrazyflieDistanceScannerSensor>(
         "crazyflie_distance_scanner");
     m_pcPropellers =
-        GetActuator<CCI_QuadRotorPositionActuator>("quadrotor_position");
+        GetActuator<argos::CCI_QuadRotorPositionActuator>("quadrotor_position");
     /* Get pointers to devices */
-    m_pcRABA = GetActuator<CCI_RangeAndBearingActuator>("range_and_bearing");
-    m_pcRABS = GetSensor<CCI_RangeAndBearingSensor>("range_and_bearing");
+    m_pcRABA =
+        GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing");
+    m_pcRABS = GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing");
     try {
-      m_pcPos = GetSensor<CCI_PositioningSensor>("positioning");
+      m_pcPos = GetSensor<argos::CCI_PositioningSensor>("positioning");
     } catch (CARGoSException& ex) {
     }
     try {
-      m_pcBattery = GetSensor<CCI_BatterySensor>("battery");
+      m_pcBattery = GetSensor<argos::CCI_BatterySensor>("battery");
     } catch (CARGoSException& ex) {
     }
   } catch (CARGoSException& ex) {
@@ -79,10 +71,9 @@ void CCrazyflieSensing::Init(TConfigurationNode& t_node) {
 
 void CCrazyflieSensing::ControlStep() {
   m_drone.step();
-
   printLogs();
 
-  m_uiCurrentStep++;
+  ++m_uiCurrentStep;
 }
 
 /****************************************/
@@ -99,6 +90,7 @@ void CCrazyflieSensing::printLogs() {
 }
 
 void CCrazyflieSensing::attemptSocketConnection() {
+  constexpr uint32_t kDroneDelay = 250;
   while (true) {
     try {
       if (m_drone.getController()->state != State::kDead) {
@@ -108,14 +100,16 @@ void CCrazyflieSensing::attemptSocketConnection() {
     } catch (const boost::system::system_error& error) {
       // We try to connect to socket 4 times per second
       // Don't need to try more
-      Timer::delayMs(250);
+      Timer::delayMs(kDroneDelay);
     }
   }
 }
 
 CCrazyflieSensing::~CCrazyflieSensing() {
   m_drone.getController()->state = State::kDead;
-  if (m_communicationThread) m_communicationThread->join();
+  if (m_communicationThread) {
+    m_communicationThread->join();
+  }
 }
 
 /****************************************/

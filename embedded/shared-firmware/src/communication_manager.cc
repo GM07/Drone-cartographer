@@ -4,10 +4,12 @@
 
 /////////////////////////////////////////////////////////////////////////
 void Drone::communicationManagerTask() {
-  Timer::delayMs(3000);
+  constexpr uint32_t kCommunicationDelay = 50;
+  constexpr uint32_t kInitDelay = 3000;
+  Timer::delayMs(kInitDelay);
 
   while (true) {
-    if (m_controller->receiveMessage(&m_messageRX, sizeof(m_messageRX))) {
+    if (m_controller->receiveMessage(&m_messageRX, sizeof(m_messageRX)) != 0U) {
       bool successfulCommand =
           handleCommand(static_cast<Command>(m_messageRX[0]), &m_messageRX[1],
                         sizeof(m_messageRX) - sizeof(Command));
@@ -19,6 +21,6 @@ void Drone::communicationManagerTask() {
       return;
     }
 
-    Timer::delayMs(50);
+    Timer::delayMs(kCommunicationDelay);
   }
 }

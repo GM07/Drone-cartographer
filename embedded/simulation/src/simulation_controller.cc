@@ -1,8 +1,4 @@
-// TODO doit être enlevé lorsque le controlleur sera implémenté
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "controllers/simulation_controller.h"
-#pragma GCC diagnostic pop
 
 #include <argos3/core/utility/logging/argos_log.h>
 
@@ -11,7 +7,7 @@
 
 #include "utils/led.h"
 
-#define ALMOST_THERE 0.01
+using ::argos::CVector3;
 
 //////////////////////////////////////////
 SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
@@ -21,7 +17,7 @@ SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
 size_t SimulationController::receiveMessage(void* message, size_t size) {
   size_t messageSize = m_socket->available();
 
-  if (messageSize > 0) {
+  if (messageSize != 0) {
     m_socket->receive(boost::asio::buffer(message, size));
   }
 
@@ -29,7 +25,7 @@ size_t SimulationController::receiveMessage(void* message, size_t size) {
 }
 
 ///////////////////////////////////////
-void SimulationController::blinkLED(LED led) {
+void SimulationController::blinkLED(LED /*led*/) {
   log("Identify :" + m_ccrazyflieSensing->GetId());
 }
 
