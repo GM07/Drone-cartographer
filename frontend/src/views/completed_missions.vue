@@ -12,6 +12,13 @@
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+
         <template>
           <v-menu
             ref="menu"
@@ -20,7 +27,7 @@
             min-width="auto"
             offset-y
             :return-value.sync="date"
-            style="position: absolute; right: 0px"
+            style="right: 0px; text-align: right; min-width: 200px"
             transition="scale-transition"
           >
             <template v-slot:activator="{on, attrs}">
@@ -29,6 +36,7 @@
                 v-bind="attrs"
                 label="Picker in menu"
                 prepend-icon="mdi-calendar"
+                style="right: 0px; text-align: right"
                 v-on="on"
               ></v-text-field>
             </template>
@@ -51,6 +59,14 @@
             <v-tab @click="changeMode('physical')">Embarqué</v-tab>
             <v-tab @click="changeMode('date')">Date</v-tab>
           </v-tabs>
+
+          <div>
+            <v-select
+              v-model="baseFilter"
+              :items="filters"
+              style="right: 0px; text-align: right; width: 200px"
+            ></v-select>
+          </div>
         </template>
       </v-app-bar>
 
@@ -117,6 +133,13 @@ export default class CompletedMissions extends Vue {
   public mode = 'all';
   public menu = false;
   public currentTab = 0;
+  public baseFilter = 'Aucun';
+  public filters = [
+    'Aucun',
+    'Nombre de drones',
+    'Distance parcourue',
+    'Temps de vol',
+  ];
   public date: string = new Date(
     Date.now() - new Date().getTimezoneOffset() * 60000
   )
@@ -131,20 +154,24 @@ export default class CompletedMissions extends Vue {
   public getFilteredMissions(): Mission[] {
     switch (this.mode) {
       case 'all':
-        return this.missions;
+        return this.sortMissions(this.missions);
 
       case 'simulated':
-        return this.missions.filter((mission: Mission) => mission.is_simulated);
+        return this.sortMissions(
+          this.missions.filter((mission: Mission) => mission.is_simulated)
+        );
 
       case 'physical':
-        return this.missions.filter(
-          (mission: Mission) => !mission.is_simulated
+        return this.sortMissions(
+          this.missions.filter((mission: Mission) => !mission.is_simulated)
         );
 
       case 'date':
-        return this.missions.filter(
-          (mission: Mission) =>
-            mission.time_stamp.substring(0, 10) === this.date
+        return this.sortMissions(
+          this.missions.filter(
+            (mission: Mission) =>
+              mission.time_stamp.substring(0, 10) === this.date
+          )
         );
 
       default:
@@ -170,6 +197,28 @@ export default class CompletedMissions extends Vue {
     this.currentTab = 3;
     this.date = date;
     this.changeMode('date');
+  }
+
+  private sortMissions(missions: Mission[]): Mission[] {
+    console.log(this.baseFilter);
+    switch (this.baseFilter) {
+      case this.filters[0]:
+        return missions;
+      case this.filters[1]:
+        return missions.sort((a, b) => {
+          return a.number_of_drones - b.number_of_drones;
+        });
+      case this.filters[2]:
+        return missions.sort((a, b) => {
+          return a.total_distance - b.total_distance;
+        });
+      case this.filters[3]:
+        return missions.sort((a, b) => {
+          return a.flight_duration - b.flight_duration;
+        });
+      default:
+        return missions;
+    }
   }
 }
 </script>

@@ -54,7 +54,7 @@ class Database:
 
     def get_all_missions_time_stamps(self) -> list:
         return serialize_objectid_from_result(list(self.db.missions.aggregate(
-            [{'$project': {'time_stamp': 1, 'is_simulated': 1}}])))
+            [{'$project': {'time_stamp': 1, 'is_simulated': 1 , 'total_distance':1,'number_of_drones':1,'flight_duration':1}}])))
 
     def get_mission_from_id(self, identifier: str):
         return self.db.missions.find_one({'_id': identifier})
