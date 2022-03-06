@@ -28,16 +28,21 @@ class Mission:
     is_simulated: bool
     total_distance: float
     maps: List[List[Point]]
+   
 
     def __init__(self, flight_duration: float, number_of_drones: int,
     is_simulated: bool, total_distance: float,
-    maps: List[List[Point]], time_stamp=datetime.now().isoformat()):
-        self.time_stamp = time_stamp
+    maps: List[List[Point]]):
+        
         self.flight_duration = flight_duration
         self.number_of_drones = number_of_drones
         self.is_simulated = is_simulated
         self.total_distance = total_distance
         self.maps = maps
+        self.time_stamp=datetime.now().isoformat()
+        
+
+    
 
 
 class Database:
