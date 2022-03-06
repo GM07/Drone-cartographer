@@ -10,6 +10,7 @@ import services.status.access_status as AccessStatus
 import services.status.mission_status as MissionStatus
 from constants import MAX_TIMEOUT, COMMANDS, URI
 from services.communication.database.mongo_interface import Database
+import os
 
 # Flask application
 APP = Flask(__name__)
