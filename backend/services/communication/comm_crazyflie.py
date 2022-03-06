@@ -1,4 +1,3 @@
-
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
@@ -8,10 +7,10 @@ from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
 
 
-
 class CommCrazyflie(AbstractComm):
     """This class is used to communicate with the crazyflie
     drones"""
+
     def __init__(self, links: list):
 
         print('Creating Embedded Crazyflie communication')

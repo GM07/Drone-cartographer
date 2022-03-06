@@ -7,6 +7,7 @@ from services.communication.byte_decoder import ByteDecoder
 
 class DroneSensors:
     """This class provides an interface for the sensors on the drones """
+
     def __init__(self, front: float, left: float, back: float, right: float):
         self.front = front
         self.left = left
@@ -16,6 +17,7 @@ class DroneSensors:
 
 class Point2D:
     """This class provides an interface for coordinates"""
+
     def __init__(self, x: float, y: float, z: float = 0):
         self.x = x
         self.y = y
@@ -32,17 +34,19 @@ class DroneState(Enum):
 
 class DroneData:
     """This class regroups all the data taken from the drones"""
-#    def __init__(self, sensors: DroneSensors, position: Point2D,
-#                 battery_level: float, state: DroneState):
-#        self.sensors = sensors
-#        self.position = position
-#        self.battery_level = battery_level
-#        self.state = state
+
+    #    def __init__(self, sensors: DroneSensors, position: Point2D,
+    #                 battery_level: float, state: DroneState):
+    #        self.sensors = sensors
+    #        self.position = position
+    #        self.battery_level = battery_level
+    #        self.state = state
 
     def __init__(self, data: bytes):
         self.__from_bytes(data)
 
 # pylint: disable=unused-private-member
+
     def __from_bytes(self, data: bytes):
         decoder: ByteDecoder = ByteDecoder(
             data, ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'i'])

@@ -11,8 +11,7 @@ from services.communication.abstract_comm import AbstractComm
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
 from services.communication.database.mongo_interface import Database
-from constants import  COMMANDS, URI
-
+from constants import COMMANDS, URI
 
 # Flask application
 APP = Flask(__name__)
@@ -36,6 +35,7 @@ COMM: AbstractComm = CommCrazyflie(URI)
 def get_drones():
     return jsonify(URI)
 
+
 # Identifying drones
 
 
@@ -47,19 +47,24 @@ def identify_drone(drone_addr):
     COMM.send_command(COMMANDS.IDENTIFY.value, links=[drone_addr])
     return 'Identified drone'
 
+
 # Launch mission
 
 
 @SOCKETIO.on('launch', namespace='/limitedAccess')
 def launch(is_simulated: bool):
-    if(MissionStatus.get_mission_started() or not
-    AccessStatus.is_request_valid(request)):
+    if (MissionStatus.get_mission_started() or
+            not AccessStatus.is_request_valid(request)):
         return ''
 
     print('launch')
     if is_simulated:
-# pylint: disable=line-too-long
-        os.system("docker exec -d embedded /bin/bash -c \"echo 'IyEvYmluL2Jhc2gKQVJHT1NfTE9DPSQoZmluZCAvIC1pbmFtZSAiY3JhenlmbGllX3NlbnNpbmcuYXJnb3MiIDI+IC9kZXYvbnVsbCkKYXJnb3MzIC1jICRBUkdPU19MT0MK' | base64 -d | /bin/bash\"")
+        # pylint: disable=line-too-long
+        os.system(
+            "docker exec -d embedded /bin/bash -c \"echo 'IyEvYmluL2Jhc2gKQVJHT1NfTE9DPSQoZmluZCAvIC1pbmFtZSAiY3JhenlmbGllX3NlbnNpbmcuYXJnb3MiIDI+IC9kZXYvbnVsbCkKYXJnb3MzIC1jICRBUkdPU19MT0MK' | base64 -d | /bin/bash\""
+        )
+
+
 # pylint: enable=line-too-long
     COMM.send_command(COMMANDS.LAUNCH.value)
 
@@ -77,13 +82,14 @@ def set_mission_type(is_simulated: bool):
         COMM = CommCrazyflie(URI)
     return ''
 
+
 # Terminate mission
 
 
 @SOCKETIO.on('terminate', namespace='/limitedAccess')
 def terminate():
-    if(not MissionStatus.get_mission_started() or not
-    AccessStatus.is_request_valid(request)):
+    if (not MissionStatus.get_mission_started() or
+            not AccessStatus.is_request_valid(request)):
         return ''
 
     COMM.send_command(COMMANDS.LAND.value)
@@ -99,11 +105,13 @@ def request_control():
         MissionStatus.update_all_clients(SOCKETIO)
     return ''
 
+
 # Get Completed mission logs
 @APP.route('/getCompletedMissions')
 def retrieve_missions():
     database_connection = Database()
     return jsonify(database_connection.get_all_missions_time_stamps())
+
 
 @SOCKETIO.on('revoke_control', namespace='/limitedAccess')
 def revoke_control():
@@ -119,6 +127,7 @@ def disconnect():
     if change:
         MissionStatus.update_all_clients(SOCKETIO)
     return ''
+
 
 @SOCKETIO.on('connect', namespace='/getMissionStatus')
 def mission_connect():

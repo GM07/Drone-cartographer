@@ -10,6 +10,7 @@ DEFAULT_SIZE = 4
 class ByteDecoder:
     """This class to decode bytes
     that are sent from the drone """
+
     def __init__(self, data: bytes, structure: dict):
         """ Structure has to follow the format {type: size}.
             Ex: {'f':4, 'f':4, 'i':4}
@@ -25,7 +26,8 @@ class ByteDecoder:
         self.structure = []
         for current in types:
             if current in DEFAULT_SIZES_OF_TYPES:
-                self.structure.append((current,DEFAULT_SIZES_OF_TYPES[current]))
+                self.structure.append(
+                    (current, DEFAULT_SIZES_OF_TYPES[current]))
             else:
                 self.structure.append((current, DEFAULT_SIZE))
 
