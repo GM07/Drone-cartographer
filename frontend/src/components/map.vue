@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <ag-charts-vue :key="data" :options="options"></ag-charts-vue>
+    <ag-charts-vue
+      :key="(this.options.series[1].data, this.options.series[0].data)"
+      :options="options"
+    ></ag-charts-vue>
+    <!-- :key="series[0]"  -->
     <button v-on:click="changeData([1, 1, 2, 2, 3, 3])">
       Click me to change the data!
     </button>
@@ -20,17 +24,19 @@ import {
 @Component({components: {AgChartsVue}})
 export default class Map extends Vue {
   readonly SOCKETIO = SocketIO(SERVER_ADDRESS + MAP_DATA_NAMESPACE);
+  readonly NDRONES = 1;
   public data: Vec2d[] = [];
+  public posDrones: Vec2d[] = [];
   public options = {
     title: {
       text: "Carte d'exploration des drones",
     },
-    data: this.getData(),
-    /*series: [
+    //data: this.getData(),
+    series: [
       {
         type: 'scatter',
         title: 'Drone',
-        data: this.getPosDrones(),
+        data: this.getPosDrones(), //[new Vec2d(2, 2)],
         xKey: 'x',
         yKey: 'y',
         marker: {
@@ -41,7 +47,7 @@ export default class Map extends Vue {
       {
         type: 'scatter',
         title: 'Périmètre',
-        data: this.getData(),
+        data: this.getData(), //[new Vec2d(1, 1)]
         xKey: 'x',
         yKey: 'y',
         marker: {
@@ -49,15 +55,15 @@ export default class Map extends Vue {
           stroke: '#56659b',
         },
       },
-    ],*/
-    series: [
+    ],
+    /*series: [
       {
         type: 'scatter',
         xKey: 'x',
         yKey: 'y',
         showInLegend: false,
       },
-    ],
+    ],*/
     axes: [
       {
         type: 'number',
@@ -78,22 +84,37 @@ export default class Map extends Vue {
   }
 
   public changeData(array: number[]): void {
-    const TEMPARRAY: Vec2d[] = [];
+    const TEMPARRAYDRONES: Vec2d[] = [];
     let arrayIdx = 0;
-    for (let i = 0; i < array.length; i++) {
-      TEMPARRAY[arrayIdx] = new Vec2d(array[i], array[++i]);
+    for (let i = 0; i < this.NDRONES * 2; i++) {
+      // Times 2 because position is a 2d vector
+      TEMPARRAYDRONES[arrayIdx] = new Vec2d(array[i], array[++i]);
       arrayIdx++;
     }
-    this.data = TEMPARRAY;
-    this.options.data = TEMPARRAY;
+    this.options.series[0].data = TEMPARRAYDRONES;
+
+    const TEMPARRAYPERIM: Vec2d[] = [];
+    arrayIdx = 0;
+    for (let i = this.NDRONES * 2; i < array.length; i++) {
+      console.log('Drone #', i);
+      //let y = i;
+      //console.log('New perim point: ', array[y], array[++y]);
+      TEMPARRAYPERIM[arrayIdx] = new Vec2d(array[i], array[++i]);
+    }
+    this.options.series[1].data = TEMPARRAYPERIM;
+
+    console.log('Drone array: ', TEMPARRAYDRONES);
+    console.log('Perim array: ', TEMPARRAYPERIM);
   }
 
   public getData(): Vec2d[] {
+    console.log('hey from getData!');
     return this.data;
   }
 
   public getPosDrones(): Vec2d[] {
-    return [new Vec2d(1.002, 1.002)];
+    console.log('hey from getPosDrones!');
+    return this.posDrones;
   }
 }
 </script>
