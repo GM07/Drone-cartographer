@@ -1,3 +1,4 @@
+"""Test module for the server.py file """
 import unittest
 
 from server import APP

@@ -4,7 +4,7 @@
         {
             "label": "Lint Backend Server",
             "type": "shell",
-            "command": "pylint * --rcfile pylintrc"
+            "command": "find . -type f -name '*.py' | xargs pylint  --rcfile pylintrc"
         },
         {
             "label": "Run tests",

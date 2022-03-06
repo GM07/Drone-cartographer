@@ -1,3 +1,5 @@
+"""This module is used to dedclare The TestCommCrazyflie
+class that is used to test the CommCrazyflie class"""
 import cflib
 import unittest
 
@@ -7,7 +9,7 @@ from constants import COMMANDS, URI
 
 
 class TestCommCrazyflie(unittest.TestCase):
-
+    """This class is used to test the CommeCrazyflie class"""
     @patch('cflib.crtp.init_drivers', MagicMock)
     @patch('cflib.crazyflie.Crazyflie', MagicMock)
     def test_constructor(self):

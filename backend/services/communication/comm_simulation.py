@@ -72,7 +72,7 @@ class CommSimulation(AbstractComm):
                 for conn in self.connections:
                     self.send_command(COMMANDS.LOGS.value)
                     received = conn.recv(32)
-                    if (len(received) > 4):
+                    if len(received) > 4:
                         data = DroneData(received)
                         print(data)
             sleep(AbstractComm.DELAY_RECEIVER_MS / 1000)

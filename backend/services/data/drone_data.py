@@ -1,9 +1,12 @@
+"""This module provides classes such as DroneSensors,
+DroneState and DroneData to be able to regroup the information
+taken from the drones"""
 from enum import Enum
 from services.communication.byte_decoder import ByteDecoder
 
 
 class DroneSensors:
-
+    """This class provides an interface for the sensors on the drones """
     def __init__(self, front: float, left: float, back: float, right: float):
         self.front = front
         self.left = left
@@ -12,7 +15,7 @@ class DroneSensors:
 
 
 class Point2D:
-
+    """This class provides an interface for coordinates"""
     def __init__(self, x: float, y: float, z: float = 0):
         self.x = x
         self.y = y
@@ -28,17 +31,18 @@ class DroneState(Enum):
 
 
 class DroneData:
+    """This class regroups all the data taken from the drones"""
+#    def __init__(self, sensors: DroneSensors, position: Point2D,
+#                 battery_level: float, state: DroneState):
+#        self.sensors = sensors
+#        self.position = position
+#        self.battery_level = battery_level
+#        self.state = state
 
-    def __init__(self, sensors: DroneSensors, position: Point2D,
-                 battery_level: float, state: DroneState):
-        self.sensors = sensors
-        self.position = position
-        self.battery_level = battery_level
-        self.state = state
+    def __init__(self, data: bytes):
+        self.__from_bytes(data)
 
-#  def __init__(self, data: bytes):
-#     self.__from_bytes(data)
-
+# pylint: disable=unused-private-member
     def __from_bytes(self, data: bytes):
         decoder: ByteDecoder = ByteDecoder(
             data, ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'i'])
@@ -47,6 +51,7 @@ class DroneData:
         self.position = Point2D(values[4], values[5])
         self.battery_level = values[6]
         self.state = DroneState(values[7])
+# pylint: enable=unused-private-member
 
     def __str__(self) -> str:
         return 'Drone Information :\n Sensor (f, l, b, r) : ' \
@@ -65,10 +70,10 @@ class DroneData:
             + '\n\n'
 
 
-def log_entry_to_drone_data(log_entry):
-    pass
+#def log_entry_to_drone_data(log_entry):
+#    pass
 
-
+# pylint: disable=pointless-string-statement
 """
 Drone GetData (0x04)
 

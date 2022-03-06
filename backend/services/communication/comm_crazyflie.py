@@ -1,25 +1,24 @@
-from time import sleep
-import threading
+
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
 from cflib.crazyflie.log import LogConfig
-from cflib.crazyflie.syncLogger import SyncLogger
 
 from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
-from services.data.drone_data import DroneData
+
 
 
 class CommCrazyflie(AbstractComm):
-
+    """This class is used to communicate with the crazyflie
+    drones"""
     def __init__(self, links: list):
 
         print('Creating Embedded Crazyflie communication')
         self.crazyflies: list[Crazyflie] = list(
             map(lambda link: Crazyflie(rw_cache='./cache'), links))
         self.links = links
-        self.crazyflies_by_id = dict()
+        self.crazyflies_by_id = {}
         for link, crazyflie in zip(links, self.crazyflies):
             self.crazyflies_by_id[link] = crazyflie
         self.initialized_drivers = False
