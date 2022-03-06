@@ -223,6 +223,7 @@ export default class CompletedMissions extends Vue {
       case this.filters[0]:
         this.getFilteredMissions();
         break;
+
       case this.filters[1]:
         this.showedMissions.sort((a: Mission, b: Mission) => {
           return this.sortMissionNumberParameters(
@@ -230,8 +231,8 @@ export default class CompletedMissions extends Vue {
             b.number_of_drones
           );
         });
-
         break;
+
       case this.filters[2]:
         this.showedMissions.sort((a: Mission, b: Mission) => {
           return this.sortMissionNumberParameters(
@@ -239,8 +240,8 @@ export default class CompletedMissions extends Vue {
             b.total_distance
           );
         });
-
         break;
+
       case this.filters[3]:
         this.showedMissions.sort((a: Mission, b: Mission) => {
           return this.sortMissionNumberParameters(
@@ -248,14 +249,15 @@ export default class CompletedMissions extends Vue {
             b.flight_duration
           );
         });
-
         break;
+
       case this.filters[4]:
         this.showedMissions.sort((a: Mission, b: Mission) => {
           if (this.isAscending) return a.time_stamp < b.time_stamp ? -1 : 1;
           else return a.time_stamp > b.time_stamp ? -1 : 1;
         });
         break;
+
       default:
     }
   }
