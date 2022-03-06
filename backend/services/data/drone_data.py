@@ -36,8 +36,8 @@ class DroneData:
         self.battery_level = battery_level
         self.state = state
 
-  #  def __init__(self, data: bytes):
-   #     self.__from_bytes(data)
+#  def __init__(self, data: bytes):
+#     self.__from_bytes(data)
 
     def __from_bytes(self, data: bytes):
         decoder: ByteDecoder = ByteDecoder(
