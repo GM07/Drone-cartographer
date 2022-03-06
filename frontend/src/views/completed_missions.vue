@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="min-width: 800px">
     <v-card class="overflow-hidden">
       <v-app-bar
         id="scrolling-techniques-4"
@@ -31,7 +31,7 @@
                   v-model="date"
                   v-bind="attrs"
                   prepend-icon="mdi-calendar"
-                  style="max-width: 200px,float:right"
+                  style="width: 200px,float:right"
                   v-on="on"
                 ></v-text-field>
               </template>
@@ -78,6 +78,7 @@
               <v-select
                 v-model="currentFilter"
                 :items="filters"
+                scrollable
                 style="width: 200px; float: right"
                 @change="sortMissions()"
               ></v-select>

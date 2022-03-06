@@ -12,6 +12,9 @@ import services.status.access_status as AccessStatus
 NAMESPACE = '/getMissionStatus'
 is_mission_started = False
 
+# TODO : Discuter si c'est vraiment necessaire d'avoir ces fonctions
+#        puisque les variables sont globales
+
 def set_mission_started(started: bool):
     global is_mission_started
     is_mission_started = started

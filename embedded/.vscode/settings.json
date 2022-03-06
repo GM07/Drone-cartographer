@@ -11,6 +11,9 @@
     "*.cc": "cpp",
     "*.cpp": "cpp",
     "*.h": "cpp",
+    "atomic": "cpp",
+    "cstdint": "cpp",
+    "stop_token": "cpp"
   },
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
