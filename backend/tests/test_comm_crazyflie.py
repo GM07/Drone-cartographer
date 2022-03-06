@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 from services.communication.crazyflie.comm_crazyflie import CommCrazyflie
 from constants import COMMANDS, URI
 
+
 class TestCommCrazyflie(unittest.TestCase):
 
     @patch('cflib.crtp.init_drivers', MagicMock)
@@ -12,7 +13,6 @@ class TestCommCrazyflie(unittest.TestCase):
     def test_constructor(self):
         comm_cf = CommCrazyflie()
         self.assertIsInstance(comm_cf, CommCrazyflie)
-        
 
     @patch('cflib.crazyflie.Crazyflie.open_link', MagicMock())
     @patch('cflib.crazyflie.appchannel.Appchannel.send_packet', MagicMock())

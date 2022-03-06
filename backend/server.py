@@ -1,3 +1,4 @@
+import os
 from pickle import NONE
 from flask import jsonify, Flask, request
 from flask_socketio import SocketIO
@@ -9,7 +10,6 @@ from services.communication.comm_simulation import CommSimulation
 import services.status.access_status as AccessStatus
 import services.status.mission_status as MissionStatus
 from constants import MAX_TIMEOUT, COMMANDS, URI
-import os
 
 # Flask application
 APP = Flask(__name__)
@@ -33,6 +33,7 @@ COMM: AbstractComm = CommCrazyflie(URI)
 def get_drones():
     return jsonify(URI)
 
+
 # Identifying drones
 
 
@@ -44,17 +45,21 @@ def identify_drone(drone_addr):
     COMM.send_command(COMMANDS.IDENTIFY.value, links=[drone_addr])
     return 'Identified drone'
 
+
 # Launch mission
 
 
 @SOCKETIO.on('launch', namespace="/limitedAccess")
 def launch(is_simulated: bool):
-    if(MissionStatus.get_mission_started() or not AccessStatus.is_request_valid(request)):
+    if (MissionStatus.get_mission_started() or
+            not AccessStatus.is_request_valid(request)):
         return ''
 
     print('launch')
     if is_simulated:
-        os.system("docker exec -d embedded /bin/bash -c \"echo 'IyEvYmluL2Jhc2gKQVJHT1NfTE9DPSQoZmluZCAvIC1pbmFtZSAiY3JhenlmbGllX3NlbnNpbmcuYXJnb3MiIDI+IC9kZXYvbnVsbCkKYXJnb3MzIC1jICRBUkdPU19MT0MK' | base64 -d | /bin/bash\"")
+        os.system(
+            "docker exec -d embedded /bin/bash -c \"echo 'IyEvYmluL2Jhc2gKQVJHT1NfTE9DPSQoZmluZCAvIC1pbmFtZSAiY3JhenlmbGllX3NlbnNpbmcuYXJnb3MiIDI+IC9kZXYvbnVsbCkKYXJnb3MzIC1jICRBUkdPU19MT0MK' | base64 -d | /bin/bash\""
+        )
     COMM.send_command(COMMANDS.LAUNCH.value)
 
     MissionStatus.launch_mission(SOCKETIO)
@@ -71,12 +76,14 @@ def set_mission_type(is_simulated: bool):
         COMM = CommCrazyflie(URI)
     return ''
 
+
 # Terminate mission
 
 
 @SOCKETIO.on('terminate', namespace="/limitedAccess")
 def terminate():
-    if(not MissionStatus.get_mission_started() or not AccessStatus.is_request_valid(request)):
+    if (not MissionStatus.get_mission_started() or
+            not AccessStatus.is_request_valid(request)):
         return ''
 
     COMM.send_command(COMMANDS.LAND.value)

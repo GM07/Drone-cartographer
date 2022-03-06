@@ -20,13 +20,17 @@ class Database:
         self.client = MongoClient('mongodb://127.0.0.1:27017/')
         self.db = self.client['admin']
 
-    def upload_mission_info(self, mission:Any):
+    def upload_mission_info(self, mission: Any):
         mission['timeStamp'] = time.localtime()
         return self.db.missions.insert_one(mission).inserted_id
 
     def get_all_missions_time_stamps(self) -> list:
-        return serialize_objectid_from_result(list(self.db.missions.aggregate(
-            [{'$project': {'timeStamp': 1}}])))
+        return serialize_objectid_from_result(
+            list(self.db.missions.aggregate([{
+                '$project': {
+                    'timeStamp': 1
+                }
+            }])))
 
     def get_missions_from_name(self, name: str):
         return serialize_objectid_from_result(
@@ -36,14 +40,15 @@ class Database:
         print(identifier)
         return self.db.missions.find_one({'_id': identifier})
 
-    def remove_mission_from_id(self, identifier:str) -> bool:
-        return self.db.missions.delete_one(
-            {'_id': identifier}).deleted_count != 0
+    def remove_mission_from_id(self, identifier: str) -> bool:
+        return self.db.missions.delete_one({
+            '_id': identifier
+        }).deleted_count != 0
 
-    def update_mission_info_from_id(self, mission:Any) -> bool:
+    def update_mission_info_from_id(self, mission: Any) -> bool:
         if '_id' in mission:
-            return self.db.missions.replace_one(
-                {'_id': mission['_id']}, mission)
+            return self.db.missions.replace_one({'_id': mission['_id']},
+                                                mission)
         return False
 
     def test_connection(self):
@@ -58,7 +63,8 @@ class Database:
         for test in result:
             print(test)
 
-def serialize_objectid_from_result(result:list):
+
+def serialize_objectid_from_result(result: list):
     for test in result:
         test['_id'] = str(test['_id'])
     return result

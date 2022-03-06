@@ -10,16 +10,18 @@ from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
 
-class CommCrazyflie(AbstractComm): 
+
+class CommCrazyflie(AbstractComm):
 
     def __init__(self, links: list):
 
         print('Creating Embedded Crazyflie communication')
-        self.crazyflies: list[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), links))
+        self.crazyflies: list[Crazyflie] = list(
+            map(lambda link: Crazyflie(rw_cache='./cache'), links))
         self.links = links
         self.crazyflies_by_id = dict()
         for link, crazyflie in zip(links, self.crazyflies):
-            self.crazyflies_by_id[link] = crazyflie 
+            self.crazyflies_by_id[link] = crazyflie
         self.initialized_drivers = False
         self.sync_crazyflies = []
         self.__init_drivers()
@@ -35,7 +37,8 @@ class CommCrazyflie(AbstractComm):
     def setup_log(self):
         self.log_configs: list[LogConfig] = []
         for crazyflie in self.crazyflies:
-            log_config = LogConfig(name='DroneData', period_in_ms=AbstractComm.DELAY_RECEIVER_MS)
+            log_config = LogConfig(name='DroneData',
+                                   period_in_ms=AbstractComm.DELAY_RECEIVER_MS)
             log_config.add_variable('range.front', 'uint16_t')
             log_config.add_variable('range.left', 'uint16_t')
             log_config.add_variable('range.right', 'uint16_t')
@@ -48,9 +51,8 @@ class CommCrazyflie(AbstractComm):
             log_config.cf = crazyflie
             self.log_configs.append(log_config)
 
-
         self.sync_crazyflies: list[SyncCrazyflie] = []
-        
+
         for link, crazyflie in zip(self.links, self.crazyflies):
             self.sync_crazyflies.append(SyncCrazyflie(link, cf=crazyflie))
 
@@ -60,12 +62,12 @@ class CommCrazyflie(AbstractComm):
             config.data_received_cb.add_callback(self.__retrieve_log)
             config.start()
 
-    def send_command(self, command: COMMANDS, links = []) -> None:
+    def send_command(self, command: COMMANDS, links=[]) -> None:
 
         sending_links = self.links if len(links) == 0 else links
 
         for link in sending_links:
-            packet = bytearray(command) # Command must be an array of numbers
+            packet = bytearray(command)  # Command must be an array of numbers
             print('Sending packet : ', packet)
             self.crazyflies_by_id[link].appchannel.send_packet(packet)
 

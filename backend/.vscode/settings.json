@@ -10,5 +10,5 @@
     "python.testing.unittestEnabled": true,
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
-    "python.linting.lintOnSave": false
+    "python.linting.lintOnSave": true
 }
