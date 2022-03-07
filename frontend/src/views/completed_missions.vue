@@ -155,7 +155,6 @@ export default class CompletedMissions extends Vue {
   private missions: Mission[] = [];
   private showedMissions: Mission[] = [];
   private mode: Filters = Filters.all;
-
   private isSearchMenuOpen = false;
   private currentTab = 0;
   private currentFilter = 'Aucun';
