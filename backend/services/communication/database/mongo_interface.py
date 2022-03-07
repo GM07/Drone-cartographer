@@ -20,7 +20,7 @@ class Point:
 
 @dataclass
 class Mission:
-    """This class has is a dataclass that holds all the parameters
+    """This class is a dataclass that holds all the parameters
     needed to describe a mission"""
     time_stamp: str
     flight_duration: float
@@ -28,7 +28,7 @@ class Mission:
     is_simulated: bool
     total_distance: float
     maps: List[List[Point]]
-   
+  
 
     def __init__(self, flight_duration: float, number_of_drones: int,
     is_simulated: bool, total_distance: float,

@@ -8,7 +8,7 @@ Vue.use(VueRouter);
 
 export const HOME_ROUTE = '/';
 export const MISSION_ROUTE = '/Mission';
-export const COMPLETED_ROUTE = '/Historique';
+export const COMPLETED_ROUTE = '/History';
 
 const ROUTES: Array<RouteConfig> = [
   {

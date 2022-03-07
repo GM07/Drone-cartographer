@@ -14,11 +14,11 @@
         <div style="margin-right: 150px">
           <template>
             <p style="color: black; float: left; margin: 5px">
-              Recherche de mission par date
+              Recherche de missions par date
             </p>
             <v-menu
               ref="menu"
-              v-model="menu"
+              v-model="isSearchMenuOpen"
               :close-on-content-click="false"
               min-width="auto"
               offset-y
@@ -38,7 +38,7 @@
 
               <v-date-picker v-model="date" scrollable style="float: right">
                 <v-spacer></v-spacer>
-                <v-btn color="primary" text @click="menu = false">
+                <v-btn color="primary" text @click="isSearchMenuOpen = false">
                   Annuler
                 </v-btn>
                 <v-btn
@@ -58,20 +58,22 @@
 
         <template v-slot:extension>
           <v-tabs v-model="currentTab">
-            <v-tab @click="changeMode('all')">Tous</v-tab>
-            <v-tab @click="changeMode('simulated')">Simulation</v-tab>
-            <v-tab @click="changeMode('physical')">Embarqué</v-tab>
-            <v-tab @click="changeMode('date')">Date</v-tab>
+            <v-tab @click="changeFilterMode($Filters.all)">Tous</v-tab>
+            <v-tab @click="changeFilterMode($Filters.simulated)"
+              >Simulation</v-tab
+            >
+            <v-tab @click="changeFilterMode($Filters.physical)">Embarqué</v-tab>
+            <v-tab @click="changeFilterMode($Filters.date)">Date</v-tab>
             <v-spacer></v-spacer>
             <div style="margin-right: 150px">
               <p style="color: black; float: left; margin-top: 5px">
-                Triage des missions affichés
+                Triage des missions affichées
               </p>
 
               <v-icon v-if="isAscending" class="ma-2" @click="swapOrder()">
                 mdi-arrow-down
               </v-icon>
-              <v-icon v-if="!isAscending" class="ma-2" @click="swapOrder()">
+              <v-icon v-else class="ma-2" @click="swapOrder()">
                 mdi-arrow-up
               </v-icon>
 
@@ -95,9 +97,9 @@
         <div v-for="item in showedMissions" :key="item._id" class="ma-5">
           <v-card class="pa-5" elevation="4" outlined>
             <v-list-item-title v-if="item.is_simulated" class="text-h6 mb-3">
-              Mission Simulé
+              Mission Simulée
             </v-list-item-title>
-            <v-list-item-title v-if="!item.is_simulated" class="text-h6 mb-3">
+            <v-list-item-title v-else class="text-h6 mb-3">
               Mission Physique
             </v-list-item-title>
 
@@ -140,12 +142,21 @@ import {ServerCommunication} from '@/communication/server_communication';
 import NavigationCommands from '@/components/navigation_commands.vue';
 import {Mission} from '@/utils/mission';
 
+enum Filters {
+  all,
+  simulated,
+  physical,
+  date,
+}
+Vue.prototype.$Filters = Filters;
+
 @Component({components: {NavigationCommands}})
 export default class CompletedMissions extends Vue {
   private missions: Mission[] = [];
   private showedMissions: Mission[] = [];
-  private mode = 'all';
-  private menu = false;
+  private mode: Filters = Filters.all;
+
+  private isSearchMenuOpen = false;
   private currentTab = 0;
   private currentFilter = 'Aucun';
   private isAscending = true;
@@ -162,7 +173,7 @@ export default class CompletedMissions extends Vue {
     .toISOString()
     .substr(0, 10);
 
-  private changeMode(mode: string): void {
+  private changeFilterMode(mode: Filters): void {
     this.mode = mode;
     this.getCompletedMissions().then(() => {
       this.getFilteredMissions();
@@ -172,31 +183,33 @@ export default class CompletedMissions extends Vue {
 
   private getFilteredMissions(): void {
     switch (this.mode) {
-      case 'all':
+      case Filters.all:
         this.showedMissions = this.missions;
         break;
 
-      case 'simulated':
+      case Filters.simulated:
         this.showedMissions = this.missions.filter(
           (mission: Mission) => mission.is_simulated
         );
         break;
 
-      case 'physical':
+      case Filters.physical:
         this.showedMissions = this.missions.filter(
           (mission: Mission) => !mission.is_simulated
         );
         break;
 
-      case 'date':
+      case Filters.date:
         this.showedMissions = this.missions.filter(
           (mission: Mission) =>
             mission.time_stamp.substring(0, 10) === this.date
         );
         break;
       default:
+        console.log('The mode variable is not set correctly');
     }
   }
+
   private beforeCreate() {
     ServerCommunication.getCompletedMissions()
       .then(res => res.json())
@@ -213,9 +226,10 @@ export default class CompletedMissions extends Vue {
         this.missions = data;
       });
   }
+
   private filterByDate(): void {
     this.currentTab = 3;
-    this.changeMode('date');
+    this.changeFilterMode(Filters.date);
   }
 
   private sortMissions(): void {
@@ -259,8 +273,10 @@ export default class CompletedMissions extends Vue {
         break;
 
       default:
+        console.log('The filter is not set to the correct value');
     }
   }
+
   private sortMissionNumberParameters(a: number, b: number): number {
     return this.isAscending ? a - b : b - a;
   }

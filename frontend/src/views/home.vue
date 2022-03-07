@@ -11,7 +11,7 @@
           <v-btn class="ma-4" large primary to="/Mission">Mission</v-btn>
         </div>
 
-        <v-btn class="ma-4" large primary to="/Historique"
+        <v-btn class="ma-4" large primary to="/History"
           >Historique de Mission
         </v-btn>
       </v-col>
