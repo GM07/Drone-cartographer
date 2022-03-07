@@ -4,7 +4,6 @@
       :key="(this.options.series[1].data, this.options.series[0].data)"
       :options="options"
     ></ag-charts-vue>
-    <!-- :key="series[0]"  -->
     <button v-on:click="changeData([1, 1, 2, 2, 3, 3])">
       Click me to change the data!
     </button>
@@ -31,12 +30,11 @@ export default class Map extends Vue {
     title: {
       text: "Carte d'exploration des drones",
     },
-    //data: this.getData(),
     series: [
       {
         type: 'scatter',
         title: 'Drone',
-        data: this.getPosDrones(), //[new Vec2d(2, 2)],
+        data: this.getPosDrones(),
         xKey: 'x',
         yKey: 'y',
         marker: {
@@ -47,7 +45,7 @@ export default class Map extends Vue {
       {
         type: 'scatter',
         title: 'Périmètre',
-        data: this.getData(), //[new Vec2d(1, 1)]
+        data: this.getData(),
         xKey: 'x',
         yKey: 'y',
         marker: {
@@ -56,14 +54,6 @@ export default class Map extends Vue {
         },
       },
     ],
-    /*series: [
-      {
-        type: 'scatter',
-        xKey: 'x',
-        yKey: 'y',
-        showInLegend: false,
-      },
-    ],*/
     axes: [
       {
         type: 'number',
@@ -85,26 +75,22 @@ export default class Map extends Vue {
 
   public changeData(array: number[]): void {
     const TEMPARRAYDRONES: Vec2d[] = [];
+    const TEMPARRAYPERIM: Vec2d[] = [];
     let arrayIdx = 0;
+
     for (let i = 0; i < this.NDRONES * 2; i++) {
       // Times 2 because position is a 2d vector
       TEMPARRAYDRONES[arrayIdx] = new Vec2d(array[i], array[++i]);
       arrayIdx++;
     }
-    this.options.series[0].data = TEMPARRAYDRONES;
-
-    const TEMPARRAYPERIM: Vec2d[] = [];
     arrayIdx = 0;
     for (let i = this.NDRONES * 2; i < array.length; i++) {
-      console.log('Drone #', i);
-      //let y = i;
-      //console.log('New perim point: ', array[y], array[++y]);
       TEMPARRAYPERIM[arrayIdx] = new Vec2d(array[i], array[++i]);
+      arrayIdx++;
     }
-    this.options.series[1].data = TEMPARRAYPERIM;
 
-    console.log('Drone array: ', TEMPARRAYDRONES);
-    console.log('Perim array: ', TEMPARRAYPERIM);
+    this.options.series[0].data = TEMPARRAYDRONES;
+    this.options.series[1].data = TEMPARRAYPERIM;
   }
 
   public getData(): Vec2d[] {
