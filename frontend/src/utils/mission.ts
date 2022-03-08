@@ -37,5 +37,5 @@ export interface Mission {
   is_simulated: boolean;
   total_distance: number;
   maps: [[Point2d]];
-  logs: {};
+  logs: Logs;
 }
