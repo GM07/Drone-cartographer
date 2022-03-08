@@ -91,6 +91,3 @@ def serialize_objectid_from_result(result: list):
     for test in result:
         test['_id'] = str(test['_id'])
     return result
-
-database =Database()
-database.test_connection()

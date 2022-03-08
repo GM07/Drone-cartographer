@@ -107,10 +107,6 @@
               Date de complétion: {{ item.time_stamp }}
             </v-list-item-title>
 
-            <v-list-item-title class="text-h7 mb-3">
-              <strong> Identifiant:</strong> {{ item._id }}
-            </v-list-item-title>
-
             <v-btn class="ma-2" color="indigo" outlined>
               Plus d'informations
             </v-btn>
@@ -175,12 +171,12 @@ export default class CompletedMissions extends Vue {
   private changeFilterMode(mode: Filters): void {
     this.mode = mode;
     this.getCompletedMissions().then(() => {
-      this.getFilteredMissions();
+      this.updateFilteredMissions();
       this.sortMissions();
     });
   }
 
-  private getFilteredMissions(): void {
+  private updateFilteredMissions(): void {
     switch (this.mode) {
       case Filters.all:
         this.showedMissions = this.missions;
@@ -227,14 +223,15 @@ export default class CompletedMissions extends Vue {
   }
 
   private filterByDate(): void {
-    this.currentTab = 3;
+    const DATE_TAB_INDEX = 3;
+    this.currentTab = DATE_TAB_INDEX;
     this.changeFilterMode(Filters.date);
   }
 
   private sortMissions(): void {
     switch (this.currentFilter) {
       case this.filters[0]:
-        this.getFilteredMissions();
+        this.updateFilteredMissions();
         break;
 
       case this.filters[1]:
