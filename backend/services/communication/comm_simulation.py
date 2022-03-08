@@ -12,6 +12,7 @@ from services.data.drone_data import DroneData
 nb_connections = 8
 identifier = 's'
 
+
 class CommSimulation(AbstractComm):
 
     INIT_TIMEOUT = 0.000001
@@ -21,7 +22,9 @@ class CommSimulation(AbstractComm):
         self.servers: list[socket.socket] = []
         self.connections: list[socket.socket] = []
         self.receive_thread = threading.Thread(
-            target=self.__receive, daemon=True, name='[Simulation] Receiving thread')
+            target=self.__receive,
+            daemon=True,
+            name='[Simulation] Receiving thread')
 
         for i in range(nb_connections):
             file_name = '/tmp/socket/{}{}'.format(identifier, i)
@@ -48,15 +51,14 @@ class CommSimulation(AbstractComm):
             except socket.timeout as err:
                 print('Error with socket ', index, ': ', err)
                 success = False
-        
-        self.is_connected = success
 
+        self.is_connected = success
 
     def send_command(self, command: COMMANDS):
 
         if not self.is_connected:
             self.attemptSocketConnection(-1)
-        
+
         if self.is_connected:
             print('Sending command ', command, ' to simulation')
             for conn in self.connections:
@@ -70,8 +72,8 @@ class CommSimulation(AbstractComm):
                 for conn in self.connections:
                     self.send_command(COMMANDS.LOGS.value)
                     received = conn.recv(32)
-                    if (len(received) > 4):
+                    if len(received) > 4:
                         data = DroneData(received)
+                        #Add log here
                         print(data)
             sleep(AbstractComm.DELAY_RECEIVER_MS / 1000)
-

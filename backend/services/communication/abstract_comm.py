@@ -1,5 +1,5 @@
-
-
+"""This module is used to declare the Abstract communication class that
+is used to communicate """
 from abc import abstractmethod
 from constants import COMMANDS
 
