@@ -6,10 +6,10 @@
 #include "controllers/abstract_controller.h"
 #include "utils/commands.h"
 
-constexpr float kSpeed = 0.1f;
+constexpr float kDroneSpeed = 0.1f;
 constexpr float kTakeOffSpeed = 1.0f;
 constexpr float kLandingSpeed = 0.25f;
-constexpr float kHeight = 0.5f;
+constexpr float kHeight = 1.0f;
 constexpr int kMessageMaxSize = 32;
 
 class Drone {

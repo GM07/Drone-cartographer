@@ -37,7 +37,8 @@ class SimulationController : public AbstractController {
   SimulationController(const SimulationController& other) = delete;
   SimulationController& operator=(const SimulationController& other) = delete;
 
-  void goTo(const Vector3D& location, bool isRelative) override;
+  void goTo(const Vector3D& direction, float speed) override;
+  void reset() override;
   void takeOff(float height) override;
   void land() override;
 

@@ -48,6 +48,7 @@ Vector3D Vector3D::reflect(const Vector3D& normal) const {
 
 Vector3D Vector3D::toUnitVector() const {
   const float l = this->length();
+
   return Vector3D(m_x / l, m_y / l, m_z / l);
 }
 

@@ -113,7 +113,9 @@ void SimulationController::takeOff(float height) {
 
   // We takeOff using absolute position to prevent multiple takeOff from
   // stacking one on top of the other
-  goTo(Vector3D(0, 0, height), false);
+  Vector3D direction(0, 0, height);
+  m_targetPosition = direction;
+  goTo(direction, kTakeOffSpeed);
 }
 
 ///////////////////////////////////////////////////
@@ -135,14 +137,13 @@ bool SimulationController::isTrajectoryFinished() const {
   return getCurrentLocation().isAlmostEqual(m_targetPosition);
 }
 
-void SimulationController::goTo(const Vector3D& location, bool isRelative) {
-  if (isRelative) {
-    m_targetPosition = getCurrentLocation() + location;
-  } else {
-    m_targetPosition = location;
-  }
+void SimulationController::goTo(const Vector3D& direction, float speed) {
+  Vector3D speedVector = direction.toUnitVector() * speed;
 
-  Vector3D simulationPosition = m_takeOffPosition + m_targetPosition;
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(CVector3(
-      simulationPosition.m_x, simulationPosition.m_y, simulationPosition.m_z));
+  m_ccrazyflieSensing->m_speedPropellers->SetLinearVelocity(
+      CVector3(speedVector.m_x, speedVector.m_y, speedVector.m_z));
+}
+
+void SimulationController::reset() {
+  m_ccrazyflieSensing->m_speedPropellers->Reset();
 }

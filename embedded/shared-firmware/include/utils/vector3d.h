@@ -21,7 +21,7 @@ class Vector3D {
   [[nodiscard]] Vector3D operator+(const Vector3D& other) const;
   [[nodiscard]] Vector3D operator-(const Vector3D& other) const;
   [[nodiscard]] Vector3D operator*(float factor) const;
-  [[nodiscard]] Vector3D operator*(const Vector3D& other) const;
+  [[nodiscard]] float operator*(const Vector3D& other) const;
   [[nodiscard]] Vector3D operator/(float factor) const;
   [[nodiscard]] bool operator==(const Vector3D& other) const;
   [[nodiscard]] bool operator!=(const Vector3D& other) const;

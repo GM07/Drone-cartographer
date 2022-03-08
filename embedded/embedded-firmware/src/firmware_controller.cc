@@ -98,10 +98,10 @@ void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
   float time = 0;
   if (isRelative) {
     m_targetPosition = location;
-    time = m_targetPosition.distanceTo(Vector3D(0, 0, 0)) / kSpeed;
+    time = m_targetPosition.distanceTo(Vector3D(0, 0, 0)) / kDroneSpeed;
   } else {
     m_targetPosition = m_takeOffPosition + location;
-    time = location.distanceTo(getCurrentLocation()) / kSpeed;
+    time = location.distanceTo(getCurrentLocation()) / kDroneSpeed;
   }
 
   crtpCommanderHighLevelGoTo(m_targetPosition.m_x, m_targetPosition.m_y,
