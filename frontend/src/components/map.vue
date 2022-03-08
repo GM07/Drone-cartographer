@@ -1,19 +1,18 @@
 <template>
-  <div id="app">
+  <div>
     <ag-charts-vue
       :key="(this.options.series[1].data, this.options.series[0].data)"
       :options="options"
+      style="height: 85vh"
     ></ag-charts-vue>
-    <button v-on:click="changeData([1, 1, 2, 2, 3, 3])">
-      Click me to change the data!
-    </button>
   </div>
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Vue, Prop} from 'vue-property-decorator';
 import {AgChartsVue} from 'ag-charts-vue';
-import {Vec2d} from '../../src/utils/vec2d';
+import {Vec2d} from '../utils/vec2d';
+import {OPTIONS} from './map_constants';
 import SocketIO from 'socket.io-client';
 import {
   SERVER_ADDRESS,
@@ -22,49 +21,9 @@ import {
 
 @Component({components: {AgChartsVue}})
 export default class Map extends Vue {
+  @Prop() readonly NDRONES!: number;
   readonly SOCKETIO = SocketIO(SERVER_ADDRESS + MAP_DATA_NAMESPACE);
-  readonly NDRONES = 1;
-  public data: Vec2d[] = [];
-  public posDrones: Vec2d[] = [];
-  public options = {
-    title: {
-      text: "Carte d'exploration des drones",
-    },
-    series: [
-      {
-        type: 'scatter',
-        title: 'Drone',
-        data: this.getPosDrones(),
-        xKey: 'x',
-        yKey: 'y',
-        marker: {
-          fill: 'rgba(227,111,106,1)',
-          stroke: '#9f4e4a',
-        },
-      },
-      {
-        type: 'scatter',
-        title: 'Périmètre',
-        data: this.getData(),
-        xKey: 'x',
-        yKey: 'y',
-        marker: {
-          fill: 'rgba(123,145,222,1)',
-          stroke: '#56659b',
-        },
-      },
-    ],
-    axes: [
-      {
-        type: 'number',
-        position: 'bottom',
-      },
-      {
-        type: 'number',
-        position: 'left',
-      },
-    ],
-  };
+  private options = OPTIONS;
 
   constructor() {
     super();
@@ -78,6 +37,7 @@ export default class Map extends Vue {
     const TEMPARRAYPERIM: Vec2d[] = [];
     let arrayIdx = 0;
 
+    console.log('NDRONES: ', this.NDRONES);
     for (let i = 0; i < this.NDRONES * 2; i++) {
       // Times 2 because position is a 2d vector
       TEMPARRAYDRONES[arrayIdx] = new Vec2d(array[i], array[++i]);
@@ -91,16 +51,6 @@ export default class Map extends Vue {
 
     this.options.series[0].data = TEMPARRAYDRONES;
     this.options.series[1].data = TEMPARRAYPERIM;
-  }
-
-  public getData(): Vec2d[] {
-    console.log('hey from getData!');
-    return this.data;
-  }
-
-  public getPosDrones(): Vec2d[] {
-    console.log('hey from getPosDrones!');
-    return this.posDrones;
   }
 }
 </script>
