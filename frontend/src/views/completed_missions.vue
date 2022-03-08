@@ -3,6 +3,7 @@
     <v-card class="overflow-hidden">
       <v-app-bar
         id="scrolling-techniques-4"
+        class="app"
         dense
         fade-img-on-scroll
         hide-on-scroll
@@ -11,7 +12,7 @@
           <v-toolbar-title>Historique</v-toolbar-title>
         </v-col>
 
-        <div style="margin-right: 150px">
+        <div style="float: right; margin-right: 150px">
           <template>
             <p style="color: black; float: left; margin: 5px">
               Recherche de missions par date
@@ -131,6 +132,12 @@
     </v-navigation-drawer>
   </div>
 </template>
+
+<style scoped>
+.app >>> .v-toolbar__content {
+  padding-right: 0px !important;
+}
+</style>
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
