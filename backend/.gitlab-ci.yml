@@ -30,7 +30,7 @@ before_script:
 prepare:
   stage: .pre
   script:
-    - cd $WORKING_DIRECTORY
+   
     - pip install -r requirements.txt
   cache:
     key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
@@ -44,7 +44,7 @@ install_dependencies:
     paths:
       - $WORKING_DIRECTORY/node_modules/
   script:
-    - cd $WORKING_DIRECTORY
+   
     - pip install -r requirements.txt
   only:
     changes:
