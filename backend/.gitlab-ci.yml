@@ -14,12 +14,16 @@ stages:
   - lint
   - test
 
-.cache_template: &cache_configuration  # Hidden yaml configuration that defines an anchor named 'cache_configuration'
-  cache: 
-    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
-    paths:
-      - $PIP_CACHE_DIR
-    policy: pull
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python -V               # Print out python version for debugging
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
 
 prepare:
   stage: .pre
