@@ -2,6 +2,7 @@ image: mcr.microsoft.com/vscode/devcontainers/python:3.8
 
 variables:
   WORKING_DIRECTORY: "backend"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
 workflow:
   rules:
@@ -12,6 +13,15 @@ stages:
   - install_dependencies
   - lint
   - test
+
+.cache_template: &cache_configuration  # Hidden yaml configuration that defines an anchor named 'cache_configuration'
+  cache: 
+    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
+    paths:
+      - PIP_CACHE_DIR
+    policy: pull
+
+
 
 prepare:
   stage: .pre
@@ -40,13 +50,14 @@ install_dependencies:
 
 lint_backend:
   stage: lint
+   <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
   script:
     - cd $WORKING_DIRECTORY
     - find . -type f -name '*.py' | xargs pylint  --rcfile pylintrc
 
 test_backend:
   stage: test
+   <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
   script:
     - cd $WORKING_DIRECTORY
-    - pip install -r requirements.txt
     - pytest
