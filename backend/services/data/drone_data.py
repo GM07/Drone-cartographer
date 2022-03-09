@@ -25,11 +25,11 @@ class Point2D:
 
 
 class DroneState(Enum):
-    IDLE = 0
-    LANDING = 1
-    EXPLORATION = 2
-    TAKINGOFF = 3
-    CRASHED = 4
+    TAKING_OFF = 1
+    LANDING = 2
+    DEAD = 3
+    EXPLORING = 4
+    CRASHED = 5
 
 
 class DroneData:
