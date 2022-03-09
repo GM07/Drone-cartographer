@@ -24,6 +24,7 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
+  - pip install -r requirements.txt
 
 prepare:
   stage: .pre
@@ -33,7 +34,7 @@ prepare:
   cache:
     key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
     paths:
-      - $WORKING_DIRECTORY/node_modules/
+      -"$CI_PROJECT_DIR/.cache/pip"
 
 install_dependencies:
   stage: install_dependencies
