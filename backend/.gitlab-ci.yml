@@ -43,7 +43,7 @@ install_dependencies:
   cache:
     key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
     paths:
-      - $WORKING_DIRECTORY/node_modules/
+      - $CI_PROJECT_DIR/.cache/pip
   script:
    
     - pip install -r requirements.txt
