@@ -1,7 +1,7 @@
 """This module has the CommCrazyflie class that is used to
 communicate with the physical drones """
 
-from typing import List
+from typing import Dict,List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
@@ -18,17 +18,16 @@ class CommCrazyflie(AbstractComm):
     An example use is comm=CommCrazyflie([])
     comm.__init_drivers()"""
 
-    def __init__(self, links: list):
+    def __init__(self, links: List):
 
         print('Creating Embedded Crazyflie communication')
-        self.crazyflies: List[Crazyflie] = list(
-            map(lambda link: Crazyflie(rw_cache='./cache'), links))
+        self.crazyflies: List[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), links))
         self.links = links
-        self.crazyflies_by_id = {}
+        self.crazyflies_by_id: Dict[str, Crazyflie] = dict()
         for link, crazyflie in zip(links, self.crazyflies):
             self.crazyflies_by_id[link] = crazyflie
         self.initialized_drivers = False
-        self.sync_crazyflies = []
+        self.sync_crazyflies: List[SyncCrazyflie] = []
         self.__init_drivers()
         self.setup_log()
 

@@ -26,15 +26,17 @@ class Point2D:
 
 class DroneState(Enum):
     IDLE = 0
-    LANDING = 1
-    EXPLORATION = 2
-    TAKINGOFF = 3
-    CRASHED = 4
+    TAKING_OFF= 1
+    LANDING = 2
+    DEAD = 3
+    EXPLORING = 4
+    CRASHED = 5
 
 
 class DroneData:
     """This class regroups all the data taken from the drones"""
-
+    
+    DATA_SIZE: int = 32
     #    def __init__(self, sensors: DroneSensors, position: Point2D,
     #                 battery_level: float, state: DroneState):
     #        self.sensors = sensors

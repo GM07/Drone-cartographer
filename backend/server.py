@@ -76,6 +76,7 @@ def launch(is_simulated: bool):
 def set_mission_type(is_simulated: bool):
     AccessStatus.set_mission_type(SOCKETIO, is_simulated, request.sid)
     global COMM
+    COMM.shutdown()
     if is_simulated:
         COMM = CommSimulation()
     else:

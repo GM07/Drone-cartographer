@@ -12,7 +12,6 @@ class COMMANDS(Enum):
     IDENTIFY = 0x1,
     LAUNCH = 0x2,
     LAND = 0x3,
-    LOGS = 0x4,  # Do not remove comma
 
 
 # Objects to communicate with Crazyflie
