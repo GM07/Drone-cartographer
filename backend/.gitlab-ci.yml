@@ -31,7 +31,6 @@ before_script:
 prepare:
   stage: .pre
   script:
-   
     - pip install -r requirements.txt
   cache:
     key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
@@ -47,7 +46,6 @@ install_dependencies:
       - .cache/pip
       - venv/
   script:
-   
     - pip install -r requirements.txt
   only:
     changes:
@@ -58,11 +56,9 @@ install_dependencies:
 lint_backend:
   stage: lint
   script:
-    
     - find . -type f -name '*.py' | xargs pylint  --rcfile pylintrc
 
 test_backend:
   stage: test
   script:
-    
     - pytest
