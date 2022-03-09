@@ -11,6 +11,7 @@ export interface DroneSensors {
 }
 
 export enum DroneState {
+  IDLE = 0 , 
   TAKING_OFF = 1,
   LANDING = 2,
   DEAD = 3,
