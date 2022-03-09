@@ -36,14 +36,16 @@ prepare:
   cache:
     key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
     paths:
-      - "$CI_PROJECT_DIR/.cache/pip"
+      - .cache/pip
+      - venv/
 
 install_dependencies:
   stage: install_dependencies
   cache:
     key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
     paths:
-      - $CI_PROJECT_DIR/.cache/pip
+      - .cache/pip
+      - venv/
   script:
    
     - pip install -r requirements.txt
