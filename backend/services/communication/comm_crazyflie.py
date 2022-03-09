@@ -1,3 +1,7 @@
+"""This module has the CommCrazyflie class that is used to
+communicate with the physical drones """
+
+from typing import List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
@@ -9,12 +13,15 @@ from services.communication.abstract_comm import AbstractComm
 
 class CommCrazyflie(AbstractComm):
     """This class is used to communicate with the crazyflie
-    drones"""
+    drones and inherits from the AbstractComm class
+
+    An example use is comm=CommCrazyflie([])
+    comm.__init_drivers()"""
 
     def __init__(self, links: list):
 
         print('Creating Embedded Crazyflie communication')
-        self.crazyflies: list[Crazyflie] = list(
+        self.crazyflies: List[Crazyflie] = list(
             map(lambda link: Crazyflie(rw_cache='./cache'), links))
         self.links = links
         self.crazyflies_by_id = {}
@@ -33,7 +40,7 @@ class CommCrazyflie(AbstractComm):
         cflib.crtp.init_drivers()
 
     def setup_log(self):
-        self.log_configs: list[LogConfig] = []
+        self.log_configs: List[LogConfig] = []
         for crazyflie in self.crazyflies:
             log_config = LogConfig(name='DroneData',
                                    period_in_ms=AbstractComm.DELAY_RECEIVER_MS)
@@ -49,7 +56,7 @@ class CommCrazyflie(AbstractComm):
             log_config.cf = crazyflie
             self.log_configs.append(log_config)
 
-        self.sync_crazyflies: list[SyncCrazyflie] = []
+        self.sync_crazyflies: List[SyncCrazyflie] = []
 
         for link, crazyflie in zip(self.links, self.crazyflies):
             self.sync_crazyflies.append(SyncCrazyflie(link, cf=crazyflie))
@@ -60,9 +67,9 @@ class CommCrazyflie(AbstractComm):
             config.data_received_cb.add_callback(self.__retrieve_log)
             config.start()
 
-    def send_command(self, command: COMMANDS, links=[]) -> None:
+    def send_command(self, command: COMMANDS, links=None) -> None:
 
-        sending_links = self.links if len(links) == 0 else links
+        sending_links = self.links if links is None else []
 
         for link in sending_links:
             packet = bytearray(command)  # Command must be an array of numbers
@@ -70,4 +77,4 @@ class CommCrazyflie(AbstractComm):
             self.crazyflies_by_id[link].appchannel.send_packet(packet)
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
-        print('[%d][%s]: %s' % (timestamp, logconf.id, data))
+        print(f'{timestamp}{logconf.id}:{data}')

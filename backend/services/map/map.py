@@ -1,8 +1,7 @@
-# pylint: disable=all
-class Map:
+#class Map:
 
-    def __init__(self):
-        return ''
+#    def __init__(self):
+#        return ''
 
-    def add_point_to_map(self):
-        return ''
+#    def add_point_to_map(self):
+#        return ''
