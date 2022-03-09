@@ -18,7 +18,7 @@ stages:
   cache: 
     key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
     paths:
-      - PIP_CACHE_DIR
+      - $PIP_CACHE_DIR
     policy: pull
 
 prepare:
