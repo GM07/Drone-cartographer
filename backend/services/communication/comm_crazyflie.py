@@ -1,5 +1,6 @@
 from time import sleep
 import threading
+from typing import Dict, List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
@@ -12,16 +13,16 @@ from services.data.drone_data import DroneData
 
 class CommCrazyflie(AbstractComm): 
 
-    def __init__(self, links: list):
+    def __init__(self, links: List):
 
         print('Creating Embedded Crazyflie communication')
-        self.crazyflies: list[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), links))
+        self.crazyflies: List[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), links))
         self.links = links
-        self.crazyflies_by_id = dict()
+        self.crazyflies_by_id: Dict[str, Crazyflie] = dict()
         for link, crazyflie in zip(links, self.crazyflies):
             self.crazyflies_by_id[link] = crazyflie 
         self.initialized_drivers = False
-        self.sync_crazyflies = []
+        self.sync_crazyflies: List[SyncCrazyflie] = []
         self.__init_drivers()
         self.setup_log()
 
@@ -33,7 +34,7 @@ class CommCrazyflie(AbstractComm):
         cflib.crtp.init_drivers()
 
     def setup_log(self):
-        self.log_configs: list[LogConfig] = []
+        self.log_configs: List[LogConfig] = []
         for crazyflie in self.crazyflies:
             log_config = LogConfig(name='DroneData', period_in_ms=AbstractComm.DELAY_RECEIVER_MS)
             log_config.add_variable('range.front', 'uint16_t')
@@ -49,7 +50,7 @@ class CommCrazyflie(AbstractComm):
             self.log_configs.append(log_config)
 
 
-        self.sync_crazyflies: list[SyncCrazyflie] = []
+        self.sync_crazyflies = []
         
         for link, crazyflie in zip(self.links, self.crazyflies):
             self.sync_crazyflies.append(SyncCrazyflie(link, cf=crazyflie))

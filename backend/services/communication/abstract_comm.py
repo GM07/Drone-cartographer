@@ -10,3 +10,6 @@ class AbstractComm:
     @abstractmethod
     def send_command(self, command: COMMANDS) -> None:
         pass
+
+    def shutdown(self):
+        pass

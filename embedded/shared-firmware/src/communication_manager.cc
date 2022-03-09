@@ -9,7 +9,7 @@ void Drone::communicationManagerTask() {
   Timer::delayMs(kInitDelay);
 
   while (true) {
-    if (m_controller->receiveMessage(&m_messageRX, sizeof(m_messageRX))) {
+    if (m_controller->receiveMessage(&m_messageRX, sizeof(m_messageRX)) != 0U) {
       handleCommand(static_cast<Command>(m_messageRX[0]), &m_messageRX[1],
                     sizeof(m_messageRX) - sizeof(Command));
     }

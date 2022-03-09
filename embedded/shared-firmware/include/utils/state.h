@@ -7,6 +7,7 @@ enum class State : uint8_t {
   kLanding = 0x02,
   kDead = 0x03,
   kExploring = 0x04,
+  kCrash = 0x05,
 };
 
 #endif

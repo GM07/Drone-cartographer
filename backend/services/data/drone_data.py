@@ -18,12 +18,15 @@ class Point2D:
 
 class DroneState(Enum):
     Idle = 0
-    Landing = 1
-    Exploration = 2
-    TakingOff = 3
-    Crashed = 4
+    TakingOff = 1
+    Landing = 2
+    Dead = 3
+    Exploring = 4
+    Crashed = 5
 
 class DroneData:
+
+    DATA_SIZE: int = 32
 
     def __init__(self, sensors: DroneSensors, position: Point2D,
         battery_level: float, state: DroneState):
