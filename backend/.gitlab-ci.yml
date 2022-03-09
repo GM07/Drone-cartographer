@@ -55,11 +55,11 @@ install_dependencies:
 lint_backend:
   stage: lint
   script:
-    - cd $WORKING_DIRECTORY
+    
     - find . -type f -name '*.py' | xargs pylint  --rcfile pylintrc
 
 test_backend:
   stage: test
   script:
-    - cd $WORKING_DIRECTORY
+    
     - pytest
