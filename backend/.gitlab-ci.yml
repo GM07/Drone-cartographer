@@ -15,6 +15,7 @@ stages:
   - test
 
 cache:
+  key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
   paths:
     - .cache/pip
     - venv/
