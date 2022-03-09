@@ -21,8 +21,6 @@ stages:
       - PIP_CACHE_DIR
     policy: pull
 
-
-
 prepare:
   stage: .pre
   script:
@@ -50,14 +48,14 @@ install_dependencies:
 
 lint_backend:
   stage: lint
-   <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
+  <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
   script:
     - cd $WORKING_DIRECTORY
     - find . -type f -name '*.py' | xargs pylint  --rcfile pylintrc
 
 test_backend:
   stage: test
-   <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
+  <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
   script:
     - cd $WORKING_DIRECTORY
     - pytest
