@@ -24,6 +24,7 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
+  - cd $WORKING_DIRECTORY
   - pip install -r requirements.txt
 
 prepare:
@@ -34,7 +35,7 @@ prepare:
   cache:
     key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
     paths:
-      -"$CI_PROJECT_DIR/.cache/pip"
+      - "$CI_PROJECT_DIR/.cache/pip"
 
 install_dependencies:
   stage: install_dependencies
