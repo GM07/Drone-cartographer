@@ -2,19 +2,53 @@
 
 #include <argos3/core/utility/logging/argos_log.h>
 
-#include <mutex>
 #include <unordered_map>
 
+#include "sensors/simulation_sensors.h"
 #include "utils/led.h"
+#include "utils/timer.h"
 
 using ::argos::CVector3;
 
 //////////////////////////////////////////
 SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
-    : m_ccrazyflieSensing(ccrazyflieSensing) {
-  static uint32_t count = 1;
-  data.front = count++;
+    : AbstractController(
+          std::make_unique<SimulationSensors>(ccrazyflieSensing)),
+      m_ccrazyflieSensing(ccrazyflieSensing),
+      m_controllerDataSem(std::make_unique<Semaphore>(1)),
+      m_sendDataThread(std::make_unique<std::thread>(
+          &SimulationController::sendDroneDataToServerThread, this)) {}
+
+SimulationController::~SimulationController() {
+  m_threadContinueFlag = false;
+  m_controllerDataSem->release();
+  if (m_sendDataThread) {
+    m_sendDataThread->join();
+  }
 }
+
+void SimulationController::updateSensorsData() {
+  data = {
+      m_abstractSensors->getFrontDistance(),
+      m_abstractSensors->getLeftDistance(),
+      m_abstractSensors->getBackDistance(),
+      m_abstractSensors->getRightDistance(),
+      m_abstractSensors->getPosX(),
+      m_abstractSensors->getPosY(),
+      m_abstractSensors->getBatteryLevel(),
+      static_cast<int>(state),
+  };
+
+  bool success = m_serverDataQueue.push(data);
+  if (!success && m_controllerDataSem->tryAcquire()) {
+    ControllerData removedData{};
+    m_serverDataQueue.pop(removedData);
+    m_serverDataQueue.push(data);
+  }
+  m_controllerDataSem->release();
+}
+
+bool SimulationController::isDroneCrashed() const { return false; }
 
 ///////////////////////////////////////
 size_t SimulationController::receiveMessage(void* message, size_t size) {
@@ -30,6 +64,41 @@ size_t SimulationController::receiveMessage(void* message, size_t size) {
 ///////////////////////////////////////
 void SimulationController::sendMessage(void* message, size_t size_bytes) {
   m_socket->send(boost::asio::buffer(message, size_bytes));
+}
+
+void SimulationController::sendDroneDataToServerThread() {
+  constexpr size_t kTryConnectionDelay = 50;
+  constexpr size_t kPacketSize = 32;
+  constexpr size_t kAckSize = 1;
+  while (m_threadContinueFlag) {
+    m_dataSocket =
+        std::make_unique<boost::asio::local::stream_protocol::socket>(
+            io_service);
+    while (m_threadContinueFlag) {
+      try {
+        m_dataSocket->connect("/tmp/socket/data" +
+                              m_ccrazyflieSensing->GetId());
+        break;
+      } catch (const boost::system::system_error& error) {
+        Timer::delayMs(kTryConnectionDelay);
+      }
+    }
+    while (m_threadContinueFlag) {
+      m_controllerDataSem->acquire();
+
+      ControllerData dataToSend{};
+      bool dataPresent = m_serverDataQueue.pop(dataToSend);
+      try {
+        if (dataPresent) {
+          uint8_t ack = 0;
+          m_dataSocket->send(boost::asio::buffer(&dataToSend, kPacketSize));
+          m_dataSocket->receive(boost::asio::buffer(&ack, kAckSize));
+        }
+      } catch (const boost::system::system_error& error) {
+        break;
+      }
+    }
+  }
 }
 
 ///////////////////////////////////////

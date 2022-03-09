@@ -71,6 +71,7 @@ void CCrazyflieSensing::Init(argos::TConfigurationNode& /*t_node*/) {
 
 void CCrazyflieSensing::ControlStep() {
   m_drone.step();
+
   printLogs();
 
   ++m_uiCurrentStep;
@@ -90,7 +91,7 @@ void CCrazyflieSensing::printLogs() {
 }
 
 void CCrazyflieSensing::attemptSocketConnection() {
-  constexpr uint32_t kDroneDelay = 250;
+  constexpr uint32_t kDroneDelay = 25;
   while (true) {
     try {
       if (m_drone.getController()->state != State::kDead) {

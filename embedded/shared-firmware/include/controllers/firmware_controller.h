@@ -9,7 +9,7 @@ extern "C" {
 
 class FirmwareController : public AbstractController {
  public:
-  FirmwareController() = default;
+  FirmwareController();
   virtual ~FirmwareController() = default;
 
   FirmwareController(FirmwareController&& other) = delete;
@@ -33,6 +33,8 @@ class FirmwareController : public AbstractController {
   void blinkLED(LED led) override;
 
   void delay(const uint32_t ticks) override{/**/};
+  void updateSensorsData() override;
+  bool isDroneCrashed() const override;
 
  private:
   ledseqContext_t m_seqLED{};
