@@ -12,16 +12,9 @@
             "command": "pytest"
         },
         {
-            "label": "Start backend",
-            "type": "shell",
-            "command": "python3 server.py"
-        },
-        {
             "label": "Run autoformater",
-            "type":"shell",
-            "command":"yapf --style google -rpi ."
+            "type": "shell",
+            "command": "yapf --style google -rpi ."
         }
-
     ]
-
 }
