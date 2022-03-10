@@ -10,15 +10,6 @@ class ByteDecoder:
     """This class to decode bytes
     that are sent from the drone """
 
-    #def __init__(self, data: bytes, structure: dict):
-    #    """ Structure has to follow the format {type: size}.
-    #        Ex: {'f':4, 'f':4, 'i':4}
-    #        which would represent a structure with 2 floats of
-    #        4 bytes and an integer of 4 bytes
-    #    """
-    #    self.structure = structure
-    #    self.data = data
-
     def __init__(self, data: bytes, types: list):
         self.data = data
 
