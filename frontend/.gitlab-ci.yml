@@ -61,10 +61,6 @@ test:
   script:
     - cd $WORKING_DIRECTORY
     - npm run test
-  artifacts:
-    name: "$CI_JOB_NAME"
-    paths:
-      - $WORKING_DIRECTORY/coverage/
 
 build:
   stage: build
