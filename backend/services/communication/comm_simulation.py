@@ -102,8 +102,8 @@ class CommSimulation(AbstractComm):
                 try:
                     server.setblocking(True)
                     server.settimeout(None)
-                    #conn, addr = server.accept()
-                    conn = server.accept()
+                    conn = server.accept()[0]
+                    print(conn)
                     server_dict[server] = conn
                 except socket.error as socket_error:
                     if socket_error.errno == EINVAL:
@@ -120,8 +120,7 @@ class CommSimulation(AbstractComm):
                 try:
                     server.setblocking(not at_least_one_connected)
                     server.settimeout(None)
-                    #conn, addr = server.accept()
-                    conn = server.accept()
+                    conn = server.accept()[0]
                     server_dict[server] = conn
                     at_least_one_connected = True
                 except socket.error as socket_error:
@@ -142,9 +141,9 @@ class CommSimulation(AbstractComm):
                 if not can_gather_data:
                     try:
                         server.setblocking(False)
-                        #new_conn, addr = server.accept()
-                        new_conn = server.accept()
-                        other_server = new_conn
+                        new_conn = server.accept()[0]
+                        self.data_servers[server] = new_conn
+                        print(other_server, self.data_servers[server])
                         can_gather_data = True
                     except socket.error as socket_error:
                         if socket_error.errno == EINVAL:
@@ -156,13 +155,15 @@ class CommSimulation(AbstractComm):
                     at_least_one_connected = True
                     is_socket_broken = False
                     try:
-                        received = other_server.recv(DroneData.DATA_SIZE)
+                        received = self.data_servers[server].recv(
+                            DroneData.DATA_SIZE)
                     except socket.error:
                         is_socket_broken = True
 
                     if len(received) > 0:
                         try:
-                            other_server.send(ack.to_bytes(1, 'big'))
+                            self.data_servers[server].send(
+                                ack.to_bytes(1, 'big'))
                         except (BrokenPipeError, socket.error):
                             is_socket_broken = True
 
@@ -174,7 +175,7 @@ class CommSimulation(AbstractComm):
 
                     if is_socket_broken:
                         print('Socket broken')
-                        other_server = None
+                        self.data_servers[server] = None
 
         print('no one connected')
 
