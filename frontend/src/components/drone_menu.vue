@@ -13,12 +13,7 @@
                   v-model="newDrone.name"
                   label="Nom du drone"
                   required
-                  :rules="[
-                    validateDroneExistTwice,
-                    validateDroneNameLength,
-                    validateDroneNameCharacters,
-                    mandatory,
-                  ]"
+                  :rules="[validateDroneExistTwice, mandatory]"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -78,7 +73,11 @@ import {Drone} from '@/communication/drone';
 export default class DroneMenu extends Vue {
   @Prop() private droneList!: Drone[];
   @Prop() private isDroneMenuOpen!: boolean;
-  private newDrone: Drone = {name: '', xPos: 0, yPos: 0};
+  private newDrone: Drone = {
+    name: 'radio://0/80/2M/E7E7E7E761',
+    xPos: 0,
+    yPos: 0,
+  };
 
   public submit(): void {
     if (
@@ -86,7 +85,7 @@ export default class DroneMenu extends Vue {
       (this.$refs.pos as Vue & {validate: () => boolean}).validate()
     ) {
       this.$emit('addDrone', this.newDrone);
-      this.newDrone.name = '';
+      this.newDrone.name = 'radio://0/80/2M/E7E7E7E761';
       this.newDrone.xPos = 0;
       this.newDrone.yPos = 0;
       this.resetValidation();
