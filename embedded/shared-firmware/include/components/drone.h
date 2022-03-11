@@ -15,17 +15,13 @@ constexpr float kTakeOffSpeed = 1.0f;
 constexpr float kLandingSpeed = 0.25f;
 constexpr float kHeight = 0.3f;
 constexpr int kMessageMaxSize = 32;
-constexpr int kMaxNum = 100;
-constexpr int kOffsetNum = 50;
 
 class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
       : m_messageRX(), m_controller(controller) {
     srand(time(NULL));
-    int x = rand() % kMaxNum - kOffsetNum;
-    int y = rand() % kMaxNum - kOffsetNum;
-    m_direction = Vector3D(x, y, 0.0F);
+    m_direction = startingDirection[rand() % startingDirection.size()];
   }
 
   Drone(const Drone& other) = delete;

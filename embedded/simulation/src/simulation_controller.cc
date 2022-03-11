@@ -39,10 +39,6 @@ void SimulationController::updateSensorsData() {
       static_cast<int>(state),
   };
 
-  log("front : " + std::to_string(data.front) + " - back : " +
-      std::to_string(data.back) + " - left : " + std::to_string(data.left) +
-      " - right : " + std::to_string(data.right));
-
   bool success = m_serverDataQueue.push(data);
   if (!success && m_controllerDataSem->tryAcquire()) {
     ControllerData removedData{};
