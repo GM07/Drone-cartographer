@@ -8,14 +8,14 @@ from services.communication.abstract_comm import AbstractComm
 
 class CommCrazyflie(AbstractComm):
 
-    def __init__(self, links: list, drone_list = None):
+    def __init__(self, drone_list: list):
 
         print('Creating Embedded Crazyflie communication')
-        self.crazyflies: list[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), links))
-        self.links = links
+        self.links = list(map(lambda drone: drone['name'], drone_list))
+        self.crazyflies: list[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
         self.crazyflies_by_id = dict()
         self.drone_list = drone_list
-        for link, crazyflie in zip(links, self.crazyflies):
+        for link, crazyflie in zip(self.links, self.crazyflies):
             self.crazyflies_by_id[link] = crazyflie
         self.initialized_drivers = False
         self.sync_crazyflies: list[SyncCrazyflie] = []
@@ -57,7 +57,7 @@ class CommCrazyflie(AbstractComm):
             config.start()
 
     def send_command(self, command: COMMANDS, links = []) -> None:
-
+        print(links)
         sending_links = self.links if len(links) == 0 else links
 
         for link in sending_links:
@@ -68,6 +68,3 @@ class CommCrazyflie(AbstractComm):
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print('[%d][%s]: %s' % (timestamp, logconf.id, data))
 
-    def send_command_to_all_drones(self, command):
-        for drone in self.drone_list:
-            self.send_command(command, drone['name'])
