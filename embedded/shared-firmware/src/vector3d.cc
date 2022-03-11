@@ -66,3 +66,9 @@ std::string Vector3D::toString() const {
   return "x: " + std::to_string(m_x) + " y: " + std::to_string(m_y) +
          " z: " + std::to_string(m_z);
 }
+
+bool Vector3D::areSameDirection(const Vector3D& vec1, const Vector3D& vec2) {
+  Vector3D projected = vec2 * ((vec1 * vec2) / (vec2 * vec2));
+  return std::abs(projected * vec2 / (projected.length() * vec2.length()) - 1) <
+         kThreshold;
+}

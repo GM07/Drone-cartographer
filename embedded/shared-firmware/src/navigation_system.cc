@@ -30,52 +30,29 @@ void Drone::step() {
 void Drone::explore() {
   Vector3D normal;
 
-  static bool touchedFront = false;
   if (m_controller->data.front > 0 &&
       m_controller->data.front <= kMinDistanceObstacle) {
-    if (!touchedFront) {
-      touchedFront = true;
-      normal += Vector3D(-1.0F, 0.0F, 0.0F);
-    }
-  } else {
-    touchedFront = false;
+    normal += Vector3D(-1.0F, 0.0F, 0.0F);
   }
 
-  static bool touchedBack = false;
   if (m_controller->data.back > 0 &&
       m_controller->data.back <= kMinDistanceObstacle) {
-    if (!touchedBack) {
-      touchedBack = true;
-      normal += Vector3D(1.0F, 0.0F, 0.0F);
-    }
-  } else {
-    touchedBack = false;
+    normal += Vector3D(1.0F, 0.0F, 0.0F);
   }
 
-  static bool touchedLeft = false;
   if (m_controller->data.left > 0 &&
       m_controller->data.left <= kMinDistanceObstacle) {
-    if (!touchedLeft) {
-      touchedLeft = true;
-      normal += Vector3D(0.0F, -1.0F, 0.0F);
-    }
-  } else {
-    touchedLeft = false;
+    normal += Vector3D(0.0F, -1.0F, 0.0F);
   }
 
-  static bool touchedRight = false;
   if (m_controller->data.right > 0 &&
       m_controller->data.right <= kMinDistanceObstacle) {
-    if (!touchedRight) {
-      touchedRight = true;
-      normal += Vector3D(0.0F, 1.0F, 0.0F);
-    }
-  } else {
-    touchedRight = false;
+    normal += Vector3D(0.0F, 1.0F, 0.0F);
   }
 
   if (!normal.isAlmostEqual(Vector3D(), kComparisonFactor) &&
-      !normal.isAlmostEqual(m_direction, kComparisonFactor)) {
+      !normal.isAlmostEqual(m_direction, kComparisonFactor) &&
+      !Vector3D::areSameDirection(m_direction, normal)) {
     Vector3D newDirection = m_direction.reflect(normal);
 
     if (!m_direction.isAlmostEqual(newDirection, kComparisonFactor)) {
