@@ -21,6 +21,7 @@ class Vector3D {
   [[nodiscard]] Vector3D operator+(const Vector3D& other) const;
   [[nodiscard]] Vector3D operator-(const Vector3D& other) const;
   [[nodiscard]] Vector3D operator*(float factor) const;
+  [[nodiscard]] float operator*(const Vector3D& other) const;
   [[nodiscard]] Vector3D operator/(float factor) const;
   [[nodiscard]] bool operator==(const Vector3D& other) const;
   [[nodiscard]] bool operator!=(const Vector3D& other) const;
@@ -28,6 +29,9 @@ class Vector3D {
   [[nodiscard]] float distanceTo(const Vector3D& other) const;
   [[nodiscard]] bool isAlmostEqual(const Vector3D& other,
                                    float threshold = kThreshold) const;
+  [[nodiscard]] Vector3D reflect(const Vector3D& normal) const;
+  [[nodiscard]] Vector3D toUnitVector() const;
+  [[nodiscard]] float length() const;
   std::string toString() const;
 
   float m_x{0}, m_y{0}, m_z{0};
