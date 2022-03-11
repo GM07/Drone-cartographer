@@ -1,6 +1,9 @@
 #ifndef DRONE_H
 #define DRONE_H
 
+#include <stdlib.h>
+#include <time.h>
+
 #include <array>
 
 #include "controllers/abstract_controller.h"
@@ -12,11 +15,19 @@ constexpr float kTakeOffSpeed = 1.0f;
 constexpr float kLandingSpeed = 0.25f;
 constexpr float kHeight = 0.3f;
 constexpr int kMessageMaxSize = 32;
+constexpr int kMaxNum = 100;
+constexpr int kOffsetNum = 50;
 
 class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
-      : m_messageRX(), m_controller(controller) {}
+      : m_messageRX(), m_controller(controller) {
+    srand(time(NULL));
+    int x = rand() % kMaxNum - kOffsetNum;
+    int y = rand() % kMaxNum - kOffsetNum;
+    m_direction = Vector3D(x, y, 0.0F);
+  }
+
   Drone(const Drone& other) = delete;
   Drone(Drone&& other) = delete;
   Drone& operator=(const Drone& other) = delete;
@@ -53,6 +64,7 @@ class Drone {
  protected:
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
+  Vector3D m_direction;
 
  public:
   static Drone& getEmbeddedDrone();

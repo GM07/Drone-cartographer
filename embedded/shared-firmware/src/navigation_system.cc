@@ -18,8 +18,6 @@ void Drone::step() {
     case State::kLanding:
       if (m_controller->isTrajectoryFinished()) {
         m_controller->state = State::kIdle;
-        m_controller->setVelocity(Vector3D(1.0, 1.0, 1.0),
-                                  0.0f);  // ISSUE : Create stop method
       }
       break;
     case State::kExploring:
@@ -29,17 +27,7 @@ void Drone::step() {
   }
 }
 
-/**
- * Simulation :
- *  X+ : front
- *  X- : back
- *  Y+ : right
- *  Y- : left
- */
-
 void Drone::explore() {
-  static Vector3D direction = {1.0F, 2.0F, 0.0F};
-
   Vector3D normal;
 
   static bool touchedFront = false;
@@ -87,13 +75,13 @@ void Drone::explore() {
   }
 
   if (!normal.isAlmostEqual(Vector3D(), kComparisonFactor) &&
-      !normal.isAlmostEqual(direction, kComparisonFactor)) {
-    Vector3D newDirection = direction.reflect(normal);
+      !normal.isAlmostEqual(m_direction, kComparisonFactor)) {
+    Vector3D newDirection = m_direction.reflect(normal);
 
-    if (!direction.isAlmostEqual(newDirection, kComparisonFactor)) {
-      direction = newDirection;
+    if (!m_direction.isAlmostEqual(newDirection, kComparisonFactor)) {
+      m_direction = newDirection;
     }
   }
 
-  m_controller->setVelocity(direction, kDroneSpeed);
+  m_controller->setVelocity(m_direction, kDroneSpeed);
 }
