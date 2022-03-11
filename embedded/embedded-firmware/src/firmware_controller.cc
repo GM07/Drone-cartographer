@@ -107,3 +107,18 @@ void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
   crtpCommanderHighLevelGoTo(m_targetPosition.m_x, m_targetPosition.m_y,
                              m_targetPosition.m_z, 0.0, time, isRelative);
 }
+
+void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
+  Vector3D speedVector = direction.toUnitVector() * speed;
+  setpoint_t setpoint;
+  setpoint.mode.z = modeAbs;
+  setpoint.position.z = kHeight;
+  setpoint.mode.yaw = modeVelocity;
+  setpoint.mode.x = modeVelocity;
+  setpoint.mode.y = modeVelocity;
+  setpoint.velocity.x = speedVector.m_x;
+  setpoint.velocity.y = speedVector.m_y;
+  setpoint.velocity_body = true;
+
+  commanderSetSetpoint(&setpoint, 3);
+}

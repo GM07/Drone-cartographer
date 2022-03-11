@@ -2,6 +2,7 @@
 
 constexpr float kMinDistanceObstacle = 120.0f;
 constexpr float kComparisonFactor = 10e-3;
+constexpr float kMaxSpeed = 0.2f;
 constexpr uint32_t kTicksPerSecond = 10;
 
 void Drone::step() {
@@ -19,14 +20,14 @@ void Drone::step() {
       }
       break;
     case State::kExploring:
-      if (m_controller->isTrajectoryFinished()) explore();
+      explore();
     default:
       break;
   }
 }
 
 void Drone::explore() {
-  static Vector3D direction = {1.0f, 1.0f, 0.0f};
+  static Vector3D direction = {1.0f, 0.0f, 0.0f};
 
   Vector3D normal;
 
@@ -59,5 +60,5 @@ void Drone::explore() {
     }
   }
 
-  m_controller->goTo(direction.toUnitVector() * 0.05f, true);
+  m_controller->setVelocity(direction, kMaxSpeed);
 }
