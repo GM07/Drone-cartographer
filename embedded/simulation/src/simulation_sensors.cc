@@ -7,6 +7,7 @@ float SimulationSensors::getFrontDistance() const {
   auto iterDistRead =
       m_ccrazyflieSensing->m_pcDistance->GetReadingsMap().begin();
 
+  std::advance(iterDistRead, SimulationReadingsMapSensorFront);
   return iterDistRead->second;
 }
 

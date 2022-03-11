@@ -61,6 +61,7 @@ void FirmwareController::takeOff(float height) {
 
 ///////////////////////////////
 void FirmwareController::land() {
+  commanderNotifySetpointsStop(0);
   m_targetPosition = getCurrentLocation();
   m_targetPosition.m_z = 0;
   float time =
@@ -99,20 +100,6 @@ void FirmwareController::blinkLED(LED led) {
   ledseqRun(&m_seqLED);
 }
 
-void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
-  float time = 0;
-  if (isRelative) {
-    m_targetPosition = location;
-    time = m_targetPosition.distanceTo(Vector3D(0, 0, 0)) / kDroneSpeed;
-  } else {
-    m_targetPosition = m_takeOffPosition + location;
-    time = location.distanceTo(getCurrentLocation()) / kDroneSpeed;
-  }
-
-  crtpCommanderHighLevelGoTo(m_targetPosition.m_x, m_targetPosition.m_y,
-                             m_targetPosition.m_z, 0.0, time, isRelative);
-}
-
 void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
   Vector3D speedVector = direction.toUnitVector() * speed;
 
@@ -123,7 +110,7 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
   setpoint.mode.y = modeVelocity;
   setpoint.velocity.x = speedVector.m_x;
   setpoint.velocity.y = speedVector.m_y;
-  setpoint.velocity_body = true;
+  setpoint.velocity_body = false;
 
   commanderSetSetpoint(&setpoint, 3);
 }

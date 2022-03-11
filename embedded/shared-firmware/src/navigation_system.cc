@@ -1,9 +1,7 @@
 #include "components/drone.h"
 
-constexpr float kMinDistanceObstacle = 120.0F;  // Millimeters
+constexpr float kMinDistanceObstacle = 200.0F;  // Millimeters
 constexpr float kComparisonFactor = 10e-3;
-constexpr float kMaxSpeed = 0.1F;  // Meters per seconds
-constexpr uint32_t kTicksPerSecond = 10;
 
 void Drone::step() {
   updateCrashStatus();
@@ -31,29 +29,61 @@ void Drone::step() {
   }
 }
 
+/**
+ * Simulation :
+ *  X+ : front
+ *  X- : back
+ *  Y+ : right
+ *  Y- : left
+ */
+
 void Drone::explore() {
-  static Vector3D direction = {1.0F, 1.0F, 0.0F};
+  static Vector3D direction = {1.0F, 2.0F, 0.0F};
 
   Vector3D normal;
 
+  static bool touchedFront = false;
   if (m_controller->data.front > 0 &&
       m_controller->data.front <= kMinDistanceObstacle) {
-    normal += Vector3D(-1.0F, 0.0F, 0.0F);
+    if (!touchedFront) {
+      touchedFront = true;
+      normal += Vector3D(-1.0F, 0.0F, 0.0F);
+    }
+  } else {
+    touchedFront = false;
   }
 
+  static bool touchedBack = false;
   if (m_controller->data.back > 0 &&
       m_controller->data.back <= kMinDistanceObstacle) {
-    normal += Vector3D(1.0F, 0.0F, 0.0F);
+    if (!touchedBack) {
+      touchedBack = true;
+      normal += Vector3D(1.0F, 0.0F, 0.0F);
+    }
+  } else {
+    touchedBack = false;
   }
 
+  static bool touchedLeft = false;
   if (m_controller->data.left > 0 &&
       m_controller->data.left <= kMinDistanceObstacle) {
-    normal += Vector3D(0.0F, 1.0F, 0.0F);
+    if (!touchedLeft) {
+      touchedLeft = true;
+      normal += Vector3D(0.0F, -1.0F, 0.0F);
+    }
+  } else {
+    touchedLeft = false;
   }
 
+  static bool touchedRight = false;
   if (m_controller->data.right > 0 &&
       m_controller->data.right <= kMinDistanceObstacle) {
-    normal += Vector3D(0.0F, -1.0F, 0.0F);
+    if (!touchedRight) {
+      touchedRight = true;
+      normal += Vector3D(0.0F, 1.0F, 0.0F);
+    }
+  } else {
+    touchedRight = false;
   }
 
   if (!normal.isAlmostEqual(Vector3D(), kComparisonFactor) &&
@@ -65,5 +95,5 @@ void Drone::explore() {
     }
   }
 
-  m_controller->setVelocity(direction, kMaxSpeed);
+  m_controller->setVelocity(direction, kDroneSpeed);
 }

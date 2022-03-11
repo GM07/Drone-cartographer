@@ -29,15 +29,19 @@ SimulationController::~SimulationController() {
 
 void SimulationController::updateSensorsData() {
   data = {
-      m_abstractSensors->getFrontDistance(),
-      m_abstractSensors->getLeftDistance(),
-      m_abstractSensors->getBackDistance(),
-      m_abstractSensors->getRightDistance(),
+      m_abstractSensors->getFrontDistance() * 10.0f,
+      m_abstractSensors->getLeftDistance() * 10.0f,
+      m_abstractSensors->getBackDistance() * 10.0f,
+      m_abstractSensors->getRightDistance() * 10.0f,
       m_abstractSensors->getPosX(),
       m_abstractSensors->getPosY(),
       m_abstractSensors->getBatteryLevel(),
       static_cast<int>(state),
   };
+
+  log("front : " + std::to_string(data.front) + " - back : " +
+      std::to_string(data.back) + " - left : " + std::to_string(data.left) +
+      " - right : " + std::to_string(data.right));
 
   bool success = m_serverDataQueue.push(data);
   if (!success && m_controllerDataSem->tryAcquire()) {
