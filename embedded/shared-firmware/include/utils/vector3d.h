@@ -4,7 +4,7 @@
 #include <string>
 #include <utility>
 
-constexpr float kThreshold = 0.005f;
+constexpr float kThreshold = 0.01;
 
 class Vector3D {
  public:

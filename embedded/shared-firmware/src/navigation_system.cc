@@ -20,12 +20,12 @@ void Drone::step() {
     case State::kLanding:
       if (m_controller->isTrajectoryFinished()) {
         m_controller->state = State::kIdle;
+        m_controller->setVelocity(Vector3D(1.0, 1.0, 1.0),
+                                  0.0f);  // ISSUE : Create stop method
       }
       break;
     case State::kExploring:
-      if (m_controller->isTrajectoryFinished()) {
-        explore();
-      }
+      explore();
     default:
       break;
   }
