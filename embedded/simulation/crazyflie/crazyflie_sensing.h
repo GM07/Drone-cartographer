@@ -92,10 +92,7 @@ class CCrazyflieSensing : public argos::CCI_Controller {
   argos::CCI_CrazyflieDistanceScannerSensor* m_pcDistance{nullptr};
 
   /* Pointer to the position actuator */
-  // argos::CCI_QuadRotorPositionActuator* m_pcPropellers{nullptr};
-
-  /* Pointer to the speed actuator */
-  argos::CCI_QuadRotorSpeedActuator* m_speedPropellers{nullptr};
+  argos::CCI_QuadRotorPositionActuator* m_pcPropellers{nullptr};
 
   /* Pointer to the range and bearing actuator */
   argos::CCI_RangeAndBearingActuator* m_pcRABA{nullptr};

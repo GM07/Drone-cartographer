@@ -94,3 +94,51 @@ ninja: build stopped: subcommand failed.
 
 
 
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: /bin/arm-none-eabi-gcc-9.2.1 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+/usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/bin/ld: /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/libc.a(lib_a-exit.o): in function `exit':
+/build/newlib-CVVEyx/newlib-3.3.0/build/arm-none-eabi/newlib/libc/stdlib/../../../../../newlib/libc/stdlib/exit.c:64: undefined reference to `_exit'
+collect2: error: ld returned 1 exit status
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /workspaces/INF3995-106/embedded/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/ninja cmTC_68eba && [1/2] Building C object CMakeFiles/cmTC_68eba.dir/testCCompiler.c.o
+[2/2] Linking C executable cmTC_68eba
+FAILED: cmTC_68eba 
+: && /bin/arm-none-eabi-gcc-9.2.1   -rdynamic CMakeFiles/cmTC_68eba.dir/testCCompiler.c.o  -o cmTC_68eba   && :
+arm-none-eabi-gcc-9.2.1: error: unrecognized command line option '-rdynamic'
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: /bin/arm-none-eabi-gcc-9.2.1 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+/usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/bin/ld: /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/libc.a(lib_a-exit.o): in function `exit':
+/build/newlib-CVVEyx/newlib-3.3.0/build/arm-none-eabi/newlib/libc/stdlib/../../../../../newlib/libc/stdlib/exit.c:64: undefined reference to `_exit'
+collect2: error: ld returned 1 exit status
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /workspaces/INF3995-106/embedded/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/ninja cmTC_8e1fb && [1/2] Building C object CMakeFiles/cmTC_8e1fb.dir/testCCompiler.c.o
+[2/2] Linking C executable cmTC_8e1fb
+FAILED: cmTC_8e1fb 
+: && /bin/arm-none-eabi-gcc-9.2.1   -rdynamic CMakeFiles/cmTC_8e1fb.dir/testCCompiler.c.o  -o cmTC_8e1fb   && :
+arm-none-eabi-gcc-9.2.1: error: unrecognized command line option '-rdynamic'
+ninja: build stopped: subcommand failed.
+
+
+

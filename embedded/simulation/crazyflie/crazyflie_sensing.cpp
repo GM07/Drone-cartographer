@@ -35,10 +35,8 @@ void CCrazyflieSensing::Init(argos::TConfigurationNode& /*t_node*/) {
      */
     m_pcDistance = GetSensor<argos::CCI_CrazyflieDistanceScannerSensor>(
         "crazyflie_distance_scanner");
-    // m_pcPropellers =
-    // GetActuator<argos::CCI_QuadRotorPositionActuator>("quadrotor_position");
-    m_speedPropellers =
-        GetActuator<argos::CCI_QuadRotorSpeedActuator>("quadrotor_speed");
+    m_pcPropellers =
+        GetActuator<argos::CCI_QuadRotorPositionActuator>("quadrotor_position");
     /* Get pointers to devices */
     m_pcRABA =
         GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing");
