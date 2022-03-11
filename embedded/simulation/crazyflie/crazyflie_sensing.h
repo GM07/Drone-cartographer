@@ -39,6 +39,7 @@
 #include <boost/asio.hpp>
 #endif
 
+#include <atomic>
 #include <mutex>
 #include <thread>
 

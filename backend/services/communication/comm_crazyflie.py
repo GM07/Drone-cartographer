@@ -1,28 +1,24 @@
-from time import sleep
-import threading
-from typing import Dict, List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
 from cflib.crazyflie.log import LogConfig
-from cflib.crazyflie.syncLogger import SyncLogger
 
 from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
-from services.data.drone_data import DroneData
 
-class CommCrazyflie(AbstractComm): 
+class CommCrazyflie(AbstractComm):
 
-    def __init__(self, links: List):
+    def __init__(self, links: list, drone_list = None):
 
         print('Creating Embedded Crazyflie communication')
-        self.crazyflies: List[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), links))
+        self.crazyflies: list[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), links))
         self.links = links
-        self.crazyflies_by_id: Dict[str, Crazyflie] = dict()
+        self.crazyflies_by_id = dict()
+        self.drone_list = drone_list
         for link, crazyflie in zip(links, self.crazyflies):
-            self.crazyflies_by_id[link] = crazyflie 
+            self.crazyflies_by_id[link] = crazyflie
         self.initialized_drivers = False
-        self.sync_crazyflies: List[SyncCrazyflie] = []
+        self.sync_crazyflies: list[SyncCrazyflie] = []
         self.__init_drivers()
         self.setup_log()
 
@@ -34,7 +30,7 @@ class CommCrazyflie(AbstractComm):
         cflib.crtp.init_drivers()
 
     def setup_log(self):
-        self.log_configs: List[LogConfig] = []
+        self.log_configs: list[LogConfig] = []
         for crazyflie in self.crazyflies:
             log_config = LogConfig(name='DroneData', period_in_ms=AbstractComm.DELAY_RECEIVER_MS)
             log_config.add_variable('range.front', 'uint16_t')
@@ -51,7 +47,6 @@ class CommCrazyflie(AbstractComm):
 
 
         self.sync_crazyflies = []
-        
         for link, crazyflie in zip(self.links, self.crazyflies):
             self.sync_crazyflies.append(SyncCrazyflie(link, cf=crazyflie))
 
@@ -70,6 +65,9 @@ class CommCrazyflie(AbstractComm):
             print('Sending packet : ', packet)
             self.crazyflies_by_id[link].appchannel.send_packet(packet)
 
-
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print('[%d][%s]: %s' % (timestamp, logconf.id, data))
+
+    def send_command_to_all_drones(self, command):
+        for drone in self.drone_list:
+            self.send_command(command, drone['name'])

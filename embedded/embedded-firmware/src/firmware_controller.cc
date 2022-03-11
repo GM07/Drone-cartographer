@@ -3,7 +3,7 @@
 
 #include "components/drone.h"
 #include "controllers/abstract_controller.h"
-#include "sensors/firmware_sensor.h"
+#include "sensors/firmware_sensors.h"
 #include "utils/led.h"
 #include "utils/timer.h"
 
@@ -15,6 +15,27 @@ extern "C" {
 #include "led.h"
 #include "ledseq.h"
 #include "param_logic.h"
+#include "supervisor.h"
+}
+
+FirmwareController::FirmwareController()
+    : AbstractController(std::make_unique<FirmwareSensors>()) {}
+
+void FirmwareController::updateSensorsData() {
+  data = {
+      m_abstractSensors->getFrontDistance(),
+      m_abstractSensors->getLeftDistance(),
+      m_abstractSensors->getBackDistance(),
+      m_abstractSensors->getRightDistance(),
+      m_abstractSensors->getPosX(),
+      m_abstractSensors->getPosY(),
+      m_abstractSensors->getBatteryLevel(),
+      static_cast<int>(state),
+  };
+}
+
+bool FirmwareController::isDroneCrashed() const {
+  return supervisorIsTumbled();
 }
 
 FirmwareController::FirmwareController()

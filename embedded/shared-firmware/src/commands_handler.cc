@@ -1,11 +1,15 @@
 #include "components/drone.h"
 #include "utils/commands.h"
 
-#define PACKET_SIZE 32
+size_t constexpr PACKET_SIZE = 32;
 
 /////////////////////////////////////////////////////////////////////////
 bool Drone::handleCommand(Command command, const void* /*extraArgs*/,
                           size_t /*extraArgsLength*/) {
+  if (m_controller->state == State::kCrash) {
+    return false;
+  }
+
   switch (command) {
     case Command::kIdentify:
       m_controller->blinkLED(LED::kLedRedLeft);

@@ -1,6 +1,6 @@
 {
-	"version": "2.0.0",
-	"tasks": [
+  "version": "2.0.0",
+  "tasks": [
     {
       "label": "Compile Simulation Firmware",
       "type": "shell",
@@ -13,17 +13,6 @@
       ]
     },
     {
-      "label": "Compile Shared Firmware",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}/shared-firmware"
-      },
-      "command": [
-        "if test -d build; then rm -rf build; fi &&",
-        "mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja"
-      ]
-    },
-    {
       "label": "Install Argos3 Package",
       "type": "shell",
       "detail": "Install argos3 from .deb package",
@@ -31,8 +20,8 @@
         "cwd": "${workspaceFolder}"
       },
       "command": "dpkg -i argos3*.deb",
-      "runOptions": {
-        "runOn": "folderOpen"
+      "runOptions": { 
+        "runOn": "folderOpen" 
       }
     },
     {
@@ -86,35 +75,46 @@
       ]
     },
     {
-      "label": "lint simulation firmware",
+      "label": "Lint Simulation Firmware",
       "type": "shell",
       "options": {
         "cwd": "${workspaceFolder}/simulation/"
       },
-      "dependsOn": [
+      "dependsOn" : [
         "Compile Simulation Firmware"
       ],
       "command": "cd build && ../../run-clang-tidy.py -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type\""
     },
+    
     {
-      "label": "lint embedded firmware",
+      "label": "Lint Embedded Firmware",
       "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/embedded-firmware/"
+        "cwd": "${workspaceFolder}/embedded-firmware/lint-workspace"
       },
-      "command": "../run-clang-tidy.py -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type\""
+      "command": "../../run-clang-tidy.py -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type\""
+    },
+    {
+      "label": "Run Pipeline",
+      "type": "shell",
+      "dependsOn": [
+        "Compile Embedded Firmware",
+        "Test All",
+        "Lint Simulation Firmware",
+        "Lint Embedded Firmware"
+      ]
     }
   ],
-	"inputs": [
-		{
-			"id": "radio",
-			"type": "pickString",
-			"default": "radio://0/80/2M/E7E7E7E761",
-			"description": "Radio adress to flash drone",
-			"options": [
-				"radio://0/80/2M/E7E7E7E761",
-				"radio://0/80/2M/E7E7E7E762"
-			]
-		}
-	]
+  "inputs": [
+    {
+      "id": "radio",
+      "type": "pickString",
+      "default": "radio://0/80/2M/E7E7E7E761",
+      "description": "Radio adress to flash drone",
+      "options": [
+        "radio://0/80/2M/E7E7E7E761",
+        "radio://0/80/2M/E7E7E7E762"
+      ]
+    }
+  ]
 }

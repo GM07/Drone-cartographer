@@ -11,6 +11,7 @@ class COMMANDS(Enum):
     LOGS = 0x4,  # Do not remove comma
 
 
+
 # Objects to communicate with Crazyflie
 # URI = ['radio://0/80/2M/E7E7E7E761', 'radio://0/80/2M/E7E7E7E762']
-URI = ['radio://0/80/2M/E7E7E7E762']
+URI = ['radio://0/80/2M/E7E7E7E761']

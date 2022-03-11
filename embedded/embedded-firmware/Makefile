@@ -13,8 +13,8 @@ PROJ_OBJ += commands_handler.o \
 	timer.o \
 	app_main.o \
 	vector3d.o \
-	firmware_sensor.o \
-	sensor_data_updater.o
+	firmware_sensors.o \
+	sensors_data_updater.o
 
 CRAZYFLIE_BASE=../crazyflie-firmware
 

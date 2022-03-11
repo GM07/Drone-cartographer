@@ -34,7 +34,8 @@ class FirmwareController : public AbstractController {
   void blinkLED(LED led) override;
 
   void delay(const uint32_t ticks) override{/**/};
-  void updateSensorData();
+  void updateSensorsData() override;
+  bool isDroneCrashed() const override;
 
  private:
   ledseqContext_t m_seqLED{};

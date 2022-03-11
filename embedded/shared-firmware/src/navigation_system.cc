@@ -6,6 +6,10 @@ constexpr float kMaxSpeed = 0.1f;  // Meters per seconds
 constexpr uint32_t kTicksPerSecond = 10;
 
 void Drone::step() {
+  updateCrashStatus();
+  updateSensorsData();
+
+  constexpr float radius = 0.5;
   switch (m_controller->state) {
     case State::kIdle:
       break;

@@ -13,7 +13,7 @@ void Semaphore::release() {
 
 void Semaphore::acquire() {
   std::unique_lock<decltype(m_mutex)> lock(m_mutex);
-  while (!m_count) {  // Handle spurious wake-ups.
+  while (m_count == 0U) {  // Handle spurious wake-ups.
     m_condition.wait(lock);
   }
   --m_count;
@@ -22,7 +22,7 @@ void Semaphore::acquire() {
 bool Semaphore::tryAcquire() {
   std::lock_guard<decltype(m_mutex)> lock(m_mutex);
 
-  if (m_count) {
+  if (m_count != 0U) {
     --m_count;
     return true;
   }

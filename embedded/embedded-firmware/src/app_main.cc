@@ -53,7 +53,7 @@ void enableCrtpHighLevelCommander() {
 
 /////////////////////////////////////////////////////////////////////////
 void addLoggingVariables() {
-  LOG_GROUP_START(custom)
+  LOG_GROUP_START(custom)  // NOLINT
   LOG_ADD(LOG_UINT8, state, &Drone::getEmbeddedDrone().getController()->state)
   LOG_GROUP_STOP(custom)
 }

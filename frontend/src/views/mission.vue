@@ -1,16 +1,42 @@
 <template>
   <div>
-    <v-app-bar v-if="isDroneListLoaded" app>
+    <v-app-bar app>
       <v-btn-toggle mandatory>
+        <v-btn v-on:click="setSelected(-1)"> General </v-btn>
+        <div v-for="(drone, index) in droneList" :key="index">
+          <v-btn v-on:click="setSelected(index)">
+            {{ drone.name }}
+          </v-btn>
+          <v-icon
+            size="12"
+            style="
+              position: absolute;
+              z-index: 1;
+              margin-left: -13px;
+              margin-top: 2px;
+            "
+            @click="deleteDrone(index)"
+            >mdi-close-circle</v-icon
+          >
+        </div>
+      </v-btn-toggle>
+      <v-btn-toggle>
         <v-btn
-          v-for="(drone, index) in droneList"
-          :key="index"
-          v-on:click="setSelected(index)"
+          v-if="isUserControlling()"
+          active-class="no-active"
+          @click.stop="isDroneMenuOpen = true"
         >
-          {{ drone }}
+          +
         </v-btn>
       </v-btn-toggle>
     </v-app-bar>
+
+    <drone-menu
+      :droneList="droneList"
+      :isDroneMenuOpen="isDroneMenuOpen"
+      @addDrone="addDrone"
+      @setDroneMenuOpen="setDroneMenuOpen"
+    ></drone-menu>
 
     <v-navigation-drawer app permanent touchless>
       <div id="top">
@@ -25,50 +51,92 @@
       <template id="bottom" v-slot:append>
         <v-divider></v-divider>
         <MissionCommands
-          v-if="isMissionCommandsEnabled()"
+          v-if="isUserControlling()"
           :accessStatus="accessStatus"
+          :droneList="droneList"
         />
+        <v-list dense nav>
+          <v-list-item v-if="isConnected()">
+            <v-list-item-icon>
+              <v-icon color="blue">mdi-access-point-network</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Connecté</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-else>
+            <v-list-item-icon>
+              <v-icon color="red">mdi-access-point-network-off</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Déconnecté</v-list-item-title>
+          </v-list-item>
+        </v-list>
       </template>
     </v-navigation-drawer>
   </div>
 </template>
 
+<style scoped>
+.v-btn--active.no-active:not(:hover)::before {
+  opacity: 0 !important;
+}
+</style>
+
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import {ServerCommunication} from '@/communication/server_communication';
 import DroneCommands from '@/components/drone_commands.vue';
 import MissionCommands from '@/components/mission_commands.vue';
 import NavigationCommands from '@/components/navigation_commands.vue';
+import DroneMenu from '@/components/drone_menu.vue';
 import {SOCKETIO_LIMITED_ACCESS} from '@/communication/server_constants';
 import {AccessStatus} from '@/communication/access_status';
+import {Drone} from '@/communication/drone';
 
 @Component({
-  components: {DroneCommands, MissionCommands, NavigationCommands},
+  components: {DroneCommands, MissionCommands, NavigationCommands, DroneMenu},
 })
 export default class Mission extends Vue {
-  public droneList = ['General'];
-  public isDroneListLoaded = false;
+  public droneList: Drone[] = [];
   public attemptedLimitedConnexion = false;
+  public dialog = false;
+  public isDroneMenuOpen = false;
   public accessStatus = {
     isMissionSimulated: false,
     isUserControlling: false,
   } as AccessStatus;
-  private chosenOption = 0;
+  private chosenOption = -1;
+
+  public deleteDrone(index: number): void {
+    this.droneList.splice(index, 1);
+  }
 
   public setSelected(index: number): void {
     this.chosenOption = index;
   }
 
-  public isDroneCommandsEnabled(): boolean {
-    return this.chosenOption !== 0 && this.accessStatus.isUserControlling;
+  public setDroneMenuOpen(value: boolean): void {
+    this.isDroneMenuOpen = value;
   }
 
-  public isMissionCommandsEnabled(): boolean {
+  public addDrone(drone: Drone): void {
+    this.droneList.push({...drone});
+  }
+
+  public isDroneCommandsEnabled(): boolean {
+    return this.chosenOption !== -1 && this.accessStatus.isUserControlling;
+  }
+
+  public isUserControlling(): boolean {
     return this.accessStatus.isUserControlling;
   }
 
   public getSelectedDrone(): string {
-    return this.droneList[this.chosenOption];
+    if (this.chosenOption !== -1 && this.droneList.length > 0) {
+      return this.droneList[this.chosenOption].name;
+    }
+    return '';
+  }
+
+  public isConnected(): boolean {
+    return SOCKETIO_LIMITED_ACCESS.connected;
   }
 
   private beforeCreate(): void {
@@ -79,19 +147,11 @@ export default class Mission extends Vue {
       }
     );
 
-    SOCKETIO_LIMITED_ACCESS.open();
+    SOCKETIO_LIMITED_ACCESS.on('disconnect', () => {
+      this.accessStatus.isUserControlling = false;
+    });
 
-    ServerCommunication.getConnectedDrones()
-      .then(resp => resp.json())
-      .then(data => {
-        this.droneList.push(...data);
-      })
-      .catch(error => {
-        console.error(error);
-      })
-      .finally(() => {
-        this.isDroneListLoaded = true;
-      });
+    SOCKETIO_LIMITED_ACCESS.open();
   }
 
   private destroyed() {

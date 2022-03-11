@@ -3,6 +3,7 @@
 #include "utils/timer.h"
 
 /////////////////////////////////////////////////////////
+FirmwareController::FirmwareController() {}
 void FirmwareController::blinkLED(LED led) {}
 size_t FirmwareController::receiveMessage(void* message, size_t size) {}
 void FirmwareController::sendMessage(void* message, size_t size) {}
@@ -12,3 +13,5 @@ Vector3D FirmwareController::getCurrentLocation() const {}
 bool FirmwareController::isTrajectoryFinished() const {}
 void FirmwareController::takeOff(float height) {}
 void FirmwareController::land() {}
+void FirmwareController::updateSensorsData() {}
+bool FirmwareController::isDroneCrashed() const { return false; }

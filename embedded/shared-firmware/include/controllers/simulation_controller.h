@@ -7,7 +7,9 @@
 #include <boost/asio.hpp>
 #include <boost/lockfree/queue.hpp>
 #endif
-
+#include <atomic>
+#include <boost/lockfree/queue.hpp>
+#include <mutex>
 #include <thread>
 
 #include "controllers/abstract_controller.h"
@@ -54,7 +56,8 @@ class SimulationController : public AbstractController {
   void blinkLED(LED /*led*/) override;
 
   void delay(uint32_t /*ticks*/) override{/**/};
-  void updateSensorData();
+  void updateSensorsData() override;
+  bool isDroneCrashed() const override;
 
 #ifndef GTEST
  private:
@@ -67,6 +70,7 @@ class SimulationController : public AbstractController {
       m_serverDataQueue{1};
   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_dataSocket;
   std::unique_ptr<std::thread> m_sendDataThread;
+  std::atomic<bool> m_threadContinueFlag{true};
 
   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
 };

@@ -26,6 +26,8 @@ class DroneState(Enum):
 
 class DroneData:
 
+    DATA_SIZE: int = 32
+
     def __init__(self, sensors: DroneSensors, position: Point2D,
         battery_level: float, state: DroneState):
         self.sensors = sensors

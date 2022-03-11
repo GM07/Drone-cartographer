@@ -93,7 +93,7 @@ void CCrazyflieSensing::printLogs() {
 }
 
 void CCrazyflieSensing::attemptSocketConnection() {
-  constexpr uint32_t kDroneDelay = 250;
+  constexpr uint32_t kDroneDelay = 25;
   while (true) {
     try {
       if (m_drone.getController()->state != State::kDead) {
