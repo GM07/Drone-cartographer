@@ -32,7 +32,7 @@ void Drone::step() {
 }
 
 void Drone::explore() {
-  static Vector3D direction = {1.0F, 0.0F, 0.0F};
+  static Vector3D direction = {1.0F, 1.0F, 0.0F};
 
   Vector3D normal;
 
@@ -48,12 +48,12 @@ void Drone::explore() {
 
   if (m_controller->data.left > 0 &&
       m_controller->data.left <= kMinDistanceObstacle) {
-    normal += Vector3D(0.0F, -1.0F, 0.0F);
+    normal += Vector3D(0.0F, 1.0F, 0.0F);
   }
 
   if (m_controller->data.right > 0 &&
       m_controller->data.right <= kMinDistanceObstacle) {
-    normal += Vector3D(0.0F, 1.0F, 0.0F);
+    normal += Vector3D(0.0F, -1.0F, 0.0F);
   }
 
   if (!normal.isAlmostEqual(Vector3D(), kComparisonFactor) &&
