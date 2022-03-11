@@ -21,6 +21,10 @@ extern "C" {
 FirmwareController::FirmwareController()
     : AbstractController(std::make_unique<FirmwareSensors>()) {}
 
+bool FirmwareController::isDroneCrashed() const {
+  return supervisorIsTumbled();
+}
+
 void FirmwareController::updateSensorsData() {
   data = {
       m_abstractSensors->getFrontDistance(),
@@ -30,26 +34,6 @@ void FirmwareController::updateSensorsData() {
       m_abstractSensors->getPosX(),
       m_abstractSensors->getPosY(),
       m_abstractSensors->getBatteryLevel(),
-      static_cast<int>(state),
-  };
-}
-
-bool FirmwareController::isDroneCrashed() const {
-  return supervisorIsTumbled();
-}
-
-FirmwareController::FirmwareController()
-    : AbstractController(std::make_unique<FirmwareSensor>()) {}
-
-void FirmwareController::updateSensorData() {
-  data = {
-      m_abstractSensor->getFrontDistance(),
-      m_abstractSensor->getLeftDistance(),
-      m_abstractSensor->getBackDistance(),
-      m_abstractSensor->getRightDistance(),
-      m_abstractSensor->getPosX(),
-      m_abstractSensor->getPosY(),
-      m_abstractSensor->getBatteryLevel(),
       static_cast<int>(state),
   };
 }

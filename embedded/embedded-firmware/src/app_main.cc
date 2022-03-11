@@ -65,7 +65,7 @@ extern "C" void appMain() {
   enableCrtpHighLevelCommander();
 
   while (true) {
-    Drone::getEmbeddedDrone().updateSensorData();
+    Drone::getEmbeddedDrone().updateSensorsData();
     updateCrashStatus();
 
     Drone::getEmbeddedDrone().step();

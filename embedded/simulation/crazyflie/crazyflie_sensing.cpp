@@ -70,7 +70,7 @@ void CCrazyflieSensing::Init(argos::TConfigurationNode& /*t_node*/) {
 /****************************************/
 
 void CCrazyflieSensing::ControlStep() {
-  m_drone.updateSensorData();
+  m_drone.updateSensorsData();
 
   m_drone.step();
 

@@ -13,7 +13,8 @@
     "*.h": "cpp",
     "atomic": "cpp",
     "cstdint": "cpp",
-    "stop_token": "cpp"
+    "stop_token": "cpp",
+    "iostream": "cpp"
   },
   "editor.tabSize": 2,
   "editor.detectIndentation": false,

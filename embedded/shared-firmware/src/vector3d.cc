@@ -42,8 +42,7 @@ float Vector3D::distanceTo(const Vector3D& other) const {
 }
 
 Vector3D Vector3D::reflect(const Vector3D& normal) const {
-  return (*this) -
-         normal.toUnitVector() * (*this * normal.toUnitVector()) * 2.0f;
+  return (*this) - normal.toUnitVector() * (*this * normal.toUnitVector()) * 2;
 }
 
 Vector3D Vector3D::toUnitVector() const {
@@ -53,7 +52,7 @@ Vector3D Vector3D::toUnitVector() const {
 }
 
 float Vector3D::length() const {
-  return static_cast<float>(sqrt(m_x * m_x + m_y * m_y + m_z * m_z));
+  return static_cast<float>(std::sqrt(m_x * m_x + m_y * m_y + m_z * m_z));
 }
 
 Vector3D& Vector3D::operator+=(const Vector3D& other) {

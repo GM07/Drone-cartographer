@@ -53,7 +53,6 @@ class AbstractController {
   virtual void updateSensorsData() = 0;
   virtual bool isDroneCrashed() const = 0;
 
-  ControllerData data{1.0, 4.0, 10.0, 5.0, 8.0, 9.0, 2.0, 3};
   State state = State::kIdle;
   std::unique_ptr<AbstractSensors> m_abstractSensors;
   ControllerData data{};

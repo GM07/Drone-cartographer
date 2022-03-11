@@ -11,5 +11,6 @@ class StubController : public FirmwareController {
   MOCK_METHOD1(blinkLED, void(LED));
   MOCK_METHOD2(sendMessage, void(void*, size_t));
   MOCK_METHOD2(receiveMessage, size_t(void*, size_t));
+  MOCK_METHOD2(setVelocity, void(const Vector3D&, float));
   MOCK_CONST_METHOD0(isTrajectoryFinished, bool());
 };

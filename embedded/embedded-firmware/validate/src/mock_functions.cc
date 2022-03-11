@@ -3,6 +3,7 @@
 extern "C" {
 #include "FreeRTOS.h"
 #include "app_channel.h"
+#include "commander.h"
 #include "crtp_commander_high_level.h"
 #include "estimator_kalman.h"
 #include "ledseq.h"
@@ -79,3 +80,5 @@ int crtpCommanderHighLevelGoTo(const float x, const float y, const float z,
 }
 
 void ledClearAll() {}
+
+void commanderSetSetpoint(setpoint_t* setpoint, int priority) {}

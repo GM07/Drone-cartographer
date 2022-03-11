@@ -15,3 +15,4 @@ void FirmwareController::takeOff(float height) {}
 void FirmwareController::land() {}
 void FirmwareController::updateSensorsData() {}
 bool FirmwareController::isDroneCrashed() const { return false; }
+void FirmwareController::setVelocity(const Vector3D& direction, float speed) {}
