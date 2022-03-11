@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+  <framework>
+    <system threads="0" />
+    <experiment length="0"
+                ticks_per_second="10"
+                 />
+  </framework>
+  <controllers>
+    <crazyflie_sensing_controller id="ssc"
+                                 library="build/simulation/crazyflie/libcrazyflie_sensing">
+      <actuators>
+        <range_and_bearing  implementation="default" />
+        <quadrotor_position implementation="default" />
+      </actuators>
+      <sensors>
+        <range_and_bearing      implementation="medium" medium="rab" show_rays="false" />
+        <crazyflie_distance_scanner implementation="rot_z_only"  show_rays="true" />
+        <positioning            implementation="default"/>
+        <battery implementation="default"/>
+      </sensors>
+      <params>
+      </params>
+    </crazyflie_sensing_controller>
+
+  </controllers>
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <arena size="10, 10, 4" center="0,0,2">
+
+    <box id="wall_north" size="5,0.001,2" movable="false">
+      <body position="0,2.5,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_south" size="5,0.001,2" movable="false">
+      <body position="0,-2.5,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_east" size="0.001,5,2" movable="false">
+      <body position="2.5,0,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_west" size="0.001,5,2" movable="false">
+      <body position="-2.5,0,0" orientation="0,0,0" />
+    </box>
+
+  </arena>
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <pointmass3d id="pm3d" iterations="10"/>
+    <dynamics2d id="dyn2d" />
+  </physics_engines>
+
+  <!-- ********* -->
+  <!-- * Media * -->
+  <!-- ********* -->
+  <media>
+    <range_and_bearing id="rab" />
+    <led id="leds" />
+  </media>
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <visualization>
+    <qt-opengl>
+      <camera>
+      <placements>
+        <placement index="0" position="2,0,4"
+                   look_at="0,0,0" up="-1,0,0" 
+                   lens_focal_length="20" />
+        </placements>
+      </camera>
+    </qt-opengl>
+  </visualization>
+
+</argos-configuration>

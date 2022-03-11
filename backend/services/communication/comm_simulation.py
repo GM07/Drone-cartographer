@@ -12,15 +12,14 @@ import queue
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
 
-nb_connections = 8
-identifier = 's'
-
 class CommSimulation(AbstractComm):
 
-    __SOCKET_COMMAND_PATH = '/tmp/socket/{}{}'
-    __SOCKET_DATA_PATH = '/tmp/socket/data{}{}'
+    __SOCKET_COMMAND_PATH = '/tmp/socket/{}'
+    __SOCKET_DATA_PATH = '/tmp/socket/data{}'
 
-    def __init__(self):
+    def __init__(self, drone_list = []):
+        self.nb_connections = len(drone_list)
+
         self.threadActive = True
         self.__COMMANDS_QUEUE = queue.Queue(10)
         self.__COMMANDS_THREAD = threading.Thread(
@@ -31,10 +30,10 @@ class CommSimulation(AbstractComm):
         self.command_servers: Dict[socket.socket, socket.socket] = {} # (server, connection)
         self.data_servers: Dict[socket.socket, socket.socket]  = {} # (server, connection)
 
-        for i in range(nb_connections):
-            file_name = self.__SOCKET_COMMAND_PATH.format(identifier, i)
+        for i in range(self.nb_connections):
+            file_name = self.__SOCKET_COMMAND_PATH.format(drone_list[i]['name'])
             self.command_servers[self.__init_server_bind(file_name)] = None 
-            file_name = self.__SOCKET_DATA_PATH.format(identifier, i)
+            file_name = self.__SOCKET_DATA_PATH.format(drone_list[i]['name'])
             self.data_servers[self.__init_server_bind(file_name)] = None
 
         self.__COMMANDS_THREAD.start()
@@ -156,8 +155,6 @@ class CommSimulation(AbstractComm):
                     if is_socket_broken:
                         print("Socket broken")
                         self.data_servers[server] = None
-
-        print("no one connected")
 
 
     def __thread_send_command(self):
