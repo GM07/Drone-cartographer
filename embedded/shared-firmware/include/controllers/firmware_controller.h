@@ -17,7 +17,7 @@ class FirmwareController : public AbstractController {
   FirmwareController(FirmwareController& other) = delete;
   FirmwareController operator=(FirmwareController& other) = delete;
 
-  void goTo(const Vector3D& location, bool isRelative) override;
+  void goTo(const Vector3D& location, bool isRelative);
   void takeOff(float height) override;
   void land() override;
 

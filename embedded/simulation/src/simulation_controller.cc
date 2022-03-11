@@ -125,16 +125,16 @@ void SimulationController::takeOff(float height) {
   // We need to add the old m_takeOffPosition to get the new one.
   m_takeOffPosition = getCurrentLocation() + m_takeOffPosition;
 
-  // We takeOff using absolute position to prevent multiple takeOff from
-  // stacking one on top of the other
-  goTo(Vector3D(0, 0, height), false);
+  m_targetPosition = getCurrentLocation() + Vector3D(0, 0, height);
+
+  setVelocity(Vector3D(0, 0, height), kTakeOffSpeed);
 }
 
 ///////////////////////////////////////////////////
 void SimulationController::land() {
   Vector3D pos = getCurrentLocation();
-  pos.m_z = 0.0;
-  goTo(pos, false);
+  m_targetPosition = Vector3D(pos.m_x, pos.m_z, 0.0);
+  setVelocity(Vector3D(0, 0, -pos.m_z), kLandingSpeed);
 }
 
 // All positions are relative to takeOff position
@@ -149,13 +149,8 @@ bool SimulationController::isTrajectoryFinished() const {
   return getCurrentLocation().isAlmostEqual(m_targetPosition);
 }
 
-void SimulationController::goTo(const Vector3D& location, bool isRelative) {
-  if (isRelative) {
-    m_targetPosition = getCurrentLocation() + location;
-  } else {
-    m_targetPosition = location;
-  }
-
+void SimulationController::setVelocity(const Vector3D& direction, float speed) {
+  Vector3D speedVector = direction.toUnitVector() * speed;
   m_ccrazyflieSensing->m_pcPropellers->SetLinearVelocity(
-      CVector3(location.m_x, location.m_y, location.m_z));
+      CVector3(speedVector.m_x, speedVector.m_y, speedVector.m_z));
 }

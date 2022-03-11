@@ -43,7 +43,6 @@ class Drone {
 
   // Navigation Manager
   void step();
-  void squareTrajectory(float sideLength, bool relative);
 
   // Sensor Manager
   void updateSensorsData();
@@ -52,9 +51,6 @@ class Drone {
  protected:
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
-
-  // DEBUG VARIABLES
-  Direction explorationDirection = Direction::kFront;
 
  public:
   static Drone& getEmbeddedDrone();
