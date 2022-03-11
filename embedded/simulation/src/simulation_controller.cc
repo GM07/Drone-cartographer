@@ -156,7 +156,6 @@ void SimulationController::goTo(const Vector3D& location, bool isRelative) {
     m_targetPosition = location;
   }
 
-  Vector3D simulationPosition = m_takeOffPosition + m_targetPosition;
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(CVector3(
-      simulationPosition.m_x, simulationPosition.m_y, simulationPosition.m_z));
+  m_ccrazyflieSensing->m_pcPropellers->SetLinearVelocity(
+      CVector3(location.m_x, location.m_y, location.m_z));
 }

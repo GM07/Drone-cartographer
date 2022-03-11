@@ -22,7 +22,7 @@ void Drone::step() {
       break;
     // DEBUG ONLY REMOVE AFTER
     case State::kExploring:
-      squareTrajectory(radius, false);
+      squareTrajectory(radius, true);
     default:
       break;
   }
@@ -53,10 +53,6 @@ void Drone::squareTrajectory(float sideLength, bool relative) {
         break;
     }
 
-    // Absolute position are relative to m_takeOffPosition
-    if (!relative) {
-      destination += m_controller->getCurrentLocation();
-    }
     m_controller->goTo(destination, relative);
   }
 }
