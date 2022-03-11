@@ -73,3 +73,11 @@ TEST(validateVector3D, distanceTo) {
   Vector3D vec2 = Vector3D(0.0f, 0.0f, 0.0f);
   EXPECT_EQ(vec1.distanceTo(vec2), 5.0f);
 }
+
+TEST(validateVector3D, reflect) {
+  Vector3D vec1 = Vector3D(1.0f, 1.0f, 0.0f);
+  Vector3D vec2 = Vector3D(0.0f, -1.0f, 0.0f);
+  Vector3D result = Vector3D(1.0f, 0.0f, 0.0f);
+
+  EXPECT_EQ(vec2.reflect(vec1), result);
+}

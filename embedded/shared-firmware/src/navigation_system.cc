@@ -1,8 +1,8 @@
 #include "components/drone.h"
 
-constexpr float kMinDistanceObstacle = 120.0f;
+constexpr float kMinDistanceObstacle = 120.0f;  // Millimeters
 constexpr float kComparisonFactor = 10e-3;
-constexpr float kMaxSpeed = 0.2f;
+constexpr float kMaxSpeed = 0.1f;  // Meters per seconds
 constexpr uint32_t kTicksPerSecond = 10;
 
 void Drone::step() {
@@ -20,7 +20,7 @@ void Drone::step() {
       }
       break;
     case State::kExploring:
-      explore();
+      if (m_controller->isTrajectoryFinished()) explore();
     default:
       break;
   }

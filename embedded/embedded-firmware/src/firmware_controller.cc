@@ -110,10 +110,10 @@ void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
 
 void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
   Vector3D speedVector = direction.toUnitVector() * speed;
-  setpoint_t setpoint;
+
+  static setpoint_t setpoint;
   setpoint.mode.z = modeAbs;
   setpoint.position.z = kHeight;
-  setpoint.mode.yaw = modeVelocity;
   setpoint.mode.x = modeVelocity;
   setpoint.mode.y = modeVelocity;
   setpoint.velocity.x = speedVector.m_x;
