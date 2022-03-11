@@ -4,26 +4,25 @@ extern "C" {
 #include "components/ccommunication_manager.h"
 #include "config.h"
 #include "debug.h"
+#include "log.h"
+#include "param_logic.h"
 #include "static_mem.h"
 #include "task.h"
 }
 
 #include "components/drone.h"
-
-// TODO doit être enlevé lorsque le controlleur sera implémenté
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "controllers/firmware_controller.h"
-#pragma GCC diagnostic pop
 
 static bool isInit = false;
 
+/////////////////////////////////////////////////////////////////////////
 Drone& Drone::getEmbeddedDrone() {
   static Drone drone(std::make_shared<FirmwareController>());
   return drone;
 }
 
-void communicationManagerTaskWrapper(void* parameter) {
+/////////////////////////////////////////////////////////////////////////
+void communicationManagerTaskWrapper(void* /*parameter*/) {
   Drone::getEmbeddedDrone().communicationManagerTask();
 }
 
@@ -38,7 +37,25 @@ void communicationManagerInit() {
 bool communicationManagerTest() { return isInit; }
 
 /////////////////////////////////////////////////////////////////////////
+void enableCrtpHighLevelCommander() {
+  paramVarId_t paramIdCommanderEnHighLevel =
+      paramGetVarId("commander", "enHighLevel");
+  paramSetInt(paramIdCommanderEnHighLevel, 1);
+}
+
+/////////////////////////////////////////////////////////////////////////
+void addLoggingVariables() {
+  LOG_GROUP_START(custom)  // NOLINT
+  LOG_ADD(LOG_UINT8, state, &Drone::getEmbeddedDrone().getController()->state)
+  LOG_GROUP_STOP(custom)
+}
+
+/////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
+  ledClearAll();
+  addLoggingVariables();
+  enableCrtpHighLevelCommander();
+
   while (true) {
     Drone::getEmbeddedDrone().step();
   }

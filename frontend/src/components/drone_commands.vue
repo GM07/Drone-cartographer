@@ -21,9 +21,7 @@ export default class DroneCommands extends Vue {
   @Prop() private droneid!: string;
 
   public identify(): void {
-    ServerCommunication.identifyDrone(this.droneid).catch(error =>
-      console.error(error)
-    );
+    ServerCommunication.identifyDrone(this.droneid);
   }
 }
 </script>

@@ -24,6 +24,7 @@ prepare:
   stage: .pre
   script:
     - cd $WORKING_DIRECTORY
+    - npm --version
     - if [[ ! -d node_modules ]];
       then
         npm ci;
@@ -60,10 +61,6 @@ test:
   script:
     - cd $WORKING_DIRECTORY
     - npm run test
-  artifacts:
-    name: "$CI_JOB_NAME"
-    paths:
-      - $WORKING_DIRECTORY/coverage/
 
 build:
   stage: build
@@ -71,7 +68,3 @@ build:
   script:
     - cd $WORKING_DIRECTORY
     - npm run build
-  artifacts:
-    name: "$CI_JOB_NAME"
-    paths:
-      - $WORKING_DIRECTORY/build/

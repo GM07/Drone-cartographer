@@ -6,14 +6,25 @@
 #include "controllers/abstract_controller.h"
 #include "utils/commands.h"
 
-#define MESSAGE_MAX_SIZE 60
+constexpr float kSpeed = 0.1f;
+constexpr float kTakeOffSpeed = 1.0f;
+constexpr float kLandingSpeed = 0.25f;
+constexpr float kHeight = 0.5f;
+constexpr int kMessageMaxSize = 32;
 
 class Drone {
  public:
-  Drone(std::shared_ptr<AbstractController> controller)
-      : m_controller(controller) {}
+  explicit Drone(std::shared_ptr<AbstractController>&& controller)
+      : m_messageRX(), m_controller(controller) {}
+  Drone(const Drone& other) = delete;
+  Drone(Drone&& other) = delete;
+  Drone& operator=(const Drone& other) = delete;
+  Drone& operator=(Drone&& other) = delete;
 
-  inline std::shared_ptr<AbstractController> getController() {
+  virtual ~Drone() = default;
+
+  [[nodiscard]] inline std::shared_ptr<AbstractController> getController()
+      const {
     return m_controller;
   };
 
@@ -25,19 +36,25 @@ class Drone {
    * @param extraArgs A pointer to an object containing the arguments
    */
   bool handleCommand(Command command, const void* extraArgs,
-                     const size_t extraArgsLength);
+                     size_t extraArgsLength);
 
   // Communication Manager
   void communicationManagerTask();
 
   // Navigation Manager
   void step();
+  void squareTrajectory(float sideLength, bool relative);
 
   // Sensor Manager
+  void updateSensorsData();
+  void updateCrashStatus();
 
- private:
+ protected:
+  std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
-  std::array<uint8_t, MESSAGE_MAX_SIZE> m_messageRX;
+
+  // DEBUG VARIABLES
+  Direction explorationDirection = Direction::kFront;
 
  public:
   static Drone& getEmbeddedDrone();

@@ -4,19 +4,13 @@ import {ROUTER} from './router';
 import vuetify from './plugins/vuetify';
 import {STORE} from './store';
 import VueSocketIO from 'vue-socket.io';
-import SocketIO from 'socket.io-client';
-import {
-  SERVER_ADDRESS,
-  GET_MISSION_STATUS_PATH,
-} from './communication/server_constants';
+import {SOCKETIO_SERVER_STATUS} from './communication/server_constants';
 
 Vue.config.productionTip = false;
 Vue.use(
   new VueSocketIO({
     debug: false,
-    connection: SocketIO(SERVER_ADDRESS, {
-      path: GET_MISSION_STATUS_PATH,
-    }),
+    connection: SOCKETIO_SERVER_STATUS,
     vuex: {
       store: STORE,
       actionPrefix: 'socket_',

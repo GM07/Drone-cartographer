@@ -1,82 +1,162 @@
-// TODO doit être enlevé lorsque le controlleur sera implémenté
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "controllers/simulation_controller.h"
-#pragma GCC diagnostic pop
 
 #include <argos3/core/utility/logging/argos_log.h>
 
-#include <mutex>
 #include <unordered_map>
 
+#include "sensors/simulation_sensors.h"
 #include "utils/led.h"
+#include "utils/timer.h"
 
-#define ALMOST_THERE 0.01
+using ::argos::CVector3;
 
 //////////////////////////////////////////
 SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
-    : m_ccrazyflieSensing(ccrazyflieSensing) {}
+    : AbstractController(
+          std::make_unique<SimulationSensors>(ccrazyflieSensing)),
+      m_ccrazyflieSensing(ccrazyflieSensing),
+      m_controllerDataSem(std::make_unique<Semaphore>(1)),
+      m_sendDataThread(std::make_unique<std::thread>(
+          &SimulationController::sendDroneDataToServerThread, this)) {}
+
+SimulationController::~SimulationController() {
+  m_threadContinueFlag = false;
+  m_controllerDataSem->release();
+  if (m_sendDataThread) {
+    m_sendDataThread->join();
+  }
+}
+
+void SimulationController::updateSensorsData() {
+  data = {
+      m_abstractSensors->getFrontDistance(),
+      m_abstractSensors->getLeftDistance(),
+      m_abstractSensors->getBackDistance(),
+      m_abstractSensors->getRightDistance(),
+      m_abstractSensors->getPosX(),
+      m_abstractSensors->getPosY(),
+      m_abstractSensors->getBatteryLevel(),
+      static_cast<int>(state),
+  };
+
+  bool success = m_serverDataQueue.push(data);
+  if (!success && m_controllerDataSem->tryAcquire()) {
+    ControllerData removedData{};
+    m_serverDataQueue.pop(removedData);
+    m_serverDataQueue.push(data);
+  }
+  m_controllerDataSem->release();
+}
+
+bool SimulationController::isDroneCrashed() const { return false; }
 
 ///////////////////////////////////////
 size_t SimulationController::receiveMessage(void* message, size_t size) {
-  size_t n;
+  size_t messageSize = m_socket->available();
 
-  if (n = m_socket->available()) {
+  if (messageSize != 0) {
     m_socket->receive(boost::asio::buffer(message, size));
   }
 
-  return n;
+  return messageSize;
 }
 
 ///////////////////////////////////////
-void SimulationController::sendMessage(void* message, size_t size) { return; }
+void SimulationController::sendMessage(void* message, size_t size_bytes) {
+  m_socket->send(boost::asio::buffer(message, size_bytes));
+}
+
+void SimulationController::sendDroneDataToServerThread() {
+  constexpr size_t kTryConnectionDelay = 50;
+  constexpr size_t kPacketSize = 32;
+  constexpr size_t kAckSize = 1;
+  while (m_threadContinueFlag) {
+    m_dataSocket =
+        std::make_unique<boost::asio::local::stream_protocol::socket>(
+            io_service);
+    while (m_threadContinueFlag) {
+      try {
+        m_dataSocket->connect("/tmp/socket/data" +
+                              m_ccrazyflieSensing->GetId());
+        break;
+      } catch (const boost::system::system_error& error) {
+        Timer::delayMs(kTryConnectionDelay);
+      }
+    }
+    while (m_threadContinueFlag) {
+      m_controllerDataSem->acquire();
+
+      ControllerData dataToSend{};
+      bool dataPresent = m_serverDataQueue.pop(dataToSend);
+      try {
+        if (dataPresent) {
+          uint8_t ack = 0;
+          m_dataSocket->send(boost::asio::buffer(&dataToSend, kPacketSize));
+          m_dataSocket->receive(boost::asio::buffer(&ack, kAckSize));
+        }
+      } catch (const boost::system::system_error& error) {
+        break;
+      }
+    }
+  }
+}
 
 ///////////////////////////////////////
-void SimulationController::setLEDState(LED led, bool enable, bool blink) {
-  if (enable) log("Identify :" + m_ccrazyflieSensing->GetId());
+void SimulationController::blinkLED(LED /*led*/) {
+  log("Identify :" + m_ccrazyflieSensing->GetId());
 }
 
 ///////////////////////////////////////////////////
 void SimulationController::initCommunicationManager() {
-  static boost::asio::io_service io_service;
-
   m_socket =
       std::make_unique<boost::asio::local::stream_protocol::socket>(io_service);
 
   m_socket->connect("/tmp/socket/" + m_ccrazyflieSensing->GetId());
 }
 
-//////////////////////////////
+///////////////////////////////////////////////////
 void SimulationController::log(const std::string& message) {
   std::lock_guard<std::mutex> logMutex(logBufferMutex);
   logBuffer << message << std::endl;
 }
 
-void SimulationController::setSimulationDroneInstance(
-    CCrazyflieSensing* ccrazyflieSensing) {
-  m_ccrazyflieSensing = ccrazyflieSensing;
-}
-
 void SimulationController::takeOff(float height) {
-  CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
+  // Since getCurrentLocation() is relative to the old m_takeOffPosition
+  // We need to add the old m_takeOffPosition to get the new one.
+  m_takeOffPosition = getCurrentLocation() + m_takeOffPosition;
 
-  if (cPos.GetZ() + ALMOST_THERE >= height) {
-    state = State::kIdle;
-    return;
-  }
-
-  cPos.SetZ(height);
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(cPos);
+  // We takeOff using absolute position to prevent multiple takeOff from
+  // stacking one on top of the other
+  goTo(Vector3D(0, 0, height), false);
 }
 
+///////////////////////////////////////////////////
 void SimulationController::land() {
-  CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
+  Vector3D pos = getCurrentLocation();
+  pos.m_z = 0.0;
+  goTo(pos, false);
+}
 
-  if (cPos.GetZ() - ALMOST_THERE <= 0.0) {
-    state = State::kIdle;
-    return;
+// All positions are relative to takeOff position
+Vector3D SimulationController::getCurrentLocation() const {
+  CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
+  Vector3D pos = Vector3D(cPos.GetX(), cPos.GetY(), cPos.GetZ());
+
+  return pos - m_takeOffPosition;
+}
+
+bool SimulationController::isTrajectoryFinished() const {
+  return getCurrentLocation().isAlmostEqual(m_targetPosition);
+}
+
+void SimulationController::goTo(const Vector3D& location, bool isRelative) {
+  if (isRelative) {
+    m_targetPosition = getCurrentLocation() + location;
+  } else {
+    m_targetPosition = location;
   }
 
-  cPos.SetZ(0.0f);
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(cPos);
+  Vector3D simulationPosition = m_takeOffPosition + m_targetPosition;
+  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(CVector3(
+      simulationPosition.m_x, simulationPosition.m_y, simulationPosition.m_z));
 }

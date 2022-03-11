@@ -3,35 +3,40 @@
 
 #include "controllers/abstract_controller.h"
 
+extern "C" {
+#include "ledseq.h"
+}
+
 class FirmwareController : public AbstractController {
  public:
-  FirmwareController(){/**/};
+  FirmwareController();
+  virtual ~FirmwareController() = default;
 
   FirmwareController(FirmwareController&& other) = delete;
   FirmwareController operator=(FirmwareController&& other) = delete;
   FirmwareController(FirmwareController& other) = delete;
   FirmwareController operator=(FirmwareController& other) = delete;
 
-  Vector3D& getCurrentLocation() override{/**/};
+  void goTo(const Vector3D& location, bool isRelative) override;
+  void takeOff(float height) override;
+  void land() override;
 
-  void setLEDState(LED led, bool enable, bool blink) override;
+  Vector3D getCurrentLocation() const override;
+  bool isTrajectoryFinished() const override;
 
-  void goTo(const Vector3D& location, float yaw, float pitch,
-            bool isRelative) override{/**/};
-  void goTo(const Vector3D& location, bool isRelative) override{/**/};
-  void takeOff(float height) override{/**/};
-  void land() override{/**/};
-
-  float getDistance(Direction direction) override{/**/};
-  float getBatteryLevel() override{/**/};
-
-  void sendP2PMessage(void* message) override{/**/};
   void initCommunicationManager() override{/**/};
   size_t receiveMessage(void* message, size_t size) override;
   void sendMessage(void* message, size_t size) override;
+  void sendP2PMessage(void* message) override{/**/};
 
   void log(const std::string& message) override{/**/};
+  void blinkLED(LED led) override;
 
   void delay(const uint32_t ticks) override{/**/};
+  void updateSensorsData() override;
+  bool isDroneCrashed() const override;
+
+ private:
+  ledseqContext_t m_seqLED{};
 };
 #endif
