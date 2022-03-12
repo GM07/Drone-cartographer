@@ -52,10 +52,14 @@ class CommCrazyflie(AbstractComm):
             self.sync_crazyflies.append(SyncCrazyflie(link, cf=crazyflie))
 
         for sync, config in zip(self.sync_crazyflies, self.log_configs):
-            sync.open_link()
-            sync.cf.log.add_config(config)
-            config.data_received_cb.add_callback(self.__retrieve_log)
-            config.start()
+            try:
+                sync.open_link()
+                sync.cf.log.add_config(config)
+                config.data_received_cb.add_callback(self.__retrieve_log)
+                config.start()
+            except Exception as e:
+                print('Exception: {}'.format(e))
+
 
     def send_command(self, command: COMMANDS, links = []) -> None:
 
