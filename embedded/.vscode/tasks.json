@@ -55,7 +55,7 @@
       "options": {
         "cwd": "${workspaceFolder}/shared-firmware/validate"
       },
-      "command": "rm -rf build/bin && cd build && cmake ../ && make -j`nproc` && ./shared_firmware"
+      "command": "rm -rf build/bin && mkdir -p build && cd build && cmake ../ && make -j`nproc` && ./shared_firmware"
     },
     {
       "label": "Test simulation firmware",
