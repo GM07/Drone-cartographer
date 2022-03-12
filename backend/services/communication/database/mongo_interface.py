@@ -42,9 +42,12 @@ class Mission:
     maps: List[List[Point]]
     logs: Logs
 
-    def __init__(self, flight_duration: float, number_of_drones: int,
-                 is_simulated: bool, total_distance: float,
-                 maps: List[List[Point]]):
+    def __init__(self,
+                 flight_duration: float,
+                 number_of_drones: int,
+                 is_simulated: bool,
+                 total_distance: float,
+                 maps: List[List[Point]] = [[]]):
 
         self.flight_duration = flight_duration
         self.number_of_drones = number_of_drones

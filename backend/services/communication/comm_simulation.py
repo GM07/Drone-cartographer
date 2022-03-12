@@ -12,6 +12,7 @@ import queue
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
 from services.communication.database.mongo_interface import Mission
+from time import perf_counter
 
 
 class CommSimulation(AbstractComm):
@@ -46,11 +47,15 @@ class CommSimulation(AbstractComm):
 
         self.__COMMANDS_THREAD.start()
         self.__RECEIVE_THREAD.start()
+        self.mission_start_time = perf_counter()
+        self.mission_end_time = 0
         self.current_mission = Mission(0, len(drone_list), True, 0, [[]])
 
     def shutdown(self):
         #add mission update with values for distance and flight_duration
         # also start timer at the beggining
+        self.mission_end_time = perf_counter()
+        self.current_mission.flight_duration = self.mission_start_time - self.mission_end_time
         self.threadActive = False
         for server, connection in self.command_servers.items():
             server.shutdown(socket.SHUT_RDWR)

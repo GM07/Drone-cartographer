@@ -6,6 +6,7 @@ from cflib.crazyflie.log import LogConfig
 from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
 from services.communication.database.mongo_interface import Mission
+from time import perf_counter
 
 
 class CommCrazyflie(AbstractComm):
@@ -26,7 +27,10 @@ class CommCrazyflie(AbstractComm):
         self.sync_crazyflies: list[SyncCrazyflie] = []
         self.__init_drivers()
         self.setup_log()
-        self.current_mission = Mission()
+        self.start_time = perf_counter()
+        self.end_time: int = 0
+        self.current_mission = Mission(0, len(self.crazyflies), False, 0)
+
         self.current_mission.is_simulated = False
 
     def __del__(self):
@@ -77,5 +81,7 @@ class CommCrazyflie(AbstractComm):
         print('[%d][%s]: %s' % (timestamp, logconf.id, data))
 
     def send_command_to_all_drones(self, command):
+        self.current_mission.logs.commands.append(command)
+
         for drone in self.drone_list:
             self.send_command(command, drone['name'])
