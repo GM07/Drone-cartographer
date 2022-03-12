@@ -1,4 +1,4 @@
-import {Vec2d} from '../utils/vec2d';
+import {Vec2d} from '@/utils/vec2d';
 
 export const OPTIONS = {
   title: {

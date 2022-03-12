@@ -12,7 +12,7 @@
 import {Component, Vue, Prop} from 'vue-property-decorator';
 import {AgChartsVue} from 'ag-charts-vue';
 import {Vec2d} from '../utils/vec2d';
-import {OPTIONS} from './map_constants';
+import {OPTIONS} from '../utils/map_constants';
 import SocketIO from 'socket.io-client';
 import {
   SERVER_ADDRESS,
@@ -37,7 +37,6 @@ export default class Map extends Vue {
     const TEMPARRAYPERIM: Vec2d[] = [];
     let arrayIdx = 0;
 
-    console.log('NDRONES: ', this.NDRONES);
     for (let i = 0; i < this.NDRONES * 2; i++) {
       // Times 2 because position is a 2d vector
       TEMPARRAYDRONES[arrayIdx] = new Vec2d(array[i], array[++i]);
