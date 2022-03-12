@@ -18,13 +18,14 @@ class CommCrazyflie(AbstractComm):
     An example use is comm=CommCrazyflie([])
     comm.__init_drivers()"""
 
-    def __init__(self, links: List):
+    def __init__(self, links: list, drone_list=None):
 
         print('Creating Embedded Crazyflie communication')
         self.crazyflies: List[Crazyflie] = list(
             map(lambda link: Crazyflie(rw_cache='./cache'), links))
         self.links = links
         self.crazyflies_by_id: Dict[str, Crazyflie] = {}
+        self.drone_list = drone_list
         for link, crazyflie in zip(links, self.crazyflies):
             self.crazyflies_by_id[link] = crazyflie
         self.initialized_drivers = False
@@ -78,3 +79,7 @@ class CommCrazyflie(AbstractComm):
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print(f'{timestamp}{logconf.id}:{data}')
+
+    def send_command_to_all_drones(self, command):
+        for drone in self.drone_list:
+            self.send_command(command, drone['name'])

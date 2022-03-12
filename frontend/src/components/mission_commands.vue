@@ -45,9 +45,11 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import {ACCESSOR} from '@/store';
 import {ServerCommunication} from '@/communication/server_communication';
 import {AccessStatus} from '@/communication/access_status';
+import {Drone} from '@/communication/drone';
 
 @Component({})
 export default class MissionCommands extends Vue {
+  @Prop() private droneList!: Drone[];
   @Prop() private accessStatus!: AccessStatus;
   public isLaunchMissionSelected = false;
   public isTerminateMissionSelected = false;
@@ -67,9 +69,9 @@ export default class MissionCommands extends Vue {
   public launchMission(): void {
     if (ACCESSOR.missionStatus.isMissionStarted) return;
     this.isLaunchMissionSelected = true;
-
     const COMMAND_SENT = ServerCommunication.launchMission(
       this.accessStatus.isMissionSimulated,
+      this.droneList,
       () => {
         this.isLaunchMissionSelected = false;
       }

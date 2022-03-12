@@ -1,4 +1,5 @@
 import * as SERVER_CONSTANTS from '@/communication/server_constants';
+import {Drone} from '@/communication/drone';
 
 export class ServerCommunication {
   public static getConnectedDrones(): Promise<Response> {
@@ -61,12 +62,14 @@ export class ServerCommunication {
 
   public static launchMission(
     isMissionSimulated: boolean,
+    droneList: Drone[],
     callback: () => void
   ): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
         SERVER_CONSTANTS.LAUNCH_MISSION_ADDRESS,
         isMissionSimulated,
+        droneList,
         callback
       );
     }
