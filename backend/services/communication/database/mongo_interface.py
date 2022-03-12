@@ -11,6 +11,7 @@ from typing import List
 from pymongo import MongoClient
 from datetime import datetime
 from services.data.drone_data import DroneData
+from constants import COMMANDS
 
 
 @dataclass
@@ -20,7 +21,7 @@ class Logs:
 
     def __init__(self):
         self.drone_info = [[]]
-        self.commands = []
+        self.commands = [COMMANDS]
 
 
 @dataclass
@@ -51,7 +52,7 @@ class Mission:
         self.total_distance = total_distance
         self.maps = maps
         self.time_stamp = datetime.now().isoformat()
-        self.logs = Logs
+        self.logs = Logs()
 
 
 class Database:

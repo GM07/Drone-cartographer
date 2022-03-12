@@ -5,6 +5,7 @@ from cflib.crazyflie.log import LogConfig
 
 from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
+from services.communication.database.mongo_interface import Mission
 
 
 class CommCrazyflie(AbstractComm):
@@ -25,6 +26,8 @@ class CommCrazyflie(AbstractComm):
         self.sync_crazyflies: list[SyncCrazyflie] = []
         self.__init_drivers()
         self.setup_log()
+        self.current_mission = Mission()
+        self.current_mission.is_simulated = False
 
     def __del__(self):
         for sync in self.sync_crazyflies:

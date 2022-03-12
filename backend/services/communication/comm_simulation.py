@@ -11,6 +11,7 @@ import queue
 
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
+from services.communication.database.mongo_interface import Mission
 
 
 class CommSimulation(AbstractComm):
@@ -45,8 +46,11 @@ class CommSimulation(AbstractComm):
 
         self.__COMMANDS_THREAD.start()
         self.__RECEIVE_THREAD.start()
+        self.current_mission = Mission(0, len(drone_list), True, 0, [[]])
 
     def shutdown(self):
+        #add mission update with values for distance and flight_duration
+        # also start timer at the beggining
         self.threadActive = False
         for server, connection in self.command_servers.items():
             server.shutdown(socket.SHUT_RDWR)
@@ -60,6 +64,7 @@ class CommSimulation(AbstractComm):
 
     def send_command(self, command: COMMANDS):
         try:
+            self.current_mission.logs.commands.append(command)
             self.__COMMANDS_QUEUE.put_nowait(command)
         except queue.Full:
             pass
@@ -126,6 +131,7 @@ class CommSimulation(AbstractComm):
         at_least_one_connected = True
         while at_least_one_connected and self.threadActive:
             at_least_one_connected = False
+            count: int = 0
             for server in self.data_servers:
                 can_gather_data = self.data_servers[server] is not None
 
@@ -161,12 +167,14 @@ class CommSimulation(AbstractComm):
                         is_socket_broken = True
                     else:
                         data = DroneData(received)
-                        #Add log here
+                        self.current_mission.logs.drone_info[count].append(
+                            DroneData)
                         print(data)
 
                     if is_socket_broken:
                         print("Socket broken")
                         self.data_servers[server] = None
+                    count += 1
 
     def __thread_send_command(self):
         missing_connection = False
