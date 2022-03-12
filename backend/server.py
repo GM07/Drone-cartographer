@@ -142,6 +142,11 @@ def mission_connect():
     return ''
 
 
+@SOCKETIO.on('get_logs', namespace='/getLogs')
+def get_logs():
+    return COMM.logs
+
+
 if __name__ == '__main__':
     print('The backend is running on port 5000')
     SOCKETIO.run(APP, debug=False, host='0.0.0.0', port=5000)

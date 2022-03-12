@@ -1,11 +1,13 @@
 """This module is used to declare the Abstract communication class that
 is used to communicate """
 from abc import abstractmethod
+from typing import List
 from constants import COMMANDS
 
 
 class AbstractComm:
     DELAY_RECEIVER_MS = 1000
+    logs: List[str, str]
 
     @abstractmethod
     def send_command(self, command: COMMANDS) -> None:

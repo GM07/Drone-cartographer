@@ -5,7 +5,7 @@ from time import sleep
 import socket
 import os, os.path
 import threading
-from typing import Dict
+from typing import Dict, List
 from constants import COMMANDS
 import queue
 
@@ -13,6 +13,7 @@ from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
 from services.communication.database.mongo_interface import Mission
 from time import perf_counter
+from datetime import datetime
 
 
 class CommSimulation(AbstractComm):
@@ -50,12 +51,13 @@ class CommSimulation(AbstractComm):
         self.mission_start_time = perf_counter()
         self.mission_end_time = 0
         self.current_mission = Mission(0, len(drone_list), True, 0, [[]])
+        self.logs = List[str, str]
 
     def shutdown(self):
-        #add mission update with values for distance and flight_duration
-        # also start timer at the beggining
+
         self.mission_end_time = perf_counter()
         self.current_mission.flight_duration = self.mission_start_time - self.mission_end_time
+
         self.threadActive = False
         for server, connection in self.command_servers.items():
             server.shutdown(socket.SHUT_RDWR)
@@ -67,11 +69,13 @@ class CommSimulation(AbstractComm):
             if connection is not None:
                 connection.shutdown(socket.SHUT_RDWR)
 
+        self.current_mission.logs = self.logs.copy()
+
     def send_command(self, command: COMMANDS):
         try:
-            self.current_mission.logs.commands.append(command)
             self.__COMMANDS_QUEUE.put_nowait(command)
         except queue.Full:
+            self.logs.append(datetime.now().isoformat(), "Command queue full")
             pass
 
     def __init_server_bind(self, file_name: str):
@@ -172,11 +176,13 @@ class CommSimulation(AbstractComm):
                         is_socket_broken = True
                     else:
                         data = DroneData(received)
-                        self.current_mission.logs.drone_info[count].append(
-                            DroneData)
+                        self.logs.append(datetime.now().isoformat(),
+                                         f'Drone {count}' + data.__str__())
                         print(data)
 
                     if is_socket_broken:
+                        self.logs.append(datetime.now().isoformat(),
+                                         f'Broken Socket no {count}')
                         print("Socket broken")
                         self.data_servers[server] = None
                     count += 1
@@ -189,9 +195,12 @@ class CommSimulation(AbstractComm):
             for server, conn in self.command_servers.items():
                 try:
                     conn.send(bytearray(command))
+                    self.logs.append(datetime.now().isoformat(), command)
                 except BrokenPipeError:
                     print('Command could not be sent, BrokenPipeError')
+                    self.logs.append(datetime.now().isoformat(), "Broken Pipe")
                     self.command_servers[server] = None
                     missing_connection = True
                 except socket.error:
+                    self.logs.append(datetime.now().isoformat(), "Socket error")
                     return

@@ -1,3 +1,4 @@
+from typing import List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
@@ -7,6 +8,7 @@ from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
 from services.communication.database.mongo_interface import Mission
 from time import perf_counter
+from datetime import datetime
 
 
 class CommCrazyflie(AbstractComm):
@@ -30,12 +32,18 @@ class CommCrazyflie(AbstractComm):
         self.start_time = perf_counter()
         self.end_time: int = 0
         self.current_mission = Mission(0, len(self.crazyflies), False, 0)
-
+        self.logs: List[str, str]
         self.current_mission.is_simulated = False
 
     def __del__(self):
         for sync in self.sync_crazyflies:
             sync.close_link()
+
+    def shutdown(self):
+        self.mission_end_time = perf_counter()
+        self.current_mission.flight_duration = self.start_time - self.end_time
+        self.current_mission.logs = self.logs
+        return super().shutdown()
 
     def __init_drivers(self):
         cflib.crtp.init_drivers()
@@ -79,9 +87,10 @@ class CommCrazyflie(AbstractComm):
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print('[%d][%s]: %s' % (timestamp, logconf.id, data))
+        self.logs.append(datetime.now().isoformat(), f'{logconf.id}{data} ')
 
     def send_command_to_all_drones(self, command):
-        self.current_mission.logs.commands.append(command)
+        self.logs.append(datetime.now().isoformat(), command)
 
         for drone in self.drone_list:
             self.send_command(command, drone['name'])

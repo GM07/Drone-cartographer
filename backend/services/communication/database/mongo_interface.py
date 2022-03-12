@@ -15,16 +15,6 @@ from constants import COMMANDS
 
 
 @dataclass
-class Logs:
-    drone_info: List[List[DroneData]]
-    commands: List[str]
-
-    def __init__(self):
-        self.drone_info = [[]]
-        self.commands = [COMMANDS]
-
-
-@dataclass
 class Point:
     x: float
     y: float
@@ -40,7 +30,7 @@ class Mission:
     is_simulated: bool
     total_distance: float
     maps: List[List[Point]]
-    logs: Logs
+    logs: List[str, str]
 
     def __init__(self,
                  flight_duration: float,
@@ -55,7 +45,7 @@ class Mission:
         self.total_distance = total_distance
         self.maps = maps
         self.time_stamp = datetime.now().isoformat()
-        self.logs = Logs()
+        self.logs = []
 
 
 class Database:
