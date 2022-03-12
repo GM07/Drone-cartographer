@@ -43,8 +43,3 @@ Vector3D& Vector3D::operator+=(const Vector3D& other) {
   m_z += other.m_z;
   return *this;
 }
-
-std::string Vector3D::toString() const {
-  return "x: " + std::to_string(m_x) + " y: " + std::to_string(m_y) +
-         " z: " + std::to_string(m_z);
-}

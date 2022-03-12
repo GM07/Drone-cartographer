@@ -28,8 +28,6 @@ class Vector3D {
   [[nodiscard]] float distanceTo(const Vector3D& other) const;
   [[nodiscard]] bool isAlmostEqual(const Vector3D& other,
                                    float threshold = kThreshold) const;
-  std::string toString() const;
-
   float m_x{0}, m_y{0}, m_z{0};
 };
 

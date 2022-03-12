@@ -43,7 +43,6 @@ class Drone {
 
   // Navigation Manager
   void step();
-  void squareTrajectory(float sideLength, bool relative);
 
   // Sensor Manager
   void updateSensorsData();

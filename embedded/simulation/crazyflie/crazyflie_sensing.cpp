@@ -90,6 +90,7 @@ void CCrazyflieSensing::printLogs() {
   logBuffer.str(std::string());
 }
 
+/****************************************/
 void CCrazyflieSensing::attemptSocketConnection() {
   constexpr uint32_t kDroneDelay = 25;
   while (true) {

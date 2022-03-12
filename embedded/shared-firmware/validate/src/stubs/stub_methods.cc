@@ -1,3 +1,6 @@
+#include <chrono>
+#include <thread>
+
 #include "components/drone.h"
 #include "controllers/firmware_controller.h"
 #include "utils/timer.h"
@@ -5,7 +8,9 @@
 /////////////////////////////////////////////////////////
 FirmwareController::FirmwareController() {}
 void FirmwareController::blinkLED(LED led) {}
-size_t FirmwareController::receiveMessage(void* message, size_t size) {}
+size_t FirmwareController::receiveMessage(void* message, size_t size) {
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
 void FirmwareController::sendMessage(void* message, size_t size) {}
 void Timer::delayMs(uint32_t delayMS) {}
 void FirmwareController::goTo(const Vector3D& location, bool isRelative) {}

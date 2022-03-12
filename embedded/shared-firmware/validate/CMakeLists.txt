@@ -48,7 +48,7 @@ target_include_directories(
 	"../../crazyflie-firmware/src/lib/CMSIS/STM32F4xx/Include/"
 	"../../crazyflie-firmware/vendor/CMSIS/CMSIS/Core/Include/")
 
-set(CMAKE_CXX_FLAGS "-Wno-return-type")
+set(CMAKE_CXX_FLAGS "-Wno-return-type --coverage")
 
 
 include(GoogleTest)

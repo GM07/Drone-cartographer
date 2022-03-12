@@ -7,6 +7,13 @@ constexpr float kDefaultX = 0.01f;
 constexpr float kDefaultY = -9.03f;
 constexpr float kDefaultZ = 154.18f;
 
+TEST(validateVector3D, shouldNotThrow) {
+  EXPECT_NO_THROW(({
+    Vector3D* vec1 = new Vector3D();
+    delete vec1;
+  }));
+}
+
 TEST(validateVector3D, plusOperator) {
   Vector3D vec1(kDefaultX, kDefaultY, kDefaultZ);
   Vector3D vec2(kDefaultX, kDefaultY, kDefaultZ);
