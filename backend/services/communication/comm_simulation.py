@@ -41,6 +41,12 @@ class CommSimulation(AbstractComm):
 
     def shutdown(self):
         self.threadActive = False
+        try:
+            self.__COMMANDS_QUEUE.get_nowait()
+        except queue.Empty:
+            pass
+        self.__COMMANDS_QUEUE.put_nowait(None)
+        
         for server, connection in self.command_servers.items():
             server.shutdown(socket.SHUT_RDWR)
             if connection is not None:
@@ -161,6 +167,8 @@ class CommSimulation(AbstractComm):
         missing_connection = False
         while not missing_connection and self.threadActive:
             command = self.__COMMANDS_QUEUE.get()
+            if command is None:
+                return
             print('Sending command ', command, ' to simulation')
             for server, conn in self.command_servers.items():
                 try:

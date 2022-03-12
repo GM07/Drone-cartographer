@@ -24,7 +24,7 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
 
-COMM : AbstractComm = AbstractComm()
+COMM : AbstractComm = CommCrazyflie(URI)
 
 @APP.route('/getDrones')
 def get_drones():
@@ -49,6 +49,7 @@ def launch(is_simulated: bool, drone_list):
     if(MissionStatus.get_mission_started() or not AccessStatus.is_request_valid(request)):
         return ''
 
+    COMM.shutdown()
     global COMM
     if is_simulated:
         configuration = SimulationConfiguration()
