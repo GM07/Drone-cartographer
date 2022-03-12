@@ -11,17 +11,18 @@ class CommCrazyflie(AbstractComm):
     """This class is used to communicate with the crazyflie
     drones"""
 
-    def __init__(self, links: list):
+    def __init__(self, links: list, drone_list=None):
 
         print('Creating Embedded Crazyflie communication')
         self.crazyflies: list[Crazyflie] = list(
             map(lambda link: Crazyflie(rw_cache='./cache'), links))
         self.links = links
         self.crazyflies_by_id = {}
+        self.drone_list = drone_list
         for link, crazyflie in zip(links, self.crazyflies):
             self.crazyflies_by_id[link] = crazyflie
         self.initialized_drivers = False
-        self.sync_crazyflies = []
+        self.sync_crazyflies: list[SyncCrazyflie] = []
         self.__init_drivers()
         self.setup_log()
 
@@ -71,3 +72,7 @@ class CommCrazyflie(AbstractComm):
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print('[%d][%s]: %s' % (timestamp, logconf.id, data))
+
+    def send_command_to_all_drones(self, command):
+        for drone in self.drone_list:
+            self.send_command(command, drone['name'])

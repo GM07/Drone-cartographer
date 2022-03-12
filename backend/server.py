@@ -12,9 +12,9 @@ from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
 import services.status.access_status as AccessStatus
 import services.status.mission_status as MissionStatus
+from services.communication.simulation_configuration import SimulationConfiguration
 from constants import MAX_TIMEOUT, COMMANDS, URI
 from services.communication.database.mongo_interface import Database
-import os
 
 # Flask application
 APP = Flask(__name__)
@@ -29,7 +29,8 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
-#COMM: AbstractComm = CommCrazyflie(URI)
+
+COMM: AbstractComm = AbstractComm()
 
 
 # Get drone addresses
@@ -48,25 +49,28 @@ def identify_drone(drone_addr):
     return 'Identified drone'
 
 
-# Launch mission
 @SOCKETIO.on('launch', namespace='/limitedAccess')
-def launch(is_simulated: bool):
-    #Add here logs
+def launch(is_simulated: bool, drone_list):
     if (MissionStatus.get_mission_started() or
             not AccessStatus.is_request_valid(request)):
         return ''
 
-    print('launch')
+    global COMM
     if is_simulated:
-        # pylint: disable=line-too-long
-        os.system(
-            "docker exec -d embedded /bin/bash -c \"echo 'IyEvYmluL2Jhc2gKQVJHT1NfTE9DPSQoZmluZCAvIC1pbmFtZSAiY3JhenlmbGllX3NlbnNpbmcuYXJnb3MiIDI+IC9kZXYvbnVsbCkKYXJnb3MzIC1jICRBUkdPU19MT0MK' | base64 -d | /bin/bash\""
-        )
+        configuration = SimulationConfiguration()
 
+        for drone in drone_list:
+            configuration.add_drone(drone)
+        configuration.add_obstacles()
+        configuration.launch()
 
-# pylint: enable=line-too-long
-    COMM.send_command(COMMANDS.LAUNCH.value)
+        COMM = CommSimulation(drone_list)
+        COMM.send_command(COMMANDS.LAUNCH.value)
+    else:
+        COMM = CommCrazyflie(drone_list)
+        COMM.send_command_to_all_drones(COMMANDS.LAUNCH.value)
 
+    AccessStatus.set_mission_type(SOCKETIO, is_simulated)
     MissionStatus.launch_mission(SOCKETIO)
     return 'Launched'
 
@@ -75,6 +79,7 @@ def launch(is_simulated: bool):
 def set_mission_type(is_simulated: bool):
     AccessStatus.set_mission_type(SOCKETIO, is_simulated, request.sid)
     global COMM
+    COMM.shutdown()
     if is_simulated:
         COMM = CommSimulation()
     else:
@@ -91,7 +96,10 @@ def terminate():
             not AccessStatus.is_request_valid(request)):
         return ''
 
-    COMM.send_command(COMMANDS.LAND.value)
+    if AccessStatus.get_mission_simulated():
+        COMM.send_command(COMMANDS.LAND.value)
+    else:
+        COMM.send_command_to_all_drones(COMMANDS.LAND.value)
 
     MissionStatus.terminate_mission(SOCKETIO)
     return 'Terminated'

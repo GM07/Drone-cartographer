@@ -25,6 +25,7 @@ class Point2D:
 
 
 class DroneState(Enum):
+    IDLE = 0
     TAKING_OFF = 1
     LANDING = 2
     DEAD = 3
@@ -35,12 +36,14 @@ class DroneState(Enum):
 class DroneData:
     """This class regroups all the data taken from the drones"""
 
-    #    def __init__(self, sensors: DroneSensors, position: Point2D,
-    #                 battery_level: float, state: DroneState):
-    #        self.sensors = sensors
-    #        self.position = position
-    #        self.battery_level = battery_level
-    #        self.state = state
+    DATA_SIZE: int = 32
+
+    def __init__(self, sensors: DroneSensors, position: Point2D,
+                 battery_level: float, state: DroneState):
+        self.sensors = sensors
+        self.position = position
+        self.battery_level = battery_level
+        self.state = state
 
     def __init__(self, data: bytes):
         self.__from_bytes(data)
