@@ -1,10 +1,8 @@
 #ifndef DRONE_H
 #define DRONE_H
 
-#include <stdlib.h>
-#include <time.h>
-
 #include <array>
+#include <random>
 
 #include "controllers/abstract_controller.h"
 #include "utils/commands.h"
@@ -15,13 +13,22 @@ constexpr float kTakeOffSpeed = 1.0f;
 constexpr float kLandingSpeed = 0.25f;
 constexpr float kHeight = 0.3f;
 constexpr int kMessageMaxSize = 32;
+constexpr size_t kNbStartingDirection = 8;
 
 class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
       : m_messageRX(), m_controller(controller) {
-    srand(time(NULL));
-    m_direction = startingDirection[rand() % startingDirection.size()];
+    static std::array<Vector3D, kNbStartingDirection> startingDirection{
+        {Vector3D(1.225F, 0.5F, 0.0F), Vector3D(0.5F, 1.225F, 0.0F),
+         Vector3D(-0.5F, 1.225F, 0.0F), Vector3D(-1.225F, 0.5F, 0.0F),
+         Vector3D(-1.225F, -0.5F, 0.0F), Vector3D(-0.5F, -1.225F, 0.0F),
+         Vector3D(0.5F, -1.225F, 0.0F), Vector3D(1.225F, -0.5F, 0.0F)}};
+
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> distribution(0, 7);
+    int direction = distribution(generator);
+    m_direction = startingDirection[direction];
   }
 
   Drone(const Drone& other) = delete;
@@ -65,5 +72,4 @@ class Drone {
  public:
   static Drone& getEmbeddedDrone();
 };
-
 #endif
