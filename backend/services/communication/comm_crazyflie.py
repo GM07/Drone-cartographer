@@ -61,7 +61,6 @@ class CommCrazyflie(AbstractComm):
 
 
     def send_command(self, command: COMMANDS, links = []) -> None:
-        print(links)
         sending_links = self.links if len(links) == 0 else links
 
         for link in sending_links:
