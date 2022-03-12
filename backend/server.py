@@ -2,11 +2,13 @@ from pickle import NONE
 from flask import jsonify, Flask, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
+from numpy import broadcast
 from services.communication.abstract_comm import AbstractComm
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
 import services.status.access_status as AccessStatus
 import services.status.mission_status as MissionStatus
+from services.map.map import Map
 from services.communication.simulation_configuration import SimulationConfiguration;
 from constants import MAX_TIMEOUT, COMMANDS, URI
 from services.communication.database.mongo_interface import Database
@@ -21,6 +23,9 @@ APP.config['SECRET_KEY'] = 'dev'
 # Socketio instance to communicate with frontend
 ASYNC_MODE = None
 SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
+
+# Map instance to store map exploration data
+MAP = Map()
 
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
@@ -51,8 +56,8 @@ def launch(is_simulated: bool, drone_list):
     if(MissionStatus.get_mission_started() or not AccessStatus.is_request_valid(request)):
         return ''
 
-    COMM.shutdown()
     global COMM
+    COMM.shutdown()
     if is_simulated:
         configuration = SimulationConfiguration()
         
@@ -134,6 +139,8 @@ def MissionConnect():
     MissionStatus.client_connected(SOCKETIO, request)
     return ''
 
+def send_data():
+    SOCKETIO.emit('getMapData', MAP.points, namespace='/getMapData', broadcast=True, include_self=False, skip_sid=True)
 
 if __name__ == '__main__':
     print('The backend is running on port 5000')
