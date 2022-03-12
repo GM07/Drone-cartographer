@@ -9,6 +9,8 @@ import services.status.access_status as AccessStatus
 import services.status.mission_status as MissionStatus
 from services.communication.simulation_configuration import SimulationConfiguration;
 from constants import MAX_TIMEOUT, COMMANDS, URI
+from services.communication.database.mongo_interface import Database
+import os
 
 # Flask application
 APP = Flask(__name__)
@@ -106,6 +108,11 @@ def request_control():
         MissionStatus.update_all_clients(SOCKETIO)
     return ''
 
+# Get Completed mission logs
+@APP.route('/getCompletedMissions')
+def retrieve_missions():
+    database_connection = Database()
+    return jsonify(database_connection.get_all_missions_time_stamps())
 
 @SOCKETIO.on('revoke_control', namespace="/limitedAccess")
 def revoke_control():
@@ -121,7 +128,6 @@ def disconnect():
     if change:
         MissionStatus.update_all_clients(SOCKETIO)
     return ''
-
 
 @SOCKETIO.on('connect', namespace="/getMissionStatus")
 def MissionConnect():
