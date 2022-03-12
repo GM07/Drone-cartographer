@@ -10,7 +10,6 @@ import services.status.mission_status as MissionStatus
 from services.communication.simulation_configuration import SimulationConfiguration;
 from constants import MAX_TIMEOUT, COMMANDS, URI
 from services.communication.database.mongo_interface import Database
-import os
 
 # Flask application
 APP = Flask(__name__)
@@ -26,7 +25,7 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
 
-COMM: AbstractComm = CommCrazyflie()
+COMM: AbstractComm = CommCrazyflie([])
 
 @APP.route('/getDrones')
 def get_drones():
@@ -49,8 +48,9 @@ def launch(is_simulated: bool, drone_list):
     if(MissionStatus.get_mission_started() or not AccessStatus.is_request_valid(request)):
         return ''
 
-    COMM.shutdown()
     global COMM
+    COMM.shutdown()
+    
     if is_simulated:
         configuration = SimulationConfiguration()
         
