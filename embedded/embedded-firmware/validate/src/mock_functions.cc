@@ -73,12 +73,8 @@ void estimatorKalmanGetEstimatedPos(point_t* pos) {}
 
 bool crtpCommanderHighLevelIsTrajectoryFinished() { return true; }
 
-int crtpCommanderHighLevelGoTo(const float x, const float y, const float z,
-                               const float yaw, const float duration_s,
-                               const bool relative) {
-  return 0;
-}
-
 void ledClearAll() {}
+
+void commanderNotifySetpointsStop(int remainValidMillisecs) {}
 
 void commanderSetSetpoint(setpoint_t* setpoint, int priority) {}

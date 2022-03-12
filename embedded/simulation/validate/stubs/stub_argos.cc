@@ -26,7 +26,7 @@ CCI_CrazyflieDistanceScannerSensor::GetReadingsMap() {
   return m_tReadingsMap;
 }
 void CCI_CrazyflieDistanceScannerSensor::ReadingsToLuaState(lua_State*) {}
-void CCI_QuadRotorPositionActuator::CreateLuaState(lua_State*) {}
+void CCI_QuadRotorSpeedActuator::CreateLuaState(lua_State*) {}
 void CCI_RangeAndBearingActuator::CreateLuaState(lua_State*) {}
 void CCI_RangeAndBearingSensor::CreateLuaState(lua_State*) {}
 void CCI_RangeAndBearingSensor::ReadingsToLuaState(lua_State*) {}

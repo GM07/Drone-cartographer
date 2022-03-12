@@ -27,12 +27,14 @@ SimulationController::~SimulationController() {
   }
 }
 
+// We multiply by 10 as we expect a reading in mm but receive a reading in cm
 void SimulationController::updateSensorsData() {
+  constexpr float kCmToMmFactor = 10.0F;
   data = {
-      m_abstractSensors->getFrontDistance() * 10.0f,
-      m_abstractSensors->getLeftDistance() * 10.0f,
-      m_abstractSensors->getBackDistance() * 10.0f,
-      m_abstractSensors->getRightDistance() * 10.0f,
+      m_abstractSensors->getFrontDistance() * kCmToMmFactor,
+      m_abstractSensors->getLeftDistance() * kCmToMmFactor,
+      m_abstractSensors->getBackDistance() * kCmToMmFactor,
+      m_abstractSensors->getRightDistance() * kCmToMmFactor,
       m_abstractSensors->getPosX(),
       m_abstractSensors->getPosY(),
       m_abstractSensors->getBatteryLevel(),
