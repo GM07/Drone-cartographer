@@ -98,4 +98,8 @@ export class ServerCommunication {
 
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
+
+  public static getCompletedMissions(): Promise<Response> {
+    return fetch(SERVER_CONSTANTS.GET_COMPLETED_MISSIONS);
+  }
 }
