@@ -39,6 +39,9 @@ void vTaskDelay(const TickType_t xTicksToDelay) {
 }
 
 ////////////////////////////////////////////////////////////////
+bool supervisorIsTumbled() { return mock->supervisorIsTumbled(); }
+
+////////////////////////////////////////////////////////////////
 size_t appchannelReceiveDataPacket(void* buffer, size_t max_length,
                                    int timeout_ms) {
   return 0;
@@ -48,6 +51,10 @@ int appchannelSendDataPacket(void* data, size_t length) { return 0; }
 paramVarId_t paramGetVarId(const char* group, const char* name) {
   return {0xffffu, 0xffffu};
 }
+
+logVarId_t logGetVarId(const char* group, const char* name) { return 0; }
+unsigned int logGetUint(logVarId_t varid) { return 0U; }
+float logGetFloat(logVarId_t varid) { return 0.0; }
 
 void paramSetInt(paramVarId_t varid, int valuei) {}
 
@@ -70,3 +77,5 @@ int crtpCommanderHighLevelGoTo(const float x, const float y, const float z,
                                const bool relative) {
   return 0;
 }
+
+void ledClearAll() {}

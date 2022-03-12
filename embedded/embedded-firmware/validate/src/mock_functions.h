@@ -1,6 +1,7 @@
 extern "C" {
 #include "FreeRTOS.h"
 #include "ledseq.h"
+#include "supervisor.h"
 #include "task.h"
 }
 
@@ -17,6 +18,7 @@ struct Functions {
   virtual void ledseqRegisterSequence(ledseqContext_t* context) = 0;
   virtual bool ledseqRun(ledseqContext_t* context) = 0;
   virtual void vTaskDelay(const TickType_t xTicksToDelay) = 0;
+  virtual bool supervisorIsTumbled() = 0;
 };
 
 struct FunctionsMock {
@@ -29,6 +31,7 @@ struct FunctionsMock {
   MOCK_METHOD1(ledseqRegisterSequence, void(ledseqContext_t*));
   MOCK_METHOD1(ledseqRun, bool(ledseqContext_t*));
   MOCK_METHOD1(vTaskDelay, void(const TickType_t));
+  MOCK_METHOD0(supervisorIsTumbled, bool());
 };
 
 extern FunctionsMock* mock;

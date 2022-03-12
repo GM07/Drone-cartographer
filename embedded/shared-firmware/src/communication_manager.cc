@@ -10,11 +10,8 @@ void Drone::communicationManagerTask() {
 
   while (true) {
     if (m_controller->receiveMessage(&m_messageRX, sizeof(m_messageRX)) != 0U) {
-      bool successfulCommand =
-          handleCommand(static_cast<Command>(m_messageRX[0]), &m_messageRX[1],
-                        sizeof(m_messageRX) - sizeof(Command));
-
-      m_controller->sendMessage(&successfulCommand, sizeof(successfulCommand));
+      handleCommand(static_cast<Command>(m_messageRX[0]), &m_messageRX[1],
+                    sizeof(m_messageRX) - sizeof(Command));
     }
 
     if (m_controller->state == State::kDead) {

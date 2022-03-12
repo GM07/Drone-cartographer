@@ -4,15 +4,30 @@
 #include <memory>
 #include <string>
 
+#include "sensors/abstract_sensors.h"
 #include "utils/directions.h"
 #include "utils/led.h"
 #include "utils/state.h"
 #include "utils/vector3d.h"
 
+// packs the bytes
+struct __attribute__((__packed__)) ControllerData {
+ public:
+  float front;
+  float left;
+  float back;
+  float right;
+  float posX;
+  float posY;
+  float batteryLevel;
+  int state;
+};
+
 class AbstractController {
  public:
   virtual ~AbstractController() = default;
   AbstractController() = default;
+  AbstractController(std::unique_ptr<AbstractSensors>&& abstractSensors);
   AbstractController(AbstractController&& other) = delete;
   AbstractController& operator=(AbstractController&& other) = delete;
   AbstractController(const AbstractController& other) = delete;
@@ -34,8 +49,12 @@ class AbstractController {
   virtual void blinkLED(LED led) = 0;
 
   virtual void delay(uint32_t ticks) = 0;
+  virtual void updateSensorsData() = 0;
+  virtual bool isDroneCrashed() const = 0;
 
   State state = State::kIdle;
+  std::unique_ptr<AbstractSensors> m_abstractSensors;
+  ControllerData data{};
 
  protected:
   Vector3D m_takeOffPosition;
