@@ -1,7 +1,7 @@
 #include "components/drone.h"
+#include "utils/math.h"
 
 constexpr float kMinDistanceObstacle = 200.0F;  // Millimeters
-constexpr float kComparisonFactor = 10e-3;
 
 void Drone::step() {
   updateCrashStatus();
@@ -50,12 +50,12 @@ void Drone::explore() {
     normal += Vector3D(0.0F, 1.0F, 0.0F);
   }
 
-  if (!normal.isAlmostEqual(Vector3D(), kComparisonFactor) &&
-      !normal.isAlmostEqual(m_direction, kComparisonFactor) &&
+  if (!areAlmostEqual(normal, Vector3D()) &&
+      !areAlmostEqual(normal, m_direction) &&
       !Vector3D::areSameDirection(m_direction, normal)) {
     Vector3D newDirection = m_direction.reflect(normal);
 
-    if (!m_direction.isAlmostEqual(newDirection, kComparisonFactor)) {
+    if (!areAlmostEqual(m_direction, newDirection)) {
       m_direction = newDirection;
     }
   }

@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include "utils/math.h"
 #include "utils/vector3d.h"
 
 constexpr float kDefaultX = 0.005f;
@@ -57,17 +58,17 @@ TEST(validateVector3D, notEqualOperator) {
   EXPECT_NE(vec1, vec2);
 }
 
-TEST(validateVector3D, isAlmostEqual) {
+TEST(validateVector3D, areAlmostEqual) {
   Vector3D vec1 = Vector3D(kDefaultX, kDefaultY, kDefaultZ);
   Vector3D vec2 = Vector3D(kDefaultX, kDefaultY, kDefaultZ);
 
-  EXPECT_TRUE(vec1.isAlmostEqual(vec2));
+  EXPECT_TRUE(areAlmostEqual(vec1, vec2));
 
   vec1 += Vector3D(kDefaultX, 0.0f, 0.0f);
-  EXPECT_TRUE(vec1.isAlmostEqual(vec2));
+  EXPECT_TRUE(areAlmostEqual(vec1, vec2));
 
   vec1 += Vector3D(0.0f, 0.0f, kDefaultZ);
-  EXPECT_FALSE(vec1.isAlmostEqual(vec2));
+  EXPECT_FALSE(areAlmostEqual(vec1, vec2));
 }
 
 TEST(validateVector3D, distanceTo) {
@@ -81,5 +82,5 @@ TEST(validateVector3D, reflect) {
   Vector3D vec2 = Vector3D(0.0f, -1.0f, 0.0f);
   Vector3D result = Vector3D(1.0f, 0.0f, 0.0f);
   Vector3D output = vec2.reflect(vec1);
-  EXPECT_TRUE(output.isAlmostEqual(result));
+  EXPECT_TRUE(areAlmostEqual(output, result));
 }
