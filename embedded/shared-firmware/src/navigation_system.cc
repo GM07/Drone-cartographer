@@ -4,7 +4,6 @@ void Drone::step() {
   updateCrashStatus();
   updateSensorsData();
 
-  constexpr float radius = 0.5;
   switch (m_controller->state) {
     case State::kIdle:
       break;
