@@ -7,6 +7,10 @@ void Drone::step() {
   updateCrashStatus();
   updateSensorsData();
 
+  // Get distance to takeoff for LED identifying
+  m_controller->sendP2PMessage(static_cast<void*>(&m_data), sizeof(m_data));
+  m_controller->receiveP2PMessage(m_peerData);
+
   switch (m_controller->state) {
     case State::kIdle:
       break;
@@ -51,14 +55,14 @@ void Drone::explore() {
   }
 
   if (!normal.isAlmostEqual(Vector3D(), kComparisonFactor) &&
-      !normal.isAlmostEqual(m_direction, kComparisonFactor) &&
-      !Vector3D::areSameDirection(m_direction, normal)) {
-    Vector3D newDirection = m_direction.reflect(normal);
+      !normal.isAlmostEqual(m_data.direction, kComparisonFactor) &&
+      !Vector3D::areSameDirection(m_data.direction, normal)) {
+    Vector3D newDirection = m_data.direction.reflect(normal);
 
-    if (!m_direction.isAlmostEqual(newDirection, kComparisonFactor)) {
-      m_direction = newDirection;
+    if (!m_data.direction.isAlmostEqual(newDirection, kComparisonFactor)) {
+      m_data.direction = newDirection;
     }
   }
 
-  m_controller->setVelocity(m_direction, kDroneSpeed);
+  m_controller->setVelocity(m_data.direction, kDroneSpeed);
 }

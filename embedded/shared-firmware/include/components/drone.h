@@ -2,16 +2,19 @@
 #define DRONE_H
 
 #include <array>
+#include <queue>
 #include <random>
 
 #include "controllers/abstract_controller.h"
 #include "utils/commands.h"
+#include "utils/droneData.h"
 
 // Meters and seconds
 constexpr float kDroneSpeed = 0.25f;
 constexpr float kTakeOffSpeed = 1.0f;
 constexpr float kLandingSpeed = 0.25f;
 constexpr float kHeight = 0.3f;
+constexpr int kMaxNbPeerData = 20;
 constexpr int kMessageMaxSize = 32;
 constexpr size_t kNbStartingDirection = 8;
 
@@ -25,10 +28,13 @@ class Drone {
          Vector3D(-1.225F, -0.5F, 0.0F), Vector3D(-0.5F, -1.225F, 0.0F),
          Vector3D(0.5F, -1.225F, 0.0F), Vector3D(1.225F, -0.5F, 0.0F)}};
 
+    // TODO - not truly random
     std::default_random_engine generator;
     std::uniform_int_distribution<int> distribution(0, 7);
     int direction = distribution(generator);
-    m_direction = startingDirection[direction];
+
+    m_data.direction = startingDirection[direction];
+    m_data.id = m_controller->getId();
   }
 
   Drone(const Drone& other) = delete;
@@ -64,12 +70,12 @@ class Drone {
   void updateSensorsData();
   void updateCrashStatus();
 
+  static Drone& getEmbeddedDrone();
+
  protected:
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
-  Vector3D m_direction;
-
- public:
-  static Drone& getEmbeddedDrone();
+  DroneData m_data;
+  std::unordered_map<size_t, DroneData> m_peerData;
 };
 #endif
