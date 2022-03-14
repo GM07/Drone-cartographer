@@ -69,11 +69,7 @@ void Drone::collisionAvoidance() {
     if (peerData.range <= kSimulationCollisionAvoidanceRange) {
       if (m_usedPeerData.find(peerData.id) == m_usedPeerData.end()) {
         m_usedPeerData.insert_or_assign(peerData.id, peerData);
-        if (Vector3D::areSameDirection(m_data.direction, peerData.direction)) {
-          m_normal += m_data.direction - peerData.direction;
-        } else {
-          m_normal += peerData.direction;
-        }
+        m_normal -= m_data.direction;
       }
     } else {
       m_usedPeerData.erase(peerData.id);
