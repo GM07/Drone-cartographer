@@ -23,19 +23,12 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import {SOCKETIO_GET_LOGS} from '@/communication/server_constants';
-import {ServerCommunication} from '@/communication/server_communication';
 
 @Component({})
 export default class LogsInterface extends Vue {
   private logs: Array<[string, string]> = [];
 
   private beforeCreate() {
-    ServerCommunication.getCurrentLogs()
-      .then(response => response.json())
-      .then((logs: Array<[string, string]>) => {
-        this.logs = logs;
-      });
-
     SOCKETIO_GET_LOGS.open();
     SOCKETIO_GET_LOGS.on('get_logs', (logs: Array<[string, string]>) => {
       const SCROLLBAR = document.getElementById('scroll');

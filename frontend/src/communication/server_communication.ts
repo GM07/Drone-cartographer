@@ -102,8 +102,4 @@ export class ServerCommunication {
   public static getCompletedMissions(): Promise<Response> {
     return fetch(SERVER_CONSTANTS.GET_COMPLETED_MISSIONS);
   }
-
-  public static getCurrentLogs(): Promise<Response> {
-    return fetch(SERVER_CONSTANTS.GET_CURRENT_LOGS);
-  }
 }

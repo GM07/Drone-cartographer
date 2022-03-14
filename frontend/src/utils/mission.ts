@@ -25,11 +25,6 @@ export interface DroneData {
   state: DroneState;
 }
 
-export interface Logs {
-  drone_info: [[DroneData]];
-  commands: [string];
-}
-
 export interface Mission {
   time_stamp: string;
   flight_duration: number;
@@ -37,5 +32,5 @@ export interface Mission {
   is_simulated: boolean;
   total_distance: number;
   maps: [[Point2d]];
-  logs: Logs;
+  logs: Array<[string, string]>;
 }

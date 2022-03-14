@@ -144,22 +144,17 @@ def mission_connect():
     return ''
 
 
-def test(arg):
-    print('hi')
-
-
-@SOCKETIO.on('get_logs', namespace='/getLogs')
+@SOCKETIO.on('connect', namespace='/getLogs')
 def send_logs():
-    print('here')
-    SOCKETIO.emit('get_logs',
-                  COMM.logs,
-                  namespace='/getLogs',
-                  broadcast=True,
-                  include_self=False,
-                  skip_sid=True,
-                  callback=test)
 
-    threading.Timer(2, send_logs).start()
+    SOCKETIO.emit(
+        'get_logs',
+        COMM.logs,
+        namespace='/getLogs',
+        broadcast=True,
+        include_self=False,
+        skip_sid=True,
+    )
 
 
 @APP.route('/getCurrentLogs')
