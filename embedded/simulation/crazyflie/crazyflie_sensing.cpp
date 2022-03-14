@@ -63,6 +63,10 @@ void CCrazyflieSensing::Init(argos::TConfigurationNode& /*t_node*/) {
   m_pcRNG = CRandom::CreateRNG("argos");
 
   m_uiCurrentStep = 0;
+
+  // Initialize drone
+  m_drone.initDrone();
+
   Reset();
 }
 

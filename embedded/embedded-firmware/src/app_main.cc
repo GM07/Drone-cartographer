@@ -63,6 +63,7 @@ extern "C" void appMain() {
   ledClearAll();
   addLoggingVariables();
   enableCrtpHighLevelCommander();
+  Drone::getEmbeddedDrone().initDrone();
 
   while (true) {
     Drone::getEmbeddedDrone().updateSensorsData();

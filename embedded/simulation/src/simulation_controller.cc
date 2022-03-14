@@ -168,10 +168,12 @@ void SimulationController::receiveP2PMessage(
       m_ccrazyflieSensing->m_pcRABS->GetReadings();
   for (auto reading : readings) {
     DroneData data((DroneData*)reading.Data.ToCArray());
+    data.range = reading.Range;
     p2pData.insert_or_assign(data.id, data);
   }
 }
 
 size_t SimulationController::getId() {
+  log(m_ccrazyflieSensing->GetId());
   return std::hash<std::string>{}(m_ccrazyflieSensing->GetId());
 }

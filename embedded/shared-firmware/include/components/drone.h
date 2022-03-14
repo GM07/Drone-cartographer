@@ -16,6 +16,7 @@ constexpr float kLandingSpeed = 0.25f;
 constexpr float kHeight = 0.3f;
 constexpr int kMaxNbPeerData = 20;
 constexpr int kMessageMaxSize = 32;
+constexpr float kSimulationCollisionAvoidanceRange = 20.0F;
 constexpr size_t kNbStartingDirection = 8;
 
 class Drone {
@@ -34,7 +35,6 @@ class Drone {
     int direction = distribution(generator);
 
     m_data.direction = startingDirection[direction];
-    m_data.id = m_controller->getId();
   }
 
   Drone(const Drone& other) = delete;
@@ -65,10 +65,14 @@ class Drone {
   // Navigation Manager
   void step();
   void explore();
+  void collisionAvoidance();
 
   // Sensor Manager
   void updateSensorsData();
   void updateCrashStatus();
+
+  // Initialisation
+  void initDrone();
 
   static Drone& getEmbeddedDrone();
 

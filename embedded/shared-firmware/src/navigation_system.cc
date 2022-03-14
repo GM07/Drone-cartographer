@@ -26,6 +26,8 @@ void Drone::step() {
       break;
     case State::kExploring:
       explore();
+      collisionAvoidance();
+      m_controller->setVelocity(m_data.direction, kDroneSpeed);
     default:
       break;
   }
@@ -63,6 +65,21 @@ void Drone::explore() {
       m_data.direction = newDirection;
     }
   }
-
-  m_controller->setVelocity(m_data.direction, kDroneSpeed);
 }
+
+void Drone::collisionAvoidance() {
+  for (auto data : m_peerData) {
+    size_t peerId = data.first;
+    DroneData peerData = data.second;
+
+    // The lowest priority changes direction
+    if (m_data.id > peerId) continue;
+
+    if (peerData.range <= kSimulationCollisionAvoidanceRange) {
+      m_data.direction.m_x = -peerData.direction.m_x;
+      m_data.direction.m_y = -peerData.direction.m_y;
+    }
+  }
+}
+
+void Drone::initDrone() { m_data.id = m_controller->getId(); }
