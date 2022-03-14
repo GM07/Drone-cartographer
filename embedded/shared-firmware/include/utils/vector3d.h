@@ -27,11 +27,16 @@ class Vector3D {
   [[nodiscard]] bool operator!=(const Vector3D& other) const;
 
   [[nodiscard]] float distanceTo(const Vector3D& other) const;
-  [[nodiscard]] bool isAlmostEqual(const Vector3D& other,
-                                   float threshold = kThreshold) const;
   [[nodiscard]] Vector3D reflect(const Vector3D& normal) const;
   [[nodiscard]] Vector3D toUnitVector() const;
   [[nodiscard]] float length() const;
+  [[nodiscard]] inline bool operator<(float value) const {
+    return this->length() < value;
+  }
+
+  [[nodiscard]] inline bool operator>(float value) const {
+    return this->length() > value;
+  }
 
   static bool areSameDirection(const Vector3D& vec1, const Vector3D& vec2);
   std::string toString() const;

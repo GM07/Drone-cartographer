@@ -11,7 +11,7 @@
                                  library="build/simulation/crazyflie/libcrazyflie_sensing">
       <actuators>
         <range_and_bearing  implementation="default" />
-        <quadrotor_position implementation="default" />
+        <quadrotor_speed implementation="default" />
       </actuators>
       <sensors>
         <range_and_bearing      implementation="medium" medium="rab" show_rays="false" />
