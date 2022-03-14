@@ -56,9 +56,6 @@ class CommSimulation(AbstractComm):
 
     def shutdown(self):
 
-        self.mission_end_time = perf_counter()
-        self.current_mission.flight_duration = self.mission_start_time - self.mission_end_time
-        self.current_mission.logs = self.logs.copy()
         self.threadActive = False
         for server, connection in self.command_servers.items():
             server.shutdown(socket.SHUT_RDWR)
@@ -70,8 +67,6 @@ class CommSimulation(AbstractComm):
             if connection is not None:
                 connection.shutdown(socket.SHUT_RDWR)
 
-        database = Database()
-        database.upload_mission_info(self.current_mission)
         return super().shutdown()
 
     def send_command(self, command: COMMANDS):
