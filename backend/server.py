@@ -10,7 +10,6 @@ import services.status.mission_status as MissionStatus
 from services.communication.simulation_configuration import SimulationConfiguration;
 from constants import MAX_TIMEOUT, COMMANDS, URI
 from services.communication.database.mongo_interface import Database
-import os
 
 # Flask application
 APP = Flask(__name__)
@@ -26,33 +25,32 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
 
-COMM : AbstractComm = CommCrazyflie(URI)
+COMM: AbstractComm = CommCrazyflie([])
 
 @APP.route('/getDrones')
 def get_drones():
     return jsonify(URI)
 
+
 # Identifying drones
-
-
 @SOCKETIO.on('identify_drone', namespace="/limitedAccess")
 def identify_drone(drone_addr):
     if not AccessStatus.is_request_valid(request):
         return ''
 
-    COMM.send_command(COMMANDS.IDENTIFY.value, links=[drone_addr])
+    COMM.send_command(COMMANDS.IDENTIFY.value, [drone_addr])
     return 'Identified drone'
 
+
 # Launch mission
-
-
 @SOCKETIO.on('launch', namespace="/limitedAccess")
 def launch(is_simulated: bool, drone_list):
     if(MissionStatus.get_mission_started() or not AccessStatus.is_request_valid(request)):
         return ''
 
-    COMM.shutdown()
     global COMM
+    COMM.shutdown()
+    
     if is_simulated:
         configuration = SimulationConfiguration()
         
@@ -62,11 +60,10 @@ def launch(is_simulated: bool, drone_list):
         configuration.launch()
 
         COMM = CommSimulation(drone_list)
-        COMM.send_command(COMMANDS.LAUNCH.value)
     else:
         COMM = CommCrazyflie(drone_list)
-        COMM.send_command_to_all_drones(COMMANDS.LAUNCH.value)
 
+    COMM.send_command(COMMANDS.LAUNCH.value)
     AccessStatus.set_mission_type(SOCKETIO, is_simulated)
     MissionStatus.launch_mission(SOCKETIO)
     return 'Launched'
@@ -83,18 +80,14 @@ def set_mission_type(is_simulated: bool):
         COMM = CommCrazyflie(URI)
     return ''
 
+
 # Terminate mission
-
-
 @SOCKETIO.on('terminate', namespace="/limitedAccess")
 def terminate():
     if(not MissionStatus.get_mission_started() or not AccessStatus.is_request_valid(request)):
         return ''
 
-    if AccessStatus.get_mission_simulated():
-        COMM.send_command(COMMANDS.LAND.value)
-    else:
-        COMM.send_command_to_all_drones(COMMANDS.LAND.value)
+    COMM.send_command(COMMANDS.LAND.value)
 
 
     MissionStatus.terminate_mission(SOCKETIO)

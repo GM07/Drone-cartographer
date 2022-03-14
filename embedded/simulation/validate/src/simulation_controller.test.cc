@@ -7,7 +7,7 @@
 #include "controllers/simulation_controller.h"
 #include "stubSocket.h"
 #include "stub_cci_positioning_sensor.h"
-#include "stub_cci_quadrotor_position_actuator.h"
+#include "stub_cci_quadrotor_speed_actuator.h"
 #include "stub_crazyflie_sensing.h"
 #include "stub_simulation_sensors.h"
 
@@ -49,7 +49,7 @@ TEST(validateSimulationController, logShouldAddSomethingToBuffer) {
 
 TEST(validateSimulationController, takeOffShouldDoSomethingIfValidHeight) {
   StubCCrazyflieSensing crazyflie;
-  StubCCIQuadrotorPositionActuator propellers;
+  StubCCIQuadrotorSpeedActuator propellers;
   argos::StubCCIPositioningSensor positionSensor;
   SimulationController controller(&crazyflie);
 
@@ -57,7 +57,7 @@ TEST(validateSimulationController, takeOffShouldDoSomethingIfValidHeight) {
   crazyflie.m_pcPropellers = &propellers;
   crazyflie.m_pcPos = &positionSensor;
 
-  EXPECT_CALL(propellers, SetAbsolutePosition(_)).Times(1);
+  EXPECT_CALL(propellers, SetLinearVelocity(_)).Times(1);
 
   controller.takeOff(1.0f);
 }

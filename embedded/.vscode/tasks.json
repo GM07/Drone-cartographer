@@ -47,7 +47,7 @@
       "options": {
         "cwd": "${workspaceFolder}/embedded-firmware/validate"
       },
-      "command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./embedded_firmware"
+      "command": "rm -rf build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./embedded_firmware"
     },
     {
       "label": "Test shared firmware",
@@ -55,7 +55,7 @@
       "options": {
         "cwd": "${workspaceFolder}/shared-firmware/validate"
       },
-      "command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./shared_firmware"
+      "command": "rm -rf build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./shared_firmware"
     },
     {
       "label": "Test simulation firmware",
@@ -63,7 +63,7 @@
       "options": {
         "cwd": "${workspaceFolder}/simulation/validate"
       },
-      "command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./simulation_firmware"
+      "command": "rm -rf build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./simulation_firmware"
     },
     {
       "label": "Test All",

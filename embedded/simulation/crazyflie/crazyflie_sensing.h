@@ -19,7 +19,7 @@
 /* Definition of the crazyflie distance sensor */
 #include <argos3/plugins/robots/crazyflie/control_interface/ci_crazyflie_distance_scanner_sensor.h>
 /* Definition of the crazyflie position actuator */
-#include <argos3/plugins/robots/generic/control_interface/ci_quadrotor_position_actuator.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_quadrotor_speed_actuator.h>
 /* Definition of the crazyflie position sensor */
 #include <argos3/plugins/robots/generic/control_interface/ci_positioning_sensor.h>
 /* Definition of the crazyflie range and bearing actuator */
@@ -90,8 +90,8 @@ class CCrazyflieSensing : public argos::CCI_Controller {
   /* Pointer to the crazyflie distance sensor */
   argos::CCI_CrazyflieDistanceScannerSensor* m_pcDistance{nullptr};
 
-  /* Pointer to the position actuator */
-  argos::CCI_QuadRotorPositionActuator* m_pcPropellers{nullptr};
+  /* Pointer to the speed actuator */
+  argos::CCI_QuadRotorSpeedActuator* m_pcPropellers{nullptr};
 
   /* Pointer to the range and bearing actuator */
   argos::CCI_RangeAndBearingActuator* m_pcRABA{nullptr};

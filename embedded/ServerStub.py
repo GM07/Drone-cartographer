@@ -23,11 +23,11 @@ class Commands:
   kTakeOff = 0x02
   kLand = 0x03
 
-nConnections = 8
+nConnections = 1
 identifier = "s"
 
 # CHANGE TO FALSE TO CONTROL REAL DRONE
-is_simulation = True
+is_simulation = False
 
 servers = []
 clients = []
