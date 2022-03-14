@@ -2,7 +2,6 @@ from pickle import NONE
 from flask import jsonify, Flask, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from numpy import broadcast
 from services.communication.abstract_comm import AbstractComm
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
@@ -79,6 +78,7 @@ def launch(is_simulated: bool, drone_list):
 
 @SOCKETIO.on('set_mission_type', namespace="/limitedAccess")
 def set_mission_type(is_simulated: bool):
+    send_data()
     AccessStatus.set_mission_type(SOCKETIO, is_simulated, request.sid)
     global COMM
     COMM.shutdown()
