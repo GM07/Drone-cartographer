@@ -33,7 +33,8 @@ export default class LogsInterface extends Vue {
     ServerCommunication.getCurrentLogs()
       .then(response => response.json())
       .then((logs: Array<[string, string]>) => {
-        this.logs.push(...logs);
+        console.log(logs);
+        this.logs = logs;
       });
     console.log('here');
     SOCKETIO_GET_LOGS.open();

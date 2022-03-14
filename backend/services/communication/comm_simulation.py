@@ -12,7 +12,7 @@ import queue
 from flask_socketio import SocketIO
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
-from services.communication.database.mongo_interface import Mission
+from services.communication.database.mongo_interface import Mission, Database
 from time import perf_counter
 from datetime import datetime
 
@@ -58,7 +58,7 @@ class CommSimulation(AbstractComm):
 
         self.mission_end_time = perf_counter()
         self.current_mission.flight_duration = self.mission_start_time - self.mission_end_time
-
+        self.current_mission.logs = self.logs.copy()
         self.threadActive = False
         for server, connection in self.command_servers.items():
             server.shutdown(socket.SHUT_RDWR)
@@ -70,7 +70,9 @@ class CommSimulation(AbstractComm):
             if connection is not None:
                 connection.shutdown(socket.SHUT_RDWR)
 
-        self.current_mission.logs = self.logs.copy()
+        database = Database()
+        database.upload_mission_info(self.current_mission)
+        return super().shutdown()
 
     def send_command(self, command: COMMANDS):
         try:

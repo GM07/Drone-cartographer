@@ -42,9 +42,7 @@ class CommCrazyflie(AbstractComm):
             sync.close_link()
 
     def shutdown(self):
-        self.mission_end_time = perf_counter()
-        self.current_mission.flight_duration = self.start_time - self.end_time
-        self.current_mission.logs = self.logs
+
         return super().shutdown()
 
     def __init_drivers(self):
