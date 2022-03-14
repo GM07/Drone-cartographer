@@ -17,6 +17,7 @@ void Drone::step() {
     case State::kTakingOff:
       if (m_controller->isTrajectoryFinished()) {
         m_controller->state = State::kExploring;
+        m_controller->setVelocity(m_data.direction, kDroneSpeed);
       }
       break;
     case State::kLanding:
@@ -25,52 +26,43 @@ void Drone::step() {
       }
       break;
     case State::kExploring:
+      m_normal = Vector3D();
       explore();
       collisionAvoidance();
-      m_controller->setVelocity(m_data.direction, kDroneSpeed);
+      changeDirection();
     default:
       break;
   }
 }
 
 void Drone::explore() {
-  Vector3D normal;
-
   if (m_controller->data.front > 0 &&
       m_controller->data.front <= kMinDistanceObstacle) {
-    normal += Vector3D(-1.0F, 0.0F, 0.0F);
+    m_normal += Vector3D(-1.0F, 0.0F, 0.0F);
   }
 
   if (m_controller->data.back > 0 &&
       m_controller->data.back <= kMinDistanceObstacle) {
-    normal += Vector3D(1.0F, 0.0F, 0.0F);
+    m_normal += Vector3D(1.0F, 0.0F, 0.0F);
   }
 
   if (m_controller->data.left > 0 &&
       m_controller->data.left <= kMinDistanceObstacle) {
-    normal += Vector3D(0.0F, -1.0F, 0.0F);
+    m_normal += Vector3D(0.0F, -1.0F, 0.0F);
   }
 
   if (m_controller->data.right > 0 &&
       m_controller->data.right <= kMinDistanceObstacle) {
-    normal += Vector3D(0.0F, 1.0F, 0.0F);
+    m_normal += Vector3D(0.0F, 1.0F, 0.0F);
   }
 
-  if (!normal.isAlmostEqual(Vector3D(), kComparisonFactor) &&
-      !normal.isAlmostEqual(m_data.direction, kComparisonFactor) &&
-      !Vector3D::areSameDirection(m_data.direction, normal)) {
-    Vector3D newDirection = m_data.direction.reflect(normal);
-
-    m_usedPeerData.clear();
-
-    if (!m_data.direction.isAlmostEqual(newDirection, kComparisonFactor)) {
-      m_data.direction = newDirection;
-    }
+  if (m_normal.isAlmostEqual(m_data.direction, kComparisonFactor) ||
+      Vector3D::areSameDirection(m_data.direction, m_normal)) {
+    m_normal = Vector3D();
   }
 }
 // 3250
 void Drone::collisionAvoidance() {
-  Vector3D normal;
   for (auto data : m_peerData) {
     DroneData peerData = data.second;
 
@@ -78,21 +70,24 @@ void Drone::collisionAvoidance() {
       if (m_usedPeerData.find(peerData.id) == m_usedPeerData.end()) {
         m_usedPeerData.insert_or_assign(peerData.id, peerData);
         if (Vector3D::areSameDirection(m_data.direction, peerData.direction)) {
-          normal += m_data.direction - peerData.direction;
+          m_normal += m_data.direction - peerData.direction;
         } else {
-          normal += peerData.direction;
+          m_normal += peerData.direction;
         }
       }
     } else {
       m_usedPeerData.erase(peerData.id);
     }
   }
+}
 
-  if (!normal.isAlmostEqual(Vector3D(), kComparisonFactor)) {
-    Vector3D newDirection = m_data.direction.reflect(normal);
+void Drone::changeDirection() {
+  if (!m_normal.isAlmostEqual(Vector3D(), kComparisonFactor)) {
+    Vector3D newDirection = m_data.direction.reflect(m_normal);
 
     if (!m_data.direction.isAlmostEqual(newDirection, kComparisonFactor)) {
       m_data.direction = newDirection;
+      m_controller->setVelocity(m_data.direction, kDroneSpeed);
     }
   }
 }

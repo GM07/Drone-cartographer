@@ -65,6 +65,7 @@ class Drone {
   void step();
   void explore();
   void collisionAvoidance();
+  void changeDirection();
 
   // Sensor Manager
   void updateSensorsData();
@@ -81,5 +82,6 @@ class Drone {
   DroneData m_data;
   std::unordered_map<size_t, DroneData> m_peerData;
   std::unordered_map<size_t, DroneData> m_usedPeerData;
+  Vector3D m_normal;
 };
 #endif
