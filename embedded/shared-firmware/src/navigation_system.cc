@@ -7,7 +7,6 @@ void Drone::step() {
   updateCrashStatus();
   updateSensorsData();
 
-  // TODO : sending and receiving P2P messages needs to be done in a thread/task
   m_controller->sendP2PMessage(static_cast<void*>(&m_data), sizeof(m_data));
   m_controller->receiveP2PMessage(m_peerData);
 
