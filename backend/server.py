@@ -117,17 +117,11 @@ def set_mission_type(is_simulated: bool):
         COMM = CommCrazyflie(URI)
     return ''
 
-<<<<<<< HEAD
 
 # Terminate mission
 
 
 @SOCKETIO.on('terminate', namespace='/limitedAccess')
-=======
-
-# Terminate mission
-@SOCKETIO.on('terminate', namespace="/limitedAccess")
->>>>>>> 205a72dabc869e35c3a047148f56ae32db1c2dc7
 def terminate():
     if (not MissionStatus.get_mission_started() or
             not AccessStatus.is_request_valid(request)):
