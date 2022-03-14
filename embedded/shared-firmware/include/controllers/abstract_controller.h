@@ -34,7 +34,7 @@ class AbstractController {
   AbstractController(const AbstractController& other) = delete;
   AbstractController& operator=(const AbstractController& other) = delete;
 
-  virtual void goTo(const Vector3D& location, bool isRelative) = 0;
+  virtual void setVelocity(const Vector3D& direction, float speed) = 0;
   virtual void takeOff(float height) = 0;
   virtual void land() = 0;
 

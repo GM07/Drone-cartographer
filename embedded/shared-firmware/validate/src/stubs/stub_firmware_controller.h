@@ -13,5 +13,6 @@ class StubController : public FirmwareController {
   MOCK_METHOD2(receiveMessage, size_t(void*, size_t));
   MOCK_METHOD0(updateSensorsData, void());
   MOCK_CONST_METHOD0(isDroneCrashed, bool());
+  MOCK_METHOD2(setVelocity, void(const Vector3D&, float));
   MOCK_CONST_METHOD0(isTrajectoryFinished, bool());
 };
