@@ -27,7 +27,10 @@ APP.config['SECRET_KEY'] = 'dev'
 
 # Socketio instance to communicate with frontend
 
-SOCKETIO = SocketIO(APP, cors_allowed_origins='*', logger=True)
+SOCKETIO = SocketIO(APP,
+                    async_mode='gevent',
+                    cors_allowed_origins='*',
+                    logger=True)
 
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'

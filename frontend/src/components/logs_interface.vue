@@ -35,7 +35,7 @@ export default class LogsInterface extends Vue {
       .then((logs: Array<[string, string]>) => {
         this.logs = logs;
       });
-    console.log('here');
+
     SOCKETIO_GET_LOGS.open();
     SOCKETIO_GET_LOGS.on('get_logs', (logs: Array<[string, string]>) => {
       const SCROLLBAR = document.getElementById('scroll');
