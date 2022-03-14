@@ -7,6 +7,7 @@ extern "C" {
 #include "log.h"
 #include "param_logic.h"
 #include "static_mem.h"
+#include "supervisor.h"
 #include "task.h"
 }
 
@@ -37,6 +38,13 @@ void communicationManagerInit() {
 bool communicationManagerTest() { return isInit; }
 
 /////////////////////////////////////////////////////////////////////////
+void updateCrashStatus() {
+  if (supervisorIsTumbled()) {
+    Drone::getEmbeddedDrone().getController()->state = State::kCrash;
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////
 void enableCrtpHighLevelCommander() {
   paramVarId_t paramIdCommanderEnHighLevel =
       paramGetVarId("commander", "enHighLevel");
@@ -57,6 +65,9 @@ extern "C" void appMain() {
   enableCrtpHighLevelCommander();
 
   while (true) {
+    Drone::getEmbeddedDrone().updateSensorsData();
+    updateCrashStatus();
+
     Drone::getEmbeddedDrone().step();
   }
 }

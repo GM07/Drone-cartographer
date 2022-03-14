@@ -1,17 +1,17 @@
 #include "components/drone.h"
+#include "utils/math.h"
+
+constexpr float kMinDistanceObstacle = 200.0F;  // Millimeters
 
 void Drone::step() {
   updateCrashStatus();
   updateSensorsData();
 
-  constexpr float radius = 0.5;
   switch (m_controller->state) {
     case State::kIdle:
       break;
     case State::kTakingOff:
       if (m_controller->isTrajectoryFinished()) {
-        // DEBUG ONLY REMOVE AFTER
-        explorationDirection = Direction::kFront;
         m_controller->state = State::kExploring;
       }
       break;
@@ -20,43 +20,45 @@ void Drone::step() {
         m_controller->state = State::kIdle;
       }
       break;
-    // DEBUG ONLY REMOVE AFTER
     case State::kExploring:
-      squareTrajectory(radius, false);
+      explore();
     default:
       break;
   }
 }
 
-void Drone::squareTrajectory(float sideLength, bool relative) {
-  if (m_controller->isTrajectoryFinished()) {
-    Vector3D destination;
-    switch (explorationDirection) {
-      case Direction::kFront:
-        destination = Vector3D(sideLength, 0.0, 0.0);
-        explorationDirection = Direction::kRight;
-        break;
-      case Direction::kRight:
-        destination = Vector3D(0.0, sideLength, 0.0);
-        explorationDirection = Direction::kBack;
-        break;
-      case Direction::kBack:
-        destination = Vector3D(-sideLength, 0.0, 0.0);
-        explorationDirection = Direction::kLeft;
-        break;
-      case Direction::kLeft:
-        destination = Vector3D(0.0, -sideLength, 0.0);
-        explorationDirection = Direction::kFront;
-        break;
-      default:
-        destination = Vector3D(0.0, 0.0, 0.0);
-        break;
-    }
+void Drone::explore() {
+  Vector3D normal;
 
-    // Absolute position are relative to m_takeOffPosition
-    if (!relative) {
-      destination += m_controller->getCurrentLocation();
-    }
-    m_controller->goTo(destination, relative);
+  if (m_controller->data.front > 0 &&
+      m_controller->data.front <= kMinDistanceObstacle) {
+    normal += Vector3D(-1.0F, 0.0F, 0.0F);
   }
+
+  if (m_controller->data.back > 0 &&
+      m_controller->data.back <= kMinDistanceObstacle) {
+    normal += Vector3D(1.0F, 0.0F, 0.0F);
+  }
+
+  if (m_controller->data.left > 0 &&
+      m_controller->data.left <= kMinDistanceObstacle) {
+    normal += Vector3D(0.0F, -1.0F, 0.0F);
+  }
+
+  if (m_controller->data.right > 0 &&
+      m_controller->data.right <= kMinDistanceObstacle) {
+    normal += Vector3D(0.0F, 1.0F, 0.0F);
+  }
+
+  if (!areAlmostEqual(normal, Vector3D()) &&
+      !areAlmostEqual(normal, m_direction) &&
+      !Vector3D::areSameDirection(m_direction, normal)) {
+    Vector3D newDirection = m_direction.reflect(normal);
+
+    if (!areAlmostEqual(m_direction, newDirection)) {
+      m_direction = newDirection;
+    }
+  }
+
+  m_controller->setVelocity(m_direction, kDroneSpeed);
 }

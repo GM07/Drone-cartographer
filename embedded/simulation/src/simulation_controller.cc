@@ -6,6 +6,7 @@
 
 #include "sensors/simulation_sensors.h"
 #include "utils/led.h"
+#include "utils/math.h"
 #include "utils/timer.h"
 
 using ::argos::CVector3;
@@ -27,12 +28,14 @@ SimulationController::~SimulationController() {
   }
 }
 
+// We multiply by 10 as we expect a reading in mm but receive a reading in cm
 void SimulationController::updateSensorsData() {
+  constexpr float kCmToMmFactor = 10.0F;
   data = {
-      m_abstractSensors->getFrontDistance(),
-      m_abstractSensors->getLeftDistance(),
-      m_abstractSensors->getBackDistance(),
-      m_abstractSensors->getRightDistance(),
+      m_abstractSensors->getFrontDistance() * kCmToMmFactor,
+      m_abstractSensors->getLeftDistance() * kCmToMmFactor,
+      m_abstractSensors->getBackDistance() * kCmToMmFactor,
+      m_abstractSensors->getRightDistance() * kCmToMmFactor,
       m_abstractSensors->getPosX(),
       m_abstractSensors->getPosY(),
       m_abstractSensors->getBatteryLevel(),
@@ -125,16 +128,16 @@ void SimulationController::takeOff(float height) {
   // We need to add the old m_takeOffPosition to get the new one.
   m_takeOffPosition = getCurrentLocation() + m_takeOffPosition;
 
-  // We takeOff using absolute position to prevent multiple takeOff from
-  // stacking one on top of the other
-  goTo(Vector3D(0, 0, height), false);
+  m_targetPosition = getCurrentLocation() + Vector3D(0, 0, height);
+
+  setVelocity(Vector3D(0, 0, height), kTakeOffSpeed);
 }
 
 ///////////////////////////////////////////////////
 void SimulationController::land() {
   Vector3D pos = getCurrentLocation();
-  pos.m_z = 0.0;
-  goTo(pos, false);
+  m_targetPosition = Vector3D(pos.m_x, pos.m_z, 0.0);
+  setVelocity(Vector3D(0, 0, -pos.m_z), kLandingSpeed);
 }
 
 // All positions are relative to takeOff position
@@ -146,17 +149,11 @@ Vector3D SimulationController::getCurrentLocation() const {
 }
 
 bool SimulationController::isTrajectoryFinished() const {
-  return getCurrentLocation().isAlmostEqual(m_targetPosition);
+  return areAlmostEqual(getCurrentLocation(), m_targetPosition);
 }
 
-void SimulationController::goTo(const Vector3D& location, bool isRelative) {
-  if (isRelative) {
-    m_targetPosition = getCurrentLocation() + location;
-  } else {
-    m_targetPosition = location;
-  }
-
-  Vector3D simulationPosition = m_takeOffPosition + m_targetPosition;
-  m_ccrazyflieSensing->m_pcPropellers->SetAbsolutePosition(CVector3(
-      simulationPosition.m_x, simulationPosition.m_y, simulationPosition.m_z));
+void SimulationController::setVelocity(const Vector3D& direction, float speed) {
+  Vector3D speedVector = direction.toUnitVector() * speed;
+  m_ccrazyflieSensing->m_pcPropellers->SetLinearVelocity(
+      CVector3(speedVector.m_x, speedVector.m_y, speedVector.m_z));
 }
