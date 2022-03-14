@@ -9,6 +9,7 @@ from typing import Dict, List
 from constants import COMMANDS
 import queue
 
+from flask_socketio import SocketIO
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
 from services.communication.database.mongo_interface import Mission
@@ -21,7 +22,8 @@ class CommSimulation(AbstractComm):
     __SOCKET_COMMAND_PATH = '/tmp/socket/{}'
     __SOCKET_DATA_PATH = '/tmp/socket/data{}'
 
-    def __init__(self, drone_list=[]):
+    def __init__(self, socket_io: SocketIO, drone_list=[]):
+        super().__init__(socket_io)
         self.nb_connections = len(drone_list)
 
         self.threadActive = True
@@ -51,7 +53,6 @@ class CommSimulation(AbstractComm):
         self.mission_start_time = perf_counter()
         self.mission_end_time = 0
         self.current_mission = Mission(0, len(drone_list), True, 0, [[]])
-        self.logs = List[str, str]
 
     def shutdown(self):
 
@@ -75,7 +76,7 @@ class CommSimulation(AbstractComm):
         try:
             self.__COMMANDS_QUEUE.put_nowait(command)
         except queue.Full:
-            self.logs.append(datetime.now().isoformat(), "Command queue full")
+            self.send_log([(datetime.now().isoformat(), "Command queue full")])
             pass
 
     def __init_server_bind(self, file_name: str):
@@ -142,21 +143,19 @@ class CommSimulation(AbstractComm):
             at_least_one_connected = False
             count: int = 0
             for server in self.data_servers:
-                can_gather_data = self.data_servers[server] is not None
 
-                if not can_gather_data:
+                if not self.data_servers[server] is not None:
                     try:
                         server.setblocking(False)
                         new_conn, addr = server.accept()
                         self.data_servers[server] = new_conn
-                        can_gather_data = True
                     except socket.error as socket_error:
                         if socket_error.errno == EINVAL:
                             return
                         elif socket_error.errno != EWOULDBLOCK:
                             raise
 
-                if can_gather_data:
+                if self.data_servers[server] is not None:
                     at_least_one_connected = True
                     is_socket_broken = False
                     try:
@@ -165,27 +164,28 @@ class CommSimulation(AbstractComm):
                     except socket.error:
                         is_socket_broken = True
 
-                    if len(received) > 0:
-                        try:
-                            self.data_servers[server].send(
-                                ACK.to_bytes(1, 'big'))
-                        except (BrokenPipeError, socket.error):
-                            is_socket_broken = True
-
                     if len(received) == 0:
                         is_socket_broken = True
                     else:
                         data = DroneData(received)
-                        self.logs.append(datetime.now().isoformat(),
-                                         f'Drone {count}' + data.__str__())
+                        self.send_log([(datetime.now().isoformat(),
+                                        f'Drone {count}' + data.__str__())])
                         print(data)
-
                     if is_socket_broken:
-                        self.logs.append(datetime.now().isoformat(),
-                                         f'Broken Socket no {count}')
+                        self.send_log([(datetime.now().isoformat(),
+                                        f'Broken Socket no {count}')])
                         print("Socket broken")
                         self.data_servers[server] = None
                     count += 1
+
+            sleep(0.500)
+
+            for server in self.data_servers:
+                if self.data_servers[server] is not None:
+                    try:
+                        self.data_servers[server].send(ACK.to_bytes(1, 'big'))
+                    except (BrokenPipeError, socket.error):
+                        self.data_servers[server] = None
 
     def __thread_send_command(self):
         missing_connection = False
@@ -195,12 +195,14 @@ class CommSimulation(AbstractComm):
             for server, conn in self.command_servers.items():
                 try:
                     conn.send(bytearray(command))
-                    self.logs.append(datetime.now().isoformat(), command)
+
+                    self.send_log([(datetime.now().isoformat(), command)])
                 except BrokenPipeError:
                     print('Command could not be sent, BrokenPipeError')
-                    self.logs.append(datetime.now().isoformat(), "Broken Pipe")
+                    self.send_log([(datetime.now().isoformat(), 'Broken Pipe')])
                     self.command_servers[server] = None
                     missing_connection = True
                 except socket.error:
-                    self.logs.append(datetime.now().isoformat(), "Socket error")
+                    self.send_log([(datetime.now().isoformat(), 'Socket error')
+                                  ])
                     return

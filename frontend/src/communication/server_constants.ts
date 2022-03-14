@@ -13,11 +13,15 @@ export const TERMINATE_MISSION_ADDRESS = 'terminate';
 export const SET_MISSION_TYPE_ADDRESS = 'set_mission_type';
 export const GET_MISSION_STATUS_NAMESPACE = '/getMissionStatus';
 export const LIMITED_ACCESS_NAMESPACE = '/limitedAccess';
+export const GET_LOGS_NAMESPACE = '/getLogs';
 export const HTTP_OK = 200;
 
 export const SOCKETIO_SERVER_STATUS = SocketIO(
   SERVER_ADDRESS + GET_MISSION_STATUS_NAMESPACE
 );
+export const SOCKETIO_GET_LOGS = SocketIO(SERVER_ADDRESS + GET_LOGS_NAMESPACE, {
+  transports: ['websocket'],
+}).close();
 
 export const SOCKETIO_LIMITED_ACCESS = SocketIO(
   SERVER_ADDRESS + LIMITED_ACCESS_NAMESPACE

@@ -1,3 +1,4 @@
+from flask_socketio import SocketIO
 from typing import List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
@@ -15,8 +16,9 @@ class CommCrazyflie(AbstractComm):
     """This class is used to communicate with the crazyflie
     drones"""
 
-    def __init__(self, links: list, drone_list=None):
+    def __init__(self, socket_io: SocketIO, links: list, drone_list=None):
 
+        super().__init__(socket_io)
         print('Creating Embedded Crazyflie communication')
         self.crazyflies: list[Crazyflie] = list(
             map(lambda link: Crazyflie(rw_cache='./cache'), links))
@@ -32,7 +34,7 @@ class CommCrazyflie(AbstractComm):
         self.start_time = perf_counter()
         self.end_time: int = 0
         self.current_mission = Mission(0, len(self.crazyflies), False, 0)
-        self.logs: List[str, str]
+
         self.current_mission.is_simulated = False
 
     def __del__(self):
@@ -87,10 +89,10 @@ class CommCrazyflie(AbstractComm):
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print('[%d][%s]: %s' % (timestamp, logconf.id, data))
-        self.logs.append(datetime.now().isoformat(), f'{logconf.id}{data} ')
+        self.send_log(tuple(datetime.now().isoformat(), f'{logconf.id}{data} '))
 
     def send_command_to_all_drones(self, command):
-        self.logs.append(datetime.now().isoformat(), command)
+        self.send_log(tuple(datetime.now().isoformat(), command))
 
         for drone in self.drone_list:
             self.send_command(command, drone['name'])

@@ -1,10 +1,10 @@
 """Root of the Flask Backend for the drone application
 Defines all routes in this file"""
-import os
 import services.status.access_status as AccessStatus
 import services.status.mission_status as MissionStatus
 
 from flask import jsonify, Flask, request
+import threading
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from services.communication.abstract_comm import AbstractComm
@@ -30,7 +30,7 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
 
-COMM: AbstractComm = AbstractComm()
+COMM: AbstractComm = AbstractComm(SOCKETIO)
 
 
 # Get drone addresses
@@ -64,10 +64,10 @@ def launch(is_simulated: bool, drone_list):
         configuration.add_obstacles()
         configuration.launch()
 
-        COMM = CommSimulation(drone_list)
+        COMM = CommSimulation(SOCKETIO, drone_list)
         COMM.send_command(COMMANDS.LAUNCH.value)
     else:
-        COMM = CommCrazyflie(drone_list)
+        COMM = CommCrazyflie(SOCKETIO, drone_list)
         COMM.send_command_to_all_drones(COMMANDS.LAUNCH.value)
 
     AccessStatus.set_mission_type(SOCKETIO, is_simulated)
@@ -81,9 +81,9 @@ def set_mission_type(is_simulated: bool):
     global COMM
     COMM.shutdown()
     if is_simulated:
-        COMM = CommSimulation()
+        COMM = CommSimulation(SOCKETIO)
     else:
-        COMM = CommCrazyflie(URI)
+        COMM = CommCrazyflie(SOCKETIO, URI)
     return ''
 
 
@@ -142,11 +142,26 @@ def mission_connect():
     return ''
 
 
+def test(arg):
+    print('hi')
+
+
 @SOCKETIO.on('get_logs', namespace='/getLogs')
-def get_logs():
-    return COMM.logs
+def send_logs():
+    print('here')
+    SOCKETIO.emit('get_logs',
+                  COMM.logs,
+                  namespace='/getLogs',
+                  broadcast=True,
+                  include_self=False,
+                  skip_sid=True,
+                  callback=test)
+
+    threading.Timer(2, send_logs).start()
 
 
 if __name__ == '__main__':
     print('The backend is running on port 5000')
+    print(SOCKETIO.async_mode)
+
     SOCKETIO.run(APP, debug=False, host='0.0.0.0', port=5000)

@@ -37,7 +37,7 @@
       @addDrone="addDrone"
       @setDroneMenuOpen="setDroneMenuOpen"
     ></drone-menu>
-
+    <LogsInterface />
     <v-navigation-drawer app permanent touchless>
       <div id="top">
         <NavigationCommands :accessStatus="accessStatus" />
@@ -89,9 +89,16 @@ import DroneMenu from '@/components/drone_menu.vue';
 import {SOCKETIO_LIMITED_ACCESS} from '@/communication/server_constants';
 import {AccessStatus} from '@/communication/access_status';
 import {Drone} from '@/communication/drone';
+import LogsInterface from '@/components/logs_interface.vue';
 
 @Component({
-  components: {DroneCommands, MissionCommands, NavigationCommands, DroneMenu},
+  components: {
+    DroneCommands,
+    MissionCommands,
+    NavigationCommands,
+    DroneMenu,
+    LogsInterface,
+  },
 })
 export default class Mission extends Vue {
   public droneList: Drone[] = [];
