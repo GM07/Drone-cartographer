@@ -30,14 +30,14 @@
         </v-btn>
       </v-btn-toggle>
     </v-app-bar>
-
+    <LogsInterface />
     <drone-menu
       :droneList="droneList"
       :isDroneMenuOpen="isDroneMenuOpen"
       @addDrone="addDrone"
       @setDroneMenuOpen="setDroneMenuOpen"
     ></drone-menu>
-    <LogsInterface />
+
     <v-navigation-drawer app permanent touchless>
       <div id="top">
         <NavigationCommands :accessStatus="accessStatus" />

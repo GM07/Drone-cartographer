@@ -1,6 +1,22 @@
 <template>
-  <v-virtual-scroll height="100" item-height="20">
-    <div v-for="log in logs" :key="log[0]">Test</div>
+  <v-virtual-scroll
+    id="scroll"
+    height="100"
+    item-height="20"
+    :items="this.logs"
+    style="z-index: 10"
+  >
+    <template v-slot:default="{item}">
+      <v-list-item :key="item[0]">
+        <v-list-item-content>
+          <v-list-item-title>
+            <strong> {{ item }}</strong>
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-divider></v-divider>
+    </template>
   </v-virtual-scroll>
 </template>
 
@@ -14,10 +30,14 @@ export default class LogsInterface extends Vue {
 
   private beforeCreate() {
     SOCKETIO_GET_LOGS.open();
-
     SOCKETIO_GET_LOGS.on('get_logs', (logs: Array<[string, string]>) => {
       this.logs.push(...logs);
       console.log(this.logs);
+      const SCROLLBAR = document.getElementById('scroll');
+      if (SCROLLBAR)
+        this.$nextTick(() => {
+          SCROLLBAR.scrollTop = SCROLLBAR.scrollHeight;
+        });
     });
   }
   private destroyed() {

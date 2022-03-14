@@ -22,6 +22,7 @@ class AbstractComm:
                               broadcast=True,
                               include_self=False,
                               skip_sid=True)
+
         self.logs += log
 
     @abstractmethod
