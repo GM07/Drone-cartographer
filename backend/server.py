@@ -9,17 +9,11 @@ from flask_cors import CORS
 from services.communication.abstract_comm import AbstractComm
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
-<<<<<<< HEAD
-from services.communication.database.mongo_interface import Database
-from services.communication.simulation_configuration import SimulationConfiguration
-from constants import COMMANDS, URI
-=======
 import services.status.access_status as AccessStatus
 import services.status.mission_status as MissionStatus
-from services.communication.simulation_configuration import SimulationConfiguration;
+from services.communication.simulation_configuration import SimulationConfiguration
 from constants import MAX_TIMEOUT, COMMANDS, URI
 from services.communication.database.mongo_interface import Database
->>>>>>> 205a72dabc869e35c3a047148f56ae32db1c2dc7
 
 # Flask application
 APP = Flask(__name__)
@@ -35,40 +29,16 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
 
-<<<<<<< HEAD
-COMM: AbstractComm = AbstractComm()
-
-=======
 COMM: AbstractComm = CommCrazyflie([])
->>>>>>> 205a72dabc869e35c3a047148f56ae32db1c2dc7
+
 
 @APP.route('/getDrones')
 def get_drones():
     return jsonify(URI)
 
-<<<<<<< HEAD
 
 # Identifying drones
-
-
 @SOCKETIO.on('identify_drone', namespace='/limitedAccess')
-def identify_drone(drone_addr):
-    if not AccessStatus.is_request_valid(request):
-        return ''
-    #pylint:disable-all
-    COMM.send_command(COMMANDS.IDENTIFY.value, links=[drone_addr])
-    #pylint:emable-all
-    return 'Identified drone'
-
-
-# Launch mission
-
-
-@SOCKETIO.on('launch', namespace='/limitedAccess')
-=======
-
-# Identifying drones
-@SOCKETIO.on('identify_drone', namespace="/limitedAccess")
 def identify_drone(drone_addr):
     if not AccessStatus.is_request_valid(request):
         return ''
@@ -79,7 +49,6 @@ def identify_drone(drone_addr):
 
 # Launch mission
 @SOCKETIO.on('launch', namespace="/limitedAccess")
->>>>>>> 205a72dabc869e35c3a047148f56ae32db1c2dc7
 def launch(is_simulated: bool, drone_list):
     if (MissionStatus.get_mission_started() or
             not AccessStatus.is_request_valid(request)):
@@ -87,7 +56,7 @@ def launch(is_simulated: bool, drone_list):
 
     global COMM
     COMM.shutdown()
-    
+
     if is_simulated:
         configuration = SimulationConfiguration()
 
@@ -140,11 +109,13 @@ def request_control():
         MissionStatus.update_all_clients(SOCKETIO)
     return ''
 
+
 # Get Completed mission logs
 @APP.route('/getCompletedMissions')
 def retrieve_missions():
     database_connection = Database()
     return jsonify(database_connection.get_all_missions_time_stamps())
+
 
 # Get Completed mission logs
 @APP.route('/getCompletedMissions')

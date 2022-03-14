@@ -60,7 +60,7 @@ class CommSimulation(AbstractComm):
         except queue.Empty:
             pass
         self.__COMMANDS_QUEUE.put_nowait(None)
-        
+
         for server, connection in self.command_servers.items():
             server.shutdown(socket.SHUT_RDWR)
             if connection is not None:

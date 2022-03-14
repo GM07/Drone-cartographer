@@ -21,7 +21,8 @@ class CommCrazyflie(AbstractComm):
 
         print('Creating Embedded Crazyflie communication')
         self.links = list(map(lambda drone: drone['name'], drone_list))
-        self.crazyflies: list[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
+        self.crazyflies: list[Crazyflie] = list(
+            map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
         self.crazyflies_by_id = dict()
         self.drone_list = drone_list
         for link, crazyflie in zip(self.links, self.crazyflies):
@@ -55,7 +56,6 @@ class CommCrazyflie(AbstractComm):
             log_config.cf = crazyflie
             self.log_configs.append(log_config)
 
-
         self.sync_crazyflies = []
         for link, crazyflie in zip(self.links, self.crazyflies):
             self.sync_crazyflies.append(SyncCrazyflie(link, cf=crazyflie))
@@ -69,8 +69,7 @@ class CommCrazyflie(AbstractComm):
             except Exception as e:
                 print('Exception: {}'.format(e))
 
-
-    def send_command(self, command: COMMANDS, links = []) -> None:
+    def send_command(self, command: COMMANDS, links=[]) -> None:
         sending_links = self.links if len(links) == 0 else links
 
         for link in sending_links:
@@ -80,4 +79,3 @@ class CommCrazyflie(AbstractComm):
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print(f'{timestamp}{logconf.id}:{data}')
-
