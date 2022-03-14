@@ -37,14 +37,11 @@ export default class Map extends Vue {
     const TEMPARRAYPERIM: Vec2d[] = [];
     let arrayIdx = 0;
 
-    for (let i = 0; i < this.NDRONES * 2; i++) {
-      // Times 2 because position is a 2d vector
-      TEMPARRAYDRONES[arrayIdx] = new Vec2d(array[i], array[++i]);
-      arrayIdx++;
-    }
-    arrayIdx = 0;
-    for (let i = this.NDRONES * 2; i < array.length; i++) {
-      TEMPARRAYPERIM[arrayIdx] = new Vec2d(array[i], array[++i]);
+    for (let i = 0; i < this.NDRONES * 2; i += 2) {
+      TEMPARRAYDRONES[arrayIdx] = new Vec2d(array[i], array[i + 1]);
+
+      const J = this.NDRONES * 2 - i;
+      TEMPARRAYPERIM[arrayIdx] = new Vec2d(array[J], array[J + 1]);
       arrayIdx++;
     }
 
