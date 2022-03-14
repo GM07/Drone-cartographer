@@ -26,7 +26,7 @@ void Drone::step() {
       break;
     case State::kExploring:
       m_normal = Vector3D();
-      explore();
+      wallAvoidance();
       collisionAvoidance();
       changeDirection();
     default:
@@ -34,7 +34,7 @@ void Drone::step() {
   }
 }
 
-void Drone::explore() {
+void Drone::wallAvoidance() {
   if (m_controller->data.front > 0 &&
       m_controller->data.front <= kMinDistanceObstacle) {
     m_normal += Vector3D(-1.0F, 0.0F, 0.0F);
@@ -43,6 +43,16 @@ void Drone::explore() {
   if (m_controller->data.back > 0 &&
       m_controller->data.back <= kMinDistanceObstacle) {
     m_normal += Vector3D(1.0F, 0.0F, 0.0F);
+  }
+
+  // This extra condition makes sure that if we are trapped between walls we
+  // move away from the closest one
+  if (m_controller->data.back > 0 && m_controller->data.front > 0 &&
+      m_controller->data.back <= kMinDistanceObstacle &&
+      m_controller->data.front <= kMinDistanceObstacle) {
+    m_normal += m_controller->data.back < m_controller->data.front
+                    ? Vector3D(1.0F, 0.0F, 0.0F)
+                    : Vector3D(-1.0F, 0.0F, 0.0F);
   }
 
   if (m_controller->data.left > 0 &&
@@ -55,12 +65,22 @@ void Drone::explore() {
     m_normal += Vector3D(0.0F, 1.0F, 0.0F);
   }
 
+  // This extra condition makes sure that if we are trapped between walls we
+  // move away from the closest one
+  if (m_controller->data.left > 0 && m_controller->data.right > 0 &&
+      m_controller->data.left <= kMinDistanceObstacle &&
+      m_controller->data.right <= kMinDistanceObstacle) {
+    m_normal += m_controller->data.left < m_controller->data.right
+                    ? Vector3D(0.0F, -1.0F, 0.0F)
+                    : Vector3D(0.0F, 1.0F, 0.0F);
+  }
+
   if (m_normal.isAlmostEqual(m_data.direction, kComparisonFactor) ||
       Vector3D::areSameDirection(m_data.direction, m_normal)) {
     m_normal = Vector3D();
   }
 }
-// 3250
+
 void Drone::collisionAvoidance() {
   for (auto data : m_peerData) {
     DroneData peerData = data.second;

@@ -63,7 +63,7 @@ class Drone {
 
   // Navigation Manager
   void step();
-  void explore();
+  void wallAvoidance();
   void collisionAvoidance();
   void changeDirection();
 
