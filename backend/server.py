@@ -1,3 +1,6 @@
+from gevent import monkey
+monkey.patch_all()
+
 from pickle import NONE
 from flask import jsonify, Flask, request
 from flask_socketio import SocketIO
@@ -7,7 +10,6 @@ from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
 import services.status.access_status as AccessStatus
 import services.status.mission_status as MissionStatus
-from services.map.map import Map
 from services.communication.simulation_configuration import SimulationConfiguration;
 from constants import MAX_TIMEOUT, COMMANDS, URI
 from services.communication.database.mongo_interface import Database
@@ -19,17 +21,17 @@ CORS(APP)
 APP.config['SECRET_KEY'] = 'dev'
 
 # Socketio instance to communicate with frontend
-ASYNC_MODE = None
+ASYNC_MODE = 'gevent'
 SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 
 # Map instance to store map exploration data
-MAP = Map()
+#MAP = Map()
 
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
 
-COMM: AbstractComm = CommCrazyflie([])
+COMM: AbstractComm = CommSimulation(SOCKETIO, [{'name': 's0', 'xPos': 0, 'yPos': 0}])
 
 @APP.route('/getDrones')
 def get_drones():
@@ -63,9 +65,9 @@ def launch(is_simulated: bool, drone_list):
         configuration.add_obstacles()
         configuration.launch()
 
-        COMM = CommSimulation(drone_list)
+        COMM = CommSimulation(SOCKETIO, drone_list)
     else:
-        COMM = CommCrazyflie(drone_list)
+        COMM = CommCrazyflie(SOCKETIO, drone_list)
 
     COMM.send_command(COMMANDS.LAUNCH.value)
     AccessStatus.set_mission_type(SOCKETIO, is_simulated)
@@ -75,14 +77,13 @@ def launch(is_simulated: bool, drone_list):
 
 @SOCKETIO.on('set_mission_type', namespace="/limitedAccess")
 def set_mission_type(is_simulated: bool):
-    send_data()
     AccessStatus.set_mission_type(SOCKETIO, is_simulated, request.sid)
     global COMM
     COMM.shutdown()
     if is_simulated:
-        COMM = CommSimulation()
+        COMM = CommSimulation(SOCKETIO)
     else:
-        COMM = CommCrazyflie(URI)
+        COMM = CommCrazyflie(SOCKETIO, URI)
     return ''
 
 
@@ -132,8 +133,8 @@ def MissionConnect():
     MissionStatus.client_connected(SOCKETIO, request)
     return ''
 
-def send_data():
-    SOCKETIO.emit('getMapData', MAP.points, namespace='/getMapData', broadcast=True, include_self=False, skip_sid=True)
+def send_data(points):
+    SOCKETIO.emit('getMapData', points, namespace='/getMapData', broadcast=True, include_self=False, skip_sid=True)
 
 if __name__ == '__main__':
     print('The backend is running on port 5000')

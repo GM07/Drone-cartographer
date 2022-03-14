@@ -8,6 +8,8 @@ import threading
 from typing import Dict
 from constants import COMMANDS
 import queue
+from flask_socketio import SocketIO
+import random
 
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
@@ -17,7 +19,8 @@ class CommSimulation(AbstractComm):
     __SOCKET_COMMAND_PATH = '/tmp/socket/{}'
     __SOCKET_DATA_PATH = '/tmp/socket/data{}'
 
-    def __init__(self, drone_list = []):
+    def __init__(self, socketIO: SocketIO, drone_list = []):
+        super().__init__(socketIO)
         self.nb_connections = len(drone_list)
 
         self.threadActive = True
@@ -157,6 +160,19 @@ class CommSimulation(AbstractComm):
                     else:
                         data = DroneData(received)
                         print(data)
+                        data.position = [random.randint(0, 10), random.randint(0, 10)]
+                        data.sensors.front = random.randint(0, 10)
+                        data.sensors.right = random.randint(0, 10)
+                        data.sensors.back = random.randint(0, 10)
+                        data.sensors.left = random.randint(0, 10)
+                        self.SOCKETIO.emit('getMapData',
+                                    {"position": data.position, 
+                                    "sensor": [data.sensors.front, data.sensors.right, data.sensors.back, data.sensors.left]},
+                                    namespace='/getMapData', 
+                                    broadcast=True, 
+                                    include_self=False, 
+                                    skip_sid=True)
+
 
                     if is_socket_broken:
                         print("Socket broken")

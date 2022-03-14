@@ -2,14 +2,15 @@ import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
 from cflib.crazyflie.log import LogConfig
+from flask_socketio import SocketIO
 
 from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
 
 class CommCrazyflie(AbstractComm):
 
-    def __init__(self, drone_list: list):
-
+    def __init__(self, socketIO: SocketIO, drone_list: list):
+        super().__init__(socketIO)
         print('Creating Embedded Crazyflie communication')
         self.links = list(map(lambda drone: drone['name'], drone_list))
         self.crazyflies: list[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
