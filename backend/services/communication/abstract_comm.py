@@ -16,6 +16,7 @@ class AbstractComm:
 
     def send_log(self, log: List[Tuple[str, str]]):
         print(log)
+
         self.__socket_io.emit('get_logs',
                               log,
                               namespace='/getLogs',

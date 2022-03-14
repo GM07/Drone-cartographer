@@ -89,10 +89,10 @@ class CommCrazyflie(AbstractComm):
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print('[%d][%s]: %s' % (timestamp, logconf.id, data))
-        self.send_log(tuple(datetime.now().isoformat(), f'{logconf.id}{data} '))
+        self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
 
     def send_command_to_all_drones(self, command):
-        self.send_log(tuple(datetime.now().isoformat(), command))
+        self.send_log([(datetime.now().isoformat(), command)])
 
         for drone in self.drone_list:
             self.send_command(command, drone['name'])

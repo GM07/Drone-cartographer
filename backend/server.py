@@ -4,6 +4,9 @@ import services.status.access_status as AccessStatus
 import services.status.mission_status as MissionStatus
 
 from flask import jsonify, Flask, request
+from gevent import monkey
+
+monkey.patch_all()
 import threading
 from flask_socketio import SocketIO
 from flask_cors import CORS
@@ -158,6 +161,12 @@ def send_logs():
                   callback=test)
 
     threading.Timer(2, send_logs).start()
+
+
+@APP.route('/getCurrentLogs')
+def get_current_logs():
+
+    return jsonify(COMM.logs)
 
 
 if __name__ == '__main__':
