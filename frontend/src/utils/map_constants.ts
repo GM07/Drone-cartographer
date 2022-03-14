@@ -1,6 +1,25 @@
 import {Vec2d} from '@/utils/vec2d';
 
+export interface MapData {
+  position: Point2D;
+  sensors: Sensors;
+}
+
+export interface Sensors {
+  front: number;
+  right: number;
+  back: number;
+  left: number;
+}
+
+export interface Point2D {
+  x: number;
+  y: number;
+  z: number;
+}
+
 export const OPTIONS = {
+  autoSize: true,
   title: {
     text: "Carte d'exploration des drones",
   },

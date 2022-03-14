@@ -71,7 +71,7 @@
         </v-list>
       </template>
     </v-navigation-drawer>
-    <Map :NDRONES="droneList.length - 1" />
+    <Map :NDRONES="1" />
   </div>
 </template>
 

@@ -5,8 +5,11 @@ import vuetify from './plugins/vuetify';
 import {STORE} from './store';
 import VueSocketIO from 'vue-socket.io';
 import {SOCKETIO_SERVER_STATUS} from './communication/server_constants';
+import VueLodash from 'vue-lodash';
+import lodash from 'lodash';
 
 Vue.config.productionTip = false;
+Vue.use(VueLodash, {lodash: lodash});
 Vue.use(
   new VueSocketIO({
     debug: false,
