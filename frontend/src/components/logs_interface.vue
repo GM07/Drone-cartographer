@@ -40,17 +40,16 @@ export default class LogsInterface extends Vue {
     SOCKETIO_GET_LOGS.on('get_logs', (logs: Array<[string, string]>) => {
       const SCROLLBAR = document.getElementById('scroll');
       let isBottom = false;
-      // TODO add lock or unlock option to move scroll or not
-      console.log(SCROLLBAR?.scrollTop, SCROLLBAR?.scrollHeight);
-      if (SCROLLBAR)
-        isBottom = SCROLLBAR.scrollTop + 100 === SCROLLBAR.scrollHeight;
-
       this.logs.push(...logs);
 
-      if (SCROLLBAR && isBottom)
-        this.$nextTick(() => {
-          SCROLLBAR.scrollTop = SCROLLBAR.scrollHeight;
-        });
+      if (SCROLLBAR) {
+        isBottom = SCROLLBAR.scrollTop + 100 === SCROLLBAR.scrollHeight;
+
+        if (isBottom)
+          this.$nextTick(() => {
+            SCROLLBAR.scrollTop = SCROLLBAR.scrollHeight;
+          });
+      }
     });
   }
   private destroyed() {
