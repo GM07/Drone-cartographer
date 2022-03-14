@@ -16,6 +16,7 @@ export const GET_MISSION_STATUS_NAMESPACE = '/getMissionStatus';
 export const LIMITED_ACCESS_NAMESPACE = '/limitedAccess';
 export const GET_LOGS_NAMESPACE = '/getLogs';
 export const HTTP_OK = 200;
+export const TIME_MULTIPLIER = 60000;
 
 export const SOCKETIO_SERVER_STATUS = SocketIO(
   SERVER_ADDRESS + GET_MISSION_STATUS_NAMESPACE

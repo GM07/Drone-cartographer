@@ -36,7 +36,7 @@ SOCKETIO = SocketIO(APP,
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
 
-COMM: AbstractComm = AbstractComm(SOCKETIO)
+COMM: AbstractComm = CommCrazyflie(SOCKETIO, [])
 
 
 # Get drone addresses
@@ -51,7 +51,7 @@ def identify_drone(drone_addr):
     if not AccessStatus.is_request_valid(request):
         return ''
 
-    COMM.send_command(COMMANDS.IDENTIFY.value, links=[drone_addr])
+    COMM.send_command(COMMANDS.IDENTIFY.value, [drone_addr])
     return 'Identified drone'
 
 
@@ -62,6 +62,8 @@ def launch(is_simulated: bool, drone_list):
         return ''
 
     global COMM
+    COMM.shutdown()
+
     if is_simulated:
         configuration = SimulationConfiguration()
 
@@ -71,11 +73,10 @@ def launch(is_simulated: bool, drone_list):
         configuration.launch()
 
         COMM = CommSimulation(SOCKETIO, drone_list)
-        COMM.send_command(COMMANDS.LAUNCH.value)
     else:
         COMM = CommCrazyflie(SOCKETIO, drone_list)
-        COMM.send_command_to_all_drones(COMMANDS.LAUNCH.value)
 
+    COMM.send_command(COMMANDS.LAUNCH.value)
     AccessStatus.set_mission_type(SOCKETIO, is_simulated)
     MissionStatus.launch_mission(SOCKETIO)
     return 'Launched'
@@ -94,18 +95,13 @@ def set_mission_type(is_simulated: bool):
 
 
 # Terminate mission
-
-
 @SOCKETIO.on('terminate', namespace='/limitedAccess')
 def terminate():
     if (not MissionStatus.get_mission_started() or
             not AccessStatus.is_request_valid(request)):
         return ''
 
-    if AccessStatus.get_mission_simulated():
-        COMM.send_command(COMMANDS.LAND.value)
-    else:
-        COMM.send_command_to_all_drones(COMMANDS.LAND.value)
+    COMM.send_command(COMMANDS.LAND.value)
 
     MissionStatus.terminate_mission(SOCKETIO)
     return 'Terminated'

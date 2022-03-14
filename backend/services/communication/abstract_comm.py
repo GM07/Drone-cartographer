@@ -30,12 +30,12 @@ class AbstractComm:
         self.logs += log
 
     @abstractmethod
-    def send_command(self, command: COMMANDS) -> None:
+    def send_command(self, command: COMMANDS, links=[]) -> None:
         pass
 
     def shutdown(self):
 
-        self.current_mission.flight_duration = self.start_time - perf_counter()
+        #self.current_mission.flight_duration = self.start_time - perf_counter()
         self.current_mission.logs = self.logs
         self.logs = []
         database = Database()

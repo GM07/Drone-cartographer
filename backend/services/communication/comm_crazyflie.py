@@ -16,16 +16,15 @@ class CommCrazyflie(AbstractComm):
     """This class is used to communicate with the crazyflie
     drones"""
 
-    def __init__(self, socket_io: SocketIO, links: list, drone_list=None):
+    def __init__(self, socket_io: SocketIO, drone_list=list):
 
         super().__init__(socket_io)
         print('Creating Embedded Crazyflie communication')
-        self.crazyflies: list[Crazyflie] = list(
-            map(lambda link: Crazyflie(rw_cache='./cache'), links))
-        self.links = links
+        self.links = list(map(lambda drone: drone['name'], drone_list))
+        self.crazyflies: list[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
         self.crazyflies_by_id = {}
         self.drone_list = drone_list
-        for link, crazyflie in zip(links, self.crazyflies):
+        for link, crazyflie in zip(self.links, self.crazyflies):
             self.crazyflies_by_id[link] = crazyflie
         self.initialized_drivers = False
         self.sync_crazyflies: list[SyncCrazyflie] = []
@@ -71,13 +70,16 @@ class CommCrazyflie(AbstractComm):
             self.sync_crazyflies.append(SyncCrazyflie(link, cf=crazyflie))
 
         for sync, config in zip(self.sync_crazyflies, self.log_configs):
-            sync.open_link()
-            sync.cf.log.add_config(config)
-            config.data_received_cb.add_callback(self.__retrieve_log)
-            config.start()
+            try:
+                sync.open_link()
+                sync.cf.log.add_config(config)
+                config.data_received_cb.add_callback(self.__retrieve_log)
+                config.start()
+            except Exception as e:
+                print('Exception: {}'.format(e))
 
-    def send_command(self, command: COMMANDS, links=[]) -> None:
 
+    def send_command(self, command: COMMANDS, links = []) -> None:
         sending_links = self.links if len(links) == 0 else links
 
         for link in sending_links:
@@ -89,8 +91,3 @@ class CommCrazyflie(AbstractComm):
         print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
 
-    def send_command_to_all_drones(self, command):
-        self.send_log([(datetime.now().isoformat(), command)])
-
-        for drone in self.drone_list:
-            self.send_command(command, drone['name'])

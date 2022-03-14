@@ -12,7 +12,7 @@
         </div>
 
         <v-btn class="ma-4" large primary to="/History"
-          >Historique de Mission
+          >Historique de mission
         </v-btn>
       </v-col>
     </v-row>

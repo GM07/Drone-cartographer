@@ -59,12 +59,12 @@
 
         <template v-slot:extension>
           <v-tabs v-model="currentTab">
-            <v-tab @click="changeFilterMode($Filters.all)">Tous</v-tab>
-            <v-tab @click="changeFilterMode($Filters.simulated)"
+            <v-tab @click="changeFilterMode(filter.all)">Tous</v-tab>
+            <v-tab @click="changeFilterMode(filter.simulated)"
               >Simulation</v-tab
             >
-            <v-tab @click="changeFilterMode($Filters.physical)">Embarqué</v-tab>
-            <v-tab @click="changeFilterMode($Filters.date)">Date</v-tab>
+            <v-tab @click="changeFilterMode(filter.physical)">Embarqué</v-tab>
+            <v-tab @click="changeFilterMode(filter.date)">Date</v-tab>
             <v-spacer></v-spacer>
             <div style="margin-right: 150px">
               <p style="color: black; float: left; margin-top: 5px">
@@ -80,7 +80,7 @@
 
               <v-select
                 v-model="currentFilter"
-                :items="filters"
+                :items="sorts"
                 scrollable
                 style="width: 200px; float: right"
                 @change="sortMissions()"
@@ -98,10 +98,10 @@
         <div v-for="item in showedMissions" :key="item._id" class="ma-5">
           <v-card class="pa-5" elevation="4" outlined>
             <v-list-item-title v-if="item.is_simulated" class="text-h6 mb-3">
-              Mission Simulée
+              Mission simulée
             </v-list-item-title>
             <v-list-item-title v-else class="text-h6 mb-3">
-              Mission Physique
+              Mission physique
             </v-list-item-title>
 
             <v-list-item-title class="text-h6 mb-3">
@@ -144,6 +144,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {ServerCommunication} from '@/communication/server_communication';
 import NavigationCommands from '@/components/navigation_commands.vue';
 import {Mission} from '@/utils/mission';
+import {TIME_MULTIPLIER} from '@/communication/server_constants';
 
 enum Filters {
   all,
@@ -151,7 +152,6 @@ enum Filters {
   physical,
   date,
 }
-Vue.prototype.$Filters = Filters;
 
 @Component({components: {NavigationCommands}})
 export default class CompletedMissions extends Vue {
@@ -160,17 +160,19 @@ export default class CompletedMissions extends Vue {
   private mode: Filters = Filters.all;
   private isSearchMenuOpen = false;
   private currentTab = 0;
+  private filter = Filters;
   private currentFilter = 'Aucun';
   private isAscending = true;
-  private filters = [
+  private sorts = [
     'Aucun',
     'Nombre de drones',
     'Distance parcourue',
     'Temps de vol',
     'Date',
   ];
+
   private date: string = new Date(
-    Date.now() - new Date().getTimezoneOffset() * 60000
+    Date.now() - new Date().getTimezoneOffset() * TIME_MULTIPLIER
   )
     .toISOString()
     .substr(0, 10);
@@ -237,11 +239,11 @@ export default class CompletedMissions extends Vue {
 
   private sortMissions(): void {
     switch (this.currentFilter) {
-      case this.filters[0]:
+      case this.sorts[0]:
         this.updateFilteredMissions();
         break;
 
-      case this.filters[1]:
+      case this.sorts[1]:
         this.showedMissions.sort((a: Mission, b: Mission) => {
           return this.sortMissionNumberParameters(
             a.number_of_drones,
@@ -250,7 +252,7 @@ export default class CompletedMissions extends Vue {
         });
         break;
 
-      case this.filters[2]:
+      case this.sorts[2]:
         this.showedMissions.sort((a: Mission, b: Mission) => {
           return this.sortMissionNumberParameters(
             a.total_distance,
@@ -259,7 +261,7 @@ export default class CompletedMissions extends Vue {
         });
         break;
 
-      case this.filters[3]:
+      case this.sorts[3]:
         this.showedMissions.sort((a: Mission, b: Mission) => {
           return this.sortMissionNumberParameters(
             a.flight_duration,
@@ -268,7 +270,7 @@ export default class CompletedMissions extends Vue {
         });
         break;
 
-      case this.filters[4]:
+      case this.sorts[4]:
         this.showedMissions.sort((a: Mission, b: Mission) => {
           if (this.isAscending) return a.time_stamp < b.time_stamp ? -1 : 1;
           else return a.time_stamp > b.time_stamp ? -1 : 1;
