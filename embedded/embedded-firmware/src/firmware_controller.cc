@@ -21,6 +21,10 @@ extern "C" {
 FirmwareController::FirmwareController()
     : AbstractController(std::make_unique<FirmwareSensors>()) {}
 
+bool FirmwareController::isDroneCrashed() const {
+  return supervisorIsTumbled();
+}
+
 void FirmwareController::updateSensorsData() {
   data = {
       m_abstractSensors->getFrontDistance(),
@@ -32,10 +36,6 @@ void FirmwareController::updateSensorsData() {
       m_abstractSensors->getBatteryLevel(),
       static_cast<int>(state),
   };
-}
-
-bool FirmwareController::isDroneCrashed() const {
-  return supervisorIsTumbled();
 }
 
 /////////////////////////
@@ -61,6 +61,7 @@ void FirmwareController::takeOff(float height) {
 
 ///////////////////////////////
 void FirmwareController::land() {
+  commanderNotifySetpointsStop(0);
   m_targetPosition = getCurrentLocation();
   m_targetPosition.m_z = 0;
   float time =
@@ -99,16 +100,17 @@ void FirmwareController::blinkLED(LED led) {
   ledseqRun(&m_seqLED);
 }
 
-void FirmwareController::goTo(const Vector3D& location, bool isRelative) {
-  float time = 0;
-  if (isRelative) {
-    m_targetPosition = location;
-    time = m_targetPosition.distanceTo(Vector3D(0, 0, 0)) / kSpeed;
-  } else {
-    m_targetPosition = m_takeOffPosition + location;
-    time = location.distanceTo(getCurrentLocation()) / kSpeed;
-  }
+void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
+  Vector3D speedVector = direction.toUnitVector() * speed;
 
-  crtpCommanderHighLevelGoTo(m_targetPosition.m_x, m_targetPosition.m_y,
-                             m_targetPosition.m_z, 0.0, time, isRelative);
+  static setpoint_t setpoint;
+  setpoint.mode.z = modeAbs;
+  setpoint.position.z = kHeight;
+  setpoint.mode.x = modeVelocity;
+  setpoint.mode.y = modeVelocity;
+  setpoint.velocity.x = speedVector.m_x;
+  setpoint.velocity.y = speedVector.m_y;
+  setpoint.velocity_body = false;
+
+  commanderSetSetpoint(&setpoint, 3);
 }

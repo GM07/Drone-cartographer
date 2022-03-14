@@ -3,6 +3,7 @@
 extern "C" {
 #include "FreeRTOS.h"
 #include "app_channel.h"
+#include "commander.h"
 #include "crtp_commander_high_level.h"
 #include "estimator_kalman.h"
 #include "ledseq.h"
@@ -72,10 +73,8 @@ void estimatorKalmanGetEstimatedPos(point_t* pos) {}
 
 bool crtpCommanderHighLevelIsTrajectoryFinished() { return true; }
 
-int crtpCommanderHighLevelGoTo(const float x, const float y, const float z,
-                               const float yaw, const float duration_s,
-                               const bool relative) {
-  return 0;
-}
-
 void ledClearAll() {}
+
+void commanderNotifySetpointsStop(int remainValidMillisecs) {}
+
+void commanderSetSetpoint(setpoint_t* setpoint, int priority) {}

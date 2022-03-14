@@ -5,10 +5,10 @@
 #include "sensors/abstract_sensors.h"
 
 enum ReadingsMapSensorIndex {
-  SimulationReadingsMapSensorFront = 0,
-  SimulationReadingsMapSensorLeft = 1,
-  SimulationReadingsMapSensorBack = 2,
-  SimulationReadingsMapSensorRight = 3
+  SimulationReadingsMapSensorRight = 0,
+  SimulationReadingsMapSensorFront = 1,
+  SimulationReadingsMapSensorLeft = 2,
+  SimulationReadingsMapSensorBack = 3,
 };
 
 class SimulationSensors : public AbstractSensors {
