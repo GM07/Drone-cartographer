@@ -56,7 +56,7 @@ install_dependencies:
 lint_backend:
   stage: lint
   script:
-    - find . -type f -name '*.py' | xargs pylint  --rcfile pylintrc
+    - yapf --style google -rpi .
 
 test_backend:
   stage: test
