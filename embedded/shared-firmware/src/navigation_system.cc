@@ -7,7 +7,7 @@ void Drone::step() {
   updateCrashStatus();
   updateSensorsData();
 
-  // Get distance to takeoff for LED identifying
+  // TODO : sending and receiving P2P messages needs to be done in a thread/task
   m_controller->sendP2PMessage(static_cast<void*>(&m_data), sizeof(m_data));
   m_controller->receiveP2PMessage(m_peerData);
 
@@ -61,23 +61,38 @@ void Drone::explore() {
       !Vector3D::areSameDirection(m_data.direction, normal)) {
     Vector3D newDirection = m_data.direction.reflect(normal);
 
+    m_usedPeerData.clear();
+
     if (!m_data.direction.isAlmostEqual(newDirection, kComparisonFactor)) {
       m_data.direction = newDirection;
     }
   }
 }
-
+// 3250
 void Drone::collisionAvoidance() {
+  Vector3D normal;
   for (auto data : m_peerData) {
-    size_t peerId = data.first;
     DroneData peerData = data.second;
 
-    // The lowest priority changes direction
-    if (m_data.id > peerId) continue;
-
     if (peerData.range <= kSimulationCollisionAvoidanceRange) {
-      m_data.direction.m_x = -peerData.direction.m_x;
-      m_data.direction.m_y = -peerData.direction.m_y;
+      if (m_usedPeerData.find(peerData.id) == m_usedPeerData.end()) {
+        m_usedPeerData.insert_or_assign(peerData.id, peerData);
+        if (Vector3D::areSameDirection(m_data.direction, peerData.direction)) {
+          normal += m_data.direction - peerData.direction;
+        } else {
+          normal += peerData.direction;
+        }
+      }
+    } else {
+      m_usedPeerData.erase(peerData.id);
+    }
+  }
+
+  if (!normal.isAlmostEqual(Vector3D(), kComparisonFactor)) {
+    Vector3D newDirection = m_data.direction.reflect(normal);
+
+    if (!m_data.direction.isAlmostEqual(newDirection, kComparisonFactor)) {
+      m_data.direction = newDirection;
     }
   }
 }

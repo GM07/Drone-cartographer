@@ -18,6 +18,7 @@ class Vector3D {
   virtual ~Vector3D() = default;
 
   Vector3D& operator+=(const Vector3D& other);
+  Vector3D& operator-=(const Vector3D& other);
   [[nodiscard]] Vector3D operator+(const Vector3D& other) const;
   [[nodiscard]] Vector3D operator-(const Vector3D& other) const;
   [[nodiscard]] Vector3D operator*(float factor) const;
