@@ -104,7 +104,7 @@ TEST(ValidateNavigationSystem, takingOffFinished) {
   drone.step();
   drone.step();
 
-  EXPECT_EQ(drone.getController()->state, State::kIdle);
+  EXPECT_EQ(drone.getController()->state, State::kExploring);
 }
 
 TEST(ValidateNavigationSystem, landingFinished) {
