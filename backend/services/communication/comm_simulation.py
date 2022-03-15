@@ -14,6 +14,7 @@ from time import sleep
 
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
+from services.data.map import Map
 
 
 class CommSimulation(AbstractComm):
@@ -26,9 +27,10 @@ class CommSimulation(AbstractComm):
     SOCKET_COMMAND_PATH = '/tmp/socket/{}'
     SOCKET_DATA_PATH = '/tmp/socket/data{}'
 
-    def __init__(self, socketIO: SocketIO, drone_list = []):
+    def __init__(self, socketIO: SocketIO, drone_list=[]):
         super().__init__(socketIO)
         print('Drone list: ', drone_list)
+        Map().set_drone_len(len(drone_list))
         self.nb_connections = len(drone_list)
         self.drone_list = drone_list
         self.thread_active = True
@@ -90,7 +92,7 @@ class CommSimulation(AbstractComm):
         return server
 
     def __receive_data_tasks_wrapper(self):
-        if self.nb_connections <= 0: 
+        if self.nb_connections <= 0:
             return
         print('Receiving thread started')
         while self.thread_active:
@@ -99,7 +101,7 @@ class CommSimulation(AbstractComm):
             self.__receive_data()
 
     def __send_command_tasks_wrapper(self):
-        if self.nb_connections <= 0: 
+        if self.nb_connections <= 0:
             return
         print('Sending thread started')
         while self.thread_active:
@@ -184,19 +186,18 @@ class CommSimulation(AbstractComm):
                         is_socket_broken = True
                     else:
                         data = DroneData(received)
-                        print(data)
-                        self.SOCKETIO.emit('getMapData',
-                                    {"position": [data.position.x, data.position.y],
-                                    "sensors": {
-                                        "front": data.sensors.front, 
-                                        "right": data.sensors.right, 
-                                        "back": data.sensors.back, 
-                                        "left": data.sensors.left
-                                        }
-                                    },
-                                    namespace='/getMapData', 
-                                    broadcast=True)
-
+                        Map().add_data(data)
+                        self.SOCKETIO.emit('getMapData', {
+                            "position": [data.position.x, data.position.y],
+                            "sensors": {
+                                "front": data.sensors.front,
+                                "right": data.sensors.right,
+                                "back": data.sensors.back,
+                                "left": data.sensors.left
+                            }
+                        },
+                                           namespace='/getMapData',
+                                           broadcast=True)
 
                     if is_socket_broken:
                         print('Socket broken')

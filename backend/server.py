@@ -1,4 +1,5 @@
 from gevent import monkey
+
 monkey.patch_all()
 
 from pickle import NONE
@@ -48,6 +49,7 @@ def identify_drone(drone_addr):
     COMM.send_command(COMMANDS.IDENTIFY.value, [drone_addr])
     return 'Identified drone'
 
+
 # Launch mission
 @SOCKETIO.on('launch', namespace="/limitedAccess")
 def launch(is_simulated: bool):
@@ -84,7 +86,7 @@ def addDrone(drone_list, is_simulated):
 
     if not is_simulated:
         COMM = CommCrazyflie(
-            drone_list)  # Recreate object to reconnect to drones
+            SOCKETIO, drone_list)  # Recreate object to reconnect to drones
 
 
 @SOCKETIO.on('set_mission_type', namespace='/limitedAccess')
@@ -152,6 +154,7 @@ def disconnect():
 def mission_connect():
     MissionStatus.client_connected(SOCKETIO, request)
     return ''
+
 
 if __name__ == '__main__':
     print('The backend is running on port 5000')

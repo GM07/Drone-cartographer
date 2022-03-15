@@ -10,6 +10,7 @@ from flask_socketio import SocketIO
 
 from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
+# from services.data.map import Map
 
 
 class CommCrazyflie(AbstractComm):
@@ -39,7 +40,7 @@ class CommCrazyflie(AbstractComm):
         try:
             self.setup_log()
         except:
-            ""
+            pass
 
     def __del__(self):
         for sync in self.sync_crazyflies:
@@ -86,15 +87,19 @@ class CommCrazyflie(AbstractComm):
             print('Sending packet : ', packet)
             self.crazyflies_by_id[link].appchannel.send_packet(packet)
 
-    def __retrieve_log(self, timestamp, data, logconf: LogConfig):
-        self.SOCKETIO.emit('getMapData', 
-                        {"position": [data['kalman.stateX'], data['kalman.stateY']], 
-                        "sensors": { "front": data['range.front'], 
-                                    "right": data['range.right'], 
-                                    "back": data['range.back'], 
-                                    "left": data['range.left']
-                                    }
-                    },
-                        namespace='/getMapData',
-                        broadcast=True,)
+    def __retrieve_log(self, _, data, __: LogConfig):
+        self.SOCKETIO.emit(
+            'getMapData',
+            {
+                "position": [data['kalman.stateX'], data['kalman.stateY']],
+                "sensors": {
+                    "front": data['range.front'],
+                    "right": data['range.right'],
+                    "back": data['range.back'],
+                    "left": data['range.left']
+                }
+            },
+            namespace='/getMapData',
+            broadcast=True,
+        )
         #print('[%d][%s]: %s' % (timestamp, logconf.id, data))
