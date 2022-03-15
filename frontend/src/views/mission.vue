@@ -51,6 +51,21 @@
         />
       </div>
 
+      <template>
+        <v-divider></v-divider>
+        <v-list-item @click="setLogsMenuOpen(!isLogsMenuOpen)">
+          <v-list-item-icon>
+            <v-icon color="blue">mdi-note-text</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title v-if="!isLogsMenuOpen"
+            >Ouvrir logs</v-list-item-title
+          >
+          <v-list-item-title v-if="isLogsMenuOpen"
+            >Fermer logs</v-list-item-title
+          >
+        </v-list-item></template
+      >
+
       <template id="bottom" v-slot:append>
         <v-divider></v-divider>
         <MissionCommands
@@ -74,12 +89,43 @@
         </v-list>
       </template>
     </v-navigation-drawer>
+    <div
+      v-if="isLogsMenuOpen"
+      id="LogsInterfaceContainer"
+      class="mb-10"
+      style="position: absolute; bottom: 0; width: 100%; min-width: 1400px"
+    >
+      <div id="LogTitle">
+        <h3 class="ma-3">Logs</h3>
+        <v-icon class="ma-3" color="black" @click="setLogsMenuOpen(false)"
+          >mdi-close</v-icon
+        >
+      </div>
+      <div id="logs">
+        <LogsInterface />
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .v-btn--active.no-active:not(:hover)::before {
   opacity: 0 !important;
+}
+
+#LogTitle {
+  display: flex;
+  flex-direction: row;
+
+  width: 100%;
+  justify-content: space-between;
+}
+
+#logs {
+  border: 10px;
+  float: left;
+  width: 100%;
+  overflow-x: auto;
 }
 </style>
 
@@ -92,16 +138,24 @@ import DroneMenu from '@/components/drone_menu.vue';
 import {SOCKETIO_LIMITED_ACCESS} from '@/communication/server_constants';
 import {AccessStatus} from '@/communication/access_status';
 import {Drone} from '@/communication/drone';
+import LogsInterface from '@/components/logs_interface.vue';
 import {ServerCommunication} from '@/communication/server_communication';
 
 @Component({
-  components: {DroneCommands, MissionCommands, NavigationCommands, DroneMenu},
+  components: {
+    DroneCommands,
+    MissionCommands,
+    NavigationCommands,
+    DroneMenu,
+    LogsInterface,
+  },
 })
 export default class Mission extends Vue {
   public droneList: Drone[] = [];
   public attemptedLimitedConnexion = false;
   public dialog = false;
   public isDroneMenuOpen = false;
+  public isLogsMenuOpen = false;
   public accessStatus = {
     isMissionSimulated: false,
     isUserControlling: false,
@@ -122,6 +176,9 @@ export default class Mission extends Vue {
 
   public setDroneMenuOpen(value: boolean): void {
     this.isDroneMenuOpen = value;
+  }
+  public setLogsMenuOpen(value: boolean): void {
+    this.isLogsMenuOpen = value;
   }
 
   public addDrone(drone: Drone): void {
