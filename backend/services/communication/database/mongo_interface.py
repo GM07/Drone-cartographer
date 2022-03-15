@@ -7,9 +7,11 @@ database = Database()
 database.upload_mission_info(mission_info)
 """
 from dataclasses import dataclass
-from typing import List
+from typing import List, Tuple
 from pymongo import MongoClient
 from datetime import datetime
+from services.data.drone_data import DroneData
+from constants import COMMANDS
 
 
 @dataclass
@@ -28,10 +30,14 @@ class Mission:
     is_simulated: bool
     total_distance: float
     maps: List[List[Point]]
+    logs: List[Tuple[str, str]]
 
-    def __init__(self, flight_duration: float, number_of_drones: int,
-                 is_simulated: bool, total_distance: float,
-                 maps: List[List[Point]]):
+    def __init__(self,
+                 flight_duration: float,
+                 number_of_drones: int,
+                 is_simulated: bool,
+                 total_distance: float,
+                 maps: List[List[Point]] = [[]]):
 
         self.flight_duration = flight_duration
         self.number_of_drones = number_of_drones
@@ -39,6 +45,7 @@ class Mission:
         self.total_distance = total_distance
         self.maps = maps
         self.time_stamp = datetime.now().isoformat()
+        self.logs = []
 
 
 class Database:
