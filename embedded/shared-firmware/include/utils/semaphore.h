@@ -13,16 +13,16 @@
 class Semaphore {
  public:
   Semaphore();
-  Semaphore(size_t maxSize);
+  explicit Semaphore(size_t maxSize);
   void release();
   void acquire();
   bool tryAcquire();
 
  private:
-  size_t m_count;  // Initialized as locked.
+  size_t m_count{0};  // Initialized as locked.
   std::mutex m_mutex;
   std::condition_variable m_condition;
-  size_t m_maxSize;
+  size_t m_maxSize{static_cast<size_t>(-1)};
 };
 
 #endif

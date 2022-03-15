@@ -4,8 +4,6 @@
 #include <string>
 #include <utility>
 
-constexpr float kThreshold = 0.01;
-
 class Vector3D {
  public:
   Vector3D() = default;
@@ -30,6 +28,8 @@ class Vector3D {
   [[nodiscard]] Vector3D reflect(const Vector3D& normal) const;
   [[nodiscard]] Vector3D toUnitVector() const;
   [[nodiscard]] float length() const;
+  [[nodiscard]] std::string toString() const;
+
   [[nodiscard]] inline bool operator<(float value) const {
     return this->length() < value;
   }
@@ -39,7 +39,6 @@ class Vector3D {
   }
 
   static bool areSameDirection(const Vector3D& vec1, const Vector3D& vec2);
-  std::string toString() const;
 
   float m_x{0}, m_y{0}, m_z{0};
 };

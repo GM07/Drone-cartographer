@@ -64,7 +64,8 @@ std::string Vector3D::toString() const {
 }
 
 bool Vector3D::areSameDirection(const Vector3D& vec1, const Vector3D& vec2) {
+  constexpr float kLimit = 0.05;
   Vector3D projected = vec2 * ((vec1 * vec2) / (vec2 * vec2));
   return std::abs(projected * vec2 / (projected.length() * vec2.length()) - 1) <
-         kThreshold;
+         kLimit;
 }

@@ -3,9 +3,11 @@
 
 #include <functional>
 
+constexpr float kThreshold = 10e-3;
+
 template <class T>
 [[nodiscard]] inline bool areAlmostEqual(const T& first, const T& second,
-                                         float threshold = 10e-3) {
+                                         float threshold = kThreshold) {
   T const diff = std::minus<>{}(first, second);
   return diff < threshold && diff > -threshold;
 }
