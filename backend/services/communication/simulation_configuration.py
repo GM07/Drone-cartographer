@@ -65,7 +65,7 @@ class SimulationConfiguration:
 
         box = ET.SubElement(entity, 'box')
         box.set('id', 'b')
-        box.set('size', '0.05,2,1')
+        box.set('size', '0.001,2,1')
         box.set('movable', 'false')
 
         tree.write(current_path + '/crazyflie_sensing.argos')

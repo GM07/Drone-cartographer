@@ -18,6 +18,10 @@ class CommCrazyflie(AbstractComm):
     comm.__init_drivers()"""
 
     def __init__(self, drone_list: list):
+        if drone_list is None:
+            self.sync_crazyflies = []
+            self.drone_list = []
+            return
 
         print('Creating Embedded Crazyflie communication')
         self.links = list(map(lambda drone: drone['name'], drone_list))
@@ -30,7 +34,10 @@ class CommCrazyflie(AbstractComm):
         self.initialized_drivers = False
         self.sync_crazyflies: List[SyncCrazyflie] = []
         self.__init_drivers()
-        self.setup_log()
+        try:
+            self.setup_log()
+        except:
+            ""
 
     def __del__(self):
         for sync in self.sync_crazyflies:
