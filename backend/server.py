@@ -61,7 +61,7 @@ def launch(is_simulated: bool):
 
         for drone in drone_list:
             configuration.add_drone(drone)
-        configuration.add_obstacles()
+        configuration.add_obstacles(drone_list)
         configuration.launch()
 
         COMM = CommSimulation(drone_list)
