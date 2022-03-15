@@ -25,8 +25,6 @@ struct __attribute__((__packed__)) ControllerData {
 
 class AbstractController {
  public:
-  AbstractController(std::unique_ptr<AbstractSensors>&& abstractSensors)
-      : m_abstractSensors(std::move(abstractSensors)){};
   virtual ~AbstractController() = default;
   AbstractController() = default;
   AbstractController(AbstractController&& other) = delete;
@@ -35,7 +33,8 @@ class AbstractController {
   AbstractController& operator=(const AbstractController& other) = delete;
 
   explicit AbstractController(
-      std::unique_ptr<AbstractSensors>&& abstractSensors);
+      std::unique_ptr<AbstractSensors>&& abstractSensors)
+      : m_abstractSensors(std::move(abstractSensors)){};
 
   virtual void setVelocity(const Vector3D& direction, float speed) = 0;
   virtual void takeOff(float height) = 0;
