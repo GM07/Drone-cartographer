@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h3 class="ma-3">Logs</h3>
     <v-virtual-scroll
       id="scroll"
       color="indigo"

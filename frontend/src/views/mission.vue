@@ -91,7 +91,19 @@
       class="mb-10"
       style="position: absolute; bottom: 0; width: 100%"
     >
-      <LogsInterface />
+      <div>
+        <h3 class="ma-3" style="float: left">Logs</h3>
+        <v-icon
+          class="ma-3"
+          color="black"
+          style="float: right"
+          @click="setLogsMenuOpen(false)"
+          >mdi-close</v-icon
+        >
+      </div>
+      <div style="float: left; width: 100%">
+        <LogsInterface />
+      </div>
     </div>
   </div>
 </template>
