@@ -11,7 +11,7 @@ class SimulationConfiguration:
     """This class configures the argos3 simulation
     an example would be
     sim = SimulationConfiguration()
-    sim.add_rone(Drone())"""
+    sim.add_drone(Drone())"""
 
     def __init__(self):
         current_path = str(pathlib.Path(__file__).parent.resolve())
