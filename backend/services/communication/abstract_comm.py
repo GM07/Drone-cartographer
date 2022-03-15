@@ -21,9 +21,7 @@ class AbstractComm:
         self.__socket_io.emit('get_logs',
                               log,
                               namespace='/getLogs',
-                              broadcast=True,
-                              include_self=False,
-                              skip_sid=True)
+                              broadcast=True)
 
         self.logs += log
 

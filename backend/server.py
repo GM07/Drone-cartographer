@@ -161,12 +161,12 @@ def mission_connect():
 @SOCKETIO.on('connect', namespace='/getLogs')
 def send_logs():
 
-    SOCKETIO.emit(
-        'get_logs',
-        COMM.logs,
-        namespace='/getLogs',
-        broadcast=True,
-    )
+    SOCKETIO.emit('get_logs',
+                  COMM.logs,
+                  namespace='/getLogs',
+                  broadcast=True,
+                  include_self=False,
+                  skip_sid=True)
 
 
 @APP.route('/getCurrentLogs')
