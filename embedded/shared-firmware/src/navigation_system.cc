@@ -75,7 +75,7 @@ void Drone::wallAvoidance() {
                     : Vector3D::y(1.0F);
   }
 
-  if (m_normal.isAlmostEqual(m_data.direction, kComparisonFactor) ||
+  if (areAlmostEqual<Vector3D>(m_normal, m_data.direction) ||
       Vector3D::areSameDirection(m_data.direction, m_normal)) {
     m_normal = Vector3D();
   }
@@ -98,19 +98,14 @@ void Drone::collisionAvoidance() {
 }
 
 void Drone::changeDirection() {
-  if (!m_normal.isAlmostEqual(Vector3D(), kComparisonFactor)) {
+  if (!areAlmostEqual<Vector3D>(m_normal, Vector3D())) {
     Vector3D newDirection = m_data.direction.reflect(m_normal);
 
-    if (!m_data.direction.isAlmostEqual(newDirection, kComparisonFactor)) {
+    if (!areAlmostEqual<Vector3D>(m_data.direction, newDirection)) {
       m_data.direction = newDirection;
       m_controller->setVelocity(m_data.direction, kDroneSpeed);
     }
   }
 }
 
-<<<<<<< HEAD
 void Drone::initDrone() { m_data.id = m_controller->getId(); }
-=======
-m_controller->setVelocity(m_direction, kDroneSpeed);
-}
->>>>>>> d7b6495dee3d79871040f0b869febd316ac7bf20

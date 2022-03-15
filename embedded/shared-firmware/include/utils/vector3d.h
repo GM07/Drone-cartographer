@@ -44,7 +44,6 @@ class Vector3D {
   static Vector3D x(float value);
   static Vector3D y(float value);
   static Vector3D z(float value);
-  std::string toString() const;
 
   float m_x{0}, m_y{0}, m_z{0};
 };

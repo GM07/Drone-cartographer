@@ -11,7 +11,7 @@
 #include "utils/droneData.h"
 
 // Meters and seconds
-constexpr float kDroneSpeed = 0.25f;
+constexpr float kDroneSpeed = 1.0f;
 constexpr float kTakeOffSpeed = 1.0f;
 constexpr float kLandingSpeed = 0.25f;
 constexpr float kHeight = 0.3f;
@@ -37,7 +37,7 @@ class Drone {
          Vector3D(kFirstNumber, -kSecondNumber, 0.0F),
          Vector3D(kSecondNumber, -kFirstNumber, 0.0F)}};
 
-    std::default_random_engine generator;
+    static std::default_random_engine generator;
     std::uniform_int_distribution<int> distribution(
         0, startingDirection.size() - 1);
 
