@@ -28,11 +28,10 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
 
-COMM: AbstractComm = CommCrazyflie(SOCKETIO, [{'name': 'radio://0/80/2M/E7E7E7E762', 'xPos': 0, 'yPos': 0}], APP)
+COMM: AbstractComm = CommSimulation(SOCKETIO, [])
 
 @APP.route('/getDrones')
 def get_drones():
-    APP.test_
     return jsonify(URI)
 
 

@@ -1,11 +1,7 @@
-from threading import Thread
-import threading
-from time import sleep
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
 from cflib.crazyflie.log import LogConfig
-from flask import Flask, copy_current_request_context
 from flask_socketio import SocketIO
 
 from constants import COMMANDS
@@ -13,9 +9,8 @@ from services.communication.abstract_comm import AbstractComm
 
 class CommCrazyflie(AbstractComm):
 
-    def __init__(self, socketIO: SocketIO, drone_list: list, app: Flask):
+    def __init__(self, socketIO: SocketIO, drone_list: list):
         super().__init__(socketIO)
-        self.APP = app
         print('Creating Embedded Crazyflie communication')
         self.links = list(map(lambda drone: drone['name'], drone_list))
         self.crazyflies: list[Crazyflie] = list(map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
@@ -27,7 +22,6 @@ class CommCrazyflie(AbstractComm):
         self.sync_crazyflies: list[SyncCrazyflie] = []
         self.__init_drivers()
         self.setup_log()
-        #self.SOCKETIO.start_background_task(self.__emit_to_client)
 
     def __del__(self):
         for sync in self.sync_crazyflies:
@@ -35,16 +29,6 @@ class CommCrazyflie(AbstractComm):
 
     def __init_drivers(self):
         cflib.crtp.init_drivers()
-
-    #@copy_current_request_context
-    def __emit_to_client(self):
-        while True:
-            sleep(1)
-            with self.APP.test_request_context('/') as app_ctx:
-                self.SOCKETIO.emit('getMapData', 
-                        [],
-                        namespace='/getMapData',
-                        broadcast=True)
 
     def setup_log(self):
         self.log_configs: list[LogConfig] = []
