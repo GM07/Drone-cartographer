@@ -22,15 +22,15 @@ class CommSimulation(AbstractComm):
     comm=CommSimulation()
     comm.send_command('Launch')"""
 
-    SOCKET_COMMAND_PATH = '/tmp/socket/{}{}'
-    SOCKET_DATA_PATH = '/tmp/socket/data{}{}'
+    SOCKET_COMMAND_PATH = '/tmp/socket/{}'
+    SOCKET_DATA_PATH = '/tmp/socket/data{}'
 
     def __init__(self, drone_list=[]):
 
         self.nb_connections = len(drone_list)
         self.thread_active = True
-        self.__commands_queue = queue.Queue(10)
-        self.__commands_thread = threading.Thread(
+        self.__COMMANDS_QUEUE = queue.Queue(10)
+        self.__COMMANDS_THREAD = threading.Thread(
             target=self.__send_command_tasks_wrapper,
             daemon=True,
             name='[Simulation] Commands thread')
@@ -50,11 +50,11 @@ class CommSimulation(AbstractComm):
             file_name = self.SOCKET_DATA_PATH.format(drone_list[i]['name'])
             self.data_servers[self.__init_server_bind(file_name)] = None
 
-        self.__commands_thread.start()
+        self.__COMMANDS_THREAD.start()
         self.__receive_thread.start()
 
     def shutdown(self):
-        self.threadActive = False
+        self.thread_active = False
         try:
             self.__COMMANDS_QUEUE.get_nowait()
         except queue.Empty:
@@ -73,7 +73,7 @@ class CommSimulation(AbstractComm):
 
     def send_command(self, command: COMMANDS):
         try:
-            self.__commands_queue.put_nowait(command)
+            self.__COMMANDS_QUEUE.put_nowait(command)
         except queue.Full:
             pass
 
@@ -183,7 +183,7 @@ class CommSimulation(AbstractComm):
 
     def __thread_send_command(self):
         missing_connection = False
-        while not missing_connection and self.threadActive:
+        while not missing_connection and self.thread_active:
             command = self.__COMMANDS_QUEUE.get()
             if command is None:
                 return
