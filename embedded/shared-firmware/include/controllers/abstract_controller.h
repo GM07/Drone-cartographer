@@ -61,7 +61,7 @@ class AbstractController {
 
   virtual void sendP2PMessage(void* message, size_t size) = 0;
   virtual void receiveP2PMessage(
-      std::unordered_map<size_t, DroneData>& p2pData) = 0;
+      std::unordered_map<size_t, DroneData>* p2pData) = 0;
 
   virtual void log(const std::string& message) = 0;
   virtual size_t getId() = 0;

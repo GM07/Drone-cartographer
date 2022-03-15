@@ -7,8 +7,8 @@ void Drone::step() {
   updateCrashStatus();
   updateSensorsData();
 
-  m_controller->sendP2PMessage(static_cast<void*>(&m_data), sizeof(m_data));
-  m_controller->receiveP2PMessage(m_peerData);
+  m_controller->sendP2PMessage(static_cast<void *>(&m_data), sizeof(m_data));
+  m_controller->receiveP2PMessage(&m_peerData);
 
   switch (m_controller->state) {
     case State::kIdle:
@@ -82,13 +82,12 @@ void Drone::wallAvoidance() {
 }
 
 void Drone::collisionAvoidance() {
-  for (auto data : m_peerData) {
+  for (const std::pair<const uint64_t, DroneData> &data : m_peerData) {
     DroneData peerData = data.second;
 
     if (peerData.range <= kSimulationCollisionAvoidanceRange) {
       if (m_usedPeerData.find(peerData.id) == m_usedPeerData.end()) {
         m_usedPeerData.insert_or_assign(peerData.id, peerData);
-        // m_normal += m_data.direction;
         m_normal += peerData.direction - m_data.direction;
       }
     } else {

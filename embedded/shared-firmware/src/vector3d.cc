@@ -77,6 +77,6 @@ bool Vector3D::areSameDirection(const Vector3D& vec1, const Vector3D& vec2) {
          kLimit;
 }
 
-Vector3D Vector3D::x(float value) { return Vector3D(value, 0.0f, 0.0f); }
-Vector3D Vector3D::y(float value) { return Vector3D(0.0f, value, 0.0f); }
-Vector3D Vector3D::z(float value) { return Vector3D(0.0f, 0.0f, value); }
+Vector3D Vector3D::x(float value) { return Vector3D(value, 0.0F, 0.0F); }
+Vector3D Vector3D::y(float value) { return Vector3D(0.0F, value, 0.0F); }
+Vector3D Vector3D::z(float value) { return Vector3D(0.0F, 0.0F, value); }

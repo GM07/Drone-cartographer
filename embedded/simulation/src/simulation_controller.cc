@@ -164,17 +164,17 @@ void SimulationController::sendP2PMessage(void* message, size_t size) {
 }
 
 void SimulationController::receiveP2PMessage(
-    std::unordered_map<size_t, DroneData>& p2pData) {
+    std::unordered_map<size_t, DroneData>* p2pData) {
   std::vector<argos::CCI_RangeAndBearingSensor::SPacket> readings =
       m_ccrazyflieSensing->m_pcRABS->GetReadings();
   for (auto reading : readings) {
-    DroneData data((DroneData*)reading.Data.ToCArray());
+    DroneData data(
+        reinterpret_cast<DroneData*>(reading.Data.ToCArray()));  // NOLINT
     data.range = reading.Range;
-    p2pData.insert_or_assign(data.id, data);
+    p2pData->insert_or_assign(data.id, data);
   }
 }
 
 size_t SimulationController::getId() {
-  log(m_ccrazyflieSensing->GetId());
   return std::hash<std::string>{}(m_ccrazyflieSensing->GetId());
 }

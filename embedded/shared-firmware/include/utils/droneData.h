@@ -5,13 +5,13 @@
 
 struct DroneData {
   Vector3D direction;
-  float distanceFromTakeoff;
-  float range;
-  size_t id;
+  float distanceFromTakeoff = 0;
+  float range = 0;
+  size_t id = 0;
 
   DroneData() = default;
 
-  DroneData(const DroneData* data) {
+  explicit DroneData(const DroneData* data) {
     direction =
         Vector3D(data->direction.m_x, data->direction.m_y, data->direction.m_z);
     distanceFromTakeoff = data->distanceFromTakeoff;

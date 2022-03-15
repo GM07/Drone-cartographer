@@ -11,10 +11,10 @@
 #include "utils/droneData.h"
 
 // Meters and seconds
-constexpr float kDroneSpeed = 1.0f;
-constexpr float kTakeOffSpeed = 1.0f;
-constexpr float kLandingSpeed = 0.25f;
-constexpr float kHeight = 0.3f;
+constexpr float kDroneSpeed = 1.0F;
+constexpr float kTakeOffSpeed = 1.0F;
+constexpr float kLandingSpeed = 0.25F;
+constexpr float kHeight = 0.3F;
 constexpr int kMaxNbPeerData = 20;
 constexpr int kMessageMaxSize = 32;
 constexpr float kSimulationCollisionAvoidanceRange = 20.0F;
@@ -24,8 +24,8 @@ class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
       : m_messageRX(), m_controller(controller) {
-    static constexpr float kFirstNumber = 0.5;
-    static constexpr float kSecondNumber = 1.225;
+    static constexpr float kFirstNumber = 0.5F;
+    static constexpr float kSecondNumber = 1.225F;
 
     static std::array<Vector3D, kNbStartingDirection> startingDirection{
         {Vector3D(kSecondNumber, kFirstNumber, 0.0F),
