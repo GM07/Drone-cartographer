@@ -1,16 +1,16 @@
 <template>
   <v-virtual-scroll
     id="scroll"
-    height="100"
+    :elevation="20"
+    height="200"
     item-height="20"
     :items="this.logs"
-    style="z-index: 10"
   >
     <template v-slot:default="{item}">
       <v-list-item :key="item[0]">
         <v-list-item-content>
           <v-list-item-title>
-            <strong> {{ item }}</strong>
+            <p>{{ item[0] }} {{ item[1] }}</p>
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>

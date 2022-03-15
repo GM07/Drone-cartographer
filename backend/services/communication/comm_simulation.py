@@ -207,7 +207,8 @@ class CommSimulation(AbstractComm):
                 try:
                     conn.send(bytearray(command))
 
-                    self.send_log([(datetime.now().isoformat(), command)])
+                    self.send_log([(datetime.now().isoformat(),
+                                    COMMANDS(command).name)])
                 except BrokenPipeError:
                     print('Command could not be sent, BrokenPipeError')
                     self.send_log([(datetime.now().isoformat(), 'Broken Pipe')])
