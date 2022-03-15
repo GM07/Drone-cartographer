@@ -83,7 +83,7 @@
       "dependsOn" : [
         "Compile Simulation Firmware"
       ],
-      "command": "cd build && ../../run-clang-tidy.py -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type\""
+      "command": "cd build && ../../run-clang-tidy.py -quiet -header-filter='.*simulation|shared-firmware.*' -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes\""
     },
     
     {
@@ -92,7 +92,7 @@
       "options": {
         "cwd": "${workspaceFolder}/embedded-firmware/lint-workspace"
       },
-      "command": "../../run-clang-tidy.py -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type\""
+      "command": "../../run-clang-tidy.py -quiet -header-filter='.*embedded-firmware|shared-firmware.*' -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes\""
     },
     {
       "label": "Run Pipeline",

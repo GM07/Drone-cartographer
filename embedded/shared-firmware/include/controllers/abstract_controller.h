@@ -27,18 +27,20 @@ class AbstractController {
  public:
   virtual ~AbstractController() = default;
   AbstractController() = default;
-  AbstractController(std::unique_ptr<AbstractSensors>&& abstractSensors);
   AbstractController(AbstractController&& other) = delete;
   AbstractController& operator=(AbstractController&& other) = delete;
   AbstractController(const AbstractController& other) = delete;
   AbstractController& operator=(const AbstractController& other) = delete;
 
+  explicit AbstractController(
+      std::unique_ptr<AbstractSensors>&& abstractSensors);
+
   virtual void setVelocity(const Vector3D& direction, float speed) = 0;
   virtual void takeOff(float height) = 0;
   virtual void land() = 0;
 
-  virtual Vector3D getCurrentLocation() const = 0;
-  virtual bool isTrajectoryFinished() const = 0;
+  [[nodiscard]] virtual Vector3D getCurrentLocation() const = 0;
+  [[nodiscard]] virtual bool isTrajectoryFinished() const = 0;
 
   virtual void initCommunicationManager() = 0;
   virtual size_t receiveMessage(void* message, size_t size) = 0;
@@ -50,7 +52,7 @@ class AbstractController {
 
   virtual void delay(uint32_t ticks) = 0;
   virtual void updateSensorsData() = 0;
-  virtual bool isDroneCrashed() const = 0;
+  [[nodiscard]] virtual bool isDroneCrashed() const = 0;
 
   State state = State::kIdle;
   std::unique_ptr<AbstractSensors> m_abstractSensors;
