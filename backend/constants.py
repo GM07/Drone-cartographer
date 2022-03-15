@@ -1,5 +1,3 @@
-# pylint: disable=trailing-comma-tuple
-# Because communication fails without it
 """"File containing constants for Drone Communication"""
 from enum import Enum
 
