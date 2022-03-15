@@ -169,14 +169,6 @@ def send_logs():
                   skip_sid=True)
 
 
-@APP.route('/getCurrentLogs')
-def get_current_logs():
-
-    return jsonify(COMM.logs)
-
-
 if __name__ == '__main__':
     print('The backend is running on port 5000')
-    print(SOCKETIO.async_mode)
-
     SOCKETIO.run(APP, debug=False, host='0.0.0.0', port=5000)
