@@ -28,3 +28,17 @@ embedded:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       changes:
         - embedded/**/*
+
+backend:
+  stage: triggers
+  trigger:
+    include: 
+      - local: '/backend/.gitlab-ci.yml'
+    strategy: depend
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - backend/**/*
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - backend/**/*

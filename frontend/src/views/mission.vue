@@ -40,7 +40,10 @@
 
     <v-navigation-drawer app permanent touchless>
       <div id="top">
-        <NavigationCommands :accessStatus="accessStatus" />
+        <NavigationCommands
+          :accessStatus="accessStatus"
+          :droneList="droneList"
+        />
         <v-divider></v-divider>
         <DroneCommands
           v-if="isDroneCommandsEnabled()"
@@ -91,6 +94,7 @@ import DroneMenu from '@/components/drone_menu.vue';
 import {SOCKETIO_LIMITED_ACCESS} from '@/communication/server_constants';
 import {AccessStatus} from '@/communication/access_status';
 import {Drone} from '@/communication/drone';
+import {ServerCommunication} from '@/communication/server_communication';
 
 @Component({
   components: {
@@ -114,6 +118,10 @@ export default class Mission extends Vue {
 
   public deleteDrone(index: number): void {
     this.droneList.splice(index, 1);
+    ServerCommunication.setDrone(
+      this.droneList,
+      this.accessStatus.isMissionSimulated
+    );
   }
 
   public setSelected(index: number): void {
@@ -126,6 +134,10 @@ export default class Mission extends Vue {
 
   public addDrone(drone: Drone): void {
     this.droneList.push({...drone});
+    ServerCommunication.setDrone(
+      this.droneList,
+      this.accessStatus.isMissionSimulated
+    );
   }
 
   public isDroneCommandsEnabled(): boolean {

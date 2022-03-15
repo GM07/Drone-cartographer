@@ -7,7 +7,7 @@
 
 class StubFirmwareSensors : public AbstractSensors {
  public:
-  StubFirmwareSensors(){};
+  StubFirmwareSensors() = default;
   StubFirmwareSensors(const StubFirmwareSensors&) = delete;
   StubFirmwareSensors& operator=(const StubFirmwareSensors&) = delete;
   virtual ~StubFirmwareSensors() = default;

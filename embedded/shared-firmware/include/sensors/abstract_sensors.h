@@ -4,6 +4,11 @@
 class AbstractSensors {
  public:
   AbstractSensors() = default;
+  AbstractSensors(AbstractSensors&&) = delete;
+  AbstractSensors(const AbstractSensors&) = delete;
+  AbstractSensors& operator=(const AbstractSensors&) = delete;
+  AbstractSensors& operator=(AbstractSensors&&) = delete;
+
   virtual ~AbstractSensors() = default;
 
   [[nodiscard]] virtual float getFrontDistance() const = 0;

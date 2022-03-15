@@ -48,7 +48,7 @@ export default class Map extends Vue {
       TEMPARRAYPERIM.push(
         new Vec2d(
           data.position[0] * 100,
-          data.position[1] - data.sensors.right / 10
+          data.position[1] * 100 - data.sensors.right / 10
         )
       );
     if (data.sensors.back > 0)
@@ -58,13 +58,13 @@ export default class Map extends Vue {
           data.position[1] * 100
         )
       );
-    /*if (data.sensors.left > 0)
+    if (data.sensors.left > 0)
       TEMPARRAYPERIM.push(
         new Vec2d(
           data.position[0] * 100,
           data.position[1] * 100 + data.sensors.left / 10
         )
-      );*/
+      );
 
     const TEMP_OPTIONS = Vue.lodash.cloneDeep(this.options);
     TEMP_OPTIONS.series[0].data = TEMPARRAYDRONES;

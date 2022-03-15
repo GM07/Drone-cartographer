@@ -4,7 +4,7 @@
         {
             "label": "Lint Backend Server",
             "type": "shell",
-            "command": "pylint * --rcfile pylintrc"
+            "command": "find . -type f -name '*.py' | xargs pylint  --rcfile pylintrc"
         },
         {
             "label": "Run tests",
@@ -12,10 +12,9 @@
             "command": "pytest"
         },
         {
-            "label": "Start server",
+            "label": "Run autoformater",
             "type": "shell",
-            "command": "python3 server.py"
+            "command": "yapf --style google -rpi ."
         }
     ]
-
 }

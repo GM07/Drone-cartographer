@@ -19,10 +19,11 @@ export class ServerCommunication {
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
-  public static takeMissionControl(): boolean {
+  public static takeMissionControl(droneList: Drone[]): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
-        SERVER_CONSTANTS.TAKE_CONTROL_ADDRESS
+        SERVER_CONSTANTS.TAKE_CONTROL_ADDRESS,
+        droneList
       );
     }
 
@@ -31,10 +32,12 @@ export class ServerCommunication {
 
   public static takeMissionControlTimeout(
     timeout: number,
+    droneList: Drone[],
     callback: () => void
   ): void {
     SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.timeout(timeout).emit(
       SERVER_CONSTANTS.TAKE_CONTROL_ADDRESS,
+      droneList,
       callback
     );
   }
@@ -62,14 +65,12 @@ export class ServerCommunication {
 
   public static launchMission(
     isMissionSimulated: boolean,
-    droneList: Drone[],
     callback: () => void
   ): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
         SERVER_CONSTANTS.LAUNCH_MISSION_ADDRESS,
         isMissionSimulated,
-        droneList,
         callback
       );
     }
@@ -97,6 +98,16 @@ export class ServerCommunication {
     }
 
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
+  public static setDrone(drone: Drone[], isMissionSimulated: boolean): void {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.SET_DRONE_ADDRESS,
+        drone,
+        isMissionSimulated
+      );
+    }
   }
 
   public static getCompletedMissions(): Promise<Response> {

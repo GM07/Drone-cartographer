@@ -6,7 +6,12 @@
 class FirmwareSensors : public AbstractSensors {
  public:
   FirmwareSensors() = default;
-  virtual ~FirmwareSensors() = default;
+  ~FirmwareSensors() override = default;
+
+  FirmwareSensors(const FirmwareSensors&) = delete;
+  FirmwareSensors(FirmwareSensors&&) = delete;
+  FirmwareSensors& operator=(const FirmwareSensors&);
+  FirmwareSensors& operator=(FirmwareSensors&&) noexcept;
 
   [[nodiscard]] float getFrontDistance() const override;
   [[nodiscard]] float getLeftDistance() const override;

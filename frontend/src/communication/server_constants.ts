@@ -11,6 +11,7 @@ export const LAUNCH_MISSION_ADDRESS = 'launch';
 export const RETURN_TO_BASE_ADDRESS = 'return_to_base';
 export const TERMINATE_MISSION_ADDRESS = 'terminate';
 export const SET_MISSION_TYPE_ADDRESS = 'set_mission_type';
+export const SET_DRONE_ADDRESS = 'set_drone';
 export const GET_MISSION_STATUS_NAMESPACE = '/getMissionStatus';
 export const LIMITED_ACCESS_NAMESPACE = '/limitedAccess';
 export const MAP_DATA_NAMESPACE = '/getMapData';
