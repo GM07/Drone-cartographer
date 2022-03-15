@@ -107,7 +107,7 @@ class CommSimulation(AbstractComm):
                 try:
                     server.setblocking(True)
                     server.settimeout(None)
-                    conn , _ = server.accept()
+                    conn, _ = server.accept()
                     print(conn)
                     server_dict[server] = conn
                 except socket.error as socket_error:
