@@ -200,6 +200,7 @@ class CommSimulation(AbstractComm):
             if command == COMMANDS.LAUNCH.value:
                 self.current_mission = Mission(0, self.nb_connections, True, 0,
                                                [[]])
+                self.logs = []
                 self.mission_start_time = perf_counter()
 
             print('Sending command ', command, ' to simulation')
@@ -222,6 +223,6 @@ class CommSimulation(AbstractComm):
                 self.current_mission.flight_duration = self.mission_start_time - perf_counter(
                 )
                 self.current_mission.logs = self.logs
-                self.logs = []
+
                 database = Database()
                 database.upload_mission_info(self.current_mission)
