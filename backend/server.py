@@ -24,9 +24,6 @@ APP.config['SECRET_KEY'] = 'dev'
 ASYNC_MODE = 'gevent'
 SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 
-# Map instance to store map exploration data
-#MAP = Map()
-
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
@@ -46,7 +43,6 @@ def identify_drone(drone_addr):
 
     COMM.send_command(COMMANDS.IDENTIFY.value, [drone_addr])
     return 'Identified drone'
-
 
 # Launch mission
 @SOCKETIO.on('launch', namespace="/limitedAccess")
@@ -132,9 +128,6 @@ def disconnect():
 def MissionConnect():
     MissionStatus.client_connected(SOCKETIO, request)
     return ''
-
-def send_data(points):
-    SOCKETIO.emit('getMapData', points, namespace='/getMapData', broadcast=True, include_self=False, skip_sid=True)
 
 if __name__ == '__main__':
     print('The backend is running on port 5000')

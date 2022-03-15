@@ -1,9 +1,5 @@
 from enum import Enum
-import pprint
-import random
 from services.communication.byte_decoder import ByteDecoder
-from services.map.map import Map
-
 
 class DroneSensors:
     def __init__(self, front: float, left: float, back: float, right: float):
@@ -57,14 +53,6 @@ class DroneData:
             + ' \nState ' \
             + str(self.state.name) \
             + '\n\n'
-
-    def convert_map_data(self): 
-        #return [random.randint(0, 10), random.randint(0, 10), random.randint(0, 10), random.randint(0, 10)]
-        return [self.position.x, self.position.y, 
-                self.position.x + self.sensors.front, self.position.y, 
-                self.position.x, self.position.y - self.sensors.right,
-                self.position.x - self.sensors.back, self.position.y, 
-                self.position.x, self.position.y + self.sensors.left]
 
 """
 Drone GetData (0x04)
