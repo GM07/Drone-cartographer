@@ -36,19 +36,19 @@ export default class Map extends Vue {
       new Vec2d(data.position[0], data.position[1]),
     ];
     const TEMPARRAYPERIM: Vec2d[] = [];
-    if (data.sensors.front !== -20)
+    if (data.sensors.front < 0)
       TEMPARRAYPERIM.push(
         new Vec2d(data.position[0] + data.sensors.front / 10, data.position[1])
       );
-    if (data.sensors.right !== -20)
+    if (data.sensors.right < 0)
       TEMPARRAYPERIM.push(
         new Vec2d(data.position[0], data.position[1] - data.sensors.right / 10)
       );
-    if (data.sensors.back !== -20)
+    if (data.sensors.back < 0)
       TEMPARRAYPERIM.push(
         new Vec2d(data.position[0] - data.sensors.back / 10, data.position[1])
       );
-    if (data.sensors.left !== -20)
+    if (data.sensors.left < 0)
       TEMPARRAYPERIM.push(
         new Vec2d(data.position[0], data.position[1] + data.sensors.left / 10)
       );
