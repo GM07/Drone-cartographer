@@ -11,7 +11,7 @@
               <v-col cols="12">
                 <v-text-field
                   v-model="newDrone.name"
-                  label="Nom du drone"
+                  label="Adresse du drone"
                   required
                   :rules="[validateDroneExistTwice, mandatory]"
                 ></v-text-field>
