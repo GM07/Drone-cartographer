@@ -122,16 +122,17 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
 
 void FirmwareController::sendP2PMessage(void* message, size_t size) {
   static P2PPacket p_reply;
-  p_reply.port = 0x00;
-  memcpy(&p_reply.data, message, size);
-  p_reply.size = size + 1;
+  p_reply.port = 0x00;                   // NOLINT
+  memcpy(&p_reply.data, message, size);  // NOLINT
+  p_reply.size = size + 1;               // NOLINT
   radiolinkSendP2PPacketBroadcast(&p_reply);
 }
 
 void FirmwareController::receiveP2PMessage(
     std::unordered_map<size_t, DroneData>* p2pData) {
   while (!receivedP2PPacket.empty()) {
-    DroneData data((DroneData*)&receivedP2PPacket.front().data);
+    DroneData data(reinterpret_cast<DroneData*>(  // NOLINT
+        &receivedP2PPacket.front().data));        // NOLINT
     data.range = receivedP2PPacket.front().rssi;
     p2pData->insert_or_assign(data.id, data);
     receivedP2PPacket.pop();
@@ -140,6 +141,6 @@ void FirmwareController::receiveP2PMessage(
 
 size_t FirmwareController::getId() {
   uint64_t address = configblockGetRadioAddress();
-  uint8_t my_id = static_cast<uint8_t>((address)&0x00000000ff);
+  auto my_id = static_cast<uint8_t>((address)&kRadioAddressMask);
   return my_id;
 }

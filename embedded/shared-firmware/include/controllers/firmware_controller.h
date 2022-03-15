@@ -11,6 +11,7 @@ extern "C" {
 }
 
 extern std::queue<P2PPacket> receivedP2PPacket;
+constexpr uint64_t kRadioAddressMask = 0x00000000ff;
 
 class FirmwareController : public AbstractController {
  public:

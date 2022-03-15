@@ -17,7 +17,9 @@ extern "C" {
 
 static bool isInit = false;
 std::queue<P2PPacket> receivedP2PPacket;
-static int rssi = 255;
+
+// TODO - Remove this after testing // NOLINT
+static int rssi = 255;  // NOLINT
 
 /////////////////////////////////////////////////////////////////////////
 Drone& Drone::getEmbeddedDrone() {
@@ -59,7 +61,7 @@ void addLoggingVariables() {
   LOG_GROUP_START(custom)  // NOLINT
   LOG_ADD(LOG_UINT8, state, &Drone::getEmbeddedDrone().getController()->state)
 
-  // TODO - remove after rssi to cm conversion or threshold has been established
+  // TODO - remove after rssi test has been established // NOLINT
   LOG_ADD(LOG_UINT8, rssi, &rssi)
   LOG_GROUP_STOP(custom)
 }
@@ -68,7 +70,7 @@ void addLoggingVariables() {
 void p2pcallbackHandler(P2PPacket* p) {
   receivedP2PPacket.push(*p);
 
-  // TODO - remove after rssi to cm conversion or threshold has been established
+  // TODO - remove after rssi test has been established // NOLINT
   rssi = p->rssi;
 }
 
