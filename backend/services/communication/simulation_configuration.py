@@ -1,15 +1,22 @@
+"""This module includes the necessary class
+to be able to configure the simulation"""
 import shutil
 import pathlib
 import os
 import subprocess
 import xml.etree.ElementTree as ET
 
+
 class SimulationConfiguration:
+    """This class configures the argos3 simulation
+    an example would be
+    sim = SimulationConfiguration()
+    sim.add_drone(Drone())"""
 
     def __init__(self):
         current_path = str(pathlib.Path(__file__).parent.resolve())
         shutil.copyfile(current_path + '/template.argos',
-         current_path + '/crazyflie_sensing.argos')
+                        current_path + '/crazyflie_sensing.argos')
 
     def add_drone(self, drone):
         current_path = str(pathlib.Path(__file__).parent.resolve())
@@ -29,12 +36,11 @@ class SimulationConfiguration:
         battery.set('orient_delta', '1e-3')
 
         body = ET.SubElement(crazyflie, 'body')
-        body.set('position', str(drone['xPos'])
-				+ ',' + str(drone['yPos']) + ',0')
+        body.set('position',
+                 str(drone['xPos']) + ',' + str(drone['yPos']) + ',0')
         body.set('orientation', '0,0,0')
 
         tree.write(current_path + '/crazyflie_sensing.argos')
-
 
     def add_obstacles(self):
         current_path = str(pathlib.Path(__file__).parent.resolve())
@@ -68,15 +74,14 @@ class SimulationConfiguration:
         nb_tries = 0
         max_nb_tries = 25
         current_path = str(pathlib.Path(__file__).parent.resolve())
-        os.system('docker cp ' + current_path
-				+ '/crazyflie_sensing.argos embedded:/crazyflie_sensing.argos')
+        os.system('docker cp ' + current_path +
+                  '/crazyflie_sensing.argos embedded:/crazyflie_sensing.argos')
 
         while nb_tries < max_nb_tries:
             return_value = subprocess.call(current_path + '/docker_exec.sh',
-						shell=True)
+                                           shell=True)
 
             if return_value == 0:
                 break
             nb_tries = nb_tries + 1
         os.system('rm -f ' + current_path + '/crazyflie_sensing.argos')
-

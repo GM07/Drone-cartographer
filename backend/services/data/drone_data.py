@@ -1,46 +1,49 @@
+"""This module provides classes such as DroneSensors,
+DroneState and DroneData to be able to regroup the information
+taken from the drones"""
 from enum import Enum
-import pprint
 from services.communication.byte_decoder import ByteDecoder
 
 
 class DroneSensors:
+    """This class provides an interface for the sensors on the drones """
+
     def __init__(self, front: float, left: float, back: float, right: float):
         self.front = front
         self.left = left
         self.back = back
         self.right = right
 
+
 class Point2D:
+    """This class provides an interface for coordinates"""
+
     def __init__(self, x: float, y: float, z: float = 0):
         self.x = x
         self.y = y
         self.z = z
 
+
 class DroneState(Enum):
-    Idle = 0
-    TakingOff = 1
-    Landing = 2
-    Dead = 3
-    Exploring = 4
-    Crashed = 5
+    IDLE = 0
+    TAKING_OFF = 1
+    LANDING = 2
+    DEAD = 3
+    EXPLORING = 4
+    CRASHED = 5
+
 
 class DroneData:
+    """This class regroups all the data taken from the drones"""
 
     DATA_SIZE: int = 32
-
-    def __init__(self, sensors: DroneSensors, position: Point2D,
-        battery_level: float, state: DroneState):
-        self.sensors = sensors
-        self.position = position
-        self.battery_level = battery_level
-        self.state = state
 
     def __init__(self, data: bytes):
         self.__from_bytes(data)
 
     def __from_bytes(self, data: bytes):
-        decoder: ByteDecoder = ByteDecoder(data,
-            ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'i'])
+        decoder: ByteDecoder = ByteDecoder(
+            data, ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'i'])
         values = decoder.get_values()
         self.sensors = DroneSensors(values[0], values[1], values[2], values[3])
         self.position = Point2D(values[4], values[5])
@@ -63,8 +66,10 @@ class DroneData:
             + str(self.state.name) \
             + '\n\n'
 
+
 def log_entry_to_drone_data(log_entry):
     pass
+
 
 """
 Drone GetData (0x04)
