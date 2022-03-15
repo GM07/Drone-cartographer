@@ -21,7 +21,7 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import {SOCKETIO_GET_LOGS} from '@/communication/server_constants';
-
+const SCROLL_DIFFERENCE = 240;
 @Component({})
 export default class LogsInterface extends Vue {
   private logs: Array<[string, string]> = [];
@@ -35,7 +35,8 @@ export default class LogsInterface extends Vue {
       this.logs.push(...logs);
       const SCROLLBAR = document.getElementById('scroll');
       if (SCROLLBAR) {
-        isBottom = SCROLLBAR.scrollTop + 240 >= SCROLLBAR.scrollHeight;
+        isBottom =
+          SCROLLBAR.scrollTop + SCROLL_DIFFERENCE >= SCROLLBAR.scrollHeight;
 
         if (isBottom)
           this.$nextTick(() => {
