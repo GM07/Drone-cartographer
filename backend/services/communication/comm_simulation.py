@@ -108,7 +108,6 @@ class CommSimulation(AbstractComm):
                     server.setblocking(True)
                     server.settimeout(None)
                     conn, _ = server.accept()
-                    print(conn)
                     server_dict[server] = conn
                 except socket.error as socket_error:
                     if socket_error.errno == EINVAL:
