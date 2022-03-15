@@ -9,8 +9,6 @@ from flask_cors import CORS
 from services.communication.abstract_comm import AbstractComm
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
-import services.status.access_status as AccessStatus
-import services.status.mission_status as MissionStatus
 from services.communication.simulation_configuration import SimulationConfiguration
 from constants import MAX_TIMEOUT, COMMANDS, URI
 from services.communication.database.mongo_interface import Database
