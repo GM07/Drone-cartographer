@@ -88,20 +88,17 @@
     </v-navigation-drawer>
     <div
       v-if="isLogsMenuOpen"
+      id="LogsInterfaceContainer"
       class="mb-10"
-      style="position: absolute; bottom: 0; width: 100%"
+      style="position: absolute; bottom: 0; width: 100%; min-width: 1400px"
     >
-      <div>
-        <h3 class="ma-3" style="float: left">Logs</h3>
-        <v-icon
-          class="ma-3"
-          color="black"
-          style="float: right"
-          @click="setLogsMenuOpen(false)"
+      <div id="LogTitle">
+        <h3 class="ma-3">Logs</h3>
+        <v-icon class="ma-3" color="black" @click="setLogsMenuOpen(false)"
           >mdi-close</v-icon
         >
       </div>
-      <div style="border: 10px; float: left; width: 100%">
+      <div id="logs">
         <LogsInterface />
       </div>
     </div>
@@ -111,6 +108,21 @@
 <style scoped>
 .v-btn--active.no-active:not(:hover)::before {
   opacity: 0 !important;
+}
+
+#LogTitle {
+  display: flex;
+  flex-direction: row;
+
+  width: 100%;
+  justify-content: space-between;
+}
+
+#logs {
+  border: 10px;
+  float: left;
+  width: 100%;
+  overflow-x: auto;
 }
 </style>
 
