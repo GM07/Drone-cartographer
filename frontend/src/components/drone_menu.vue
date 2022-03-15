@@ -117,9 +117,9 @@ export default class DroneMenu extends Vue {
 
   public validateDroneNameLength(v: string): boolean | string {
     return (
-      v.length < 20 ||
+      v.length < 40 ||
       v.length === 0 ||
-      'Le nom du drone doit être entre 0 et 20 caractères'
+      'Le nom du drone doit être entre 0 et 40 caractères'
     );
   }
 
@@ -150,7 +150,7 @@ export default class DroneMenu extends Vue {
 
   public validateDroneNameCharacters(v: string): boolean | string {
     return (
-      v.match('^[a-zA-Z0-9_]*$') !== null ||
+      v.match('^[a-zA-Z0-9_:/]*$') !== null ||
       'Le nom du drone contient des caractères invalides'
     );
   }

@@ -33,18 +33,24 @@ import {ServerCommunication} from '@/communication/server_communication';
 import {ROUTER} from '@/router';
 import {ACCESSOR} from '@/store';
 import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Drone} from '@/communication/drone';
 
 @Component({})
 export default class NavigationCommands extends Vue {
   @Prop() private accessStatus!: AccessStatus;
+  @Prop() private droneList!: Drone[];
   public attemptedLimitedConnection = false;
 
   constructor() {
     super();
     const TIMEOUT = 1000;
-    ServerCommunication.takeMissionControlTimeout(TIMEOUT, () => {
-      this.setLimitedConnection(true);
-    });
+    ServerCommunication.takeMissionControlTimeout(
+      TIMEOUT,
+      this.droneList,
+      () => {
+        this.setLimitedConnection(true);
+      }
+    );
   }
 
   public setLimitedConnection(connection: boolean): void {
@@ -65,7 +71,7 @@ export default class NavigationCommands extends Vue {
 
   public takeMissionControl(): void {
     if (!ACCESSOR.missionStatus.isSomeoneControlling)
-      ServerCommunication.takeMissionControl();
+      ServerCommunication.takeMissionControl(this.droneList);
   }
 
   public revokeMissionControl(): void {

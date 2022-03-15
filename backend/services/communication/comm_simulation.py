@@ -28,6 +28,7 @@ class CommSimulation(AbstractComm):
     def __init__(self, drone_list=[]):
 
         self.nb_connections = len(drone_list)
+        self.drone_list = drone_list
         self.thread_active = True
         self.__COMMANDS_QUEUE = queue.Queue(10)
         self.__COMMANDS_THREAD = threading.Thread(
@@ -75,6 +76,7 @@ class CommSimulation(AbstractComm):
         try:
             self.__COMMANDS_QUEUE.put_nowait(command)
         except queue.Full:
+            print("Command queue is full")
             pass
 
     def __init_server_bind(self, file_name: str):
@@ -110,6 +112,7 @@ class CommSimulation(AbstractComm):
                     conn, _ = server.accept()
                     server_dict[server] = conn
                 except socket.error as socket_error:
+                    print(socket_error)
                     if socket_error.errno == EINVAL:
                         return
                     else:
@@ -187,7 +190,6 @@ class CommSimulation(AbstractComm):
             command = self.__COMMANDS_QUEUE.get()
             if command is None:
                 return
-            print('Sending command ', command, ' to simulation')
             for server, conn in self.command_servers.items():
                 try:
                     conn.send(bytearray(command))
