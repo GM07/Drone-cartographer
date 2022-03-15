@@ -47,7 +47,7 @@
       "options": {
         "cwd": "${workspaceFolder}/embedded-firmware/validate"
       },
-      "command": "rm -rf build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./embedded_firmware"
+      "command": "rm -rf build/bin && mkdir -p build && cd build && cmake ../ && make -j`nproc` && ./embedded_firmware"
     },
     {
       "label": "Test shared firmware",
@@ -105,6 +105,17 @@
       ]
     },
     {
+      "label": "Coverage Embedded Firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/embedded-firmware/validate"
+      },
+      "dependsOn": [
+        "Test embedded firmware"
+      ],
+      "command": "lcov --directory ../src -c -d build/CMakeFiles -o cov.info --no-external && genhtml cov.info -o out"
+    },
+    {
       "label": "Coverage Shared Firmware",
       "type": "shell",
       "options": {
@@ -114,7 +125,7 @@
         "Test shared firmware"
       ],
       "command": "lcov --directory ../src -c -d build/CMakeFiles -o cov.info --no-external && genhtml cov.info -o out"
-    },
+    }
   ],
   "inputs": [
     {

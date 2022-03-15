@@ -1,6 +1,7 @@
 #ifndef ABSTRACT_CONTROLLER_H
 #define ABSTRACT_CONTROLLER_H
 
+#include <cstring>
 #include <memory>
 #include <string>
 
@@ -21,6 +22,15 @@ struct __attribute__((__packed__)) ControllerData {
   float posY;
   float batteryLevel;
   int state;
+
+  [[nodiscard]] bool operator==(const ControllerData& other) const {
+    return (front == other.front && left == other.left && back == other.back &&
+            right == other.right && posX == other.posX && posY == other.posY &&
+            batteryLevel == other.batteryLevel && state == other.state);
+  }
+  [[nodiscard]] bool operator!=(const ControllerData& other) const {
+    return !(*this == other);
+  }
 };
 
 class AbstractController {

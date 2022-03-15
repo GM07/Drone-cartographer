@@ -34,7 +34,7 @@ target_link_libraries(
 add_compile_definitions(STM32F40_41xxx)
 add_compile_definitions(STM32F4XX)
 
-set(CMAKE_CXX_FLAGS "-Wno-int-to-pointer-cast -Wno-return-type")
+set(CMAKE_CXX_FLAGS "-Wno-int-to-pointer-cast -Wno-return-type --coverage -g")
 
 
 target_include_directories(
