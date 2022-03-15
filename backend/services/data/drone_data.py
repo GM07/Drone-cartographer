@@ -67,10 +67,10 @@ class DroneData:
             + '\n\n'
 
 
-#def log_entry_to_drone_data(log_entry):
-#    pass
+def log_entry_to_drone_data(log_entry):
+    pass
 
-# pylint: disable=pointless-string-statement
+
 """
 Drone GetData (0x04)
 
