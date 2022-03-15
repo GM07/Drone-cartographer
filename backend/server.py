@@ -30,11 +30,6 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 COMM: AbstractComm = CommCrazyflie([])
 
 
-@APP.route('/getDrones')
-def get_drones():
-    return jsonify(COMM.get_drones())
-
-
 # Identifying drones
 @SOCKETIO.on('identify_drone', namespace='/limitedAccess')
 def identify_drone(drone_addr):
@@ -79,9 +74,18 @@ def addDrone(drone_list, is_simulated):
     global COMM
     COMM.set_drone(drone_list)
 
+    SOCKETIO.emit('droneList',
+                  COMM.get_drones(),
+                  namespace='/limitedAccess',
+                  broadcast=True,
+                  include_self=False,
+                  skip_sid=True)
+
     if not is_simulated:
         COMM = CommCrazyflie(
             drone_list)  # Recreate object to reconnect to drones
+
+    return ''
 
 
 @SOCKETIO.on('set_mission_type', namespace='/limitedAccess')
@@ -98,8 +102,6 @@ def set_mission_type(is_simulated: bool):
 
 
 # Terminate mission
-
-
 @SOCKETIO.on('terminate', namespace='/limitedAccess')
 def terminate():
     if (not MissionStatus.get_mission_started() or
@@ -113,11 +115,9 @@ def terminate():
 
 
 @SOCKETIO.on('take_control', namespace='/limitedAccess')
-def request_control(drone_list):
+def request_control():
     change = AccessStatus.take_control(SOCKETIO, request)
     if change:
-        global COMM
-        COMM.set_drone(drone_list)
         MissionStatus.update_all_clients(SOCKETIO)
     return ''
 
@@ -142,6 +142,16 @@ def disconnect():
     change = AccessStatus.client_disconnected(SOCKETIO, request)
     if change:
         MissionStatus.update_all_clients(SOCKETIO)
+    return ''
+
+
+@SOCKETIO.on('connect', namespace='/limitedAccess')
+def connect():
+    AccessStatus.update_specific_client(SOCKETIO, request.sid)
+    SOCKETIO.emit('droneList',
+                  COMM.get_drones(),
+                  namespace='/limitedAccess',
+                  room=request.sid)
     return ''
 
 
