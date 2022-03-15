@@ -34,7 +34,7 @@ class CommSimulation(AbstractComm):
             target=self.__send_command_tasks_wrapper,
             daemon=True,
             name='[Simulation] Commands thread')
-        self.__receive_thread = threading.Thread(
+        self.__RECEIVE_THREAD = threading.Thread(
             target=self.__receive_data_tasks_wrapper,
             daemon=True,
             name='[Simulation] Receiving thread')
@@ -51,7 +51,7 @@ class CommSimulation(AbstractComm):
             self.data_servers[self.__init_server_bind(file_name)] = None
 
         self.__COMMANDS_THREAD.start()
-        self.__receive_thread.start()
+        self.__RECEIVE_THREAD.start()
 
     def shutdown(self):
         self.thread_active = False
