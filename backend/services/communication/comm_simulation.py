@@ -1,6 +1,7 @@
 """This module has the CommSimulation class that is used to
 communicate with the simulation """
 
+from curses.ascii import DEL
 from errno import EINVAL, EWOULDBLOCK
 import socket
 import os
@@ -16,6 +17,8 @@ from services.data.drone_data import DroneData
 from services.communication.database.mongo_interface import Mission, Database
 from time import perf_counter, sleep
 from datetime import datetime
+
+DELAY = 0.500
 
 
 class CommSimulation(AbstractComm):
@@ -192,7 +195,7 @@ class CommSimulation(AbstractComm):
                         self.data_servers[server] = None
                     count += 1
 
-            sleep(0.500)
+            sleep(DELAY)
 
             for server in self.data_servers:
                 if self.data_servers[server] is not None:
