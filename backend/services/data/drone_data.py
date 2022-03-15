@@ -38,17 +38,8 @@ class DroneData:
 
     DATA_SIZE: int = 32
 
-    def __init__(self, sensors: DroneSensors, position: Point2D,
-                 battery_level: float, state: DroneState):
-        self.sensors = sensors
-        self.position = position
-        self.battery_level = battery_level
-        self.state = state
-
     def __init__(self, data: bytes):
         self.__from_bytes(data)
-
-# pylint: disable=unused-private-member
 
     def __from_bytes(self, data: bytes):
         decoder: ByteDecoder = ByteDecoder(
@@ -58,7 +49,6 @@ class DroneData:
         self.position = Point2D(values[4], values[5])
         self.battery_level = values[6]
         self.state = DroneState(values[7])
-# pylint: enable=unused-private-member
 
     def __str__(self) -> str:
         return 'Drone Information :\n Sensor (f, l, b, r) : ' \
@@ -77,10 +67,10 @@ class DroneData:
             + '\n\n'
 
 
-#def log_entry_to_drone_data(log_entry):
-#    pass
+def log_entry_to_drone_data(log_entry):
+    pass
 
-# pylint: disable=pointless-string-statement
+
 """
 Drone GetData (0x04)
 

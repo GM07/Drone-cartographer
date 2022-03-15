@@ -8,10 +8,10 @@
 #include "utils/commands.h"
 
 // Meters and seconds
-constexpr float kDroneSpeed = 0.25f;
-constexpr float kTakeOffSpeed = 1.0f;
-constexpr float kLandingSpeed = 0.25f;
-constexpr float kHeight = 0.3f;
+constexpr float kDroneSpeed = 0.25F;
+constexpr float kTakeOffSpeed = 1.0F;
+constexpr float kLandingSpeed = 0.25F;
+constexpr float kHeight = 0.3F;
 constexpr int kMessageMaxSize = 32;
 constexpr size_t kNbStartingDirection = 8;
 
@@ -19,16 +19,25 @@ class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
       : m_messageRX(), m_controller(controller) {
+    static constexpr float kFirstNumber = 0.5;
+    static constexpr float kSecondNumber = 1.225;
+
     static std::array<Vector3D, kNbStartingDirection> startingDirection{
-        {Vector3D(1.225F, 0.5F, 0.0F), Vector3D(0.5F, 1.225F, 0.0F),
-         Vector3D(-0.5F, 1.225F, 0.0F), Vector3D(-1.225F, 0.5F, 0.0F),
-         Vector3D(-1.225F, -0.5F, 0.0F), Vector3D(-0.5F, -1.225F, 0.0F),
-         Vector3D(0.5F, -1.225F, 0.0F), Vector3D(1.225F, -0.5F, 0.0F)}};
+        {Vector3D(kSecondNumber, kFirstNumber, 0.0F),
+         Vector3D(kFirstNumber, kSecondNumber, 0.0F),
+         Vector3D(-kFirstNumber, kSecondNumber, 0.0F),
+         Vector3D(-kSecondNumber, kFirstNumber, 0.0F),
+         Vector3D(-kSecondNumber, -kFirstNumber, 0.0F),
+         Vector3D(-kFirstNumber, -kSecondNumber, 0.0F),
+         Vector3D(kFirstNumber, -kSecondNumber, 0.0F),
+         Vector3D(kSecondNumber, -kFirstNumber, 0.0F)}};
 
     std::default_random_engine generator;
-    std::uniform_int_distribution<int> distribution(0, 7);
+    std::uniform_int_distribution<int> distribution(
+        0, startingDirection.size() - 1);
+
     int direction = distribution(generator);
-    m_direction = startingDirection[direction];
+    m_direction = startingDirection.at(direction);
   }
 
   Drone(const Drone& other) = delete;

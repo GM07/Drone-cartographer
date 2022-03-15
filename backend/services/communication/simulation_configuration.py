@@ -1,3 +1,5 @@
+"""This module includes the necessary class
+to be able to configure the simulation"""
 import shutil
 import pathlib
 import os
@@ -6,6 +8,10 @@ import xml.etree.ElementTree as ET
 
 
 class SimulationConfiguration:
+    """This class configures the argos3 simulation
+    an example would be
+    sim = SimulationConfiguration()
+    sim.add_drone(Drone())"""
 
     def __init__(self):
         current_path = str(pathlib.Path(__file__).parent.resolve())
@@ -59,7 +65,7 @@ class SimulationConfiguration:
 
         box = ET.SubElement(entity, 'box')
         box.set('id', 'b')
-        box.set('size', '0.05,2,1')
+        box.set('size', '0.001,2,1')
         box.set('movable', 'false')
 
         tree.write(current_path + '/crazyflie_sensing.argos')

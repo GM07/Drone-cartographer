@@ -1,5 +1,7 @@
 #include "mock_functions.h"
 
+#include "components/drone.h"
+
 extern "C" {
 #include "FreeRTOS.h"
 #include "app_channel.h"
@@ -10,10 +12,9 @@ extern "C" {
 #include "log.h"
 #include "param_logic.h"
 #include "stabilizer_types.h"
+#include "supervisor.h"
 #include "task.h"
 }
-
-#include "components/drone.h"
 
 FunctionsMock* mock;
 
@@ -28,7 +29,13 @@ BaseType_t xTaskCreate(TaskFunction_t pxTaskCode, const char* const pcName,
 
 ///////////////////////////////////////////////////////////////
 void ledseqRegisterSequence(ledseqContext_t* context) {
-  return mock->ledseqRegisterSequence(context);
+  mock->ledseqRegisterSequence(context);
+}
+
+////////////////////////////////////////////////////////////////
+size_t appchannelReceiveDataPacket(void* buffer, size_t max_length,
+                                   int timeout_ms) {
+  return mock->appchannelReceiveDataPacket(buffer, max_length, timeout_ms);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -36,45 +43,64 @@ bool ledseqRun(ledseqContext_t* context) { return mock->ledseqRun(context); }
 
 ////////////////////////////////////////////////////////////////
 void vTaskDelay(const TickType_t xTicksToDelay) {
-  return mock->vTaskDelay(xTicksToDelay);
+  mock->vTaskDelay(xTicksToDelay);
 }
 
 ////////////////////////////////////////////////////////////////
 bool supervisorIsTumbled() { return mock->supervisorIsTumbled(); }
 
 ////////////////////////////////////////////////////////////////
-size_t appchannelReceiveDataPacket(void* buffer, size_t max_length,
-                                   int timeout_ms) {
-  return 0;
-}
-int appchannelSendDataPacket(void* data, size_t length) { return 0; }
-
-paramVarId_t paramGetVarId(const char* group, const char* name) {
-  return {0xffffu, 0xffffu};
+int appchannelSendDataPacket(void* data, size_t length) {
+  return mock->appchannelSendDataPacket(data, length);
 }
 
-logVarId_t logGetVarId(const char* group, const char* name) { return 0; }
-unsigned int logGetUint(logVarId_t varid) { return 0U; }
-float logGetFloat(logVarId_t varid) { return 0.0; }
+////////////////////////////////////////////////////////////////
+bool crtpCommanderHighLevelIsTrajectoryFinished() {
+  return mock->crtpCommanderHighLevelIsTrajectoryFinished();
+}
 
-void paramSetInt(paramVarId_t varid, int valuei) {}
+////////////////////////////////////////////////////////////////
+void estimatorKalmanGetEstimatedPos(point_t* pos) {
+  return mock->estimatorKalmanGetEstimatedPos(pos);
+}
 
+////////////////////////////////////////////////////////////////
+void commanderSetSetpoint(setpoint_t* setpoint, int priority) {
+  return mock->commanderSetSetpoint(setpoint, priority);
+}
+
+////////////////////////////////////////////////////////////////
 int crtpCommanderHighLevelTakeoff(const float absoluteHeight_m,
                                   const float duration_s) {
-  return 0;
+  return mock->crtpCommanderHighLevelTakeoff(absoluteHeight_m, duration_s);
 }
 
+////////////////////////////////////////////////////////////////
 int crtpCommanderHighLevelLand(const float absoluteHeight_m,
                                const float duration_s) {
-  return 0;
+  return mock->crtpCommanderHighLevelLand(absoluteHeight_m, duration_s);
 }
 
-void estimatorKalmanGetEstimatedPos(point_t* pos) {}
+////////////////////////////////////////////////////////////////
+paramVarId_t paramGetVarId(const char* group, const char* name) {
+  return mock->paramGetVarId(group, name);
+}
 
-bool crtpCommanderHighLevelIsTrajectoryFinished() { return true; }
+////////////////////////////////////////////////////////////////
+void paramSetInt(paramVarId_t varid, int valuei) {
+  mock->paramSetInt(varid, valuei);
+}
+
+////////////////////////////////////////////////////////////////
+logVarId_t logGetVarId(const char* group, const char* name) {
+  return mock->logGetVarId(group, name);
+}
+
+////////////////////////////////////////////////////////////////
+unsigned int logGetUint(logVarId_t varid) { return mock->logGetUint(varid); }
+
+////////////////////////////////////////////////////////////////
+float logGetFloat(logVarId_t varid) { return mock->logGetFloat(varid); }
 
 void ledClearAll() {}
-
 void commanderNotifySetpointsStop(int remainValidMillisecs) {}
-
-void commanderSetSetpoint(setpoint_t* setpoint, int priority) {}

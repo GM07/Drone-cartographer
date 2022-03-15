@@ -1,3 +1,5 @@
+"""Module that holds the Drone dataclass that designates
+the name and position of the drone"""
 from dataclasses import dataclass
 
 

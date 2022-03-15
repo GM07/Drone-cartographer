@@ -71,7 +71,6 @@ export default class MissionCommands extends Vue {
     this.isLaunchMissionSelected = true;
     const COMMAND_SENT = ServerCommunication.launchMission(
       this.accessStatus.isMissionSimulated,
-      this.droneList,
       () => {
         this.isLaunchMissionSelected = false;
       }

@@ -1,5 +1,8 @@
+"""This module has the CommCrazyflie class that is used to
+communicate with the physical drones """
+
+from typing import Dict, List
 from flask_socketio import SocketIO
-from typing import List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
@@ -14,9 +17,15 @@ from datetime import datetime
 
 class CommCrazyflie(AbstractComm):
     """This class is used to communicate with the crazyflie
-    drones"""
+    drones and inherits from the AbstractComm class
+    An example use is comm=CommCrazyflie([])
+    comm.__init_drivers()"""
 
-    def __init__(self, socket_io: SocketIO, drone_list=list):
+    def __init__(self, socket_io: SocketIO, drone_list: list):
+        if drone_list is None:
+            self.sync_crazyflies = []
+            self.drone_list = []
+            return
 
         super().__init__(socket_io)
         print('Creating Embedded Crazyflie communication')
@@ -28,10 +37,12 @@ class CommCrazyflie(AbstractComm):
         for link, crazyflie in zip(self.links, self.crazyflies):
             self.crazyflies_by_id[link] = crazyflie
         self.initialized_drivers = False
-        self.sync_crazyflies: list[SyncCrazyflie] = []
+        self.sync_crazyflies: List[SyncCrazyflie] = []
         self.__init_drivers()
-        self.setup_log()
-        self.mission_start_time = perf_counter()
+        try:
+            self.setup_log()
+        except:
+            pass
 
     def __del__(self):
         for sync in self.sync_crazyflies:
@@ -45,7 +56,7 @@ class CommCrazyflie(AbstractComm):
         cflib.crtp.init_drivers()
 
     def setup_log(self):
-        self.log_configs: list[LogConfig] = []
+        self.log_configs: List[LogConfig] = []
         for crazyflie in self.crazyflies:
             log_config = LogConfig(name='DroneData',
                                    period_in_ms=AbstractComm.DELAY_RECEIVER_MS)
@@ -61,8 +72,7 @@ class CommCrazyflie(AbstractComm):
             log_config.cf = crazyflie
             self.log_configs.append(log_config)
 
-        self.sync_crazyflies: list[SyncCrazyflie] = []
-
+        self.sync_crazyflies = []
         for link, crazyflie in zip(self.links, self.crazyflies):
             self.sync_crazyflies.append(SyncCrazyflie(link, cf=crazyflie))
 
@@ -96,5 +106,5 @@ class CommCrazyflie(AbstractComm):
             database.upload_mission_info(self.current_mission)
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
-        print('[%d][%s]: %s' % (timestamp, logconf.id, data))
+        print(f'{timestamp}{logconf.id}:{data}')
         self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])

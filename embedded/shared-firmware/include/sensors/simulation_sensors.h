@@ -13,8 +13,13 @@ enum ReadingsMapSensorIndex {
 
 class SimulationSensors : public AbstractSensors {
  public:
-  SimulationSensors(CCrazyflieSensing* ccrazyflieSensing);
-  virtual ~SimulationSensors() = default;
+  explicit SimulationSensors(CCrazyflieSensing* ccrazyflieSensing);
+  ~SimulationSensors() override = default;
+  SimulationSensors() = delete;
+  SimulationSensors& operator=(const SimulationSensors&) = delete;
+  SimulationSensors& operator=(SimulationSensors&&) = delete;
+  SimulationSensors(const SimulationSensors&) = delete;
+  SimulationSensors(const SimulationSensors&&) = delete;
 
   [[nodiscard]] float getFrontDistance() const override;
   [[nodiscard]] float getLeftDistance() const override;

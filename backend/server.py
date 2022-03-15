@@ -13,8 +13,6 @@ from flask_cors import CORS
 from services.communication.abstract_comm import AbstractComm
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
-import services.status.access_status as AccessStatus
-import services.status.mission_status as MissionStatus
 from services.communication.simulation_configuration import SimulationConfiguration
 from constants import MAX_TIMEOUT, COMMANDS, URI
 from services.communication.database.mongo_interface import Database
@@ -43,7 +41,7 @@ COMM: AbstractComm = CommCrazyflie(SOCKETIO, [])
 # Get drone addresses
 @APP.route('/getDrones')
 def get_drones():
-    return jsonify(URI)
+    return jsonify(COMM.get_drones())
 
 
 # Identifying drones
@@ -56,14 +54,16 @@ def identify_drone(drone_addr):
     return 'Identified drone'
 
 
+# Launch mission
 @SOCKETIO.on('launch', namespace='/limitedAccess')
-def launch(is_simulated: bool, drone_list):
+def launch(is_simulated: bool):
     if (MissionStatus.get_mission_started() or
             not AccessStatus.is_request_valid(request)):
         return ''
 
     global COMM
     COMM.shutdown()
+    drone_list = COMM.get_drones()
 
     if is_simulated:
         configuration = SimulationConfiguration()
@@ -83,15 +83,26 @@ def launch(is_simulated: bool, drone_list):
     return 'Launched'
 
 
+@SOCKETIO.on('set_drone', namespace='/limitedAccess')
+def addDrone(drone_list, is_simulated):
+    global COMM
+    COMM.set_drone(drone_list)
+
+    if not is_simulated:
+        COMM = CommCrazyflie(
+            SOCKETIO, drone_list)  # Recreate object to reconnect to drones
+
+
 @SOCKETIO.on('set_mission_type', namespace='/limitedAccess')
 def set_mission_type(is_simulated: bool):
     AccessStatus.set_mission_type(SOCKETIO, is_simulated, request.sid)
     global COMM
     COMM.shutdown()
+    drone_list = COMM.get_drones()
     if is_simulated:
-        COMM = CommSimulation(SOCKETIO)
+        COMM = CommSimulation(SOCKETIO, drone_list)
     else:
-        COMM = CommCrazyflie(SOCKETIO, URI)
+        COMM = CommCrazyflie(SOCKETIO, drone_list)
     return ''
 
 
@@ -109,9 +120,11 @@ def terminate():
 
 
 @SOCKETIO.on('take_control', namespace='/limitedAccess')
-def request_control():
+def request_control(drone_list):
     change = AccessStatus.take_control(SOCKETIO, request)
     if change:
+        global COMM
+        COMM.set_drone(drone_list)
         MissionStatus.update_all_clients(SOCKETIO)
     return ''
 
@@ -153,8 +166,6 @@ def send_logs():
         COMM.logs,
         namespace='/getLogs',
         broadcast=True,
-        include_self=False,
-        skip_sid=True,
     )
 
 

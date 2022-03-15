@@ -14,6 +14,7 @@ class AbstractComm:
     current_mission: Mission
 
     def __init__(self, socket_io: SocketIO) -> None:
+
         self.__socket_io = socket_io
 
     def send_log(self, log: List[Tuple[str, str]]):
@@ -25,6 +26,12 @@ class AbstractComm:
                               skip_sid=True)
 
         self.logs += log
+
+    def set_drone(self, drone_list):
+        self.drone_list = drone_list
+
+    def get_drones(self):
+        return self.drone_list
 
     @abstractmethod
     def send_command(self, command: COMMANDS, links=[]) -> None:

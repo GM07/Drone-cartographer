@@ -1,9 +1,10 @@
-# __init__.py
+"""This module has the CommSimulation class that is used to
+communicate with the simulation """
 
 from errno import EINVAL, EWOULDBLOCK
-from time import sleep
 import socket
-import os, os.path
+import os
+import os.path
 import threading
 from typing import Dict, List
 from constants import COMMANDS
@@ -13,20 +14,25 @@ from flask_socketio import SocketIO
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
 from services.communication.database.mongo_interface import Mission, Database
-from time import perf_counter
+from time import perf_counter, sleep
 from datetime import datetime
 
 
 class CommSimulation(AbstractComm):
+    """This class is used to communicate with the crazyflie
+    drones and inherits from the AbstractComm class
+    An example use is
+    comm=CommSimulation()
+    comm.send_command('Launch')"""
 
-    __SOCKET_COMMAND_PATH = '/tmp/socket/{}'
-    __SOCKET_DATA_PATH = '/tmp/socket/data{}'
+    SOCKET_COMMAND_PATH = '/tmp/socket/{}'
+    SOCKET_DATA_PATH = '/tmp/socket/data{}'
 
     def __init__(self, socket_io: SocketIO, drone_list=[]):
         super().__init__(socket_io)
         self.nb_connections = len(drone_list)
-
-        self.threadActive = True
+        self.drone_list = drone_list
+        self.thread_active = True
         self.__COMMANDS_QUEUE = queue.Queue(10)
         self.__COMMANDS_THREAD = threading.Thread(
             target=self.__send_command_tasks_wrapper,
@@ -43,9 +49,9 @@ class CommSimulation(AbstractComm):
                                 socket.socket] = {}  # (server, connection)
 
         for i in range(self.nb_connections):
-            file_name = self.__SOCKET_COMMAND_PATH.format(drone_list[i]['name'])
+            file_name = self.SOCKET_COMMAND_PATH.format(drone_list[i]['name'])
             self.command_servers[self.__init_server_bind(file_name)] = None
-            file_name = self.__SOCKET_DATA_PATH.format(drone_list[i]['name'])
+            file_name = self.SOCKET_DATA_PATH.format(drone_list[i]['name'])
             self.data_servers[self.__init_server_bind(file_name)] = None
 
         self.__COMMANDS_THREAD.start()
@@ -55,8 +61,7 @@ class CommSimulation(AbstractComm):
         self.current_mission: Mission
 
     def shutdown(self):
-
-        self.threadActive = False
+        self.thread_active = False
         try:
             self.__COMMANDS_QUEUE.get_nowait()
         except queue.Empty:
@@ -81,6 +86,7 @@ class CommSimulation(AbstractComm):
             self.__COMMANDS_QUEUE.put_nowait(command)
         except queue.Full:
             self.send_log([(datetime.now().isoformat(), "Command queue full")])
+            print("Command queue is full")
             pass
 
     def __init_server_bind(self, file_name: str):
@@ -93,14 +99,14 @@ class CommSimulation(AbstractComm):
 
     def __receive_data_tasks_wrapper(self):
         print('Receiving thread started')
-        while self.threadActive:
+        while self.thread_active:
             CommSimulation.__thread_attempt_data_socket_connection(
                 self.data_servers)
             self.__receive_data()
 
     def __send_command_tasks_wrapper(self):
         print('Sending thread started')
-        while self.threadActive:
+        while self.thread_active:
             CommSimulation.__thread_attempt_socket_connection(
                 self.command_servers)
             self.__thread_send_command()
@@ -113,9 +119,10 @@ class CommSimulation(AbstractComm):
                 try:
                     server.setblocking(True)
                     server.settimeout(None)
-                    conn, addr = server.accept()
+                    conn, _ = server.accept()
                     server_dict[server] = conn
                 except socket.error as socket_error:
+                    print(socket_error)
                     if socket_error.errno == EINVAL:
                         return
                     else:
@@ -130,7 +137,7 @@ class CommSimulation(AbstractComm):
                 try:
                     server.setblocking(not at_least_one_connected)
                     server.settimeout(None)
-                    conn, addr = server.accept()
+                    conn, _ = server.accept()
                     server_dict[server] = conn
                     at_least_one_connected = True
                 except socket.error as socket_error:
@@ -140,26 +147,29 @@ class CommSimulation(AbstractComm):
                         raise
 
     def __receive_data(self):
-        ACK = 0x01
+        ack = 0x01
 
         at_least_one_connected = True
-        while at_least_one_connected and self.threadActive:
+        while at_least_one_connected and self.thread_active:
             at_least_one_connected = False
             count: int = 0
-            for server in self.data_servers:
+            for server, other_server in self.data_servers.items():
+                can_gather_data = other_server is not None
 
-                if not self.data_servers[server] is not None:
+                if not can_gather_data:
                     try:
                         server.setblocking(False)
-                        new_conn, addr = server.accept()
+                        new_conn, _ = server.accept()
                         self.data_servers[server] = new_conn
+                        print(other_server, self.data_servers[server])
+                        can_gather_data = True
                     except socket.error as socket_error:
                         if socket_error.errno == EINVAL:
                             return
                         elif socket_error.errno != EWOULDBLOCK:
                             raise
 
-                if self.data_servers[server] is not None:
+                if can_gather_data:
                     at_least_one_connected = True
                     is_socket_broken = False
                     try:
@@ -187,13 +197,13 @@ class CommSimulation(AbstractComm):
             for server in self.data_servers:
                 if self.data_servers[server] is not None:
                     try:
-                        self.data_servers[server].send(ACK.to_bytes(1, 'big'))
+                        self.data_servers[server].send(ack.to_bytes(1, 'big'))
                     except (BrokenPipeError, socket.error):
                         self.data_servers[server] = None
 
     def __thread_send_command(self):
         missing_connection = False
-        while not missing_connection and self.threadActive:
+        while not missing_connection and self.thread_active:
             command = self.__COMMANDS_QUEUE.get()
             if command is None:
                 return

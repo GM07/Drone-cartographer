@@ -2,6 +2,7 @@ image: mcr.microsoft.com/vscode/devcontainers/python:3.8
 
 variables:
   WORKING_DIRECTORY: "backend"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
 workflow:
   rules:
@@ -13,24 +14,38 @@ stages:
   - lint
   - test
 
+cache:
+  key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python -V               # Print out python version for debugging
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+  - cd $WORKING_DIRECTORY
+ 
+
 prepare:
   stage: .pre
   script:
-    - cd $WORKING_DIRECTORY
     - pip install -r requirements.txt
   cache:
     key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
     paths:
-      - $WORKING_DIRECTORY/node_modules/
+      - .cache/pip
+      - venv/
 
 install_dependencies:
   stage: install_dependencies
   cache:
     key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
     paths:
-      - $WORKING_DIRECTORY/node_modules/
+      - .cache/pip
+      - venv/
   script:
-    - cd $WORKING_DIRECTORY
     - pip install -r requirements.txt
   only:
     changes:
@@ -41,11 +56,9 @@ install_dependencies:
 lint_backend:
   stage: lint
   script:
-    - cd $WORKING_DIRECTORY
-    - find . -type f -name '*.py' | xargs pylint  --rcfile pylintrc
+    - yapf --style google -rpd .
 
 test_backend:
   stage: test
   script:
-    - cd $WORKING_DIRECTORY
     - pytest

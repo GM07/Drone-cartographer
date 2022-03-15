@@ -1,7 +1,7 @@
 #include "utils/semaphore.h"
 
-Semaphore::Semaphore() : m_count(0), m_maxSize(-1) {}
-Semaphore::Semaphore(size_t maxSize) : m_count(0), m_maxSize(maxSize) {}
+Semaphore::Semaphore() : m_maxSize(-1) {}
+Semaphore::Semaphore(size_t maxSize) : m_maxSize(maxSize) {}
 
 void Semaphore::release() {
   std::lock_guard<decltype(m_mutex)> lock(m_mutex);
