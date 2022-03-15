@@ -128,6 +128,16 @@ void FirmwareController::sendP2PMessage(void* message, size_t size) {
   radiolinkSendP2PPacketBroadcast(&p_reply);
 }
 
+void FirmwareController::receiveP2PMessage(
+    std::unordered_map<size_t, DroneData>& p2pData) {
+  while (!receivedP2PPacket.empty()) {
+    DroneData data((DroneData*)&receivedP2PPacket.front().data);
+    data.range = receivedP2PPacket.front().rssi;
+    p2pData.insert_or_assign(data.id, data);
+    receivedP2PPacket.pop();
+  }
+}
+
 size_t FirmwareController::getId() {
   uint64_t address = configblockGetRadioAddress();
   uint8_t my_id = static_cast<uint8_t>((address)&0x00000000ff);

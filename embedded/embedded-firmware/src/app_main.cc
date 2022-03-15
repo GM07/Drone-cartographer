@@ -15,6 +15,7 @@ extern "C" {
 #include "controllers/firmware_controller.h"
 
 static bool isInit = false;
+std::queue<P2PPacket> receivedP2PPacket;
 
 /////////////////////////////////////////////////////////////////////////
 Drone& Drone::getEmbeddedDrone() {
@@ -59,11 +60,7 @@ void addLoggingVariables() {
 }
 
 /////////////////////////////////////////////////////////////////////////
-void p2pcallbackHandler(P2PPacket* p) {
-  DroneData data((DroneData*)p->data);
-  data.range = p->rssi;
-  Drone::getEmbeddedDrone().m_peerData.insert_or_assign(data.id, data);
-}
+void p2pcallbackHandler(P2PPacket* p) { receivedP2PPacket.push(*p); }
 
 /////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
@@ -71,6 +68,8 @@ extern "C" void appMain() {
   addLoggingVariables();
   enableCrtpHighLevelCommander();
   Drone::getEmbeddedDrone().initDrone();
+
+  p2pRegisterCB(p2pcallbackHandler);
 
   while (true) {
     Drone::getEmbeddedDrone().updateSensorsData();
