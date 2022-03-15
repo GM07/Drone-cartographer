@@ -11,5 +11,6 @@ class COMMANDS(Enum):
     LAUNCH = 0x2,
     LAND = 0x3,
 
+
 # Objects to communicate with Crazyflie
 URI = ['radio://0/80/2M/E7E7E7E761', 'radio://0/80/2M/E7E7E7E762']
