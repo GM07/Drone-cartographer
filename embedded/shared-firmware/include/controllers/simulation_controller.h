@@ -50,12 +50,10 @@ class SimulationController : public AbstractController {
   size_t receiveMessage(void* message, size_t size) override;
   void sendMessage(void* message, size_t size) override;
   void sendDroneDataToServerThread();
-  void sendP2PMessage(void* /*message*/) override{/**/};
 
   void log(const std::string& message) override;
   void blinkLED(LED /*led*/) override;
 
-  void delay(uint32_t /*ticks*/) override{/**/};
   void updateSensorsData() override;
   [[nodiscard]] bool isDroneCrashed() const override;
 
