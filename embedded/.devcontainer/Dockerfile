@@ -25,7 +25,8 @@ RUN apt-get update \
     libglx0 \
     libegl1 \
     libxext6 \
-    libx11-6
+    libx11-6 \
+    lcov
 
 # Set env variable for 
 ENV NVIDIA_VISIBLE_DEVICES all

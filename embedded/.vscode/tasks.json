@@ -55,7 +55,7 @@
       "options": {
         "cwd": "${workspaceFolder}/shared-firmware/validate"
       },
-      "command": "rm -rf build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./shared_firmware"
+      "command": "rm -rf build/bin && mkdir -p build && cd build && cmake ../ && make -j`nproc` && ./shared_firmware"
     },
     {
       "label": "Test simulation firmware",
@@ -103,7 +103,18 @@
         "Lint Simulation Firmware",
         "Lint Embedded Firmware"
       ]
-    }
+    },
+    {
+      "label": "Coverage Shared Firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/shared-firmware/validate"
+      },
+      "dependsOn": [
+        "Test shared firmware"
+      ],
+      "command": "lcov --directory ../src -c -d build/CMakeFiles -o cov.info --no-external && genhtml cov.info -o out"
+    },
   ],
   "inputs": [
     {
