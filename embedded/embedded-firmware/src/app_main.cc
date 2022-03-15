@@ -59,6 +59,13 @@ void addLoggingVariables() {
 }
 
 /////////////////////////////////////////////////////////////////////////
+void p2pcallbackHandler(P2PPacket* p) {
+  DroneData data((DroneData*)p->data);
+  data.range = p->rssi;
+  Drone::getEmbeddedDrone().m_peerData.insert_or_assign(data.id, data);
+}
+
+/////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
   ledClearAll();
   addLoggingVariables();

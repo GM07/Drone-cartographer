@@ -1,5 +1,8 @@
-
 #include "controllers/firmware_controller.h"
+
+#include <cstdint>
+#include <cstring>
+#include <iostream>
 
 #include "components/drone.h"
 #include "controllers/abstract_controller.h"
@@ -10,11 +13,13 @@
 extern "C" {
 #include "app_channel.h"
 #include "commander.h"
+#include "configblock.h"
 #include "crtp_commander_high_level.h"
 #include "estimator_kalman.h"
 #include "led.h"
 #include "ledseq.h"
 #include "param_logic.h"
+#include "radiolink.h"
 #include "supervisor.h"
 }
 
@@ -113,4 +118,18 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
   setpoint.velocity_body = false;
 
   commanderSetSetpoint(&setpoint, 3);
+}
+
+void FirmwareController::sendP2PMessage(void* message, size_t size) {
+  static P2PPacket p_reply;
+  p_reply.port = 0x00;
+  memcpy(&p_reply.data, message, size);
+  p_reply.size = size + 1;
+  radiolinkSendP2PPacketBroadcast(&p_reply);
+}
+
+size_t FirmwareController::getId() {
+  uint64_t address = configblockGetRadioAddress();
+  uint8_t my_id = static_cast<uint8_t>((address)&0x00000000ff);
+  return my_id;
 }

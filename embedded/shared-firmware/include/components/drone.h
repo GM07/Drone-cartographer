@@ -2,6 +2,7 @@
 #define DRONE_H
 
 #include <array>
+#include <mutex>
 #include <queue>
 #include <random>
 
@@ -80,8 +81,10 @@ class Drone {
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
   DroneData m_data;
-  std::unordered_map<size_t, DroneData> m_peerData;
   std::unordered_map<size_t, DroneData> m_usedPeerData;
   Vector3D m_normal;
+
+ public:
+  std::unordered_map<size_t, DroneData> m_peerData;
 };
 #endif
