@@ -145,7 +145,7 @@ class CommSimulation(AbstractComm):
                 if not can_gather_data:
                     try:
                         server.setblocking(False)
-                        new_conn = server.accept()[0]
+                        new_conn , _ = server.accept()
                         self.data_servers[server] = new_conn
                         print(other_server, self.data_servers[server])
                         can_gather_data = True
