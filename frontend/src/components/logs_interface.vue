@@ -1,23 +1,27 @@
 <template>
-  <v-virtual-scroll
-    id="scroll"
-    :elevation="20"
-    height="200"
-    item-height="20"
-    :items="this.logs"
-  >
-    <template v-slot:default="{item}">
-      <v-list-item :key="item[0]">
-        <v-list-item-content>
-          <v-list-item-title>
-            <p>{{ item[0] }} {{ item[1] }}</p>
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+  <div>
+    <h3 class="ma-3">Logs</h3>
+    <v-virtual-scroll
+      id="scroll"
+      color="indigo"
+      :elevation="20"
+      height="200"
+      item-height="20"
+      :items="this.logs"
+    >
+      <template v-slot:default="{item}">
+        <v-list-item :key="item[0]">
+          <v-list-item-content>
+            <v-list-item-title>
+              <p>{{ item[0] }} {{ item[1] }}</p>
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
 
-      <v-divider></v-divider>
-    </template>
-  </v-virtual-scroll>
+        <v-divider></v-divider>
+      </template>
+    </v-virtual-scroll>
+  </div>
 </template>
 
 <script lang="ts">

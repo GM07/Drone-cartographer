@@ -30,7 +30,7 @@
         </v-btn>
       </v-btn-toggle>
     </v-app-bar>
-    <LogsInterface />
+
     <drone-menu
       :droneList="droneList"
       :isDroneMenuOpen="isDroneMenuOpen"
@@ -47,6 +47,21 @@
           :droneid="getSelectedDrone()"
         />
       </div>
+
+      <template>
+        <v-divider></v-divider>
+        <v-list-item @click="setLogsMenuOpen(!isLogsMenuOpen)">
+          <v-list-item-icon>
+            <v-icon color="blue">mdi-note-text</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title v-if="!isLogsMenuOpen"
+            >Ouvrir logs</v-list-item-title
+          >
+          <v-list-item-title v-if="isLogsMenuOpen"
+            >Fermer logs</v-list-item-title
+          >
+        </v-list-item></template
+      >
 
       <template id="bottom" v-slot:append>
         <v-divider></v-divider>
@@ -71,6 +86,13 @@
         </v-list>
       </template>
     </v-navigation-drawer>
+    <div
+      v-if="isLogsMenuOpen"
+      class="mb-10"
+      style="position: absolute; bottom: 0; width: 100%"
+    >
+      <LogsInterface />
+    </div>
   </div>
 </template>
 
@@ -105,6 +127,7 @@ export default class Mission extends Vue {
   public attemptedLimitedConnexion = false;
   public dialog = false;
   public isDroneMenuOpen = false;
+  public isLogsMenuOpen = false;
   public accessStatus = {
     isMissionSimulated: false,
     isUserControlling: false,
@@ -121,6 +144,9 @@ export default class Mission extends Vue {
 
   public setDroneMenuOpen(value: boolean): void {
     this.isDroneMenuOpen = value;
+  }
+  public setLogsMenuOpen(value: boolean): void {
+    this.isLogsMenuOpen = value;
   }
 
   public addDrone(drone: Drone): void {
