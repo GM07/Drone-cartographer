@@ -25,7 +25,7 @@ class CommSimulation(AbstractComm):
     SOCKET_COMMAND_PATH = '/tmp/socket/{}{}'
     SOCKET_DATA_PATH = '/tmp/socket/data{}{}'
 
-    def __init__(self, drone_list=List()):
+    def __init__(self, drone_list=[]):
 
         self.nb_connections = len(drone_list)
         self.thread_active = True

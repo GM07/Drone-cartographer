@@ -25,7 +25,7 @@
 		"--net=host",
 		"--device=/dev/",
 		"--name=embedded",
-		"--gpus=all", //Uncomment to use NVDIA GPU
+		//"--gpus=all", //Uncomment to use NVDIA GPU
 		"-e",
 		"DISPLAY=${env:DISPLAY}",
 		"--device-cgroup-rule=a 166:* rwm",
