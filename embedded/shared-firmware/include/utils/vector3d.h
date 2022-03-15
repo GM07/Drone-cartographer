@@ -35,6 +35,9 @@ class Vector3D {
   [[nodiscard]] float length() const;
 
   static bool areSameDirection(const Vector3D& vec1, const Vector3D& vec2);
+  static Vector3D x(float value);
+  static Vector3D y(float value);
+  static Vector3D z(float value);
   std::string toString() const;
 
   float m_x{0}, m_y{0}, m_z{0};

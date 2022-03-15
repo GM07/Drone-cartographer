@@ -37,12 +37,12 @@ void Drone::step() {
 void Drone::wallAvoidance() {
   if (m_controller->data.front > 0 &&
       m_controller->data.front <= kMinDistanceObstacle) {
-    m_normal += Vector3D(-1.0F, 0.0F, 0.0F);
+    m_normal += Vector3D::x(-1.0F);
   }
 
   if (m_controller->data.back > 0 &&
       m_controller->data.back <= kMinDistanceObstacle) {
-    m_normal += Vector3D(1.0F, 0.0F, 0.0F);
+    m_normal += Vector3D::x(1.0F);
   }
 
   // This extra condition makes sure that if we are trapped between walls we
@@ -51,18 +51,18 @@ void Drone::wallAvoidance() {
       m_controller->data.back <= kMinDistanceObstacle &&
       m_controller->data.front <= kMinDistanceObstacle) {
     m_normal += m_controller->data.back < m_controller->data.front
-                    ? Vector3D(1.0F, 0.0F, 0.0F)
-                    : Vector3D(-1.0F, 0.0F, 0.0F);
+                    ? Vector3D::x(1.0F)
+                    : Vector3D::x(-1.0F);
   }
 
   if (m_controller->data.left > 0 &&
       m_controller->data.left <= kMinDistanceObstacle) {
-    m_normal += Vector3D(0.0F, -1.0F, 0.0F);
+    m_normal += Vector3D::y(-1.0F);
   }
 
   if (m_controller->data.right > 0 &&
       m_controller->data.right <= kMinDistanceObstacle) {
-    m_normal += Vector3D(0.0F, 1.0F, 0.0F);
+    m_normal += Vector3D::y(1.0F);
   }
 
   // This extra condition makes sure that if we are trapped between walls we
@@ -71,8 +71,8 @@ void Drone::wallAvoidance() {
       m_controller->data.left <= kMinDistanceObstacle &&
       m_controller->data.right <= kMinDistanceObstacle) {
     m_normal += m_controller->data.left < m_controller->data.right
-                    ? Vector3D(0.0F, -1.0F, 0.0F)
-                    : Vector3D(0.0F, 1.0F, 0.0F);
+                    ? Vector3D::y(-1.0F)
+                    : Vector3D::y(1.0F);
   }
 
   if (m_normal.isAlmostEqual(m_data.direction, kComparisonFactor) ||
@@ -88,7 +88,8 @@ void Drone::collisionAvoidance() {
     if (peerData.range <= kSimulationCollisionAvoidanceRange) {
       if (m_usedPeerData.find(peerData.id) == m_usedPeerData.end()) {
         m_usedPeerData.insert_or_assign(peerData.id, peerData);
-        m_normal -= m_data.direction;
+        // m_normal += m_data.direction;
+        m_normal += peerData.direction - m_data.direction;
       }
     } else {
       m_usedPeerData.erase(peerData.id);
