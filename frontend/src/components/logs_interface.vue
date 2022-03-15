@@ -33,13 +33,14 @@ export default class LogsInterface extends Vue {
 
   private beforeCreate() {
     SOCKETIO_GET_LOGS.open();
-    SOCKETIO_GET_LOGS.on('get_logs', (logs: Array<[string, string]>) => {
-      const SCROLLBAR = document.getElementById('scroll');
-      let isBottom = false;
-      this.logs.push(...logs);
 
+    SOCKETIO_GET_LOGS.on('get_logs', (logs: Array<[string, string]>) => {
+      let isBottom = false;
+
+      this.logs.push(...logs);
+      const SCROLLBAR = document.getElementById('scroll');
       if (SCROLLBAR) {
-        isBottom = SCROLLBAR.scrollTop + 100 === SCROLLBAR.scrollHeight;
+        isBottom = SCROLLBAR.scrollTop + 240 >= SCROLLBAR.scrollHeight;
 
         if (isBottom)
           this.$nextTick(() => {
