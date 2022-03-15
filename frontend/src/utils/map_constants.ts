@@ -1,7 +1,7 @@
 import {Vec2d} from '@/utils/vec2d';
 
 export interface MapData {
-  position: Point2D;
+  position: number[];
   sensors: Sensors;
 }
 
@@ -10,12 +10,6 @@ export interface Sensors {
   right: number;
   back: number;
   left: number;
-}
-
-export interface Point2D {
-  x: number;
-  y: number;
-  z: number;
 }
 
 export const OPTIONS = {
