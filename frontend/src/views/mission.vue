@@ -101,7 +101,7 @@
           >mdi-close</v-icon
         >
       </div>
-      <div style="float: left; width: 100%">
+      <div style="border: 10px; float: left; width: 100%">
         <LogsInterface />
       </div>
     </div>
