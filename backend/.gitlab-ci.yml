@@ -56,7 +56,7 @@ install_dependencies:
 lint_backend:
   stage: lint
   script:
-    - yapf --style google -rpi .
+    - yapf --style google -rpd .
 
 test_backend:
   stage: test
