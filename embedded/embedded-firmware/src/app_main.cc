@@ -16,6 +16,7 @@ extern "C" {
 
 static bool isInit = false;
 std::queue<P2PPacket> receivedP2PPacket;
+static int rssi = 255;
 
 /////////////////////////////////////////////////////////////////////////
 Drone& Drone::getEmbeddedDrone() {
@@ -56,11 +57,19 @@ void enableCrtpHighLevelCommander() {
 void addLoggingVariables() {
   LOG_GROUP_START(custom)  // NOLINT
   LOG_ADD(LOG_UINT8, state, &Drone::getEmbeddedDrone().getController()->state)
+
+  // TODO - remove after rssi to cm conversion or threshold has been established
+  LOG_ADD(LOG_UINT8, rssi, &rssi)
   LOG_GROUP_STOP(custom)
 }
 
 /////////////////////////////////////////////////////////////////////////
-void p2pcallbackHandler(P2PPacket* p) { receivedP2PPacket.push(*p); }
+void p2pcallbackHandler(P2PPacket* p) {
+  receivedP2PPacket.push(*p);
+
+  // TODO - remove after rssi to cm conversion or threshold has been established
+  rssi = p->rssi;
+}
 
 /////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {

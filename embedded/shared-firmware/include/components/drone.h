@@ -30,6 +30,7 @@ class Drone {
          Vector3D(-1.225F, -0.5F, 0.0F), Vector3D(-0.5F, -1.225F, 0.0F),
          Vector3D(0.5F, -1.225F, 0.0F), Vector3D(1.225F, -0.5F, 0.0F)}};
 
+    // TODO - Make truly random (Just seed with time)
     static std::default_random_engine generator;
     std::uniform_int_distribution<int> distribution(0, 7);
     int direction = distribution(generator);
