@@ -76,12 +76,16 @@ class CommSimulation(AbstractComm):
 
 
     def __receive_data_tasks_wrapper(self):
+        if self.nb_connections <= 0: 
+            return
         print('Receiving thread started')
         while self.threadActive:
             CommSimulation.__thread_attempt_data_socket_connection(self.data_servers)
             self.__receive_data()
 
     def __send_command_tasks_wrapper(self):
+        if self.nb_connections <= 0: 
+            return
         print('Sending thread started')
         while self.threadActive:
             CommSimulation.__thread_attempt_socket_connection(self.command_servers)
@@ -169,14 +173,13 @@ class CommSimulation(AbstractComm):
                                         }
                                     },
                                     namespace='/getMapData', 
-                                    broadcast=True, 
-                                    include_self=False, 
-                                    skip_sid=True)
+                                    broadcast=True)
 
 
                     if is_socket_broken:
                         print("Socket broken")
                         self.data_servers[server] = None
+            sleep(0.5)
 
 
     def __thread_send_command(self):

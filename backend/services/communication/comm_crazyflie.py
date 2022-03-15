@@ -80,4 +80,4 @@ class CommCrazyflie(AbstractComm):
                     },
                         namespace='/getMapData',
                         broadcast=True,)
-        print('[%d][%s]: %s' % (timestamp, logconf.id, data))
+        #print('[%d][%s]: %s' % (timestamp, logconf.id, data))

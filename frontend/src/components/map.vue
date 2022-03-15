@@ -32,26 +32,39 @@ export default class Map extends Vue {
   }
 
   public changeData(data: MapData): void {
+    console.log(data);
     const TEMPARRAYDRONES: Vec2d[] = [
-      new Vec2d(data.position[0], data.position[1]),
+      new Vec2d(data.position[0] * 100, data.position[1] * 100),
     ];
     const TEMPARRAYPERIM: Vec2d[] = [];
-    if (data.sensors.front < 0)
+    if (data.sensors.front > 0)
       TEMPARRAYPERIM.push(
-        new Vec2d(data.position[0] + data.sensors.front / 10, data.position[1])
+        new Vec2d(
+          data.position[0] * 100 + data.sensors.front / 10,
+          data.position[1] * 100
+        )
       );
-    if (data.sensors.right < 0)
+    if (data.sensors.right > 0)
       TEMPARRAYPERIM.push(
-        new Vec2d(data.position[0], data.position[1] - data.sensors.right / 10)
+        new Vec2d(
+          data.position[0] * 100,
+          data.position[1] - data.sensors.right / 10
+        )
       );
-    if (data.sensors.back < 0)
+    if (data.sensors.back > 0)
       TEMPARRAYPERIM.push(
-        new Vec2d(data.position[0] - data.sensors.back / 10, data.position[1])
+        new Vec2d(
+          data.position[0] * 100 - data.sensors.back / 10,
+          data.position[1] * 100
+        )
       );
-    if (data.sensors.left < 0)
+    /*if (data.sensors.left > 0)
       TEMPARRAYPERIM.push(
-        new Vec2d(data.position[0], data.position[1] + data.sensors.left / 10)
-      );
+        new Vec2d(
+          data.position[0] * 100,
+          data.position[1] * 100 + data.sensors.left / 10
+        )
+      );*/
 
     const TEMP_OPTIONS = Vue.lodash.cloneDeep(this.options);
     TEMP_OPTIONS.series[0].data = TEMPARRAYDRONES;
