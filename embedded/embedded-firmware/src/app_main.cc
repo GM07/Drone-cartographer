@@ -11,6 +11,7 @@ extern "C" {
 #include "task.h"
 }
 
+#include "app_main.h"
 #include "components/drone.h"
 #include "controllers/firmware_controller.h"
 

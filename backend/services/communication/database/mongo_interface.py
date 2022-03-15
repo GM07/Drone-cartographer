@@ -28,21 +28,17 @@ class Mission:
     is_simulated: bool
     total_distance: float
     maps: List[List[Point]]
-  
 
     def __init__(self, flight_duration: float, number_of_drones: int,
-    is_simulated: bool, total_distance: float,
-    maps: List[List[Point]]):
-        
+                 is_simulated: bool, total_distance: float,
+                 maps: List[List[Point]]):
+
         self.flight_duration = flight_duration
         self.number_of_drones = number_of_drones
         self.is_simulated = is_simulated
         self.total_distance = total_distance
         self.maps = maps
-        self.time_stamp=datetime.now().isoformat()
-        
-
-    
+        self.time_stamp = datetime.now().isoformat()
 
 
 class Database:
@@ -58,28 +54,41 @@ class Database:
         return self.db.missions.insert_one(mission.__dict__).inserted_id
 
     def get_all_missions_time_stamps(self) -> list:
-        return serialize_objectid_from_result(list(self.db.missions.aggregate(
-            [{'$project': {'time_stamp': 1, 'is_simulated': 1 , 'total_distance':1,'number_of_drones':1,'flight_duration':1}}])))
+        return serialize_objectid_from_result(
+            list(
+                self.db.missions.aggregate([{
+                    '$project': {
+                        'time_stamp': 1,
+                        'is_simulated': 1,
+                        'total_distance': 1,
+                        'number_of_drones': 1,
+                        'flight_duration': 1
+                    }
+                }])))
 
     def get_mission_from_id(self, identifier: str):
         return self.db.missions.find_one({'_id': identifier})
 
     def remove_mission_from_id(self, identifier: str) -> bool:
-        return self.db.missions.delete_one(
-            {'_id': identifier}).deleted_count != 0
+        return self.db.missions.delete_one({
+            '_id': identifier
+        }).deleted_count != 0
 
     def update_mission_info_from_id(self, mission: Mission,
                                     identifier: str) -> bool:
-        return self.db.missions.replace_one(
-            {'_id': identifier}, mission.__dict__).matched_count != 0
+        return self.db.missions.replace_one({
+            '_id': identifier
+        }, mission.__dict__).matched_count != 0
 
     def test_connection(self):
         self.db.drop_collection('missions')
-        self.upload_mission_info(Mission( 10, 4, True, 40, [[]]))
-        self.upload_mission_info(Mission( 10, 4, False, 20, [[]]))
-        self.upload_mission_info(Mission( 11, 5, True, 41, [[]]))
-        self.upload_mission_info(
-            Mission( 10, 3, False, 40, [[{'x': 1, 'y': 2}]]))
+        self.upload_mission_info(Mission(10, 4, True, 40, [[]]))
+        self.upload_mission_info(Mission(10, 4, False, 20, [[]]))
+        self.upload_mission_info(Mission(11, 5, True, 41, [[]]))
+        self.upload_mission_info(Mission(10, 3, False, 40, [[{
+            'x': 1,
+            'y': 2
+        }]]))
 
         result = self.get_all_missions_time_stamps()
 

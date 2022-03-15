@@ -43,8 +43,8 @@ class SimulationController : public AbstractController {
   void takeOff(float height) override;
   void land() override;
 
-  Vector3D getCurrentLocation() const override;
-  bool isTrajectoryFinished() const override;
+  [[nodiscard]] Vector3D getCurrentLocation() const override;
+  [[nodiscard]] bool isTrajectoryFinished() const override;
 
   void initCommunicationManager() override;
   size_t receiveMessage(void* message, size_t size) override;
@@ -59,9 +59,8 @@ class SimulationController : public AbstractController {
   void blinkLED(LED /*led*/) override;
   size_t getId() override;
 
-  void delay(uint32_t /*ticks*/) override{/**/};
   void updateSensorsData() override;
-  bool isDroneCrashed() const override;
+  [[nodiscard]] bool isDroneCrashed() const override;
 
 #ifndef GTEST
  private:

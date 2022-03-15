@@ -15,19 +15,19 @@ extern std::queue<P2PPacket> receivedP2PPacket;
 class FirmwareController : public AbstractController {
  public:
   FirmwareController();
-  virtual ~FirmwareController() = default;
+  ~FirmwareController() override = default;
 
   FirmwareController(FirmwareController&& other) = delete;
   FirmwareController operator=(FirmwareController&& other) = delete;
-  FirmwareController(FirmwareController& other) = delete;
-  FirmwareController operator=(FirmwareController& other) = delete;
+  FirmwareController(const FirmwareController& other) = delete;
+  FirmwareController operator=(const FirmwareController& other) = delete;
 
   void setVelocity(const Vector3D& direction, float speed) override;
   void takeOff(float height) override;
   void land() override;
 
-  Vector3D getCurrentLocation() const override;
-  bool isTrajectoryFinished() const override;
+  [[nodiscard]] Vector3D getCurrentLocation() const override;
+  [[nodiscard]] bool isTrajectoryFinished() const override;
 
   void initCommunicationManager() override{/**/};
   size_t receiveMessage(void* message, size_t size) override;
@@ -41,9 +41,8 @@ class FirmwareController : public AbstractController {
   void blinkLED(LED led) override;
   size_t getId() override;
 
-  void delay(const uint32_t ticks) override{/**/};
   void updateSensorsData() override;
-  bool isDroneCrashed() const override;
+  [[nodiscard]] bool isDroneCrashed() const override;
 
  private:
   ledseqContext_t m_seqLED{};

@@ -1,3 +1,4 @@
+""""File containing constants for Drone Communication"""
 from enum import Enum
 
 # Max timeout for the connection with the simulation
@@ -5,11 +6,11 @@ MAX_TIMEOUT = 10
 
 
 class COMMANDS(Enum):
+    """Enum for all possible drone commands"""
     IDENTIFY = 0x1,
     LAUNCH = 0x2,
     LAND = 0x3,
     LOGS = 0x4,  # Do not remove comma
-
 
 
 # Objects to communicate with Crazyflie

@@ -32,10 +32,6 @@ bool Vector3D::operator!=(const Vector3D& other) const {
   return !(*this == other);
 }
 
-bool Vector3D::isAlmostEqual(const Vector3D& other, float threshold) const {
-  return distanceTo(other) <= threshold;
-}
-
 float Vector3D::distanceTo(const Vector3D& other) const {
   return std::sqrt(powf(m_x - other.m_x, 2) + powf(m_y - other.m_y, 2) +
                    powf(m_z - other.m_z, 2));
@@ -75,9 +71,10 @@ std::string Vector3D::toString() const {
 }
 
 bool Vector3D::areSameDirection(const Vector3D& vec1, const Vector3D& vec2) {
+  constexpr float kLimit = 0.05;
   Vector3D projected = vec2 * ((vec1 * vec2) / (vec2 * vec2));
   return std::abs(projected * vec2 / (projected.length() * vec2.length()) - 1) <
-         kThreshold;
+         kLimit;
 }
 
 Vector3D Vector3D::x(float value) { return Vector3D(value, 0.0f, 0.0f); }

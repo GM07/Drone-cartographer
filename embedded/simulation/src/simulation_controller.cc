@@ -6,6 +6,7 @@
 
 #include "sensors/simulation_sensors.h"
 #include "utils/led.h"
+#include "utils/math.h"
 #include "utils/timer.h"
 
 using ::argos::CVector3;
@@ -148,7 +149,7 @@ Vector3D SimulationController::getCurrentLocation() const {
 }
 
 bool SimulationController::isTrajectoryFinished() const {
-  return getCurrentLocation().isAlmostEqual(m_targetPosition);
+  return areAlmostEqual(getCurrentLocation(), m_targetPosition);
 }
 
 void SimulationController::setVelocity(const Vector3D& direction, float speed) {

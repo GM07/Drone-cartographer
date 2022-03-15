@@ -1,15 +1,46 @@
+"""This module includes the necessary class
+to be able to configure the simulation"""
 import shutil
 import pathlib
 import os
 import subprocess
+import math
+from dataclasses import dataclass
+import random
 import xml.etree.ElementTree as ET
 
+
+@dataclass
+class Box:
+    x_pos: float
+    y_pos: float
+    x_pos_argos: float
+    y_pos_argos: float
+    width: float
+    height: float
+    orientation: float
+
+    def __init__(self, x_pos: float, y_pos: float, length: float,
+                 orientation: float):
+        self.width = length * math.sin(orientation)
+        self.height = length * math.cos(orientation)
+        self.x_pos_argos = x_pos
+        self.y_pos_argos = y_pos
+        self.x_pos = x_pos - self.width / 2
+        self.y_pos = y_pos - self.height / 2
+        self.orientation = orientation
+
+
 class SimulationConfiguration:
+    """This class configures the argos3 simulation
+    an example would be
+    sim = SimulationConfiguration()
+    sim.add_drone(Drone())"""
 
     def __init__(self):
         current_path = str(pathlib.Path(__file__).parent.resolve())
         shutil.copyfile(current_path + '/template.argos',
-         current_path + '/crazyflie_sensing.argos')
+                        current_path + '/crazyflie_sensing.argos')
 
     def add_drone(self, drone):
         current_path = str(pathlib.Path(__file__).parent.resolve())
@@ -29,54 +60,77 @@ class SimulationConfiguration:
         battery.set('orient_delta', '1e-3')
 
         body = ET.SubElement(crazyflie, 'body')
-        body.set('position', str(drone['xPos'])
-				+ ',' + str(drone['yPos']) + ',0')
+        body.set('position',
+                 str(drone['xPos']) + ',' + str(drone['yPos']) + ',0')
         body.set('orientation', '0,0,0')
 
         tree.write(current_path + '/crazyflie_sensing.argos')
 
+    def add_obstacles(self, drone_list):
+        box_list = list()
+        WALL_LENGTH = 2  # 0.5 Meters ?
+        NB_WALLS = 5
+        DRONE_SIZE = 0.2
+        ROOM_SIZE = 2.5
+        for drone in drone_list:
+            # TODO drone rotation is not implemented yet
+            box: Box = Box(
+                float(drone['xPos']) - DRONE_SIZE / 2,
+                float(drone['yPos']) - DRONE_SIZE / 2, DRONE_SIZE, 0)
+            box_list.append(box)
 
-    def add_obstacles(self):
+        while (len(box_list) < len(drone_list) + NB_WALLS):
+            # Generate random point
+            pos_x = random.uniform(-(ROOM_SIZE - WALL_LENGTH / 2),
+                                   (ROOM_SIZE - WALL_LENGTH / 2))
+            pos_y = random.uniform(-(ROOM_SIZE - WALL_LENGTH / 2),
+                                   (ROOM_SIZE - WALL_LENGTH / 2))
+            direction = random.uniform(0, math.pi / 2)
+            box: Box = Box(pos_x, pos_y, WALL_LENGTH, direction)
+
+            is_invalid = False
+            for box_test in box_list:
+                if self.__is_colliding(box_test, box):
+                    is_invalid = True
+                    break
+            if not is_invalid:
+                box_list.append(box)
+
         current_path = str(pathlib.Path(__file__).parent.resolve())
         tree = ET.parse(current_path + '/crazyflie_sensing.argos')
         arena = tree.find('arena')
 
-        distribute = ET.SubElement(arena, 'distribute')
+        index = len(drone_list)
+        while index < len(box_list):
+            box = ET.SubElement(arena, 'box')
+            box.set('id', 'b' + str(index))
+            box.set('size', '0.01,2,1')
+            box.set('movable', 'false')
 
-        position = ET.SubElement(distribute, 'position')
-        position.set('method', 'uniform')
-        position.set('min', '-2.5,-2.5,0')
-        position.set('max', '2.5,2.5,0')
+            body = ET.SubElement(box, 'body')
+            body.set(
+                'position',
+                str(box_list[index].x_pos_argos) + ',' +
+                str(box_list[index].y_pos_argos) + ',0')
+            body.set('orientation',
+                     str(math.degrees(box_list[index].orientation)) + ',0,0')
 
-        orientation = ET.SubElement(distribute, 'orientation')
-        orientation.set('method', 'uniform')
-        orientation.set('min', '0,0,0')
-        orientation.set('max', '360,0,0')
-
-        entity = ET.SubElement(distribute, 'entity')
-        entity.set('quantity', '5')
-        entity.set('max_trials', '100')
-
-        box = ET.SubElement(entity, 'box')
-        box.set('id', 'b')
-        box.set('size', '0.05,2,1')
-        box.set('movable', 'false')
+            index += 1
 
         tree.write(current_path + '/crazyflie_sensing.argos')
 
+    def __is_colliding(self, box1: Box, box2: Box):
+        return \
+            (box1.x_pos < box2.x_pos + box2.width) \
+        and (box1.x_pos + box1.width > box2.x_pos) \
+        and (box1.y_pos < box2.y_pos + box2.height) \
+        and (box1.y_pos + box1.height > box2.y_pos)
+
     def launch(self):
-        nb_tries = 0
-        max_nb_tries = 25
         current_path = str(pathlib.Path(__file__).parent.resolve())
-        os.system('docker cp ' + current_path
-				+ '/crazyflie_sensing.argos embedded:/crazyflie_sensing.argos')
+        os.system('docker cp ' + current_path +
+                  '/crazyflie_sensing.argos embedded:/crazyflie_sensing.argos')
 
-        while nb_tries < max_nb_tries:
-            return_value = subprocess.call(current_path + '/docker_exec.sh',
-						shell=True)
+        subprocess.call(current_path + '/docker_exec.sh', shell=True)
 
-            if return_value == 0:
-                break
-            nb_tries = nb_tries + 1
         os.system('rm -f ' + current_path + '/crazyflie_sensing.argos')
-

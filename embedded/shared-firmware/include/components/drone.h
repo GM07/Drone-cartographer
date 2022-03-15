@@ -24,18 +24,25 @@ class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
       : m_messageRX(), m_controller(controller) {
+    static constexpr float kFirstNumber = 0.5;
+    static constexpr float kSecondNumber = 1.225;
+
     static std::array<Vector3D, kNbStartingDirection> startingDirection{
-        {Vector3D(1.225F, 0.5F, 0.0F), Vector3D(0.5F, 1.225F, 0.0F),
-         Vector3D(-0.5F, 1.225F, 0.0F), Vector3D(-1.225F, 0.5F, 0.0F),
-         Vector3D(-1.225F, -0.5F, 0.0F), Vector3D(-0.5F, -1.225F, 0.0F),
-         Vector3D(0.5F, -1.225F, 0.0F), Vector3D(1.225F, -0.5F, 0.0F)}};
+        {Vector3D(kSecondNumber, kFirstNumber, 0.0F),
+         Vector3D(kFirstNumber, kSecondNumber, 0.0F),
+         Vector3D(-kFirstNumber, kSecondNumber, 0.0F),
+         Vector3D(-kSecondNumber, kFirstNumber, 0.0F),
+         Vector3D(-kSecondNumber, -kFirstNumber, 0.0F),
+         Vector3D(-kFirstNumber, -kSecondNumber, 0.0F),
+         Vector3D(kFirstNumber, -kSecondNumber, 0.0F),
+         Vector3D(kSecondNumber, -kFirstNumber, 0.0F)}};
 
-    // TODO - Make truly random (Just seed with time)
-    static std::default_random_engine generator;
-    std::uniform_int_distribution<int> distribution(0, 7);
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> distribution(
+        0, startingDirection.size() - 1);
+
     int direction = distribution(generator);
-
-    m_data.direction = startingDirection[direction];
+    m_data.direction = startingDirection.at(direction);
   }
 
   Drone(const Drone& other) = delete;
@@ -84,8 +91,6 @@ class Drone {
   DroneData m_data;
   std::unordered_map<size_t, DroneData> m_usedPeerData;
   Vector3D m_normal;
-
- public:
   std::unordered_map<size_t, DroneData> m_peerData;
 };
 #endif

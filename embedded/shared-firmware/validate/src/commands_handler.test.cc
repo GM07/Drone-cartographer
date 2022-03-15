@@ -14,25 +14,36 @@ TEST(ValidateCommandsHandler, handleCommandIdentify) {
 }
 
 TEST(ValidateCommandsHandler, handleCommandTakeOff) {
-  Drone drone(std::dynamic_pointer_cast<AbstractController>(
-      std::make_shared<StubController>()));
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
   drone.getController()->state = State::kTakingOff;
-  EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              takeOff(_))
-      .Times(1);
-  EXPECT_EQ(drone.handleCommand(Command::kTakeOff, nullptr, 0), true);
+  EXPECT_CALL(*controller, takeOff(_)).Times(1);
+  EXPECT_TRUE(drone.handleCommand(Command::kTakeOff, nullptr, 0));
   EXPECT_EQ(drone.getController()->state, State::kTakingOff);
 }
 
 TEST(ValidateCommandsHandler, handleCommandLand) {
-  Drone drone(std::dynamic_pointer_cast<AbstractController>(
-      std::make_shared<StubController>()));
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
   drone.getController()->state = State::kLanding;
-  EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              land())
-      .Times(1);
-  EXPECT_EQ(drone.handleCommand(Command::kLand, nullptr, 0), true);
+  EXPECT_CALL(*controller, land()).Times(1);
+  EXPECT_TRUE(drone.handleCommand(Command::kLand, nullptr, 0));
   EXPECT_EQ(drone.getController()->state, State::kLanding);
+}
+
+TEST(ValidateCOmmandsHandler, shouldNotHandleCommandsIfCrashed) {
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
+  drone.getController()->state = State::kCrash;
+
+  EXPECT_FALSE(drone.handleCommand(Command::kIdentify, nullptr, 0));
+  EXPECT_FALSE(drone.handleCommand(Command::kTakeOff, nullptr, 0));
+  EXPECT_FALSE(drone.handleCommand(Command::kLand, nullptr, 0));
+
+  EXPECT_EQ(drone.getController()->state, State::kCrash);
 }
 
 TEST(ValidateCommandsHandler, handleCommandInvalid) {

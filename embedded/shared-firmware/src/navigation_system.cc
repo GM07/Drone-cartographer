@@ -1,8 +1,7 @@
 #include "components/drone.h"
-#include "utils/timer.h"
+#include "utils/math.h"
 
 constexpr float kMinDistanceObstacle = 200.0F;  // Millimeters
-constexpr float kComparisonFactor = 10e-3;
 
 void Drone::step() {
   updateCrashStatus();
@@ -109,4 +108,9 @@ void Drone::changeDirection() {
   }
 }
 
+<<<<<<< HEAD
 void Drone::initDrone() { m_data.id = m_controller->getId(); }
+=======
+m_controller->setVelocity(m_direction, kDroneSpeed);
+}
+>>>>>>> d7b6495dee3d79871040f0b869febd316ac7bf20
