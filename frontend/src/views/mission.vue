@@ -149,11 +149,8 @@ import {ServerCommunication} from '@/communication/server_communication';
     MissionCommands,
     NavigationCommands,
     DroneMenu,
-<<<<<<< HEAD
     Map,
-=======
     LogsInterface,
->>>>>>> 2cf3757e81f4d7728846e198a0d2b75545215d29
   },
 })
 export default class Mission extends Vue {
