@@ -51,6 +51,7 @@ def identify_drone(drone_addr):
     if not AccessStatus.is_request_valid(request):
         return ''
 
+    global COMM
     COMM.send_command(COMMANDS.IDENTIFY.value, [drone_addr])
     return 'Identified drone'
 

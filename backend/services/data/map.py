@@ -30,7 +30,7 @@ class MapData:
 
     def to_socket_data(self):
         return {
-            "id": self.drone_id,
+            # "id": self.drone_id,
             "position": [
                 self.drone_data.position.x, self.drone_data.position.y
             ],
@@ -79,10 +79,10 @@ class Map:
             self.buffer_data[drone_id] = list()
         self.buffer_data[drone_id].append(data)
 
-        if (len(self.buffer_data[drone_id]) >=
-                self.drone_len * Map._DATA_NB_FILTER):
-            front, left, back, right = self.mean_data_per_sensor(
-                self.buffer_data[drone_id])
+        # if (len(self.buffer_data[drone_id]) >=
+        #         self.drone_len * Map._DATA_NB_FILTER):
+        #     front, left, back, right = self.mean_data_per_sensor(
+        #         self.buffer_data[drone_id])
 
         self.emit_data(map_data, socket)
 

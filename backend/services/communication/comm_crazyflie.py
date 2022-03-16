@@ -103,7 +103,10 @@ class CommCrazyflie(AbstractComm):
         for link in sending_links:
             packet = bytearray(command)  # Command must be an array of numbers
             print('Sending packet : ', packet)
-            self.crazyflies_by_id[link].appchannel.send_packet(packet)
+            try:
+                self.crazyflies_by_id[link].appchannel.send_packet(packet)
+            except Exception as e:
+                print(f'Error : {e.with_traceback()}')
 
         if command == COMMANDS.LAND.value:
             self.current_mission.flight_duration = self.mission_start_time - perf_counter(
