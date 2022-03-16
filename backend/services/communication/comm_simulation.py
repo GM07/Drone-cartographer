@@ -34,12 +34,11 @@ class CommSimulation(AbstractComm):
     SOCKET_DATA_PATH = '/tmp/socket/data{}'
 
     def __init__(self, socketIO: SocketIO, drone_list=[]):
-        super().__init__(socketIO)
+        super().__init__(socketIO, drone_list)
         print('Drone list: ', drone_list)
         # Map().set_drone_len(len(drone_list))
         self.nb_connections = len(drone_list)
-        super().drone_list = drone_list
-        self.drone_list = super().drone_list
+        self.drone_list = drone_list
         self.thread_active = True
         self.__COMMANDS_QUEUE = queue.Queue(10)
         self.__COMMANDS_THREAD = threading.Thread(
