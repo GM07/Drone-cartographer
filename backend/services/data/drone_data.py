@@ -41,6 +41,9 @@ class DroneData:
     def __init__(self, data: bytes):
         self.__from_bytes(data)
 
+    def update_sensors(self, sensors: DroneSensors):
+        self.sensors = sensors
+
     def __from_bytes(self, data: bytes):
         decoder: ByteDecoder = ByteDecoder(
             data, ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'i'])

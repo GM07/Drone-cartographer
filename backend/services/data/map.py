@@ -2,8 +2,9 @@ from flask_socketio import SocketIO
 import threading
 from functools import wraps
 from typing import Dict, List
+from itertools import groupby
 
-from services.data.drone_data import DroneData
+from services.data.drone_data import DroneData, DroneSensors
 
 
 def lock(lock: threading.Lock):
@@ -48,13 +49,11 @@ class Map:
     _instance = None
     _lock = threading.Lock()
     _DATA_NB_FILTER = 4
-
-    def __init__(self):
-        self.raw_individual_data: Dict[str, List[DroneData]] = {}
-        self.raw_data: List[MapData] = list()
-        self.filtered_data: List[MapData] = list()
-        self.buffer_data: Dict[str, List[DroneData]] = {}
-        self.drone_len = 0
+    raw_individual_data: Dict[str, List[DroneData]] = {}
+    raw_data: List[MapData] = list()
+    filtered_data: List[MapData] = list()
+    buffer_data: Dict[str, List[DroneData]] = {}
+    drone_len = 0
 
     # Thread safe constructor
     # __new__ is called before the __init__
@@ -79,12 +78,14 @@ class Map:
             self.buffer_data[drone_id] = list()
         self.buffer_data[drone_id].append(data)
 
-        # if (len(self.buffer_data[drone_id]) >=
-        #         self.drone_len * Map._DATA_NB_FILTER):
-        #     front, left, back, right = self.mean_data_per_sensor(
-        #         self.buffer_data[drone_id])
+        sending_data = map_data
+        # if len(self.buffer_data[drone_id]) >= Map._DATA_NB_FILTER:
+        # front, left, back, right = self.mean_data_per_sensor(
+        # self.buffer_data[drone_id])
+        # mean_sensors: DroneSensors = DroneSensors(front, left, back, right)
+        # sending_data.drone_data.update_sensors(mean_sensors)
 
-        self.emit_data(map_data, socket)
+        self.emit_data(sending_data, socket)
 
     def emit_data(self, map_data: MapData, socket: SocketIO):
         socket.emit(
@@ -94,19 +95,19 @@ class Map:
             broadcast=True,
         )
 
-    def mean_data_per_sensor(self, list: List[DroneData]):
+    def mean_data_per_sensor(self, drone_list: List[DroneData]):
 
         m_front, m_left, m_back, m_right = 0, 0, 0, 0
-        for elem in list:
+        for elem in drone_list:
             m_front += elem.sensors.front
             m_left += elem.sensors.left
             m_back += elem.sensors.back
             m_right += elem.sensors.right
 
-        m_front /= len(list)
-        m_left /= len(list)
-        m_back /= len(list)
-        m_right /= len(list)
+        m_front /= len(drone_list)
+        m_left /= len(drone_list)
+        m_back /= len(drone_list)
+        m_right /= len(drone_list)
 
         return m_front, m_left, m_back, m_right
 

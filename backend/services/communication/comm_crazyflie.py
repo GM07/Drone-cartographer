@@ -35,6 +35,7 @@ class CommCrazyflie(AbstractComm):
 
         print('Creating Embedded Crazyflie communication with drone list :',
               drone_list)
+        Map().set_drone_len(len(drone_list))
         self.links = list(map(lambda drone: drone['name'], drone_list))
         self.crazyflies: list[Crazyflie] = list(
             map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
