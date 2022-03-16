@@ -28,6 +28,20 @@ class MapData:
         self.drone_id = drone_id
         self.drone_data = drone_data
 
+    def to_socket_data(self):
+        return {
+            "id": self.drone_id,
+            "position": [
+                self.drone_data.position.x, self.drone_data.position.y
+            ],
+            "sensors": {
+                "front": self.drone_data.sensors.front,
+                "right": self.drone_data.sensors.right,
+                "back": self.drone_data.sensors.back,
+                "left": self.drone_data.sensors.left
+            }
+        }
+
 
 # Thread safe Singleton
 class Map:
@@ -70,12 +84,12 @@ class Map:
             front, left, back, right = self.mean_data_per_sensor(
                 self.buffer_data[drone_id])
 
-        self.emit_data(data, socket)
+        self.emit_data(map_data, socket)
 
-    def emit_data(self, drone_data: DroneData, socket: SocketIO):
+    def emit_data(self, map_data: MapData, socket: SocketIO):
         socket.emit(
             'getMapData',
-            drone_data.to_socket_data(),
+            map_data.to_socket_data(),
             namespace='/getMapData',
             broadcast=True,
         )

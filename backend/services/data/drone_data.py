@@ -66,17 +66,6 @@ class DroneData:
             + str(self.state.name) \
             + '\n\n'
 
-    def to_socket_data(self):
-        return {
-            "position": [self.position.x, self.position.y],
-            "sensors": {
-                "front": self.sensors.front,
-                "right": self.sensors.right,
-                "back": self.sensors.back,
-                "left": self.sensors.left
-            }
-        }
-
 
 def log_entry_to_drone_data(log_entry):
     pass

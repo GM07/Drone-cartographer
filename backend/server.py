@@ -7,7 +7,6 @@ from pickle import NONE
 Defines all routes in this file"""
 
 from flask import jsonify, Flask, request
-
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from services.communication.abstract_comm import AbstractComm
@@ -74,7 +73,6 @@ def launch(is_simulated: bool):
             configuration.add_drone(drone)
         configuration.add_obstacles(drone_list)
         configuration.launch()
-
         COMM = CommSimulation(SOCKETIO, drone_list)
     else:
         COMM = CommCrazyflie(SOCKETIO, drone_list)
@@ -117,6 +115,7 @@ def terminate():
             not AccessStatus.is_request_valid(request)):
         return ''
 
+    global COMM
     COMM.send_command(COMMANDS.LAND.value)
 
     MissionStatus.terminate_mission(SOCKETIO)

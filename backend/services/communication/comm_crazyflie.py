@@ -47,8 +47,8 @@ class CommCrazyflie(AbstractComm):
         self.__init_drivers()
         try:
             self.setup_log()
-        except:
-            pass
+        except Exception as e:
+            print(f'Exception: {e}')
 
     def __del__(self):
         self.shutdown()
