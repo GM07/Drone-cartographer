@@ -35,7 +35,7 @@ class Map:
     _DATA_NB_FILTER = 4
 
     def __init__(self):
-        self.raw_individual_data: Dict[str, MapData] = {}
+        self.raw_individual_data: Dict[str, List[DroneData]] = {}
         self.raw_data: List[MapData] = list()
         self.filtered_data: List[MapData] = list()
         self.buffer_data: Dict[str, List[DroneData]] = {}
@@ -56,7 +56,7 @@ class Map:
 
         if self.raw_individual_data[id] is None:
             self.raw_individual_data[id] = list()
-        self.raw_individual_data[id].append(map_data)
+        self.raw_individual_data[id].append(data)
 
         self.raw_data.append(map_data)
 
