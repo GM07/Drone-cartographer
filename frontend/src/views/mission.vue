@@ -221,7 +221,6 @@ export default class Mission extends Vue {
     });
 
     SOCKETIO_LIMITED_ACCESS.on('droneList', (droneList: Drone[]) => {
-      console.log('Bonjour');
       this.droneList = droneList;
     });
 
