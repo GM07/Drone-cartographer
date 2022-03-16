@@ -14,7 +14,7 @@ from time import sleep
 
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
-from services.data.map import Map
+from services.data.map import Map, MapData
 
 
 class CommSimulation(AbstractComm):
@@ -67,14 +67,26 @@ class CommSimulation(AbstractComm):
         self.__COMMANDS_QUEUE.put_nowait(None)
 
         for server, connection in self.command_servers.items():
-            server.shutdown(socket.SHUT_RDWR)
-            if connection is not None:
-                connection.shutdown(socket.SHUT_RDWR)
+            try:
+                server.shutdown(socket.SHUT_RDWR)
+            except:
+                pass
+            try:
+                if connection is not None:
+                    connection.shutdown(socket.SHUT_RDWR)
+            except:
+                pass
 
         for server, connection in self.data_servers.items():
-            server.shutdown(socket.SHUT_RDWR)
-            if connection is not None:
-                connection.shutdown(socket.SHUT_RDWR)
+            try:
+                server.shutdown(socket.SHUT_RDWR)
+            except:
+                pass
+            try:
+                if connection is not None:
+                    connection.shutdown(socket.SHUT_RDWR)
+            except:
+                pass
 
     def send_command(self, command: COMMANDS):
         try:
@@ -186,7 +198,7 @@ class CommSimulation(AbstractComm):
                         is_socket_broken = True
                     else:
                         data = DroneData(received)
-                        Map().add_data(data)
+                        Map().add_data(MapData(server.getsockname(), data))
                         self.SOCKETIO.emit('getMapData', {
                             "position": [data.position.x, data.position.y],
                             "sensors": {

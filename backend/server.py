@@ -58,8 +58,8 @@ def launch(is_simulated: bool):
         return ''
 
     global COMM
-    COMM.shutdown()
     drone_list = COMM.get_drones()
+    COMM.shutdown()
 
     if is_simulated:
         configuration = SimulationConfiguration()
@@ -85,6 +85,7 @@ def addDrone(drone_list, is_simulated):
     COMM.set_drone(drone_list)
 
     if not is_simulated:
+        COMM.shutdown()
         COMM = CommCrazyflie(
             SOCKETIO, drone_list)  # Recreate object to reconnect to drones
 

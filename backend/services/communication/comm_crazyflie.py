@@ -1,6 +1,7 @@
 """This module has the CommCrazyflie class that is used to
 communicate with the physical drones """
 
+from logging import shutdown
 from typing import Dict, List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
@@ -10,7 +11,7 @@ from flask_socketio import SocketIO
 
 from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
-# from services.data.map import Map
+from services.data.map import Map, MapData
 
 
 class CommCrazyflie(AbstractComm):
@@ -22,11 +23,13 @@ class CommCrazyflie(AbstractComm):
     def __init__(self, socketIO: SocketIO, drone_list: list):
         super().__init__(socketIO)
         if drone_list is None:
+            print('Error : drone list is empty')
             self.sync_crazyflies = []
             self.drone_list = []
             return
 
-        print('Creating Embedded Crazyflie communication')
+        print('Creating Embedded Crazyflie communication with drone list :',
+              drone_list)
         self.links = list(map(lambda drone: drone['name'], drone_list))
         self.crazyflies: list[Crazyflie] = list(
             map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
@@ -43,11 +46,14 @@ class CommCrazyflie(AbstractComm):
             pass
 
     def __del__(self):
-        for sync in self.sync_crazyflies:
-            sync.close_link()
+        self.shutdown()
 
     def __init_drivers(self):
         cflib.crtp.init_drivers()
+
+    def shutdown(self):
+        for sync in self.sync_crazyflies:
+            sync.close_link()
 
     def setup_log(self):
         self.log_configs: List[LogConfig] = []
@@ -87,16 +93,17 @@ class CommCrazyflie(AbstractComm):
             print('Sending packet : ', packet)
             self.crazyflies_by_id[link].appchannel.send_packet(packet)
 
-    def __retrieve_log(self, _, data, __: LogConfig):
+    def __retrieve_log(self, _, data, logconf: LogConfig):
+        # Map().add_data(MapData(logconf.id, data))
         self.SOCKETIO.emit(
             'getMapData',
             {
-                "position": [data['kalman.stateX'], data['kalman.stateY']],
-                "sensors": {
-                    "front": data['range.front'],
-                    "right": data['range.right'],
-                    "back": data['range.back'],
-                    "left": data['range.left']
+                'position': [data['kalman.stateX'], data['kalman.stateY']],
+                'sensors': {
+                    'front': data['range.front'],
+                    'right': data['range.right'],
+                    'back': data['range.back'],
+                    'left': data['range.left']
                 }
             },
             namespace='/getMapData',
