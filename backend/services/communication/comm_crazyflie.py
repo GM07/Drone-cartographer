@@ -11,7 +11,7 @@ from flask_socketio import SocketIO
 
 from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
-from services.data.map import Map, MapData
+# from services.data.map import Map, MapData
 
 
 class CommCrazyflie(AbstractComm):
@@ -94,6 +94,7 @@ class CommCrazyflie(AbstractComm):
             self.crazyflies_by_id[link].appchannel.send_packet(packet)
 
     def __retrieve_log(self, _, data, logconf: LogConfig):
+        print(data)
         # Map().add_data(MapData(logconf.id, data))
         self.SOCKETIO.emit(
             'getMapData',

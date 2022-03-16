@@ -58,8 +58,8 @@ def launch(is_simulated: bool):
         return ''
 
     global COMM
-    drone_list = COMM.get_drones()
     COMM.shutdown()
+    drone_list = COMM.get_drones()
 
     if is_simulated:
         configuration = SimulationConfiguration()
@@ -88,6 +88,7 @@ def addDrone(drone_list, is_simulated):
         COMM.shutdown()
         COMM = CommCrazyflie(
             SOCKETIO, drone_list)  # Recreate object to reconnect to drones
+    return ''
 
 
 @SOCKETIO.on('set_mission_type', namespace='/limitedAccess')

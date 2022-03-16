@@ -30,7 +30,7 @@ class CommSimulation(AbstractComm):
     def __init__(self, socketIO: SocketIO, drone_list=[]):
         super().__init__(socketIO)
         print('Drone list: ', drone_list)
-        Map().set_drone_len(len(drone_list))
+        # Map().set_drone_len(len(drone_list))
         self.nb_connections = len(drone_list)
         self.drone_list = drone_list
         self.thread_active = True
@@ -198,7 +198,7 @@ class CommSimulation(AbstractComm):
                         is_socket_broken = True
                     else:
                         data = DroneData(received)
-                        # Map().add_data(MapData(str(server.getsockname()), data))
+                        Map().add_data(MapData(str(server.getsockname()), data))
                         self.SOCKETIO.emit('getMapData', {
                             "position": [data.position.x, data.position.y],
                             "sensors": {

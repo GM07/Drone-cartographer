@@ -49,24 +49,25 @@ class Map:
                 cls._instance = super(Map, cls).__new__(cls)
             return cls._instance
 
-    @lock(_lock)
+    # @lock(_lock)
     def add_data(self, map_data: MapData):
-        id = map_data.drone_id
+        drone_id = map_data.drone_id
         data = map_data.drone_data
 
-        if self.raw_individual_data[id] is None:
-            self.raw_individual_data[id] = list()
-        self.raw_individual_data[id].append(data)
+        if not drone_id in self.raw_individual_data:
+            self.raw_individual_data[drone_id] = list()
+        self.raw_individual_data[drone_id].append(data)
 
         self.raw_data.append(map_data)
 
-        if self.buffer_data[id] is None:
-            self.buffer_data[id] = list()
-        self.buffer_data[id].append(data)
+        if drone_id not in self.buffer_data:
+            self.buffer_data[drone_id] = list()
+        self.buffer_data[drone_id].append(data)
 
-        if (len(self.buffer_data[id]) >= self.drone_len * Map._DATA_NB_FILTER):
+        if (len(self.buffer_data[drone_id]) >=
+                self.drone_len * Map._DATA_NB_FILTER):
             front, left, back, right = self.mean_data_per_sensor(
-                self.buffer_data[id])
+                self.buffer_data[drone_id])
 
     def mean_data_per_sensor(self, list: List[DroneData]):
 
