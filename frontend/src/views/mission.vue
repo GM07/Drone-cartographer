@@ -8,6 +8,7 @@
             {{ drone.name }}
           </v-btn>
           <v-icon
+            v-if="isUserControlling()"
             size="12"
             style="
               position: absolute;
