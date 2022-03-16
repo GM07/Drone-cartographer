@@ -2,6 +2,7 @@
 communicate with the physical drones """
 
 from logging import shutdown
+from types import TracebackType
 from typing import Dict, List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
@@ -15,6 +16,7 @@ from services.communication.abstract_comm import AbstractComm
 from services.communication.database.mongo_interface import Mission, Database
 from time import perf_counter
 from datetime import datetime
+from services.data.drone_data import DroneData, log_data_to_drone_data
 
 from services.data.map import Map, MapData
 
@@ -101,13 +103,14 @@ class CommCrazyflie(AbstractComm):
             self.current_mission = Mission(0, len(self.drone_list), False, 0,
                                            [[]])
             self.mission_start_time = perf_counter()
+
         for link in sending_links:
             packet = bytearray(command)  # Command must be an array of numbers
             print('Sending packet : ', packet)
             try:
                 self.crazyflies_by_id[link].appchannel.send_packet(packet)
             except Exception as e:
-                print(f'Error : {e.with_traceback()}')
+                print(f'Error : {e}')
 
         if command == COMMANDS.LAND.value:
             self.current_mission.flight_duration = self.mission_start_time - perf_counter(
@@ -119,7 +122,8 @@ class CommCrazyflie(AbstractComm):
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print(data)
-        Map().add_data(MapData(logconf.id, data), self.SOCKETIO)
+        # Map().add_data(MapData(logconf.id, log_data_to_drone_data(data)),
+        #    self.SOCKETIO)
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         print(f'{timestamp}{logconf.id}:{data}')
         self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
