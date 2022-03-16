@@ -26,7 +26,7 @@ class CommCrazyflie(AbstractComm):
     comm.__init_drivers()"""
 
     def __init__(self, socket_io: SocketIO, drone_list: list):
-        super().__init__(socket_io)
+        super().__init__(socket_io, drone_list)
         if drone_list is None:
             print('Error : drone list is empty')
             self.sync_crazyflies = []
@@ -39,7 +39,6 @@ class CommCrazyflie(AbstractComm):
         self.crazyflies: list[Crazyflie] = list(
             map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
         self.crazyflies_by_id = {}
-        self.drone_list = drone_list
         for link, crazyflie in zip(self.links, self.crazyflies):
             self.crazyflies_by_id[link] = crazyflie
         self.initialized_drivers = False
@@ -51,13 +50,14 @@ class CommCrazyflie(AbstractComm):
             print(f'Exception: {e}')
 
     def __del__(self):
+        print('destructor called')
         self.shutdown()
 
     def __init_drivers(self):
         cflib.crtp.init_drivers()
 
     def shutdown(self):
-        print('shutdown called')
+        print(f'shutdown called : {self.sync_crazyflies}')
         for sync in self.sync_crazyflies:
             print(f'closing link : {sync}')
             sync.close_link()
@@ -85,7 +85,7 @@ class CommCrazyflie(AbstractComm):
 
         for sync, config in zip(self.sync_crazyflies, self.log_configs):
             try:
-                print(f'opening link : {sync}')
+                print(f'opening link ({self.drone_list}) : {sync}')
                 sync.open_link()
                 sync.cf.log.add_config(config)
                 config.data_received_cb.add_callback(self.__retrieve_log)
@@ -105,17 +105,17 @@ class CommCrazyflie(AbstractComm):
             print('Sending packet : ', packet)
             self.crazyflies_by_id[link].appchannel.send_packet(packet)
 
-        # if command == COMMANDS.LAND.value:
-        #     self.current_mission.flight_duration = self.mission_start_time - perf_counter(
-        #     )
-        #     self.current_mission.logs = self.logs
-        #     self.logs = []
-        #     database = Database()
-        #     database.upload_mission_info(self.current_mission)
+        if command == COMMANDS.LAND.value:
+            self.current_mission.flight_duration = self.mission_start_time - perf_counter(
+            )
+            self.current_mission.logs = self.logs
+            self.logs = []
+            database = Database()
+            database.upload_mission_info(self.current_mission)
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print(data)
         Map().add_data(MapData(logconf.id, data), self.SOCKETIO)
-        #print('[%d][%s]: %s' % (timestamp, logconf.id, data))
-        # print(f'{timestamp}{logconf.id}:{data}')
-        # self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
+        # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
+        print(f'{timestamp}{logconf.id}:{data}')
+        self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])

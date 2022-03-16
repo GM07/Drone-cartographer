@@ -13,9 +13,9 @@ class AbstractComm(metaclass=ABCMeta):
     logs: List[Tuple[str, str]] = []
     current_mission: Mission
 
-    def __init__(self, socket_io: SocketIO):
+    def __init__(self, socket_io: SocketIO, drone_list: list):
         self.SOCKETIO = socket_io
-        self.drone_list = []
+        self.drone_list = drone_list
 
     def send_log(self, log: List[Tuple[str, str]]):
         self.SOCKETIO.emit('get_logs',
