@@ -3,7 +3,6 @@ communicate with the physical drones """
 
 from logging import shutdown
 from typing import Dict, List
-from flask_socketio import SocketIO
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
@@ -16,6 +15,8 @@ from services.communication.abstract_comm import AbstractComm
 from services.communication.database.mongo_interface import Mission, Database
 from time import perf_counter
 from datetime import datetime
+
+from services.data.map import Map, MapData
 
 
 class CommCrazyflie(AbstractComm):
@@ -51,10 +52,6 @@ class CommCrazyflie(AbstractComm):
 
     def __del__(self):
         self.shutdown()
-
-    def shutdown(self):
-
-        return super().shutdown()
 
     def __init_drivers(self):
         cflib.crtp.init_drivers()
@@ -115,21 +112,7 @@ class CommCrazyflie(AbstractComm):
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print(data)
-        # Map().add_data(MapData(logconf.id, data))
-        self.SOCKETIO.emit(
-            'getMapData',
-            {
-                'position': [data['kalman.stateX'], data['kalman.stateY']],
-                'sensors': {
-                    'front': data['range.front'],
-                    'right': data['range.right'],
-                    'back': data['range.back'],
-                    'left': data['range.left']
-                }
-            },
-            namespace='/getMapData',
-            broadcast=True,
-        )
+        Map().add_data(MapData(logconf.id, data), self.SOCKETIO)
         #print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         print(f'{timestamp}{logconf.id}:{data}')
         self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])

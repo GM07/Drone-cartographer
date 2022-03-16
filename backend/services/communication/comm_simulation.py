@@ -205,18 +205,8 @@ class CommSimulation(AbstractComm):
                         is_socket_broken = True
                     else:
                         data = DroneData(received)
-                        Map().add_data(MapData(str(server.getsockname()), data))
-                        self.SOCKETIO.emit('getMapData', {
-                            "position": [data.position.x, data.position.y],
-                            "sensors": {
-                                "front": data.sensors.front,
-                                "right": data.sensors.right,
-                                "back": data.sensors.back,
-                                "left": data.sensors.left
-                            }
-                        },
-                                           namespace='/getMapData',
-                                           broadcast=True)
+                        Map().add_data(MapData(str(server.getsockname()), data),
+                                       self.SOCKETIO)
 
                         self.send_log([(datetime.now().isoformat(),
                                         f'Drone {count}' + data.__str__())])

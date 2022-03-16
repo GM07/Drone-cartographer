@@ -1,3 +1,4 @@
+from flask_socketio import SocketIO
 import threading
 from functools import wraps
 from typing import Dict, List
@@ -50,7 +51,7 @@ class Map:
             return cls._instance
 
     # @lock(_lock)
-    def add_data(self, map_data: MapData):
+    def add_data(self, map_data: MapData, socket: SocketIO):
         drone_id = map_data.drone_id
         data = map_data.drone_data
 
@@ -68,6 +69,16 @@ class Map:
                 self.drone_len * Map._DATA_NB_FILTER):
             front, left, back, right = self.mean_data_per_sensor(
                 self.buffer_data[drone_id])
+
+        self.emit_data(data, socket)
+
+    def emit_data(self, drone_data: DroneData, socket: SocketIO):
+        socket.emit(
+            'getMapData',
+            drone_data.to_socket_data(),
+            namespace='/getMapData',
+            broadcast=True,
+        )
 
     def mean_data_per_sensor(self, list: List[DroneData]):
 
