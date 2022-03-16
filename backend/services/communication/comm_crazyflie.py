@@ -3,6 +3,7 @@ communicate with the physical drones """
 
 from logging import shutdown
 from typing import Dict, List
+from flask_socketio import SocketIO
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
@@ -12,6 +13,9 @@ from flask_socketio import SocketIO
 from constants import COMMANDS
 from services.communication.abstract_comm import AbstractComm
 # from services.data.map import Map, MapData
+from services.communication.database.mongo_interface import Mission, Database
+from time import perf_counter
+from datetime import datetime
 
 
 class CommCrazyflie(AbstractComm):
@@ -20,20 +24,20 @@ class CommCrazyflie(AbstractComm):
     An example use is comm=CommCrazyflie([])
     comm.__init_drivers()"""
 
-    def __init__(self, socketIO: SocketIO, drone_list: list):
-        super().__init__(socketIO)
+    def __init__(self, socket_io: SocketIO, drone_list: list):
         if drone_list is None:
             print('Error : drone list is empty')
             self.sync_crazyflies = []
             self.drone_list = []
             return
 
+        super().__init__(socket_io)
         print('Creating Embedded Crazyflie communication with drone list :',
               drone_list)
         self.links = list(map(lambda drone: drone['name'], drone_list))
         self.crazyflies: list[Crazyflie] = list(
             map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
-        self.crazyflies_by_id = dict()
+        self.crazyflies_by_id = {}
         self.drone_list = drone_list
         for link, crazyflie in zip(self.links, self.crazyflies):
             self.crazyflies_by_id[link] = crazyflie
@@ -47,6 +51,10 @@ class CommCrazyflie(AbstractComm):
 
     def __del__(self):
         self.shutdown()
+
+    def shutdown(self):
+
+        return super().shutdown()
 
     def __init_drivers(self):
         cflib.crtp.init_drivers()
@@ -88,12 +96,24 @@ class CommCrazyflie(AbstractComm):
     def send_command(self, command: COMMANDS, links=[]) -> None:
         sending_links = self.links if len(links) == 0 else links
 
+        if command == COMMANDS.LAUNCH.value:
+            self.current_mission = Mission(0, len(self.drone_list), False, 0,
+                                           [[]])
+            self.mission_start_time = perf_counter()
         for link in sending_links:
             packet = bytearray(command)  # Command must be an array of numbers
             print('Sending packet : ', packet)
             self.crazyflies_by_id[link].appchannel.send_packet(packet)
 
-    def __retrieve_log(self, _, data, logconf: LogConfig):
+        if command == COMMANDS.LAND.value:
+            self.current_mission.flight_duration = self.mission_start_time - perf_counter(
+            )
+            self.current_mission.logs = self.logs
+            self.logs = []
+            database = Database()
+            database.upload_mission_info(self.current_mission)
+
+    def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print(data)
         # Map().add_data(MapData(logconf.id, data))
         self.SOCKETIO.emit(
@@ -111,3 +131,5 @@ class CommCrazyflie(AbstractComm):
             broadcast=True,
         )
         #print('[%d][%s]: %s' % (timestamp, logconf.id, data))
+        print(f'{timestamp}{logconf.id}:{data}')
+        self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])

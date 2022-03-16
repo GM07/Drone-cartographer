@@ -1,6 +1,7 @@
 """This module has the CommSimulation class that is used to
 communicate with the simulation """
 
+from curses.ascii import DEL
 from errno import EINVAL, EWOULDBLOCK
 import socket
 import os
@@ -12,15 +13,20 @@ import queue
 from flask_socketio import SocketIO
 from time import sleep
 
+from flask_socketio import SocketIO
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
 from services.data.map import Map, MapData
+from services.communication.database.mongo_interface import Mission, Database
+from time import perf_counter, sleep
+from datetime import datetime
+
+DELAY = 0.500
 
 
 class CommSimulation(AbstractComm):
     """This class is used to communicate with the crazyflie
     drones and inherits from the AbstractComm class
-
     An example use is
     comm=CommSimulation()
     comm.send_command('Launch')"""
@@ -57,6 +63,9 @@ class CommSimulation(AbstractComm):
 
         self.__COMMANDS_THREAD.start()
         self.__RECEIVE_THREAD.start()
+        self.mission_start_time = 0
+        self.mission_end_time = 0
+        self.current_mission: Mission
 
     def shutdown(self):
         self.thread_active = False
@@ -88,10 +97,14 @@ class CommSimulation(AbstractComm):
             except:
                 pass
 
+        return super().shutdown()
+
     def send_command(self, command: COMMANDS):
         try:
+
             self.__COMMANDS_QUEUE.put_nowait(command)
         except queue.Full:
+            self.send_log([(datetime.now().isoformat(), "Command queue full")])
             print("Command queue is full")
             pass
 
@@ -162,6 +175,7 @@ class CommSimulation(AbstractComm):
         at_least_one_connected = True
         while at_least_one_connected and self.thread_active:
             at_least_one_connected = False
+            count: int = 0
             for server, other_server in self.data_servers.items():
                 can_gather_data = other_server is not None
 
@@ -187,13 +201,6 @@ class CommSimulation(AbstractComm):
                     except socket.error:
                         is_socket_broken = True
 
-                    if len(received) > 0:
-                        try:
-                            self.data_servers[server].send(
-                                ack.to_bytes(1, 'big'))
-                        except (BrokenPipeError, socket.error):
-                            is_socket_broken = True
-
                     if len(received) == 0:
                         is_socket_broken = True
                     else:
@@ -211,10 +218,24 @@ class CommSimulation(AbstractComm):
                                            namespace='/getMapData',
                                            broadcast=True)
 
+                        self.send_log([(datetime.now().isoformat(),
+                                        f'Drone {count}' + data.__str__())])
+                    #print(data)
                     if is_socket_broken:
-                        print('Socket broken')
+                        self.send_log([(datetime.now().isoformat(),
+                                        f'Broken Socket no {count}')])
+                        print("Socket broken")
                         self.data_servers[server] = None
-            sleep(0.05)
+                    count += 1
+
+            sleep(DELAY)
+
+            for server in self.data_servers:
+                if self.data_servers[server] is not None:
+                    try:
+                        self.data_servers[server].send(ack.to_bytes(1, 'big'))
+                    except (BrokenPipeError, socket.error):
+                        self.data_servers[server] = None
 
     def __thread_send_command(self):
         missing_connection = False
@@ -222,12 +243,33 @@ class CommSimulation(AbstractComm):
             command = self.__COMMANDS_QUEUE.get()
             if command is None:
                 return
+            if command == COMMANDS.LAUNCH.value:
+                self.current_mission = Mission(0, self.nb_connections, True, 0,
+                                               [[]])
+                self.logs = []
+                self.mission_start_time = perf_counter()
+
+            print('Sending command ', command, ' to simulation')
             for server, conn in self.command_servers.items():
                 try:
                     conn.send(bytearray(command))
+
+                    self.send_log([(datetime.now().isoformat(),
+                                    COMMANDS(command).name)])
                 except BrokenPipeError:
                     print('Command could not be sent, BrokenPipeError')
+                    self.send_log([(datetime.now().isoformat(), 'Broken Pipe')])
                     self.command_servers[server] = None
                     missing_connection = True
                 except socket.error:
+                    self.send_log([(datetime.now().isoformat(), 'Socket error')
+                                  ])
                     return
+
+            if command == COMMANDS.LAND.value:
+                self.current_mission.flight_duration = self.mission_start_time - perf_counter(
+                )
+                self.current_mission.logs = self.logs
+
+                database = Database()
+                database.upload_mission_info(self.current_mission)

@@ -5,13 +5,14 @@ monkey.patch_all()
 from pickle import NONE
 """Root of the Flask Backend for the drone application
 Defines all routes in this file"""
-import services.status.access_status as AccessStatus
-import services.status.mission_status as MissionStatus
 
 from flask import jsonify, Flask, request
+
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from services.communication.abstract_comm import AbstractComm
+import services.status.access_status as AccessStatus
+import services.status.mission_status as MissionStatus
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
 from services.communication.simulation_configuration import SimulationConfiguration
@@ -25,8 +26,12 @@ CORS(APP)
 APP.config['SECRET_KEY'] = 'dev'
 
 # Socketio instance to communicate with frontend
-ASYNC_MODE = 'gevent'
-SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
+
+SOCKETIO = SocketIO(
+    APP,
+    async_mode='gevent',
+    cors_allowed_origins='*',
+)
 
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
@@ -35,6 +40,7 @@ SOCKETIO = SocketIO(APP, async_mode=ASYNC_MODE, cors_allowed_origins='*')
 COMM: AbstractComm = CommCrazyflie(SOCKETIO, [])
 
 
+# Get drone addresses
 @APP.route('/getDrones')
 def get_drones():
     return jsonify(COMM.get_drones())
@@ -51,7 +57,7 @@ def identify_drone(drone_addr):
 
 
 # Launch mission
-@SOCKETIO.on('launch', namespace="/limitedAccess")
+@SOCKETIO.on('launch', namespace='/limitedAccess')
 def launch(is_simulated: bool):
     if (MissionStatus.get_mission_started() or
             not AccessStatus.is_request_valid(request)):
@@ -66,7 +72,7 @@ def launch(is_simulated: bool):
 
         for drone in drone_list:
             configuration.add_drone(drone)
-        configuration.add_obstacles()
+        configuration.add_obstacles(drone_list)
         configuration.launch()
 
         COMM = CommSimulation(SOCKETIO, drone_list)
@@ -105,8 +111,6 @@ def set_mission_type(is_simulated: bool):
 
 
 # Terminate mission
-
-
 @SOCKETIO.on('terminate', namespace='/limitedAccess')
 def terminate():
     if (not MissionStatus.get_mission_started() or
@@ -156,6 +160,17 @@ def disconnect():
 def mission_connect():
     MissionStatus.client_connected(SOCKETIO, request)
     return ''
+
+
+@SOCKETIO.on('connect', namespace='/getLogs')
+def send_logs():
+
+    SOCKETIO.emit('get_logs',
+                  COMM.logs,
+                  namespace='/getLogs',
+                  broadcast=True,
+                  include_self=False,
+                  skip_sid=True)
 
 
 if __name__ == '__main__':

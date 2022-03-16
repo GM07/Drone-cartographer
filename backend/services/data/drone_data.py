@@ -52,16 +52,16 @@ class DroneData:
 
     def __str__(self) -> str:
         return 'Drone Information :\n Sensor (f, l, b, r) : ' \
-            + str(self.sensors.front) + ', '\
-            + str(self.sensors.left) + ', ' \
-            + str(self.sensors.back) + ', ' \
-            + str(self.sensors.right) + ', ' \
+            + f'{self.sensors.front:.3f}' + ', '\
+            + f'{self.sensors.left:.3f}' + ', ' \
+            + f'{self.sensors.back:.3f}' + ', ' \
+            + f'{self.sensors.right:.3f}' + ', ' \
             + ' \nPosition (x, y, z) : ' \
-            + str(self.position.x) + ', ' \
-            + str(self.position.y) + ', ' \
-            + str(self.position.z) + ', ' \
+            + f'{self.position.x:.3f}' + ', ' \
+            + f'{self.position.y:.3f}' + ', ' \
+            + f'{self.position.z:.3f}' + ', ' \
             + ' \nBattery level ' \
-            + str(self.battery_level) \
+            + f'{self.battery_level:.3f}' \
             + ' \nState ' \
             + str(self.state.name) \
             + '\n\n'
