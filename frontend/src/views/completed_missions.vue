@@ -214,7 +214,6 @@ export default class CompletedMissions extends Vue {
   private filter = Filters;
   private currentFilter = 'Aucun';
   private isAscending = true;
-  private areLogsOpen = false;
   private sorts = [
     'Aucun',
     'Nombre de drones',
