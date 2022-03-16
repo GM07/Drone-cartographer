@@ -1,6 +1,6 @@
 <template>
-  <div style="min-width: 800px">
-    <v-card class="overflow-hidden">
+  <div style="min-width: 1400px">
+    <v-card>
       <v-app-bar
         id="scrolling-techniques-4"
         class="app"
@@ -96,7 +96,12 @@
         min-height="96px"
       >
         <div v-for="item in showedMissions" :key="item._id" class="ma-5">
-          <v-card class="pa-5" elevation="4" outlined>
+          <v-card
+            class="pa-5"
+            elevation="4"
+            outlined
+            style="width: 100%; min-width: fit-content; overflow-x: auto"
+          >
             <v-list-item-title v-if="item.is_simulated" class="text-h6 mb-3">
               Mission simulée
             </v-list-item-title>
@@ -107,10 +112,55 @@
             <v-list-item-title class="text-h6 mb-3">
               Date de complétion: {{ item.time_stamp }}
             </v-list-item-title>
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
 
-            <v-btn class="ma-2" color="indigo" outlined>
-              Plus d'informations
-            </v-btn>
+                width: 100%;
+                justify-content: space-between;
+              "
+            >
+              <v-btn class="ma-2" color="indigo" outlined>
+                Plus d'informations
+              </v-btn>
+              <v-btn
+                v-if="openLogId != item._id"
+                class="ma-2"
+                color="indigo"
+                outlined
+                @click="setLogsMenu(true, item)"
+              >
+                Afficher logs
+              </v-btn>
+              <v-btn
+                v-if="openLogId === item._id"
+                class="ma-2"
+                color="indigo"
+                outlined
+                @click="setLogsMenu(false)"
+              >
+                Fermer logs
+              </v-btn>
+            </div>
+
+            <v-virtual-scroll
+              v-if="openLogId === item._id"
+              id="scroll"
+              :elevation="20"
+              height="300"
+              item-height="20"
+              :items="item.logs"
+              style="min-width: 1400px; overflow-x: auto"
+            >
+              <template v-slot:default="{item}">
+                <v-list-item :key="item[0]">
+                  <v-list-item-content>
+                    <p>{{ item[0] }} {{ item[1] }}</p>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-virtual-scroll>
           </v-card>
         </div>
       </v-sheet>
@@ -160,6 +210,7 @@ export default class CompletedMissions extends Vue {
   private mode: Filters = Filters.all;
   private isSearchMenuOpen = false;
   private currentTab = 0;
+  private openLogId = ' ';
   private filter = Filters;
   private currentFilter = 'Aucun';
   private isAscending = true;
@@ -289,6 +340,22 @@ export default class CompletedMissions extends Vue {
   private swapOrder() {
     this.isAscending = !this.isAscending;
     this.sortMissions();
+  }
+
+  private setLogsMenu(logs: boolean, item: Mission) {
+    if (logs)
+      this.getMissionInfo(item).then((mission: Mission) => {
+        item.logs = mission.logs;
+        this.openLogId = mission._id;
+      });
+    else this.openLogId = ' ';
+  }
+  private getMissionInfo(item: Mission): Promise<Mission> {
+    return ServerCommunication.getSpecificMission(item._id)
+      .then(res => res.json())
+      .then((data: Mission) => {
+        return data;
+      });
   }
 }
 </script>

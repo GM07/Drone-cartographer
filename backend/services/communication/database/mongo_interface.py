@@ -8,6 +8,7 @@ database.upload_mission_info(mission_info)
 """
 from dataclasses import dataclass
 from typing import List, Tuple
+from mongomock import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
 from services.data.drone_data import DroneData
@@ -74,17 +75,20 @@ class Database:
                 }])))
 
     def get_mission_from_id(self, identifier: str):
-        return self.db.missions.find_one({'_id': identifier})
+        mission = self.db.missions.find_one({'_id': ObjectId(identifier)})
+        if mission is not None:
+            mission['_id'] = str(mission['_id'])
+        return mission
 
     def remove_mission_from_id(self, identifier: str) -> bool:
         return self.db.missions.delete_one({
-            '_id': identifier
+            '_id': ObjectId(identifier)
         }).deleted_count != 0
 
     def update_mission_info_from_id(self, mission: Mission,
                                     identifier: str) -> bool:
         return self.db.missions.replace_one({
-            '_id': identifier
+            '_id': ObjectId(identifier)
         }, mission.__dict__).matched_count != 0
 
     def test_connection(self):
