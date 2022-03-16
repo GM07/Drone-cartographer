@@ -198,7 +198,7 @@ class CommSimulation(AbstractComm):
                         is_socket_broken = True
                     else:
                         data = DroneData(received)
-                        Map().add_data(MapData(server.getsockname(), data))
+                        # Map().add_data(MapData(str(server.getsockname()), data))
                         self.SOCKETIO.emit('getMapData', {
                             "position": [data.position.x, data.position.y],
                             "sensors": {
@@ -214,7 +214,7 @@ class CommSimulation(AbstractComm):
                     if is_socket_broken:
                         print('Socket broken')
                         self.data_servers[server] = None
-            sleep(0.5)
+            sleep(0.05)
 
     def __thread_send_command(self):
         missing_connection = False

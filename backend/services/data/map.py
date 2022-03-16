@@ -23,7 +23,7 @@ def lock(lock: threading.Lock):
 
 class MapData:
 
-    def __init__(self, drone_id, drone_data: DroneData):
+    def __init__(self, drone_id: str, drone_data: DroneData):
         self.drone_id = drone_id
         self.drone_data = drone_data
 

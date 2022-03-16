@@ -94,8 +94,8 @@ def addDrone(drone_list, is_simulated):
 def set_mission_type(is_simulated: bool):
     AccessStatus.set_mission_type(SOCKETIO, is_simulated, request.sid)
     global COMM
-    COMM.shutdown()
     drone_list = COMM.get_drones()
+    COMM.shutdown()
     if is_simulated:
         COMM = CommSimulation(SOCKETIO, drone_list)
     else:
