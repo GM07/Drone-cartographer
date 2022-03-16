@@ -29,6 +29,7 @@ void Drone::step() {
       wallAvoidance();
       collisionAvoidance();
       changeDirection();
+      m_controller->setVelocity(m_data.direction, kDroneSpeed);
     default:
       break;
   }
@@ -102,7 +103,6 @@ void Drone::changeDirection() {
 
     if (!areAlmostEqual<Vector3D>(m_data.direction, newDirection)) {
       m_data.direction = newDirection;
-      m_controller->setVelocity(m_data.direction, kDroneSpeed);
     }
   }
 }

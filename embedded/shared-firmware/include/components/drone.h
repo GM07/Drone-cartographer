@@ -11,7 +11,7 @@
 #include "utils/droneData.h"
 
 // Meters and seconds
-constexpr float kDroneSpeed = 1.0F;
+constexpr float kDroneSpeed = 0.25F;
 constexpr float kTakeOffSpeed = 1.0F;
 constexpr float kLandingSpeed = 0.25F;
 constexpr float kHeight = 0.3F;
