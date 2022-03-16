@@ -76,7 +76,8 @@ class Database:
 
     def get_mission_from_id(self, identifier: str):
         mission = self.db.missions.find_one({'_id': ObjectId(identifier)})
-        mission['_id'] = str(mission['_id'])
+        if mission is not None:
+            mission['_id'] = str(mission['_id'])
         return mission
 
     def remove_mission_from_id(self, identifier: str) -> bool:

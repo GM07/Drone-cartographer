@@ -12,12 +12,13 @@ BASE_TIMESTAMP = 4
 BASE_FLIGHT_DURATION = 10
 BASE_NUMBER_OF_DRONES = 3
 BASE_TOTAL_DISTANCE = 40
+ID_ADDON = '551137c2f9e1fac808a5f57'
 
 
 def populate_db(db):
     for x in range(3):
         db.missions.insert_one({
-            '_id': x,
+            '_id': mongomock.ObjectId(str(x) + ID_ADDON),
             'time_stamp': str(BASE_TIMESTAMP + x),
             'flight_duration': BASE_FLIGHT_DURATION + x,
             'number_of_drones': BASE_NUMBER_OF_DRONES + x,
@@ -26,7 +27,7 @@ def populate_db(db):
             'maps': [[{
                 'x': 1 + x,
                 'y': 2 + x
-            }]]
+            }]],
         })
 
 
@@ -64,7 +65,7 @@ class TestApplication(unittest.TestCase):
         expected_value = []
         for x in range(3):
             expected_value.append({
-                '_id': str(x),
+                '_id': str(x) + ID_ADDON,
                 'time_stamp': str(BASE_TIMESTAMP + x),
                 'is_simulated': False,
                 'total_distance': BASE_TOTAL_DISTANCE + x,
@@ -80,7 +81,7 @@ class TestApplication(unittest.TestCase):
         database = Database()
         populate_db(database.db)
         expected_value = {
-            '_id': 2,
+            '_id': ('2' + ID_ADDON),
             'time_stamp': str(BASE_TIMESTAMP + 2),
             'flight_duration': BASE_FLIGHT_DURATION + 2,
             'number_of_drones': BASE_NUMBER_OF_DRONES + 2,
@@ -91,7 +92,9 @@ class TestApplication(unittest.TestCase):
                 'y': 2 + 2
             }]]
         }
-        result = database.get_mission_from_id(2)
+
+        result = database.get_mission_from_id('2' + ID_ADDON)
+        print(result, expected_value)
         self.assertEqual(result, expected_value)
 
     @patch('services.communication.database.mongo_interface.MongoClient',
@@ -99,8 +102,8 @@ class TestApplication(unittest.TestCase):
     def test_remove_mission_from_id(self):
         database = Database()
         populate_db(database.db)
-        self.assertTrue(database.remove_mission_from_id(1))
-        result = database.get_mission_from_id(1)
+        self.assertTrue(database.remove_mission_from_id('1' + ID_ADDON))
+        result = database.get_mission_from_id('1' + ID_ADDON)
         self.assertEqual(result, None)
 
     @patch('services.communication.database.mongo_interface.MongoClient',
@@ -113,8 +116,11 @@ class TestApplication(unittest.TestCase):
                            'x': 1,
                            'y': 2
                        }]])
-        self.assertFalse(database.update_mission_info_from_id(test, 5))
-        self.assertTrue(database.update_mission_info_from_id(test, 2))
+        self.assertFalse(
+            database.update_mission_info_from_id(test, '5' + ID_ADDON))
+        self.assertTrue(
+            database.update_mission_info_from_id(test, '2' + ID_ADDON))
         self.assertEqual(
             test.time_stamp,
-            database.db.missions.find_one({'_id': 2})['time_stamp'])
+            database.db.missions.find_one(
+                {'_id': mongomock.ObjectId('2' + ID_ADDON)})['time_stamp'])
