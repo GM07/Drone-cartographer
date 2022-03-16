@@ -2,17 +2,16 @@
 communicate with the physical drones """
 
 from typing import Dict, List
-from flask_socketio import SocketIO
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
 from cflib.crazyflie.log import LogConfig
 
 from constants import COMMANDS
-from services.communication.abstract_comm import AbstractComm
 from services.communication.database.mongo_interface import Mission, Database
 from time import perf_counter
 from datetime import datetime
+from services.communication.abstract_comm import AbstractComm
 
 
 class CommCrazyflie(AbstractComm):
@@ -21,13 +20,12 @@ class CommCrazyflie(AbstractComm):
     An example use is comm=CommCrazyflie([])
     comm.__init_drivers()"""
 
-    def __init__(self, socket_io: SocketIO, drone_list: list):
+    def __init__(self, drone_list: list):
         if drone_list is None:
             self.sync_crazyflies = []
             self.drone_list = []
             return
 
-        super().__init__(socket_io)
         print('Creating Embedded Crazyflie communication')
         self.links = list(map(lambda drone: drone['name'], drone_list))
         self.crazyflies: list[Crazyflie] = list(

@@ -1,8 +1,9 @@
 """This module is used to declare the Abstract communication class that
 is used to communicate """
 from abc import abstractmethod
-from flask_socketio import SocketIO
+import gevent.queue
 
+from services.communication.comm_tasks import LOGS_QUEUE
 from typing import List, Tuple
 from constants import COMMANDS
 from services.communication.database.mongo_interface import Mission
@@ -13,15 +14,11 @@ class AbstractComm:
     logs: List[Tuple[str, str]] = []
     current_mission: Mission
 
-    def __init__(self, socket_io: SocketIO) -> None:
-
-        self.__socket_io = socket_io
-
     def send_log(self, log: List[Tuple[str, str]]):
-        self.__socket_io.emit('get_logs',
-                              log,
-                              namespace='/getLogs',
-                              broadcast=True)
+        try:
+            LOGS_QUEUE.put_nowait(log)
+        except gevent.queue.Full:
+            pass
 
         self.logs += log
 

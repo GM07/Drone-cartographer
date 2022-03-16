@@ -1,8 +1,7 @@
 """This module has the CommSimulation class that is used to
 communicate with the simulation """
 
-from curses.ascii import DEL
-from errno import EINVAL, EWOULDBLOCK
+from errno import EBADF, EINVAL, EWOULDBLOCK
 import socket
 import os
 import os.path
@@ -11,12 +10,11 @@ from typing import Dict, List
 from constants import COMMANDS
 import queue
 
-from flask_socketio import SocketIO
-from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
 from services.communication.database.mongo_interface import Mission, Database
 from time import perf_counter, sleep
 from datetime import datetime
+from services.communication.abstract_comm import AbstractComm
 
 DELAY = 0.500
 
@@ -31,8 +29,8 @@ class CommSimulation(AbstractComm):
     SOCKET_COMMAND_PATH = '/tmp/socket/{}'
     SOCKET_DATA_PATH = '/tmp/socket/data{}'
 
-    def __init__(self, socket_io: SocketIO, drone_list=[]):
-        super().__init__(socket_io)
+    def __init__(self, drone_list=[]):
+
         self.nb_connections = len(drone_list)
         self.drone_list = drone_list
         self.thread_active = True
@@ -57,8 +55,9 @@ class CommSimulation(AbstractComm):
             file_name = self.SOCKET_DATA_PATH.format(drone_list[i]['name'])
             self.data_servers[self.__init_server_bind(file_name)] = None
 
-        self.__COMMANDS_THREAD.start()
-        self.__RECEIVE_THREAD.start()
+        if self.nb_connections > 0:
+            self.__COMMANDS_THREAD.start()
+            self.__RECEIVE_THREAD.start()
         self.mission_start_time = 0
         self.mission_end_time = 0
         self.current_mission: Mission
@@ -85,7 +84,6 @@ class CommSimulation(AbstractComm):
 
     def send_command(self, command: COMMANDS):
         try:
-
             self.__COMMANDS_QUEUE.put_nowait(command)
         except queue.Full:
             self.send_log([(datetime.now().isoformat(), "Command queue full")])
@@ -105,14 +103,16 @@ class CommSimulation(AbstractComm):
         while self.thread_active:
             CommSimulation.__thread_attempt_data_socket_connection(
                 self.data_servers)
-            self.__receive_data()
+            if self.thread_active:
+                self.__receive_data()
 
     def __send_command_tasks_wrapper(self):
         print('Sending thread started')
         while self.thread_active:
             CommSimulation.__thread_attempt_socket_connection(
                 self.command_servers)
-            self.__thread_send_command()
+            if self.thread_active:
+                self.__thread_send_command()
 
     @staticmethod
     def __thread_attempt_socket_connection(server_dict: Dict[socket.socket,
@@ -125,8 +125,7 @@ class CommSimulation(AbstractComm):
                     conn, _ = server.accept()
                     server_dict[server] = conn
                 except socket.error as socket_error:
-                    print(socket_error)
-                    if socket_error.errno == EINVAL:
+                    if socket_error.errno == EINVAL or socket_error.errno == EBADF:
                         return
                     else:
                         raise
@@ -144,7 +143,7 @@ class CommSimulation(AbstractComm):
                     server_dict[server] = conn
                     at_least_one_connected = True
                 except socket.error as socket_error:
-                    if socket_error.errno == EINVAL:
+                    if socket_error.errno == EINVAL or socket_error.errno == EBADF:
                         return
                     elif socket_error.errno != EWOULDBLOCK:
                         raise
@@ -167,7 +166,7 @@ class CommSimulation(AbstractComm):
                         print(other_server, self.data_servers[server])
                         can_gather_data = True
                     except socket.error as socket_error:
-                        if socket_error.errno == EINVAL:
+                        if socket_error.errno == EINVAL or socket_error.errno == EBADF:
                             return
                         elif socket_error.errno != EWOULDBLOCK:
                             raise
@@ -187,7 +186,7 @@ class CommSimulation(AbstractComm):
                         data = DroneData(received)
                         self.send_log([(datetime.now().isoformat(),
                                         f'Drone {count}' + data.__str__())])
-                    #print(data)
+                        #print(data)
                     if is_socket_broken:
                         self.send_log([(datetime.now().isoformat(),
                                         f'Broken Socket no {count}')])
