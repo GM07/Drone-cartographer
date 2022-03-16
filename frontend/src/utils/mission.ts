@@ -26,6 +26,7 @@ export interface DroneData {
 }
 
 export interface Mission {
+  _id: string;
   time_stamp: string;
   flight_duration: number;
   number_of_drones: number;

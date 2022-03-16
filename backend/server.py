@@ -136,6 +136,12 @@ def retrieve_missions():
     return jsonify(database_connection.get_all_missions_time_stamps())
 
 
+@APP.route('/getSpecificMission/<id>')
+def retrieve_specific_mission(id: str):
+    database_connection = Database()
+    return jsonify(database_connection.get_mission_from_id(id))
+
+
 @SOCKETIO.on('revoke_control', namespace='/limitedAccess')
 def revoke_control():
     change = AccessStatus.revoke_controlling_client(SOCKETIO, request)
