@@ -1,13 +1,15 @@
 """Root of the Flask Backend for the drone application
 Defines all routes in this file"""
-import services.status.access_status as AccessStatus
-import services.status.mission_status as MissionStatus
 
-from flask import jsonify, Flask, request
 from gevent import monkey
 
 monkey.patch_all()
-import threading
+
+import services.status.access_status as AccessStatus
+import services.status.mission_status as MissionStatus
+
+from services.communication.comm_tasks import start_logs_task
+from flask import jsonify, Flask, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from services.communication.abstract_comm import AbstractComm
@@ -35,7 +37,7 @@ SOCKETIO = SocketIO(
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
 
-COMM: AbstractComm = CommCrazyflie(SOCKETIO, [])
+COMM: AbstractComm = CommCrazyflie([])
 
 
 # Get drone addresses
@@ -73,9 +75,9 @@ def launch(is_simulated: bool):
         configuration.add_obstacles(drone_list)
         configuration.launch()
 
-        COMM = CommSimulation(SOCKETIO, drone_list)
+        COMM = CommSimulation(drone_list)
     else:
-        COMM = CommCrazyflie(SOCKETIO, drone_list)
+        COMM = CommCrazyflie(drone_list)
 
     COMM.send_command(COMMANDS.LAUNCH.value)
     AccessStatus.set_mission_type(SOCKETIO, is_simulated)
@@ -90,7 +92,7 @@ def addDrone(drone_list, is_simulated):
 
     if not is_simulated:
         COMM = CommCrazyflie(
-            SOCKETIO, drone_list)  # Recreate object to reconnect to drones
+            drone_list)  # Recreate object to reconnect to drones
 
 
 @SOCKETIO.on('set_mission_type', namespace='/limitedAccess')
@@ -100,9 +102,9 @@ def set_mission_type(is_simulated: bool):
     COMM.shutdown()
     drone_list = COMM.get_drones()
     if is_simulated:
-        COMM = CommSimulation(SOCKETIO, drone_list)
+        COMM = CommSimulation(drone_list)
     else:
-        COMM = CommCrazyflie(SOCKETIO, drone_list)
+        COMM = CommCrazyflie(drone_list)
     return ''
 
 
@@ -167,6 +169,9 @@ def send_logs():
                   broadcast=True,
                   include_self=False,
                   skip_sid=True)
+
+    start_logs_task(SOCKETIO)
+    return ''
 
 
 if __name__ == '__main__':
