@@ -1,6 +1,6 @@
 """This module is used to declare the Abstract communication class that
 is used to communicate """
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 from flask_socketio import SocketIO
 
 from typing import List, Tuple
@@ -8,7 +8,7 @@ from constants import COMMANDS
 from services.communication.database.mongo_interface import Mission
 
 
-class AbstractComm:
+class AbstractComm(metaclass=ABCMeta):
     DELAY_RECEIVER_MS = 1000
     logs: List[Tuple[str, str]] = []
     current_mission: Mission
@@ -34,5 +34,6 @@ class AbstractComm:
     def send_command(self, command: COMMANDS, links=[]) -> None:
         pass
 
+    @abstractmethod
     def shutdown(self):
         pass

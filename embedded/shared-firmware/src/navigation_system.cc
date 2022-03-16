@@ -21,7 +21,8 @@ void Drone::step() {
       }
       break;
     case State::kExploring:
-      explore();
+      // explore();
+      m_controller->setVelocity(m_direction, 0.0F);
     default:
       break;
   }

@@ -26,13 +26,13 @@ class CommCrazyflie(AbstractComm):
     comm.__init_drivers()"""
 
     def __init__(self, socket_io: SocketIO, drone_list: list):
+        super().__init__(socket_io)
         if drone_list is None:
             print('Error : drone list is empty')
             self.sync_crazyflies = []
             self.drone_list = []
             return
 
-        super().__init__(socket_io)
         print('Creating Embedded Crazyflie communication with drone list :',
               drone_list)
         self.links = list(map(lambda drone: drone['name'], drone_list))
@@ -57,7 +57,9 @@ class CommCrazyflie(AbstractComm):
         cflib.crtp.init_drivers()
 
     def shutdown(self):
+        print('shutdown called')
         for sync in self.sync_crazyflies:
+            print(f'closing link : {sync}')
             sync.close_link()
 
     def setup_log(self):
@@ -83,6 +85,7 @@ class CommCrazyflie(AbstractComm):
 
         for sync, config in zip(self.sync_crazyflies, self.log_configs):
             try:
+                print(f'opening link : {sync}')
                 sync.open_link()
                 sync.cf.log.add_config(config)
                 config.data_received_cb.add_callback(self.__retrieve_log)
@@ -102,17 +105,17 @@ class CommCrazyflie(AbstractComm):
             print('Sending packet : ', packet)
             self.crazyflies_by_id[link].appchannel.send_packet(packet)
 
-        if command == COMMANDS.LAND.value:
-            self.current_mission.flight_duration = self.mission_start_time - perf_counter(
-            )
-            self.current_mission.logs = self.logs
-            self.logs = []
-            database = Database()
-            database.upload_mission_info(self.current_mission)
+        # if command == COMMANDS.LAND.value:
+        #     self.current_mission.flight_duration = self.mission_start_time - perf_counter(
+        #     )
+        #     self.current_mission.logs = self.logs
+        #     self.logs = []
+        #     database = Database()
+        #     database.upload_mission_info(self.current_mission)
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print(data)
         Map().add_data(MapData(logconf.id, data), self.SOCKETIO)
         #print('[%d][%s]: %s' % (timestamp, logconf.id, data))
-        print(f'{timestamp}{logconf.id}:{data}')
-        self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
+        # print(f'{timestamp}{logconf.id}:{data}')
+        # self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
