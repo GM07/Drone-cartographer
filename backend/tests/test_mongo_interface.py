@@ -94,7 +94,6 @@ class TestApplication(unittest.TestCase):
         }
 
         result = database.get_mission_from_id('2' + ID_ADDON)
-        print(result, expected_value)
         self.assertEqual(result, expected_value)
 
     @patch('services.communication.database.mongo_interface.MongoClient',
