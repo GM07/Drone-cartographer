@@ -6,6 +6,7 @@ import {useAccessor, getterTree, mutationTree, actionTree} from 'typed-vuex';
 
 Vue.use(Vuex);
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const STATE = () => ({
   isConnected: false,
   missionStatus: {
@@ -73,6 +74,7 @@ const STORE_PATTERN = {
   actions: ACTIONS,
 };
 
+export {STATE};
 export const STORE = new Vuex.Store(STORE_PATTERN);
 export const ACCESSOR = useAccessor(STORE, STORE_PATTERN);
 

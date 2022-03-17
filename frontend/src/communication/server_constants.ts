@@ -1,7 +1,9 @@
 import SocketIO from 'socket.io-client';
 
 export const SERVER_ADDRESS =
-  window.location.protocol + '//' + window.location.hostname + ':5000';
+  process.env.NODE_ENV === 'test'
+    ? ''
+    : window.location.protocol + '//' + window.location.hostname + ':5000';
 export const GET_DRONES_ADDRESS = SERVER_ADDRESS + '/getDrones';
 export const GET_COMPLETED_MISSIONS = SERVER_ADDRESS + '/getCompletedMissions';
 export const GET_SPECIFIC_MISSION = SERVER_ADDRESS + '/getSpecificMission';

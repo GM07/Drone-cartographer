@@ -27,8 +27,6 @@ export default class LogsInterface extends Vue {
   private logs: Array<[string, string]> = [];
 
   private beforeCreate() {
-    SOCKETIO_GET_LOGS.open();
-
     SOCKETIO_GET_LOGS.on('get_logs', (logs: Array<[string, string]>) => {
       let isBottom = false;
 
@@ -44,6 +42,8 @@ export default class LogsInterface extends Vue {
           });
       }
     });
+
+    SOCKETIO_GET_LOGS.open();
   }
   private destroyed() {
     SOCKETIO_GET_LOGS.removeAllListeners().close();

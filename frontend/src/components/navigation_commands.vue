@@ -44,13 +44,9 @@ export default class NavigationCommands extends Vue {
   constructor() {
     super();
     const TIMEOUT = 1000;
-    ServerCommunication.takeMissionControlTimeout(
-      TIMEOUT,
-      this.droneList,
-      () => {
-        this.setLimitedConnection(true);
-      }
-    );
+    ServerCommunication.takeMissionControlTimeout(TIMEOUT, () => {
+      this.setLimitedConnection(true);
+    });
   }
 
   public setLimitedConnection(connection: boolean): void {
@@ -71,7 +67,7 @@ export default class NavigationCommands extends Vue {
 
   public takeMissionControl(): void {
     if (!ACCESSOR.missionStatus.isSomeoneControlling)
-      ServerCommunication.takeMissionControl(this.droneList);
+      ServerCommunication.takeMissionControl();
   }
 
   public revokeMissionControl(): void {
