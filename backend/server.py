@@ -8,7 +8,7 @@ monkey.patch_all()
 import services.status.access_status as AccessStatus
 import services.status.mission_status as MissionStatus
 
-from services.communication.comm_tasks import start_logs_task
+from services.communication.comm_tasks import start_drone_status_task, start_logs_task
 from flask import jsonify, Flask, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
@@ -175,6 +175,11 @@ def connect():
 def mission_connect():
     MissionStatus.client_connected(SOCKETIO, request)
     return ''
+
+
+@SOCKETIO.on('connect', namespace='/getDroneStatus')
+def send_drone_status():
+    start_drone_status_task(SOCKETIO)
 
 
 @SOCKETIO.on('connect', namespace='/getLogs')

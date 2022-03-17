@@ -3,3 +3,8 @@ export interface Drone {
   xPos: number;
   yPos: number;
 }
+
+export interface DroneStatus {
+  drone: Drone;
+  status: string;
+}

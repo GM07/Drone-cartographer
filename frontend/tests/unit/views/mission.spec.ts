@@ -9,14 +9,17 @@ import Vuetify from 'vuetify';
 import SocketIO from 'socket.io-client';
 import {Server} from 'socket.io';
 import {createServer} from 'http';
-import {Drone} from '@/communication/drone';
+import {Drone, DroneStatus} from '@/communication/drone';
 
 describe('mission.vue', () => {
   let limitedAccessEmitSpy: jasmine.Spy;
   let routerSpy: jasmine.Spy;
   let wrapper: Wrapper<DefaultProps & Mission, Element>;
   const VUETIFY = new Vuetify();
-  const DEFAULT_DRONE = {name: 'a', xPos: 0, yPos: 0} as Drone;
+  const DEFAULT_DRONE_STATUS = {
+    drone: {name: 'a', xPos: 0, yPos: 0},
+    status: 'IDLE',
+  } as DroneStatus;
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -69,16 +72,16 @@ describe('mission.vue', () => {
 
   it('should delete a drone', () => {
     wrapper.vm['chosenOption'] = 100;
-    wrapper.vm.droneList = [DEFAULT_DRONE, DEFAULT_DRONE];
+    wrapper.vm.droneList = [DEFAULT_DRONE_STATUS, DEFAULT_DRONE_STATUS];
     expect(wrapper.vm.droneList.length).toEqual(2);
     wrapper.vm.deleteDrone(1);
     expect(wrapper.vm.droneList.length).toEqual(1);
   });
 
   it('should add a drone', () => {
-    wrapper.vm.droneList = [DEFAULT_DRONE];
+    wrapper.vm.droneList = [DEFAULT_DRONE_STATUS];
     expect(wrapper.vm.droneList.length).toEqual(1);
-    wrapper.vm.addDrone(DEFAULT_DRONE);
+    wrapper.vm.addDrone(DEFAULT_DRONE_STATUS.drone);
     expect(wrapper.vm.droneList.length).toEqual(2);
   });
 
@@ -104,10 +107,13 @@ describe('mission.vue', () => {
   it('should get selected drone name', () => {
     wrapper.vm['chosenOption'] = -1;
     expect(wrapper.vm.getSelectedDrone()).toEqual('');
-    const EXPECTED_DRONE = {name: 'expectedDrone', xPos: 0, yPos: 0} as Drone;
+    const EXPECTED_DRONE = {
+      drone: {name: 'expectedDrone', xPos: 0, yPos: 0},
+      status: 'stat',
+    };
     wrapper.vm.droneList[0] = EXPECTED_DRONE;
     wrapper.vm['chosenOption'] = 0;
-    expect(wrapper.vm.getSelectedDrone()).toEqual(EXPECTED_DRONE.name);
+    expect(wrapper.vm.getSelectedDrone()).toEqual(EXPECTED_DRONE.drone.name);
   });
 
   it('should tell if connected', () => {
@@ -129,7 +135,7 @@ describe('mission.vue', () => {
       stubs: ['NavigationCommands', 'DroneCommands', 'MissionCommands'],
     });
 
-    serverSocket.emit('droneList', [DEFAULT_DRONE]);
+    serverSocket.emit('droneList', [DEFAULT_DRONE_STATUS.drone]);
 
     serverSocket.emit(
       'update_status',
