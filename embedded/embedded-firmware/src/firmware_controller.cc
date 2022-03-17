@@ -139,6 +139,14 @@ void FirmwareController::receiveP2PMessage(
   }
 }
 
+float FirmwareController::getMinCollisionAvoidanceDistance() {
+  return kRealMinCollisionAvoidanceRange;
+}
+
+float FirmwareController::getMaxCollisionAvoidanceDistance() {
+  return kRealMaxCollisionAvoidanceRange;
+}
+
 size_t FirmwareController::getId() {
   uint64_t address = configblockGetRadioAddress();
   auto my_id = static_cast<uint8_t>((address)&kRadioAddressMask);
