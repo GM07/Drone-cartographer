@@ -1,6 +1,7 @@
 """This module is used to declare the Abstract communication class that
 is used to communicate """
 from abc import abstractmethod
+from flask_socketio import SocketIO
 import gevent.queue
 
 from services.communication.comm_tasks import LOGS_QUEUE
@@ -30,6 +31,10 @@ class AbstractComm:
 
     @abstractmethod
     def send_command(self, command: COMMANDS, links=[]) -> None:
+        pass
+
+    @abstractmethod
+    def validate_name(self, name: str) -> str:
         pass
 
     def shutdown(self):

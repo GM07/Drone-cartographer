@@ -80,7 +80,7 @@ def launch(is_simulated: bool):
 
 
 @SOCKETIO.on('set_drone', namespace='/limitedAccess')
-def addDrone(drone_list, is_simulated):
+def set_drone(drone_list, is_simulated):
     global COMM
     COMM.set_drone(drone_list)
 
