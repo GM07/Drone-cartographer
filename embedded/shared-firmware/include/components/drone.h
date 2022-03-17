@@ -17,7 +17,9 @@ constexpr float kLandingSpeed = 0.25F;
 constexpr float kHeight = 0.3F;
 constexpr int kMaxNbPeerData = 20;
 constexpr int kMessageMaxSize = 32;
-constexpr float kSimulationCollisionAvoidanceRange = 45.0f;
+constexpr float kSimulationCollisionAvoidanceRange = 20.0F;
+constexpr float kRealMinCollisionAvoidanceRange = 45.0F;
+constexpr float kRealMaxCollisionAvoidanceRange = 55.0F;
 constexpr size_t kNbStartingDirection = 8;
 
 class Drone {

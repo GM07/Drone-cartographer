@@ -68,6 +68,9 @@ class AbstractController {
   virtual void blinkLED(LED led) = 0;
 
   virtual void updateSensorsData() = 0;
+  [[nodiscard]] virtual float getMinCollisionAvoidanceDistance() = 0;
+  [[nodiscard]] virtual float getMaxCollisionAvoidanceDistance() = 0;
+
   [[nodiscard]] virtual bool isDroneCrashed() const = 0;
 
   State state = State::kIdle;

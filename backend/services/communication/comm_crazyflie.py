@@ -79,6 +79,7 @@ class CommCrazyflie(AbstractComm):
             log_config.add_variable('kalman.stateZ', 'float')
             log_config.add_variable('pm.batteryLevel', 'uint8_t')
             log_config.add_variable('custom.state', 'uint8_t')
+            # log_config.add_variable('custom.rssi', 'uint8_t')
             log_config.cf = crazyflie
             self.log_configs.append(log_config)
 
@@ -89,7 +90,8 @@ class CommCrazyflie(AbstractComm):
         for sync, config in zip(self.sync_crazyflies, self.log_configs):
             try:
                 print(f'opening link ({self.drone_list}) : {sync}')
-                sync.open_link()
+                if not sync.is_link_open():
+                    sync.open_link()
                 sync.cf.log.add_config(config)
                 config.data_received_cb.add_callback(self.__retrieve_log)
                 config.start()
@@ -125,5 +127,5 @@ class CommCrazyflie(AbstractComm):
         # Map().add_data(MapData(logconf.id, log_data_to_drone_data(data)),
         #    self.SOCKETIO)
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
-        print(f'{timestamp}{logconf.id}:{data}')
+        # print(f'{timestamp}{logconf.id}:{data}')
         self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])

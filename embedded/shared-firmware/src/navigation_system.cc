@@ -91,12 +91,13 @@ void Drone::collisionAvoidance() {
   for (const std::pair<const uint64_t, DroneData> &data : m_peerData) {
     DroneData peerData = data.second;
 
-    if (peerData.range <= kSimulationCollisionAvoidanceRange) {
+    if (peerData.range <= m_controller->getMinCollisionAvoidanceDistance()) {
       if (m_usedPeerData.find(peerData.id) == m_usedPeerData.end()) {
         m_usedPeerData.insert_or_assign(peerData.id, peerData);
         m_normal += peerData.direction - m_data.direction;
       }
-    } else {
+    } else if (peerData.range >
+               m_controller->getMaxCollisionAvoidanceDistance()) {
       m_usedPeerData.erase(peerData.id);
     }
   }

@@ -175,6 +175,14 @@ void SimulationController::receiveP2PMessage(
   }
 }
 
+float SimulationController::getMinCollisionAvoidanceDistance() {
+  return kSimulationCollisionAvoidanceRange;
+}
+
+float SimulationController::getMaxCollisionAvoidanceDistance() {
+  return kSimulationCollisionAvoidanceRange;
+}
+
 size_t SimulationController::getId() {
   return std::hash<std::string>{}(m_ccrazyflieSensing->GetId());
 }
