@@ -8,6 +8,9 @@ services:
     restart: always
     
     network_mode: host
+
+    volumes:
+      - ./mongo-data-vol:/data/db
     
 
 
