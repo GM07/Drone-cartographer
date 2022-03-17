@@ -10,15 +10,17 @@ import threading
 from typing import Dict, List
 from constants import COMMANDS
 import queue
+from flask_socketio import SocketIO
 from services.communication.interface.drone import Drone
 
 from services.data.drone_data import DroneData
+from services.data.map import Map, MapData
 from services.communication.database.mongo_interface import Mission, Database
 from time import perf_counter, sleep
 from datetime import datetime
 from services.communication.abstract_comm import AbstractComm
 
-DELAY = 0.500
+DELAY = 0.01
 
 
 class CommSimulation(AbstractComm):
@@ -27,12 +29,13 @@ class CommSimulation(AbstractComm):
     An example use is
     comm=CommSimulation()
     comm.send_command('Launch')"""
-
     SOCKET_COMMAND_PATH = '/tmp/socket/{}'
     SOCKET_DATA_PATH = '/tmp/socket/data{}'
 
-    def __init__(self, drone_list=[]):
-
+    def __init__(self, socketIO: SocketIO, drone_list=[]):
+        super().__init__(socketIO, drone_list)
+        print('Drone list: ', drone_list)
+        Map().set_drone_len(len(drone_list))
         self.nb_connections = len(drone_list)
         for drone in drone_list:
             drone['name'] = self.validate_name(drone['name'])
@@ -104,6 +107,8 @@ class CommSimulation(AbstractComm):
         return server
 
     def __receive_data_tasks_wrapper(self):
+        if self.nb_connections <= 0:
+            return
         print('Receiving thread started')
         while self.thread_active:
             CommSimulation.__thread_attempt_data_socket_connection(
@@ -112,6 +117,8 @@ class CommSimulation(AbstractComm):
                 self.__receive_data()
 
     def __send_command_tasks_wrapper(self):
+        if self.nb_connections <= 0:
+            return
         print('Sending thread started')
         while self.thread_active:
             CommSimulation.__thread_attempt_socket_connection(
@@ -190,6 +197,8 @@ class CommSimulation(AbstractComm):
                         is_socket_broken = True
                     else:
                         data = DroneData(received)
+                        Map().add_data(MapData(str(server.getsockname()), data),
+                                       self.SOCKETIO)
                         self.send_log([
                             (datetime.now().isoformat(),
                              f'Drone {self.drone_list[count]}' + data.__str__())
@@ -241,6 +250,7 @@ class CommSimulation(AbstractComm):
                     self.send_log([(datetime.now().isoformat(), 'Socket error')
                                   ])
                     return
+
             if command == COMMANDS.LAND.value:
                 self.current_mission.flight_duration = self.mission_start_time - perf_counter(
                 )

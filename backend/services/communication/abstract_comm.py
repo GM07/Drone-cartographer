@@ -1,6 +1,6 @@
 """This module is used to declare the Abstract communication class that
 is used to communicate """
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 from flask_socketio import SocketIO
 import gevent.queue
 
@@ -10,10 +10,14 @@ from constants import COMMANDS
 from services.communication.database.mongo_interface import Mission
 
 
-class AbstractComm:
-    DELAY_RECEIVER_MS = 1000
+class AbstractComm(metaclass=ABCMeta):
+    DELAY_RECEIVER_MS = 50
     logs: List[Tuple[str, str]] = []
     current_mission: Mission
+
+    def __init__(self, socket_io: SocketIO, drone_list: list):
+        self.SOCKETIO = socket_io
+        self.drone_list = drone_list
 
     def send_log(self, log: List[Tuple[str, str]]):
         try:

@@ -33,13 +33,35 @@ class DroneState(Enum):
     CRASHED = 5
 
 
+def log_data_to_drone_data(log_data):
+    drone_data: DroneData = DroneData(bytes(), True)
+    drone_data.position.x = log_data['kalman.stateX']
+    drone_data.position.y = log_data['kalman.stateY']
+    drone_data.position.z = log_data['kalman.stateZ']
+    drone_data.sensors.front = log_data['range.front']
+    drone_data.sensors.back = log_data['range.back']
+    drone_data.sensors.left = log_data['range.left']
+    drone_data.sensors.right = log_data['range.right']
+    drone_data.battery_level = log_data['pm.batteryLevel']
+
+    return drone_data
+
+
 class DroneData:
     """This class regroups all the data taken from the drones"""
 
     DATA_SIZE: int = 32
 
-    def __init__(self, data: bytes):
-        self.__from_bytes(data)
+    def __init__(self, data: bytes, empty=False):
+        self.position = Point2D(0, 0)
+        self.sensors = DroneSensors(0, 0, 0, 0)
+        self.battery_level = 0
+        self.state = DroneState(0)
+        if not empty:
+            self.__from_bytes(data)
+
+    def update_sensors(self, sensors: DroneSensors):
+        self.sensors = sensors
 
     def __from_bytes(self, data: bytes):
         decoder: ByteDecoder = ByteDecoder(

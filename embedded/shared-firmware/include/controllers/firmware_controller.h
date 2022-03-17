@@ -1,11 +1,20 @@
 #ifndef FIRMWARE_CONTROLLER_H
 #define FIRMWARE_CONTROLLER_H
 
+#include <queue>
+
 #include "controllers/abstract_controller.h"
 
 extern "C" {
+#include "FreeRTOS.h"
 #include "ledseq.h"
+#include "radiolink.h"
+#include "semphr.h"
 }
+
+extern std::queue<P2PPacket> receivedP2PPacket;
+extern SemaphoreHandle_t p2pPacketMutex;
+constexpr uint64_t kRadioAddressMask = 0x00000000ff;
 
 class FirmwareController : public AbstractController {
  public:
@@ -28,10 +37,17 @@ class FirmwareController : public AbstractController {
   size_t receiveMessage(void* message, size_t size) override;
   void sendMessage(void* message, size_t size) override;
 
+  void sendP2PMessage(void* message, size_t size) override;
+  void receiveP2PMessage(
+      std::unordered_map<size_t, DroneData>* p2pData) override;
+
   void log(const std::string& message) override{/**/};
   void blinkLED(LED led) override;
+  size_t getId() override;
 
   void updateSensorsData() override;
+  [[nodiscard]] float getMinCollisionAvoidanceDistance() override;
+  [[nodiscard]] float getMaxCollisionAvoidanceDistance() override;
   [[nodiscard]] bool isDroneCrashed() const override;
 
  private:

@@ -58,6 +58,13 @@ Vector3D& Vector3D::operator+=(const Vector3D& other) {
   return *this;
 }
 
+Vector3D& Vector3D::operator-=(const Vector3D& other) {
+  m_x -= other.m_x;
+  m_y -= other.m_y;
+  m_z -= other.m_z;
+  return *this;
+}
+
 std::string Vector3D::toString() const {
   return "x: " + std::to_string(m_x) + " y: " + std::to_string(m_y) +
          " z: " + std::to_string(m_z);
@@ -69,3 +76,7 @@ bool Vector3D::areSameDirection(const Vector3D& vec1, const Vector3D& vec2) {
   return std::abs(projected * vec2 / (projected.length() * vec2.length()) - 1) <
          kLimit;
 }
+
+Vector3D Vector3D::x(float value) { return Vector3D(value, 0.0F, 0.0F); }
+Vector3D Vector3D::y(float value) { return Vector3D(0.0F, value, 0.0F); }
+Vector3D Vector3D::z(float value) { return Vector3D(0.0F, 0.0F, value); }
