@@ -221,6 +221,10 @@ export default class Mission extends Vue {
       this.accessStatus.isUserControlling = false;
     });
 
+    SOCKETIO_LIMITED_ACCESS.on('droneList', (droneList: Drone[]) => {
+      this.droneList = droneList;
+    });
+
     SOCKETIO_LIMITED_ACCESS.open();
   }
 
