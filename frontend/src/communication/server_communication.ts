@@ -19,7 +19,7 @@ export class ServerCommunication {
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
-  public static takeMissionControl(droneList: Drone[]): boolean {
+  public static takeMissionControl(): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
         SERVER_CONSTANTS.TAKE_CONTROL_ADDRESS
@@ -31,7 +31,6 @@ export class ServerCommunication {
 
   public static takeMissionControlTimeout(
     timeout: number,
-    droneList: Drone[],
     callback: () => void
   ): void {
     SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.timeout(timeout).emit(

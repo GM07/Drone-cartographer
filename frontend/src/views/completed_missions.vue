@@ -192,7 +192,6 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import {ServerCommunication} from '@/communication/server_communication';
-import NavigationCommands from '@/components/navigation_commands.vue';
 import {Mission} from '@/utils/mission';
 import {TIME_MULTIPLIER} from '@/communication/server_constants';
 
@@ -203,7 +202,7 @@ enum Filters {
   date,
 }
 
-@Component({components: {NavigationCommands}})
+@Component({})
 export default class CompletedMissions extends Vue {
   private missions: Mission[] = [];
   private showedMissions: Mission[] = [];
@@ -260,8 +259,6 @@ export default class CompletedMissions extends Vue {
             mission.time_stamp.substring(0, 10) === this.date
         );
         break;
-      default:
-        console.log('The mode variable is not set correctly');
     }
   }
 
@@ -327,9 +324,6 @@ export default class CompletedMissions extends Vue {
           else return a.time_stamp > b.time_stamp ? -1 : 1;
         });
         break;
-
-      default:
-        console.log('The filter is not set to the correct value');
     }
   }
 
@@ -350,6 +344,7 @@ export default class CompletedMissions extends Vue {
       });
     else this.openLogId = ' ';
   }
+
   private getMissionInfo(item: Mission): Promise<Mission> {
     return ServerCommunication.getSpecificMission(item._id)
       .then(res => res.json())

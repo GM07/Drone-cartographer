@@ -13,7 +13,13 @@
                   v-model="newDrone.name"
                   label="Adresse du drone"
                   required
-                  :rules="[validateDroneExistTwice, mandatory]"
+                  :rules="[
+                    validateDroneExistTwice,
+                    validateDroneNameLength,
+                    validateDroneNameCharacters,
+                    mandatory,
+                  ]"
+                  v-on:keydown.enter.prevent
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -103,7 +109,7 @@ export default class DroneMenu extends Vue {
     ).resetValidation();
   }
 
-  validatePositionForm(): void {
+  public validatePositionForm(): void {
     (this.$refs.pos as Vue & {validate: () => boolean}).validate();
   }
 
@@ -117,17 +123,12 @@ export default class DroneMenu extends Vue {
 
   public validateDroneNameLength(v: string): boolean | string {
     return (
-      v.length < 40 ||
-      v.length === 0 ||
+      (v.length < 40 && v.length > 0) ||
       'Le nom du drone doit être entre 0 et 40 caractères'
     );
   }
 
   public validateDistance(): boolean | string {
-    if (this.newDrone.xPos === null || this.newDrone.yPos === null) {
-      return true;
-    }
-
     return (
       this.droneList.filter(drone => {
         return (
