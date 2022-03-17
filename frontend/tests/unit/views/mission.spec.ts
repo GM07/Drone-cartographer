@@ -57,7 +57,7 @@ describe('mission.vue', () => {
     wrapper = shallowMount<Mission>(Mission, {
       store: STORE_STUB,
       vuetify: VUETIFY,
-      stubs: ['NavigationCommands', 'DroneCommands', 'MissionCommands'],
+      stubs: ['NavigationCommands', 'DroneCommands', 'MissionCommands', 'Map'],
     });
   });
 

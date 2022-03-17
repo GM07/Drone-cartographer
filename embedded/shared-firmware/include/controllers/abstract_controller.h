@@ -4,9 +4,11 @@
 #include <cstring>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "sensors/abstract_sensors.h"
 #include "utils/directions.h"
+#include "utils/droneData.h"
 #include "utils/led.h"
 #include "utils/state.h"
 #include "utils/vector3d.h"
@@ -57,10 +59,18 @@ class AbstractController {
   virtual size_t receiveMessage(void* message, size_t size) = 0;
   virtual void sendMessage(void* message, size_t size) = 0;
 
+  virtual void sendP2PMessage(void* message, size_t size) = 0;
+  virtual void receiveP2PMessage(
+      std::unordered_map<size_t, DroneData>* p2pData) = 0;
+
   virtual void log(const std::string& message) = 0;
+  virtual size_t getId() = 0;
   virtual void blinkLED(LED led) = 0;
 
   virtual void updateSensorsData() = 0;
+  [[nodiscard]] virtual float getMinCollisionAvoidanceDistance() = 0;
+  [[nodiscard]] virtual float getMaxCollisionAvoidanceDistance() = 0;
+
   [[nodiscard]] virtual bool isDroneCrashed() const = 0;
 
   State state = State::kIdle;

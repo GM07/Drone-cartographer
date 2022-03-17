@@ -8,7 +8,7 @@
             "program": "server.py",
             "console": "integratedTerminal",
             "env": {
-                "GEVENT_SUPPORT": "True"
+                "GEVENT_SUPPORT": "True",
             }
         }
     ]

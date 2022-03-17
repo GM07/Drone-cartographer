@@ -1,18 +1,18 @@
-"""Root of the Flask Backend for the drone application
-Defines all routes in this file"""
-
 from gevent import monkey
 
 monkey.patch_all()
 
-import services.status.access_status as AccessStatus
-import services.status.mission_status as MissionStatus
+from pickle import NONE
+"""Root of the Flask Backend for the drone application
+Defines all routes in this file"""
 
 from services.communication.comm_tasks import start_drone_status_task, start_logs_task
 from flask import jsonify, Flask, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from services.communication.abstract_comm import AbstractComm
+import services.status.access_status as AccessStatus
+import services.status.mission_status as MissionStatus
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
 from services.communication.simulation_configuration import SimulationConfiguration
@@ -37,7 +37,7 @@ SOCKETIO = SocketIO(
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
 
-COMM: AbstractComm = CommCrazyflie([])
+COMM: AbstractComm = CommCrazyflie(SOCKETIO, [])
 
 
 # Identifying drones
@@ -46,6 +46,7 @@ def identify_drone(drone_addr):
     if not AccessStatus.is_request_valid(request):
         return ''
 
+    global COMM
     COMM.send_command(COMMANDS.IDENTIFY.value, [drone_addr])
     return 'Identified drone'
 
@@ -68,10 +69,9 @@ def launch(is_simulated: bool):
             configuration.add_drone(drone)
         configuration.add_obstacles(drone_list)
         configuration.launch()
-
-        COMM = CommSimulation(drone_list)
+        COMM = CommSimulation(SOCKETIO, drone_list)
     else:
-        COMM = CommCrazyflie(drone_list)
+        COMM = CommCrazyflie(SOCKETIO, drone_list)
 
     COMM.send_command(COMMANDS.LAUNCH.value)
     AccessStatus.set_mission_type(SOCKETIO, is_simulated)
@@ -92,8 +92,10 @@ def set_drone(drone_list, is_simulated):
                   skip_sid=True)
 
     if not is_simulated:
+        COMM.shutdown()
         COMM = CommCrazyflie(
-            drone_list)  # Recreate object to reconnect to drones
+            SOCKETIO, drone_list)  # Recreate object to reconnect to drones
+    return ''
 
     return ''
 
@@ -102,12 +104,12 @@ def set_drone(drone_list, is_simulated):
 def set_mission_type(is_simulated: bool):
     AccessStatus.set_mission_type(SOCKETIO, is_simulated, request.sid)
     global COMM
-    COMM.shutdown()
     drone_list = COMM.get_drones()
+    COMM.shutdown()
     if is_simulated:
-        COMM = CommSimulation(drone_list)
+        COMM = CommSimulation(SOCKETIO, drone_list)
     else:
-        COMM = CommCrazyflie(drone_list)
+        COMM = CommCrazyflie(SOCKETIO, drone_list)
     return ''
 
 
@@ -118,6 +120,7 @@ def terminate():
             not AccessStatus.is_request_valid(request)):
         return ''
 
+    global COMM
     COMM.send_command(COMMANDS.LAND.value)
 
     MissionStatus.terminate_mission(SOCKETIO)

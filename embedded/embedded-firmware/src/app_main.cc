@@ -6,6 +6,7 @@ extern "C" {
 #include "debug.h"
 #include "log.h"
 #include "param_logic.h"
+#include "semphr.h"
 #include "static_mem.h"
 #include "supervisor.h"
 #include "task.h"
@@ -16,6 +17,12 @@ extern "C" {
 #include "controllers/firmware_controller.h"
 
 static bool isInit = false;
+StaticSemaphore_t mutexBuffer;
+SemaphoreHandle_t p2pPacketMutex;
+std::queue<P2PPacket> receivedP2PPacket;
+
+// TODO - Remove this after testing // NOLINT
+static int rssi = 255;  // NOLINT
 
 /////////////////////////////////////////////////////////////////////////
 Drone& Drone::getEmbeddedDrone() {
@@ -56,7 +63,27 @@ void enableCrtpHighLevelCommander() {
 void addLoggingVariables() {
   LOG_GROUP_START(custom)  // NOLINT
   LOG_ADD(LOG_UINT8, state, &Drone::getEmbeddedDrone().getController()->state)
+
+  // TODO - remove after rssi test has been established // NOLINT
+  LOG_ADD(LOG_UINT8, rssi, &rssi)
   LOG_GROUP_STOP(custom)
+}
+
+constexpr uint8_t MAX_QUEUE_SIZE = 50;
+/////////////////////////////////////////////////////////////////////////
+void p2pcallbackHandler(P2PPacket* p) {
+  xSemaphoreTake(p2pPacketMutex, portMAX_DELAY);
+  P2PPacket packet;
+  memcpy(&packet, p, sizeof(P2PPacket));
+
+  if (receivedP2PPacket.size() >= MAX_QUEUE_SIZE) {
+    receivedP2PPacket.pop();
+  }
+  receivedP2PPacket.push(packet);
+  xSemaphoreGive(p2pPacketMutex);
+
+  // TODO - remove after rssi test has been established // NOLINT
+  rssi = p->rssi;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -64,6 +91,11 @@ extern "C" void appMain() {
   ledClearAll();
   addLoggingVariables();
   enableCrtpHighLevelCommander();
+  Drone::getEmbeddedDrone().initDrone();
+
+  p2pPacketMutex = xSemaphoreCreateMutexStatic(&mutexBuffer);
+  configASSERT(p2pPacketMutex);  // Verify that the mutex is created
+  p2pRegisterCB(p2pcallbackHandler);
 
   while (true) {
     Drone::getEmbeddedDrone().updateSensorsData();

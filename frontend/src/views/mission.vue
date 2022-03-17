@@ -131,6 +131,18 @@
       @setDroneMenuOpen="setDroneMenuOpen"
     ></drone-menu>
 
+    <v-select
+      v-bind:items="droneNameList"
+      label="Sélectionner les cartes individuelles voulues"
+      multiple
+      no-data-text="Aucun drone disponible"
+      style="padding: 20px"
+      v-on:input="limitNumMaps"
+    ></v-select>
+    <div style="display: flex; flex-direction: row">
+      <Map v-bind:mapData="mapData1" />
+      <Map v-bind:mapData="mapData2" />
+    </div>
     <div
       v-if="isLogsMenuOpen"
       id="LogsInterfaceContainer"
@@ -181,15 +193,20 @@ import {Component, Vue} from 'vue-property-decorator';
 import DroneCommands from '@/components/drone_commands.vue';
 import MissionCommands from '@/components/mission_commands.vue';
 import NavigationCommands from '@/components/navigation_commands.vue';
+import Map from '@/components/map.vue';
 import DroneMenu from '@/components/drone_menu.vue';
 import {
-  SOCKETIO_DRONE_STATUS,
   SOCKETIO_LIMITED_ACCESS,
+  SERVER_ADDRESS,
+  MAP_DATA_NAMESPACE,
+  SOCKETIO_DRONE_STATUS,
 } from '@/communication/server_constants';
 import {AccessStatus} from '@/communication/access_status';
 import {Drone, DroneStatus} from '@/communication/drone';
 import LogsInterface from '@/components/logs_interface.vue';
 import {ServerCommunication} from '@/communication/server_communication';
+import SocketIO from 'socket.io-client';
+import {MapData, EMPTY_MAP} from '@/utils/map_constants';
 
 @Component({
   components: {
@@ -197,10 +214,15 @@ import {ServerCommunication} from '@/communication/server_communication';
     MissionCommands,
     NavigationCommands,
     DroneMenu,
+    Map,
     LogsInterface,
   },
 })
 export default class Mission extends Vue {
+  readonly SOCKETIO = SocketIO(SERVER_ADDRESS + MAP_DATA_NAMESPACE, {
+    transports: ['websocket', 'polling'],
+  });
+
   public miniVariant = true;
   public attemptedLimitedConnexion = false;
   public dialog = false;
@@ -211,7 +233,38 @@ export default class Mission extends Vue {
     isMissionSimulated: false,
     isUserControlling: false,
   } as AccessStatus;
+
+  public mapData1: MapData = EMPTY_MAP;
+  public mapData2: MapData = EMPTY_MAP;
+
+  private droneNameList: string[] = [];
+  private visualizedMaps: string[] = [];
+
   private chosenOption = -1;
+
+  constructor() {
+    super();
+    this.SOCKETIO.on('getMapData', data => {
+      this.changeData(data);
+    });
+  }
+
+  public changeData(data: MapData): void {
+    const BASE_PATH = this.accessStatus.isMissionSimulated
+      ? '/tmp/socket/data'
+      : '';
+
+    if (data.id === BASE_PATH + this.visualizedMaps[0]) this.mapData1 = data;
+    else if (data.id === BASE_PATH + this.visualizedMaps[1])
+      this.mapData2 = data;
+  }
+
+  public limitNumMaps(input: string[]): void {
+    if (input.length > 2) {
+      input.pop();
+    }
+    this.visualizedMaps = input;
+  }
 
   public deleteDrone(index: number): void {
     if (this.chosenOption >= index) {
@@ -238,6 +291,7 @@ export default class Mission extends Vue {
   }
 
   public addDrone(drone: Drone): void {
+    this.droneNameList.push(drone.name);
     this.droneList.push({drone: {...drone}, status: 'IDLE'});
     ServerCommunication.setDrone(
       this.getDrones(),

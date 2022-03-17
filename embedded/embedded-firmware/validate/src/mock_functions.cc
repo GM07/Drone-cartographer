@@ -102,5 +102,43 @@ unsigned int logGetUint(logVarId_t varid) { return mock->logGetUint(varid); }
 ////////////////////////////////////////////////////////////////
 float logGetFloat(logVarId_t varid) { return mock->logGetFloat(varid); }
 
+////////////////////////////////////////////////////////////////
+void p2pRegisterCB(P2PCallback cb) { return mock->p2pRegisterCB(cb); }
+
+////////////////////////////////////////////////////////////////
+bool radiolinkSendP2PPacketBroadcast(P2PPacket* p2pp) {
+  return mock->radiolinkSendP2PPacketBroadcast(p2pp);
+}
+
+////////////////////////////////////////////////////////////////
+uint64_t configblockGetRadioAddress() {
+  return mock->configblockGetRadioAddress();
+}
+
+////////////////////////////////////////////////////////////////
+QueueHandle_t xQueueCreateMutexStatic(const uint8_t ucQueueType,
+                                      StaticQueue_t* pxStaticQueue) {
+  return mock->xQueueCreateMutexStatic(ucQueueType, pxStaticQueue);
+}
+
+////////////////////////////////////////////////////////////////
+void assertFail(char* exp, char* file, int line) {
+  return mock->assertFail(exp, file, line);
+}
+
+////////////////////////////////////////////////////////////////
+BaseType_t xQueueGenericSend(QueueHandle_t xQueue,
+                             const void* const pvItemToQueue,
+                             TickType_t xTicksToWait,
+                             const BaseType_t xCopyPosition) {
+  return mock->xQueueGenericSend(xQueue, pvItemToQueue, xTicksToWait,
+                                 xCopyPosition);
+}
+
+////////////////////////////////////////////////////////////////
+BaseType_t xQueueSemaphoreTake(QueueHandle_t xQueue, TickType_t xTicksToWait) {
+  mock->xQueueSemaphoreTake(xQueue, xTicksToWait);
+}
+
 void ledClearAll() {}
 void commanderNotifySetpointsStop(int remainValidMillisecs) {}
