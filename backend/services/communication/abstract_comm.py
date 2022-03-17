@@ -4,7 +4,7 @@ from abc import abstractmethod
 from flask_socketio import SocketIO
 import gevent.queue
 
-from services.communication.comm_tasks import LOGS_QUEUE
+from services.communication.comm_tasks import DRONE_STATUS_QUEUE, LOGS_QUEUE
 from typing import List, Tuple
 from constants import COMMANDS
 from services.communication.database.mongo_interface import Mission
@@ -22,6 +22,12 @@ class AbstractComm:
             pass
 
         self.logs += log
+
+    def send_drone_status(self, status: List[Tuple[str, str]]):
+        try:
+            DRONE_STATUS_QUEUE.put_nowait(status)
+        except gevent.queue.Full:
+            pass
 
     def set_drone(self, drone_list):
         self.drone_list = drone_list

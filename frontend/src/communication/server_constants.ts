@@ -18,15 +18,24 @@ export const SET_DRONE_ADDRESS = 'set_drone';
 export const GET_MISSION_STATUS_NAMESPACE = '/getMissionStatus';
 export const LIMITED_ACCESS_NAMESPACE = '/limitedAccess';
 export const GET_LOGS_NAMESPACE = '/getLogs';
+export const DRONE_STATUS_NAMESPACE = '/getDroneStatus';
 export const HTTP_OK = 200;
 export const TIME_MULTIPLIER = 60000;
 
 export const SOCKETIO_SERVER_STATUS = SocketIO(
   SERVER_ADDRESS + GET_MISSION_STATUS_NAMESPACE
 );
+
 export const SOCKETIO_GET_LOGS = SocketIO(SERVER_ADDRESS + GET_LOGS_NAMESPACE, {
   transports: ['websocket'],
 }).close();
+
+export const SOCKETIO_DRONE_STATUS = SocketIO(
+  SERVER_ADDRESS + DRONE_STATUS_NAMESPACE,
+  {
+    transports: ['websocket'],
+  }
+).close();
 
 export const SOCKETIO_LIMITED_ACCESS = SocketIO(
   SERVER_ADDRESS + LIMITED_ACCESS_NAMESPACE

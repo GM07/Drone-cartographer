@@ -10,6 +10,7 @@ import threading
 from typing import Dict, List
 from constants import COMMANDS
 import queue
+from services.communication.interface.drone import Drone
 
 from services.data.drone_data import DroneData
 from services.communication.database.mongo_interface import Mission, Database
@@ -158,6 +159,7 @@ class CommSimulation(AbstractComm):
         at_least_one_connected = True
         while at_least_one_connected and self.thread_active:
             at_least_one_connected = False
+
             count: int = 0
             for server, other_server in self.data_servers.items():
                 can_gather_data = other_server is not None
@@ -188,8 +190,12 @@ class CommSimulation(AbstractComm):
                         is_socket_broken = True
                     else:
                         data = DroneData(received)
-                        self.send_log([(datetime.now().isoformat(),
-                                        f'Drone {count}' + data.__str__())])
+                        self.send_log([
+                            (datetime.now().isoformat(),
+                             f'Drone {self.drone_list[count]}' + data.__str__())
+                        ])
+                        self.send_drone_status([(self.drone_list[count]['name'],
+                                                 data.state.name)])
                         #print(data)
                     if is_socket_broken:
                         self.send_log([(datetime.now().isoformat(),

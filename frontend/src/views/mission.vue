@@ -19,7 +19,7 @@
 
           <NavigationCommands
             :accessStatus="accessStatus"
-            :droneList="droneList"
+            :droneList="getDrones()"
           />
           <v-divider></v-divider>
           <DroneCommands
@@ -47,7 +47,7 @@
           <MissionCommands
             v-if="isUserControlling()"
             :accessStatus="accessStatus"
-            :droneList="droneList"
+            :droneList="getDrones()"
           />
 
           <v-list dense nav>
@@ -85,7 +85,11 @@
               </v-card>
             </v-item>
           </v-col>
-          <v-col v-for="(drone, index) in droneList" :key="index" cols="auto">
+          <v-col
+            v-for="(droneStatus, index) in droneList"
+            :key="index"
+            cols="auto"
+          >
             <v-item v-slot="{toggle}">
               <v-card
                 :color="chosenOption === index ? 'primary' : ''"
@@ -100,7 +104,8 @@
                     <v-icon>mdi-close-circle</v-icon>
                   </v-btn>
                 </v-card-actions>
-                <v-card-text>{{ drone.name }}</v-card-text>
+                <v-card-text>{{ droneStatus.drone.name }}</v-card-text>
+                <v-card-text> État: {{ droneStatus.status }}</v-card-text>
               </v-card>
             </v-item>
           </v-col>
@@ -120,7 +125,7 @@
     </v-item-group>
 
     <drone-menu
-      :droneList="droneList"
+      :droneList="getDrones()"
       :isDroneMenuOpen="isDroneMenuOpen"
       @addDrone="addDrone"
       @setDroneMenuOpen="setDroneMenuOpen"
@@ -177,9 +182,12 @@ import DroneCommands from '@/components/drone_commands.vue';
 import MissionCommands from '@/components/mission_commands.vue';
 import NavigationCommands from '@/components/navigation_commands.vue';
 import DroneMenu from '@/components/drone_menu.vue';
-import {SOCKETIO_LIMITED_ACCESS} from '@/communication/server_constants';
+import {
+  SOCKETIO_DRONE_STATUS,
+  SOCKETIO_LIMITED_ACCESS,
+} from '@/communication/server_constants';
 import {AccessStatus} from '@/communication/access_status';
-import {Drone} from '@/communication/drone';
+import {Drone, DroneStatus} from '@/communication/drone';
 import LogsInterface from '@/components/logs_interface.vue';
 import {ServerCommunication} from '@/communication/server_communication';
 
@@ -198,7 +206,7 @@ export default class Mission extends Vue {
   public dialog = false;
   public isDroneMenuOpen = false;
   public isLogsMenuOpen = false;
-  public droneList: Drone[] = [];
+  public droneList: DroneStatus[] = [];
   public accessStatus = {
     isMissionSimulated: false,
     isUserControlling: false,
@@ -210,8 +218,9 @@ export default class Mission extends Vue {
       this.chosenOption = -1;
     }
     this.droneList.splice(index, 1);
+
     ServerCommunication.setDrone(
-      this.droneList,
+      this.getDrones(),
       this.accessStatus.isMissionSimulated
     );
   }
@@ -224,10 +233,14 @@ export default class Mission extends Vue {
     this.isDroneMenuOpen = value;
   }
 
+  public getDrones(): Drone[] {
+    return this.droneList.map(droneStatus => droneStatus.drone);
+  }
+
   public addDrone(drone: Drone): void {
-    this.droneList.push({...drone});
+    this.droneList.push({drone: {...drone}, status: 'IDLE'});
     ServerCommunication.setDrone(
-      this.droneList,
+      this.getDrones(),
       this.accessStatus.isMissionSimulated
     );
   }
@@ -242,7 +255,7 @@ export default class Mission extends Vue {
 
   public getSelectedDrone(): string {
     if (this.chosenOption !== -1 && this.droneList.length > 0) {
-      return this.droneList[this.chosenOption].name;
+      return this.droneList[this.chosenOption].drone.name;
     }
     return '';
   }
@@ -264,15 +277,32 @@ export default class Mission extends Vue {
       this.accessStatus.isUserControlling = false;
     });
 
+    SOCKETIO_DRONE_STATUS.on(
+      'update_drone_status',
+      (statusList: Array<[string, string]>) => {
+        statusList.forEach(statusTuple => {
+          for (let i = 0; i < this.droneList.length; i++) {
+            console.log(this.droneList[i].drone.name, statusTuple[0]);
+            if (this.droneList[i].drone.name === statusTuple[0])
+              this.droneList[i].status = statusTuple[1];
+          }
+        });
+      }
+    );
+
     SOCKETIO_LIMITED_ACCESS.on('droneList', (droneList: Drone[]) => {
-      this.droneList = droneList;
+      this.droneList = droneList.map(droneValue => {
+        return {drone: droneValue, status: 'IDLE'} as DroneStatus;
+      });
     });
 
     SOCKETIO_LIMITED_ACCESS.open();
+    SOCKETIO_DRONE_STATUS.open();
   }
 
   private destroyed() {
     SOCKETIO_LIMITED_ACCESS.removeAllListeners().close();
+    SOCKETIO_DRONE_STATUS.removeAllListeners().close();
   }
 }
 </script>

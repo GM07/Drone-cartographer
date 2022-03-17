@@ -12,6 +12,7 @@ from services.communication.database.mongo_interface import Mission, Database
 from time import perf_counter
 from datetime import datetime
 from services.communication.abstract_comm import AbstractComm
+from services.data.drone_data import DroneData
 
 
 class CommCrazyflie(AbstractComm):
@@ -104,8 +105,11 @@ class CommCrazyflie(AbstractComm):
             database.upload_mission_info(self.current_mission)
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
+        drone_data = DroneData(data)
         print(f'{timestamp}{logconf.id}:{data}')
         self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
+        self.send_drone_status([(self.drone_list[logconf.id]['name'],
+                                 drone_data.state.name)])
 
     def validate_name(self, name: str) -> str:
         return name
