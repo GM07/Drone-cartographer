@@ -157,3 +157,24 @@ void SimulationController::setVelocity(const Vector3D& direction, float speed) {
   m_ccrazyflieSensing->m_pcPropellers->SetLinearVelocity(
       CVector3(speedVector.m_x, speedVector.m_y, speedVector.m_z));
 }
+
+void SimulationController::sendP2PMessage(void* message, size_t size) {
+  argos::CByteArray data(static_cast<argos::UInt8*>(message), size);
+  m_ccrazyflieSensing->m_pcRABA->SetData(data);
+}
+
+void SimulationController::receiveP2PMessage(
+    std::unordered_map<size_t, DroneData>* p2pData) {
+  std::vector<argos::CCI_RangeAndBearingSensor::SPacket> readings =
+      m_ccrazyflieSensing->m_pcRABS->GetReadings();
+  for (auto reading : readings) {
+    DroneData data(
+        reinterpret_cast<DroneData*>(reading.Data.ToCArray()));  // NOLINT
+    data.range = reading.Range;
+    p2pData->insert_or_assign(data.id, data);
+  }
+}
+
+size_t SimulationController::getId() {
+  return std::hash<std::string>{}(m_ccrazyflieSensing->GetId());
+}

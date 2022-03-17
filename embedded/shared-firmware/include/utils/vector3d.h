@@ -16,6 +16,7 @@ class Vector3D {
   virtual ~Vector3D() = default;
 
   Vector3D& operator+=(const Vector3D& other);
+  Vector3D& operator-=(const Vector3D& other);
   [[nodiscard]] Vector3D operator+(const Vector3D& other) const;
   [[nodiscard]] Vector3D operator-(const Vector3D& other) const;
   [[nodiscard]] Vector3D operator*(float factor) const;
@@ -40,7 +41,11 @@ class Vector3D {
 
   static bool areSameDirection(const Vector3D& vec1, const Vector3D& vec2);
 
+  static Vector3D x(float value);
+  static Vector3D y(float value);
+  static Vector3D z(float value);
+
   float m_x{0}, m_y{0}, m_z{0};
-};
+} __attribute__((packed));
 
 #endif

@@ -52,3 +52,5 @@ RUN mkdir -p ${GNU_ARM_DIRECTORY} && \
     wget -qO- "https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-${GNU_ARM_VERSION}-x86_64-linux.tar.bz2" | tar -xj -C "${GNU_ARM_DIRECTORY}"
 
 ENV PATH="${GNU_ARM_DIRECTORY}/gcc-arm-none-eabi-${GNU_ARM_VERSION}/bin:$PATH"
+
+RUN apt-get install -y python3-tk

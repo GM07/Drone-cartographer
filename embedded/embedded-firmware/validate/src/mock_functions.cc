@@ -102,5 +102,18 @@ unsigned int logGetUint(logVarId_t varid) { return mock->logGetUint(varid); }
 ////////////////////////////////////////////////////////////////
 float logGetFloat(logVarId_t varid) { return mock->logGetFloat(varid); }
 
+////////////////////////////////////////////////////////////////
+void p2pRegisterCB(P2PCallback cb) { return mock->p2pRegisterCB(cb); }
+
+////////////////////////////////////////////////////////////////
+bool radiolinkSendP2PPacketBroadcast(P2PPacket* p2pp) {
+  return mock->radiolinkSendP2PPacketBroadcast(p2pp);
+}
+
+////////////////////////////////////////////////////////////////
+uint64_t configblockGetRadioAddress() {
+  return mock->configblockGetRadioAddress();
+}
+
 void ledClearAll() {}
 void commanderNotifySetpointsStop(int remainValidMillisecs) {}

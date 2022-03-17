@@ -2,11 +2,13 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "app_channel.h"
 #include "commander.h"
+#include "configblock.h"
 #include "crtp_commander_high_level.h"
 #include "estimator_kalman.h"
 #include "ledseq.h"
 #include "log.h"
 #include "param_logic.h"
+#include "radiolink.h"
 #include "stabilizer_types.h"
 #include "task.h"
 }
@@ -38,6 +40,9 @@ struct Functions {
   virtual logVarId_t logGetVarId(const char* group, const char* name) = 0;
   virtual unsigned int logGetUint(logVarId_t varid) = 0;
   virtual float logGetFloat(logVarId_t varid) = 0;
+  virtual void p2pRegisterCB(P2PCallback cb) = 0;
+  virtual bool radiolinkSendP2PPacketBroadcast(P2PPacket* p2pp) = 0;
+  virtual uint64_t configblockGetRadioAddress() = 0;
 };
 
 struct FunctionsMock {
@@ -63,6 +68,9 @@ struct FunctionsMock {
   MOCK_METHOD2(logGetVarId, logVarId_t(const char*, const char*));
   MOCK_METHOD1(logGetUint, unsigned int(logVarId_t));
   MOCK_METHOD1(logGetFloat, float(logVarId_t));
+  MOCK_METHOD1(p2pRegisterCB, void(P2PCallback));
+  MOCK_METHOD1(radiolinkSendP2PPacketBroadcast, bool(P2PPacket*));
+  MOCK_METHOD0(configblockGetRadioAddress, uint64_t());
 };
 
 extern FunctionsMock* mock;

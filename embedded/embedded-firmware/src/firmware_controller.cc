@@ -1,5 +1,8 @@
-
 #include "controllers/firmware_controller.h"
+
+#include <cstdint>
+#include <cstring>
+#include <iostream>
 
 #include "components/drone.h"
 #include "controllers/abstract_controller.h"
@@ -10,11 +13,13 @@
 extern "C" {
 #include "app_channel.h"
 #include "commander.h"
+#include "configblock.h"
 #include "crtp_commander_high_level.h"
 #include "estimator_kalman.h"
 #include "led.h"
 #include "ledseq.h"
 #include "param_logic.h"
+#include "radiolink.h"
 #include "supervisor.h"
 }
 
@@ -113,4 +118,31 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
   setpoint.velocity_body = false;
 
   commanderSetSetpoint(&setpoint, 3);
+}
+
+void FirmwareController::sendP2PMessage(void* message, size_t size) {
+  static P2PPacket p_reply;
+  p_reply.port = 0x00;                      // NOLINT
+  memcpy(&p_reply.data[0], message, size);  // NOLINT
+  p_reply.size = size;                      // NOLINT
+  radiolinkSendP2PPacketBroadcast(&p_reply);
+}
+
+void FirmwareController::receiveP2PMessage(
+    std::unordered_map<size_t, DroneData>* p2pData) {
+  xSemaphoreTake(p2pPacketMutex, portMAX_DELAY);
+  while (!receivedP2PPacket.empty()) {
+    DroneData data(reinterpret_cast<DroneData*>(  // NOLINT
+        &receivedP2PPacket.front().data));        // NOLINT
+    data.range = receivedP2PPacket.front().rssi;
+    p2pData->insert_or_assign(data.id, data);
+    receivedP2PPacket.pop();
+  }
+  xSemaphoreGive(p2pPacketMutex);
+}
+
+size_t FirmwareController::getId() {
+  uint64_t address = configblockGetRadioAddress();
+  auto my_id = static_cast<uint8_t>((address)&kRadioAddressMask);
+  return my_id;
 }
