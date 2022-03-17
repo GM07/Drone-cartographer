@@ -106,3 +106,6 @@ class CommCrazyflie(AbstractComm):
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         print(f'{timestamp}{logconf.id}:{data}')
         self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
+
+    def validate_name(self, name: str) -> str:
+        return name

@@ -3,6 +3,7 @@ communicate with the simulation """
 
 from errno import EBADF, EINVAL, EWOULDBLOCK
 import socket
+import re
 import os
 import os.path
 import threading
@@ -32,6 +33,9 @@ class CommSimulation(AbstractComm):
     def __init__(self, drone_list=[]):
 
         self.nb_connections = len(drone_list)
+        for drone in drone_list:
+            drone['name'] = self.validate_name(drone['name'])
+
         self.drone_list = drone_list
         self.thread_active = True
         self.__COMMANDS_QUEUE = queue.Queue(10)
@@ -238,3 +242,6 @@ class CommSimulation(AbstractComm):
 
                 database = Database()
                 database.upload_mission_info(self.current_mission)
+
+    def validate_name(self, name: str) -> str:
+        return re.sub(r'[\/:]', '', name)
