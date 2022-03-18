@@ -9,7 +9,7 @@ import Vuetify from 'vuetify';
 import SocketIO from 'socket.io-client';
 import {Server} from 'socket.io';
 import {createServer} from 'http';
-import {Drone, DroneStatus} from '@/communication/drone';
+import {DroneStatus} from '@/communication/drone';
 
 describe('mission.vue', () => {
   let limitedAccessEmitSpy: jasmine.Spy;

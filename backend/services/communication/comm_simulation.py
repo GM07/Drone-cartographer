@@ -21,7 +21,7 @@ from time import perf_counter, sleep
 from datetime import datetime
 from services.communication.abstract_comm import AbstractComm
 
-DELAY = 0.01
+DELAY = 0.1
 
 
 class CommSimulation(AbstractComm):
