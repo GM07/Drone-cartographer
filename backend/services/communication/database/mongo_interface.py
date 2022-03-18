@@ -91,21 +91,6 @@ class Database:
             '_id': ObjectId(identifier)
         }, mission.__dict__).matched_count != 0
 
-    def test_connection(self):
-        self.db.drop_collection('missions')
-        self.upload_mission_info(Mission(10, 4, True, 40, [[]]))
-        self.upload_mission_info(Mission(10, 4, False, 20, [[]]))
-        self.upload_mission_info(Mission(11, 5, True, 41, [[]]))
-        self.upload_mission_info(Mission(10, 3, False, 40, [[{
-            'x': 1,
-            'y': 2
-        }]]))
-
-        result = self.get_all_missions_time_stamps()
-
-        for test in result:
-            print(test)
-
 
 def serialize_objectid_from_result(result: list):
     for test in result:
