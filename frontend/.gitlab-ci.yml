@@ -9,7 +9,6 @@ workflow:
       - $WORKING_DIRECTORY/**/*
 
 stages:
-  - install_dependencies
   - lint_test
   - build
 
@@ -25,28 +24,11 @@ prepare:
   script:
     - cd $WORKING_DIRECTORY
     - npm --version
-    - if [[ ! -d node_modules ]];
-      then
-        npm ci;
-      fi
-  cache: 
-    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
-    paths:
-      - $WORKING_DIRECTORY/node_modules/
-
-install_dependencies:
-  stage: install_dependencies
-  cache: 
-    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
-    paths:
-      - $WORKING_DIRECTORY/node_modules/
-  script:
-    - cd $WORKING_DIRECTORY
     - npm ci
-  only:
-    changes:
-      - $WORKING_DIRECTORY/package-lock.json
-      - $WORKING_DIRECTORY/package.json
+  cache: 
+    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
+    paths:
+      - $WORKING_DIRECTORY/node_modules/
 
 lint:
   stage: lint_test
