@@ -18,7 +18,7 @@ class DroneSensors:
 class Point2D:
     """This class provides an interface for coordinates"""
 
-    def __init__(self, x: float, y: float, z: float = 0):
+    def __init__(self, x: float, y: float, z=0):
         self.x = x
         self.y = y
         self.z = z

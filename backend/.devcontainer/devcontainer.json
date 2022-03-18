@@ -8,7 +8,7 @@
   "workspaceFolder": "/workspaces/INF3995-106/backend",
   "extensions": [
     "ms-python.python",
-    "himanoa.Python-autopep8"
+    "himanoa.Python-autopep8",
   ],
   "runArgs": [
     "--network=host",

@@ -3,7 +3,9 @@
 It is called when you run pylint from the root. It contains unit test methods
 and implements Mongomock
 """
-from services.communication.database.mongo_interface import Database, Mission
+from datetime import datetime
+from email.mime import base
+from services.communication.database.mongo_interface import Database, Mission, Point, serialize_objectid_from_result
 import mongomock
 import unittest
 from unittest.mock import patch
@@ -123,3 +125,25 @@ class TestApplication(unittest.TestCase):
             test.time_stamp,
             database.db.missions.find_one(
                 {'_id': mongomock.ObjectId('2' + ID_ADDON)})['time_stamp'])
+
+    def test_mission_serialization(self):
+        base_list = [{'_id': mongomock.ObjectId('1' + ID_ADDON)}]
+        expected_result = [{'_id': ('1' + ID_ADDON)}]
+
+        self.assertEqual(serialize_objectid_from_result(base_list),
+                         expected_result)
+
+    def test_mission_interface(self):
+        mission = Mission(0, 1, True, 2, [{'x': 0, 'y': 1}])
+        self.assertEqual(mission.flight_duration, 0)
+        self.assertEqual(mission.number_of_drones, 1)
+        self.assertEqual(mission.total_distance, 2)
+        self.assertEqual(mission.is_simulated, True)
+        self.assertEqual(mission.time_stamp[0:4],
+                         datetime.now().isoformat()[0:4])
+        self.assertEqual(mission.logs, [])
+
+    def test_point_interface(self):
+        point = Point(0, 1)
+        self.assertEqual(point.x, 0)
+        self.assertEqual(point.y, 1)
