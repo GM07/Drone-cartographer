@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-layout class="main-container" column fill-height justify-space-between>
     <v-navigation-drawer
       app
       :mini-variant="this.$vuetify.breakpoint.smAndDown && miniVariant"
@@ -7,7 +7,7 @@
       touchless
     >
       <v-layout column dense fill-height justify-space-between>
-        <div id="top">
+        <div id="topSidebar">
           <v-list v-if="this.$vuetify.breakpoint.smAndDown" dense>
             <v-list-item @click="miniVariant = !miniVariant">
               <v-list-item-icon>
@@ -42,7 +42,7 @@
             </v-list-item>
           </v-list>
         </div>
-        <div id="bottom" justify-end>
+        <div id="bottomSidebar" justify-end>
           <v-divider></v-divider>
           <MissionCommands
             v-if="isUserControlling()"
@@ -68,61 +68,81 @@
       </v-layout>
     </v-navigation-drawer>
 
-    <v-item-group>
-      <v-container fluid style="border-bottom: 1px solid grey">
-        <v-row dense no-gutters style="flex-wrap: nowrap; overflow-x: auto">
-          <v-col class="d-flex" cols="auto">
-            <v-item v-slot="{toggle}">
-              <v-card
-                :color="chosenOption === -1 ? 'primary' : ''"
-                elevation="2"
-                @click="
-                  toggle();
-                  setSelected(-1);
-                "
-              >
-                <v-card-text>General</v-card-text>
-              </v-card>
-            </v-item>
-          </v-col>
-          <v-col
-            v-for="(droneStatus, index) in droneList"
-            :key="index"
-            cols="auto"
-          >
-            <v-item v-slot="{toggle}">
-              <v-card
-                :color="chosenOption === index ? 'primary' : ''"
-                elevation="2"
-                @click="
-                  toggle();
-                  setSelected(index);
-                "
-              >
-                <v-card-actions v-if="isUserControlling()">
-                  <v-btn outlined rounded text @click.stop="deleteDrone(index)">
-                    <v-icon>mdi-close-circle</v-icon>
-                  </v-btn>
-                </v-card-actions>
-                <v-card-text>{{ droneStatus.drone.name }}</v-card-text>
-                <v-card-text> État: {{ droneStatus.status }}</v-card-text>
-              </v-card>
-            </v-item>
-          </v-col>
-          <v-col class="d-flex" cols="auto">
-            <v-item v-if="isUserControlling()">
-              <v-card
-                active-class="no-active"
-                elevation="2"
-                @click.stop="isDroneMenuOpen = true"
-              >
-                <v-card-text>+</v-card-text>
-              </v-card>
-            </v-item>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-item-group>
+    <div id="topContent">
+      <v-item-group>
+        <v-container fluid style="border-bottom: 1px solid grey">
+          <v-row dense no-gutters style="flex-wrap: nowrap; overflow-x: auto">
+            <v-col class="d-flex" cols="auto">
+              <v-item v-slot="{toggle}">
+                <v-card
+                  :color="chosenOption === -1 ? 'primary' : ''"
+                  elevation="2"
+                  @click="
+                    toggle();
+                    setSelected(-1);
+                  "
+                >
+                  <v-card-text>General</v-card-text>
+                </v-card>
+              </v-item>
+            </v-col>
+            <v-col
+              v-for="(droneStatus, index) in droneList"
+              :key="index"
+              cols="auto"
+            >
+              <v-item v-slot="{toggle}">
+                <v-card
+                  :color="chosenOption === index ? 'primary' : ''"
+                  elevation="2"
+                  @click="
+                    toggle();
+                    setSelected(index);
+                  "
+                >
+                  <v-card-actions v-if="isUserControlling()">
+                    <v-btn
+                      outlined
+                      rounded
+                      text
+                      @click.stop="deleteDrone(index)"
+                    >
+                      <v-icon>mdi-close-circle</v-icon>
+                    </v-btn>
+                  </v-card-actions>
+                  <v-card-text>{{ droneStatus.drone.name }}</v-card-text>
+                  <v-card-text> État: {{ droneStatus.status }}</v-card-text>
+                </v-card>
+              </v-item>
+            </v-col>
+            <v-col class="d-flex" cols="auto">
+              <v-item v-if="isUserControlling()">
+                <v-card
+                  active-class="no-active"
+                  elevation="2"
+                  @click.stop="isDroneMenuOpen = true"
+                >
+                  <v-card-text>+</v-card-text>
+                </v-card>
+              </v-item>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-item-group>
+
+      <v-select
+        v-bind:items="droneNameList"
+        label="Sélectionner les cartes individuelles voulues"
+        multiple
+        no-data-text="Aucun drone disponible"
+        style="padding: 20px"
+        v-on:input="limitNumMaps"
+      ></v-select>
+      <div style="display: flex; flex-direction: row">
+        <Map v-bind:mapData="mapData1" />
+        <Map v-bind:mapData="mapData2" />
+      </div>
+    </div>
 
     <drone-menu
       :droneList="getDrones()"
@@ -131,40 +151,26 @@
       @setDroneMenuOpen="setDroneMenuOpen"
     ></drone-menu>
 
-    <v-select
-      v-bind:items="droneNameList"
-      label="Sélectionner les cartes individuelles voulues"
-      multiple
-      no-data-text="Aucun drone disponible"
-      style="padding: 20px"
-      v-on:input="limitNumMaps"
-    ></v-select>
-    <div style="display: flex; flex-direction: row">
-      <Map v-bind:mapData="mapData1" />
-      <Map v-bind:mapData="mapData2" />
-    </div>
     <div
       v-if="isLogsMenuOpen"
-      id="LogsInterfaceContainer"
-      class="mb-10"
-      style="position: absolute; bottom: 0; width: 100%; min-width: 1400px"
+      justify-end
+      style="width: 100%; min-width: 1400px"
     >
-      <div id="LogTitle">
-        <h3 class="ma-3">Logs</h3>
-        <v-icon class="ma-3" color="black" @click="setLogsMenuOpen(false)"
-          >mdi-close</v-icon
-        >
-      </div>
-      <div id="logs">
-        <LogsInterface />
-      </div>
+      <v-btn @click="isLogsMenuOpen = !isLogsMenuOpen">
+        <v-icon color="black"> mdi-close </v-icon>Logs
+      </v-btn>
+      <LogsInterface />
     </div>
-  </div>
+  </v-layout>
 </template>
 
 <style scoped>
 .v-btn--active.no-active:not(:hover)::before {
   opacity: 0 !important;
+}
+
+.main-container {
+  min-width: min-content;
 }
 
 .logs-menu {

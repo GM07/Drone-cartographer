@@ -9,9 +9,7 @@
     >
       <template v-slot:default="{item}">
         <v-list-item :key="item[0]">
-          <v-list-item-content>
-            <p>{{ item[0] }} {{ item[1] }}</p>
-          </v-list-item-content>
+          <v-list-item-title>{{ item[0] }} {{ item[1] }}</v-list-item-title>
         </v-list-item>
       </template>
     </v-virtual-scroll>
