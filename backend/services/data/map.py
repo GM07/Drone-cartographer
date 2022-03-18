@@ -65,8 +65,6 @@ class Map:
 
     # @lock(_lock)
     def add_data(self, map_data: MapData, socket: SocketIO):
-        if map_data.drone_data.state is not DroneState.EXPLORING:
-            return
 
         drone_id = map_data.drone_id
         data = map_data.drone_data
@@ -90,6 +88,7 @@ class Map:
                 Map.filter_sensor_value(back), Map.filter_sensor_value(right))
             sending_data.drone_data.update_sensors(mean_sensors)
             self.emit_data(sending_data, socket)
+            # print(sending_data.drone_id, sending_data.drone_data)
             self.buffer_data[drone_id].clear()
 
     @staticmethod

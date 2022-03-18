@@ -7,13 +7,9 @@ void Drone::step() {
   updateCrashStatus();
   updateSensorsData();
 
-  static uint8_t p2pCounter = 0;
-  constexpr uint8_t kP2PDelay = 100;
-  if (p2pCounter++ > kP2PDelay) {
-    m_controller->sendP2PMessage(static_cast<void *>(&m_data), sizeof(m_data));
-    p2pCounter = 0;
-  }
+  droneState = static_cast<uint8_t>(m_controller->state);
 
+  m_controller->sendP2PMessage(static_cast<void *>(&m_data), sizeof(m_data));
   m_controller->receiveP2PMessage(&m_peerData);
 
   switch (m_controller->state) {
@@ -96,9 +92,9 @@ void Drone::collisionAvoidance() {
       if (m_usedPeerData.find(peerData.id) == m_usedPeerData.end()) {
         m_usedPeerData.insert_or_assign(peerData.id, peerData);
         m_normal += peerData.direction - m_data.direction;
+        m_controller->blinkLED(LED::kLedGreenLeft);
       }
-    } else if (peerData.range >
-               m_controller->getMaxCollisionAvoidanceDistance()) {
+    } else {
       m_usedPeerData.erase(peerData.id);
     }
   }
