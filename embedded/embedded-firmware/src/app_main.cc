@@ -21,9 +21,6 @@ StaticSemaphore_t mutexBuffer;
 SemaphoreHandle_t p2pPacketMutex;
 std::queue<P2PPacket> receivedP2PPacket;
 
-// TODO - Remove this after testing // NOLINT
-static int rssi = 255;  // NOLINT
-
 /////////////////////////////////////////////////////////////////////////
 Drone& Drone::getEmbeddedDrone() {
   static Drone drone(std::make_shared<FirmwareController>());
@@ -59,13 +56,12 @@ void enableCrtpHighLevelCommander() {
   paramSetInt(paramIdCommanderEnHighLevel, 1);
 }
 
+uint8_t droneState = State::kIdle;
 /////////////////////////////////////////////////////////////////////////
 void addLoggingVariables() {
   LOG_GROUP_START(custom)  // NOLINT
-  LOG_ADD(LOG_UINT8, state, &Drone::getEmbeddedDrone().getController()->state)
+  LOG_ADD(LOG_UINT8, droneCustomState, &droneState)
 
-  // TODO - remove after rssi test has been established // NOLINT
-  LOG_ADD(LOG_UINT8, rssi, &rssi)
   LOG_GROUP_STOP(custom)
 }
 
@@ -81,9 +77,6 @@ void p2pcallbackHandler(P2PPacket* p) {
   }
   receivedP2PPacket.push(packet);
   xSemaphoreGive(p2pPacketMutex);
-
-  // TODO - remove after rssi test has been established // NOLINT
-  rssi = p->rssi;
 }
 
 /////////////////////////////////////////////////////////////////////////

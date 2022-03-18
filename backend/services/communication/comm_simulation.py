@@ -11,6 +11,7 @@ from typing import Dict, List
 from constants import COMMANDS
 import queue
 from flask_socketio import SocketIO
+from time import sleep
 from services.communication.interface.drone import Drone
 
 from services.data.drone_data import DroneData

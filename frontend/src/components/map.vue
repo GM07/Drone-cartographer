@@ -99,7 +99,7 @@ export default class Map extends Vue {
     for (const VEC of TEMPARRAYPERIM) {
       CANVAS_CTX.fillStyle = 'blue';
       const WALL_POS = this.toCanvasPos(VEC);
-      CANVAS_CTX.fillRect(WALL_POS.x, WALL_POS.y, 2, 2);
+      CANVAS_CTX.fillRect(WALL_POS.x, WALL_POS.y, 3, 3);
     }
 
     this.options.series[0].data = this.dronePos;

@@ -1,8 +1,10 @@
 """This module is used to declare the Abstract communication class that
 is used to communicate """
 from abc import ABCMeta, abstractmethod
-from flask_socketio import SocketIO
 import gevent.queue
+from flask_socketio import SocketIO
+from services.communication.comm_tasks import LOGS_QUEUE
+from flask_socketio import SocketIO
 
 from services.communication.comm_tasks import DRONE_STATUS_QUEUE, LOGS_QUEUE
 from typing import List, Tuple
@@ -47,5 +49,6 @@ class AbstractComm(metaclass=ABCMeta):
     def validate_name(self, name: str) -> str:
         pass
 
+    @abstractmethod
     def shutdown(self):
         pass

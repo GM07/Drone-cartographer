@@ -43,6 +43,7 @@ def log_data_to_drone_data(log_data):
     drone_data.sensors.left = log_data['range.left']
     drone_data.sensors.right = log_data['range.right']
     drone_data.battery_level = log_data['pm.batteryLevel']
+    drone_data.state = log_data['custom.droneCustomState']
 
     return drone_data
 

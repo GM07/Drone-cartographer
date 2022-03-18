@@ -97,8 +97,6 @@ def set_drone(drone_list, is_simulated):
             SOCKETIO, drone_list)  # Recreate object to reconnect to drones
     return ''
 
-    return ''
-
 
 @SOCKETIO.on('set_mission_type', namespace='/limitedAccess')
 def set_mission_type(is_simulated: bool):
@@ -164,6 +162,12 @@ def disconnect():
     return ''
 
 
+@SOCKETIO.on('connect', namespace='/getMissionStatus')
+def mission_connect():
+    MissionStatus.client_connected(SOCKETIO, request)
+    return ''
+
+
 @SOCKETIO.on('connect', namespace='/limitedAccess')
 def connect():
     AccessStatus.update_specific_client(SOCKETIO, request.sid)
@@ -174,15 +178,10 @@ def connect():
     return ''
 
 
-@SOCKETIO.on('connect', namespace='/getMissionStatus')
-def mission_connect():
-    MissionStatus.client_connected(SOCKETIO, request)
-    return ''
-
-
 @SOCKETIO.on('connect', namespace='/getDroneStatus')
 def send_drone_status():
     start_drone_status_task(SOCKETIO)
+    return ''
 
 
 @SOCKETIO.on('connect', namespace='/getLogs')

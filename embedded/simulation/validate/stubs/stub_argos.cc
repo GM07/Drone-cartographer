@@ -67,3 +67,5 @@ const CCI_BatterySensor::SReading& CCI_BatterySensor::GetReading() const {
 }
 
 }  // namespace argos
+
+uint8_t droneState = State::kIdle;

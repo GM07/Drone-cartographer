@@ -19,8 +19,10 @@ constexpr int kMaxNbPeerData = 20;
 constexpr int kMessageMaxSize = 32;
 constexpr float kSimulationCollisionAvoidanceRange = 20.0F;
 constexpr float kRealMinCollisionAvoidanceRange = 45.0F;
-constexpr float kRealMaxCollisionAvoidanceRange = 55.0F;
+constexpr float kRealMaxCollisionAvoidanceRange = 45.0F;
 constexpr size_t kNbStartingDirection = 8;
+
+extern uint8_t droneState;
 
 class Drone {
  public:

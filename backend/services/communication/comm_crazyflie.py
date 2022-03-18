@@ -1,6 +1,8 @@
 """This module has the CommCrazyflie class that is used to
 communicate with the physical drones """
 
+from logging import shutdown
+from types import TracebackType
 from typing import Dict, List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
@@ -13,9 +15,11 @@ from constants import COMMANDS
 from services.communication.database.mongo_interface import Mission, Database
 from time import perf_counter
 from datetime import datetime
-from services.data.drone_data import DroneData, log_data_to_drone_data
+from services.data.drone_data import DroneData, DroneState, log_data_to_drone_data
 from services.communication.abstract_comm import AbstractComm
 from services.data.drone_data import DroneData
+
+from services.data.map import Map, MapData
 
 from services.data.map import Map, MapData
 
@@ -77,8 +81,7 @@ class CommCrazyflie(AbstractComm):
             log_config.add_variable('kalman.stateY', 'float')
             log_config.add_variable('kalman.stateZ', 'float')
             log_config.add_variable('pm.batteryLevel', 'uint8_t')
-            log_config.add_variable('custom.state', 'uint8_t')
-            # log_config.add_variable('custom.rssi', 'uint8_t')
+            log_config.add_variable('custom.droneCustomState', 'uint8_t')
             self.log_configs.append(log_config)
 
         self.sync_crazyflies = []
@@ -121,14 +124,13 @@ class CommCrazyflie(AbstractComm):
             database.upload_mission_info(self.current_mission)
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
-        Map().add_data(MapData(logconf.name, log_data_to_drone_data(data)),
-                       self.SOCKETIO)
+        drone_data = log_data_to_drone_data(data)
+        Map().add_data(MapData(logconf.name, drone_data), self.SOCKETIO)
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
-        print(f'{timestamp}{logconf.id}:{data}')
-        drone_data = DroneData(data)
+        # print(f'{timestamp}{logconf.id}:{data}')
         self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
-        self.send_drone_status([(self.drone_list[logconf.id]['name'],
-                                 drone_data.state.name)])
+        self.send_drone_status([(logconf.name,
+                                 DroneState(drone_data.state).name)])
 
     def validate_name(self, name: str) -> str:
         return name
