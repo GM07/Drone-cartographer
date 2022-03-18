@@ -105,6 +105,7 @@ class CommCrazyflie(AbstractComm):
         if command == COMMANDS.LAUNCH.value:
             self.current_mission = Mission(0, len(self.drone_list), False, 0,
                                            [[]])
+            self.logs = []
             self.mission_start_time = perf_counter()
 
         for link in sending_links:
@@ -119,7 +120,6 @@ class CommCrazyflie(AbstractComm):
             self.current_mission.flight_duration = self.mission_start_time - perf_counter(
             )
             self.current_mission.logs = self.logs
-            self.logs = []
             database = Database()
             database.upload_mission_info(self.current_mission)
 
