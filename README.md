@@ -1,6 +1,10 @@
 # Demonstration of the requirements
-R.F.1 : https://youtu.be/0blojlENKxA
-R.F.2 : https://youtu.be/TizYuNy4m-8
+R.F.1 : https://youtu.be/jW5N3KHpleM
+R.F.2 : https://youtu.be/exyVJGXXqWs and https://youtu.be/910Vv9pmuNg
+R.F.3 : https://youtu.be/zdT6yJBZk_A and https://youtu.be/r0D-aA17_5Q
+R.F.4-R.F.5 : https://youtu.be/xhmPRty4eb4 and https://youtu.be/Kp2DKjgZOGI
+R.F.10 : https://youtu.be/eavHEMG_ItM
+R.C.1 : https://youtu.be/0A95FmTyeaU
 # Project Configuration for Ubuntu
 
 ## Cloning project
