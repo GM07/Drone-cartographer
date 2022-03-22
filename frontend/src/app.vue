@@ -6,6 +6,9 @@
   </v-app>
 </template>
 
+<style lang="sass">
+@import '../node_modules/typeface-roboto/index.css'
+</style>
 <script lang="ts">
 import Vue from 'vue';
 
