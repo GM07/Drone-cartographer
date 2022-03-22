@@ -61,7 +61,7 @@ class SimulationController : public AbstractController {
   void updateSensorsData() override;
   [[nodiscard]] float getMinCollisionAvoidanceDistance() const override;
   [[nodiscard]] float getMaxCollisionAvoidanceDistance() const override;
-  [[nodiscard]] bool isDroneCrashed() const override;
+  [[nodiscard]] inline bool isDroneCrashed() const override { return false; };
 
 #ifndef GTEST
  private:
