@@ -67,6 +67,7 @@ class CommCrazyflie(AbstractComm):
         for sync in self.sync_crazyflies:
             print(f'closing link : {sync}')
             sync.close_link()
+        return super().shutdown()
 
     def setup_log(self):
         self.log_configs: List[LogConfig] = []
