@@ -5,16 +5,15 @@
 #include "socket.h"
 #else
 #include <boost/asio.hpp>
-#include <boost/lockfree/queue.hpp>
 #endif
+
 #include <atomic>
-#include <boost/lockfree/queue.hpp>
 #include <mutex>
+#include <optional>
 #include <thread>
 
 #include "controllers/abstract_controller.h"
 #include "crazyflie_sensing.h"
-#include "utils/semaphore.h"
 
 inline std::stringstream logBuffer;
 inline std::mutex logBufferMutex;
@@ -47,21 +46,21 @@ class SimulationController : public AbstractController {
   [[nodiscard]] bool isTrajectoryFinished() const override;
 
   void initCommunicationManager() override;
-  size_t receiveMessage(void* message, size_t size) override;
-  void sendMessage(void* message, size_t size) override;
+  size_t receiveMessage(void* message, size_t size) const override;
+  void sendMessage(void* message, size_t size) const override;
   void sendDroneDataToServerThread();
 
   void sendP2PMessage(void* message, size_t size) override;
   void receiveP2PMessage(
-      std::unordered_map<size_t, DroneData>* p2pData) override;
+      std::unordered_map<size_t, DroneData>& p2pData) override;
 
   void log(const std::string& message) override;
   void blinkLED(LED /*led*/) override;
-  size_t getId() override;
+  [[nodiscard]] size_t getId() const override;
 
   void updateSensorsData() override;
-  [[nodiscard]] float getMinCollisionAvoidanceDistance() override;
-  [[nodiscard]] float getMaxCollisionAvoidanceDistance() override;
+  [[nodiscard]] float getMinCollisionAvoidanceDistance() const override;
+  [[nodiscard]] float getMaxCollisionAvoidanceDistance() const override;
   [[nodiscard]] bool isDroneCrashed() const override;
 
 #ifndef GTEST
@@ -70,14 +69,13 @@ class SimulationController : public AbstractController {
 
   CCrazyflieSensing* m_ccrazyflieSensing;
 
-  std::unique_ptr<Semaphore> m_controllerDataSem;
-  boost::lockfree::queue<ControllerData, boost::lockfree::fixed_sized<true>>
-      m_serverDataQueue{1};
+  std::optional<ControllerData> m_controllerData;
+  std::mutex m_controllerDataMutex;
   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_dataSocket;
-  std::unique_ptr<std::thread> m_sendDataThread;
-  std::atomic<bool> m_threadContinueFlag{true};
-
   std::unique_ptr<boost::asio::local::stream_protocol::socket> m_socket;
+  std::unique_ptr<std::thread> m_sendDataThread;
+
+  std::atomic_bool m_threadContinueFlag{true};
 };
 
 #endif

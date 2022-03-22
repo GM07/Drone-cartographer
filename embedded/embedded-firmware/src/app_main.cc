@@ -16,10 +16,14 @@ extern "C" {
 #include "components/drone.h"
 #include "controllers/firmware_controller.h"
 
-static bool isInit = false;
+namespace {
+
+bool kIsInit = false;
 StaticSemaphore_t mutexBuffer;
-SemaphoreHandle_t p2pPacketMutex;
-std::queue<P2PPacket> receivedP2PPacket;
+
+}  // namespace
+
+uint8_t droneState = State::kIdle;
 
 /////////////////////////////////////////////////////////////////////////
 Drone& Drone::getEmbeddedDrone() {
@@ -36,16 +40,16 @@ void communicationManagerTaskWrapper(void* /*parameter*/) {
 void communicationManagerInit() {
   xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
               configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
-  isInit = true;
+  kIsInit = true;
 }
 
 /////////////////////////////////////////////////////////////////////////
-bool communicationManagerTest() { return isInit; }
+bool communicationManagerTest() { return kIsInit; }
 
 /////////////////////////////////////////////////////////////////////////
 void updateCrashStatus() {
   if (supervisorIsTumbled()) {
-    Drone::getEmbeddedDrone().getController()->state = State::kCrash;
+    Drone::getEmbeddedDrone().getController()->m_state = State::kCrash;
   }
 }
 
@@ -56,26 +60,26 @@ void enableCrtpHighLevelCommander() {
   paramSetInt(paramIdCommanderEnHighLevel, 1);
 }
 
-uint8_t droneState = State::kIdle;
 /////////////////////////////////////////////////////////////////////////
 void addLoggingVariables() {
   LOG_GROUP_START(custom)  // NOLINT
   LOG_ADD(LOG_UINT8, droneCustomState, &droneState)
-
   LOG_GROUP_STOP(custom)
 }
 
-constexpr uint8_t MAX_QUEUE_SIZE = 50;
 /////////////////////////////////////////////////////////////////////////
 void p2pcallbackHandler(P2PPacket* p) {
-  xSemaphoreTake(p2pPacketMutex, portMAX_DELAY);
-  P2PPacket packet;
-  memcpy(&packet, p, sizeof(P2PPacket));
+  constexpr size_t kMaxQueueSize = 50;
 
-  if (receivedP2PPacket.size() >= MAX_QUEUE_SIZE) {
-    receivedP2PPacket.pop();
+  xSemaphoreTake(p2pPacketMutex, portMAX_DELAY);
+  {
+    P2PPacket packet;
+    memcpy(&packet, p, sizeof(packet));
+
+    if (receivedP2PPacket.size() < kMaxQueueSize) {
+      receivedP2PPacket.push(packet);
+    }
   }
-  receivedP2PPacket.push(packet);
   xSemaphoreGive(p2pPacketMutex);
 }
 
@@ -91,7 +95,7 @@ extern "C" void appMain() {
   p2pRegisterCB(p2pcallbackHandler);
 
   while (true) {
-    Drone::getEmbeddedDrone().updateSensorsData();
+    Drone::getEmbeddedDrone().getController()->updateSensorsData();
     updateCrashStatus();
 
     Drone::getEmbeddedDrone().step();

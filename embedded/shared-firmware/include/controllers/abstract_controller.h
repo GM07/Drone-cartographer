@@ -6,34 +6,15 @@
 #include <string>
 #include <unordered_map>
 
+#include "controller_data.h"
 #include "sensors/abstract_sensors.h"
 #include "utils/directions.h"
-#include "utils/droneData.h"
+#include "utils/drone_data.h"
 #include "utils/led.h"
 #include "utils/state.h"
 #include "utils/vector3d.h"
 
-// packs the bytes
-struct __attribute__((__packed__)) ControllerData {
- public:
-  float front;
-  float left;
-  float back;
-  float right;
-  float posX;
-  float posY;
-  float batteryLevel;
-  int state;
-
-  [[nodiscard]] bool operator==(const ControllerData& other) const {
-    return (front == other.front && left == other.left && back == other.back &&
-            right == other.right && posX == other.posX && posY == other.posY &&
-            batteryLevel == other.batteryLevel && state == other.state);
-  }
-  [[nodiscard]] bool operator!=(const ControllerData& other) const {
-    return !(*this == other);
-  }
-};
+using std::unordered_map;
 
 class AbstractController {
  public:
@@ -54,28 +35,26 @@ class AbstractController {
 
   [[nodiscard]] virtual Vector3D getCurrentLocation() const = 0;
   [[nodiscard]] virtual bool isTrajectoryFinished() const = 0;
+  [[nodiscard]] virtual bool isDroneCrashed() const = 0;
 
   virtual void initCommunicationManager() = 0;
-  virtual size_t receiveMessage(void* message, size_t size) = 0;
-  virtual void sendMessage(void* message, size_t size) = 0;
+  virtual size_t receiveMessage(void* message, size_t size) const = 0;
+  virtual void sendMessage(void* message, size_t size) const = 0;
 
   virtual void sendP2PMessage(void* message, size_t size) = 0;
-  virtual void receiveP2PMessage(
-      std::unordered_map<size_t, DroneData>* p2pData) = 0;
+  virtual void receiveP2PMessage(unordered_map<size_t, DroneData>& p2pData) = 0;
 
   virtual void log(const std::string& message) = 0;
-  virtual size_t getId() = 0;
+  [[nodiscard]] virtual size_t getId() const = 0;
   virtual void blinkLED(LED led) = 0;
 
   virtual void updateSensorsData() = 0;
-  [[nodiscard]] virtual float getMinCollisionAvoidanceDistance() = 0;
-  [[nodiscard]] virtual float getMaxCollisionAvoidanceDistance() = 0;
+  [[nodiscard]] virtual float getMinCollisionAvoidanceDistance() const = 0;
+  [[nodiscard]] virtual float getMaxCollisionAvoidanceDistance() const = 0;
 
-  [[nodiscard]] virtual bool isDroneCrashed() const = 0;
-
-  State state = State::kIdle;
+  State m_state{State::kIdle};
   std::unique_ptr<AbstractSensors> m_abstractSensors;
-  ControllerData data{};
+  ControllerData m_data{};
 
  protected:
   Vector3D m_takeOffPosition;

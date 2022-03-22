@@ -9,7 +9,7 @@
 /* Logging */
 #include <argos3/core/utility/logging/argos_log.h>
 
-#include "utils/timer.h"
+#include "utils/time.h"
 
 using ::argos::CARGoSException;
 using ::argos::CRandom;
@@ -76,7 +76,7 @@ void CCrazyflieSensing::Init(argos::TConfigurationNode& /*t_node*/) {
 /****************************************/
 
 void CCrazyflieSensing::ControlStep() {
-  m_drone.updateSensorsData();
+  m_drone.getController()->updateSensorsData();
 
   m_drone.step();
 
@@ -103,20 +103,20 @@ void CCrazyflieSensing::attemptSocketConnection() {
   constexpr uint32_t kDroneDelay = 25;
   while (true) {
     try {
-      if (m_drone.getController()->state != State::kDead) {
+      if (m_drone.getController()->m_state != State::kDead) {
         m_drone.getController()->initCommunicationManager();
       }
       return;
     } catch (const boost::system::system_error& error) {
       // We try to connect to socket 4 times per second
       // Don't need to try more
-      Timer::delayMs(kDroneDelay);
+      Time::delayMs(kDroneDelay);
     }
   }
 }
 
 CCrazyflieSensing::~CCrazyflieSensing() {
-  m_drone.getController()->state = State::kDead;
+  m_drone.getController()->m_state = State::kDead;
   if (m_communicationThread) {
     m_communicationThread->join();
   }

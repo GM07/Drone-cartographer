@@ -1,6 +1,6 @@
 import struct
 
-DEFAULT_SIZES_OF_TYPES = {'f': 4, 'i': 4}
+DEFAULT_SIZES_OF_TYPES = {'f': 4, 'i': 4, 'b': 1}
 DEFAULT_SIZE = 4
 
 

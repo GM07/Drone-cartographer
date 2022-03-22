@@ -66,7 +66,7 @@ class DroneData:
 
     def __from_bytes(self, data: bytes):
         decoder: ByteDecoder = ByteDecoder(
-            data, ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'i'])
+            data, ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'b'])
         values = decoder.get_values()
         self.sensors = DroneSensors(values[0], values[1], values[2], values[3])
         self.position = Point2D(values[4], values[5])

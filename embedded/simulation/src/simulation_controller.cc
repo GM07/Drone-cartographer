@@ -7,7 +7,7 @@
 #include "sensors/simulation_sensors.h"
 #include "utils/led.h"
 #include "utils/math.h"
-#include "utils/timer.h"
+#include "utils/time.h"
 
 using ::argos::CVector3;
 
@@ -16,13 +16,11 @@ SimulationController::SimulationController(CCrazyflieSensing* ccrazyflieSensing)
     : AbstractController(
           std::make_unique<SimulationSensors>(ccrazyflieSensing)),
       m_ccrazyflieSensing(ccrazyflieSensing),
-      m_controllerDataSem(std::make_unique<Semaphore>(1)),
       m_sendDataThread(std::make_unique<std::thread>(
           &SimulationController::sendDroneDataToServerThread, this)) {}
 
 SimulationController::~SimulationController() {
   m_threadContinueFlag = false;
-  m_controllerDataSem->release();
   if (m_sendDataThread) {
     m_sendDataThread->join();
   }
@@ -31,7 +29,7 @@ SimulationController::~SimulationController() {
 // We multiply by 10 as we expect a reading in mm but receive a reading in cm
 void SimulationController::updateSensorsData() {
   constexpr float kCmToMmFactor = 10.0F;
-  data = {
+  m_data = {
       m_abstractSensors->getFrontDistance() * kCmToMmFactor,
       m_abstractSensors->getLeftDistance() * kCmToMmFactor,
       m_abstractSensors->getBackDistance() * kCmToMmFactor,
@@ -39,22 +37,22 @@ void SimulationController::updateSensorsData() {
       m_abstractSensors->getPosX(),
       m_abstractSensors->getPosY(),
       m_abstractSensors->getBatteryLevel(),
-      static_cast<int>(state),
+      m_state,
   };
 
-  bool success = m_serverDataQueue.push(data);
-  if (!success && m_controllerDataSem->tryAcquire()) {
-    ControllerData removedData{};
-    m_serverDataQueue.pop(removedData);
-    m_serverDataQueue.push(data);
+  {
+    std::lock_guard<decltype(m_controllerDataMutex)> guard(
+        m_controllerDataMutex);
+    ControllerData dataToEmplace =
+        m_data;  // std::make_option moves the value so we must copy it first
+    m_controllerData = std::make_optional<ControllerData>(dataToEmplace);
   }
-  m_controllerDataSem->release();
 }
 
 bool SimulationController::isDroneCrashed() const { return false; }
 
 ///////////////////////////////////////
-size_t SimulationController::receiveMessage(void* message, size_t size) {
+size_t SimulationController::receiveMessage(void* message, size_t size) const {
   size_t messageSize = m_socket->available();
 
   if (messageSize != 0) {
@@ -65,14 +63,14 @@ size_t SimulationController::receiveMessage(void* message, size_t size) {
 }
 
 ///////////////////////////////////////
-void SimulationController::sendMessage(void* message, size_t size_bytes) {
+void SimulationController::sendMessage(void* message, size_t size_bytes) const {
   m_socket->send(boost::asio::buffer(message, size_bytes));
 }
 
+///////////////////////////////////////
 void SimulationController::sendDroneDataToServerThread() {
   constexpr size_t kTryConnectionDelay = 50;
   constexpr size_t kPacketSize = 32;
-  constexpr size_t kAckSize = 1;
   while (m_threadContinueFlag) {
     m_dataSocket =
         std::make_unique<boost::asio::local::stream_protocol::socket>(
@@ -83,20 +81,26 @@ void SimulationController::sendDroneDataToServerThread() {
                               m_ccrazyflieSensing->GetId());
         break;
       } catch (const boost::system::system_error& error) {
-        Timer::delayMs(kTryConnectionDelay);
+        Time::delayMs(kTryConnectionDelay);
       }
     }
     while (m_threadContinueFlag) {
-      m_controllerDataSem->acquire();
-
-      ControllerData dataToSend{};
-      bool dataPresent = m_serverDataQueue.pop(dataToSend);
       try {
-        if (dataPresent) {
+        if (m_controllerData.has_value()) {
           uint8_t ack = 0;
+
+          ControllerData dataToSend;
+          {
+            std::lock_guard<decltype(m_controllerDataMutex)> guard(
+                m_controllerDataMutex);
+            dataToSend = m_controllerData.value();
+            m_controllerData.reset();
+          }
+
           m_dataSocket->send(boost::asio::buffer(&dataToSend, kPacketSize));
-          m_dataSocket->receive(boost::asio::buffer(&ack, kAckSize));
+          m_dataSocket->receive(boost::asio::buffer(&ack, sizeof(ack)));
         }
+
       } catch (const boost::system::system_error& error) {
         break;
       }
@@ -164,25 +168,27 @@ void SimulationController::sendP2PMessage(void* message, size_t size) {
 }
 
 void SimulationController::receiveP2PMessage(
-    std::unordered_map<size_t, DroneData>* p2pData) {
+    std::unordered_map<size_t, DroneData>& p2pData) {
   std::vector<argos::CCI_RangeAndBearingSensor::SPacket> readings =
       m_ccrazyflieSensing->m_pcRABS->GetReadings();
   for (auto reading : readings) {
     DroneData data(
-        reinterpret_cast<DroneData*>(reading.Data.ToCArray()));  // NOLINT
-    data.range = reading.Range;
-    p2pData->insert_or_assign(data.id, data);
+        *reinterpret_cast<DroneData*>(reading.Data.ToCArray()));  // NOLINT
+    data.m_range = reading.Range;
+    p2pData.insert_or_assign(data.m_id, data);
   }
 }
 
-float SimulationController::getMinCollisionAvoidanceDistance() {
+[[nodiscard]] float SimulationController::getMinCollisionAvoidanceDistance()
+    const {
   return kSimulationCollisionAvoidanceRange;
 }
 
-float SimulationController::getMaxCollisionAvoidanceDistance() {
+[[nodiscard]] float SimulationController::getMaxCollisionAvoidanceDistance()
+    const {
   return kSimulationCollisionAvoidanceRange;
 }
 
-size_t SimulationController::getId() {
+[[nodiscard]] size_t SimulationController::getId() const {
   return std::hash<std::string>{}(m_ccrazyflieSensing->GetId());
 }

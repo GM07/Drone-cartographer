@@ -2,25 +2,24 @@
 #define DRONE_H
 
 #include <array>
-#include <mutex>
-#include <queue>
 #include <random>
 
 #include "controllers/abstract_controller.h"
 #include "utils/commands.h"
-#include "utils/droneData.h"
+#include "utils/drone_data.h"
+
+constexpr size_t kMessageMaxSize = 32;
+constexpr size_t kNbStartingDirection = 8;
 
 // Meters and seconds
 constexpr float kDroneSpeed = 0.25F;
 constexpr float kTakeOffSpeed = 1.0F;
 constexpr float kLandingSpeed = 0.25F;
 constexpr float kHeight = 0.3F;
-constexpr int kMaxNbPeerData = 20;
-constexpr int kMessageMaxSize = 32;
+
 constexpr float kSimulationCollisionAvoidanceRange = 20.0F;
 constexpr float kRealMinCollisionAvoidanceRange = 45.0F;
 constexpr float kRealMaxCollisionAvoidanceRange = 45.0F;
-constexpr size_t kNbStartingDirection = 8;
 
 extern uint8_t droneState;
 
@@ -28,10 +27,11 @@ class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
       : m_messageRX(), m_controller(controller) {
-    static constexpr float kFirstNumber = 0.5F;
-    static constexpr float kSecondNumber = 1.225F;
+    constexpr float kFirstNumber = 0.5F;
+    constexpr float kSecondNumber = 1.225F;
 
-    static std::array<Vector3D, kNbStartingDirection> startingDirection{
+    std::default_random_engine generator;
+    std::array<Vector3D, kNbStartingDirection> startingDirection{
         {Vector3D(kSecondNumber, kFirstNumber, 0.0F),
          Vector3D(kFirstNumber, kSecondNumber, 0.0F),
          Vector3D(-kFirstNumber, kSecondNumber, 0.0F),
@@ -41,12 +41,10 @@ class Drone {
          Vector3D(kFirstNumber, -kSecondNumber, 0.0F),
          Vector3D(kSecondNumber, -kFirstNumber, 0.0F)}};
 
-    static std::default_random_engine generator;
     std::uniform_int_distribution<int> distribution(
         0, startingDirection.size() - 1);
 
-    int direction = distribution(generator);
-    m_data.direction = startingDirection.at(direction);
+    m_data.m_direction = startingDirection.at(distribution(generator));
   }
 
   Drone(const Drone& other) = delete;
@@ -62,14 +60,7 @@ class Drone {
   };
 
   // Command Manager
-  /**
-   * @brief Handles commands received from CommunicationManager
-   *
-   * @param command The command
-   * @param extraArgs A pointer to an object containing the arguments
-   */
-  bool handleCommand(Command command, const void* extraArgs,
-                     size_t extraArgsLength);
+  bool handleCommand(Command command);
 
   // Communication Manager
   void communicationManagerTask();
@@ -80,21 +71,19 @@ class Drone {
   void collisionAvoidance();
   void changeDirection();
 
-  // Sensor Manager
-  void updateSensorsData();
   void updateCrashStatus();
 
   // Initialisation
-  void initDrone();
+  inline void initDrone() { m_data.m_id = m_controller->getId(); };
 
   static Drone& getEmbeddedDrone();
 
  protected:
+  DroneData m_data;
+  Vector3D m_normal;
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
-  DroneData m_data;
-  std::unordered_map<size_t, DroneData> m_usedPeerData;
-  Vector3D m_normal;
   std::unordered_map<size_t, DroneData> m_peerData;
+  std::unordered_map<size_t, DroneData> m_usedPeerData;
 };
 #endif

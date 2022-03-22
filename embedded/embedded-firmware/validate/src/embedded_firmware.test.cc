@@ -148,10 +148,10 @@ TEST(ValidateEmbeddedFirmware, updateSensorsData) {
   controller.m_abstractSensors = std::move(sensor);
 
   controller.updateSensorsData();
-  ControllerData firstData = controller.data;
+  ControllerData firstData = controller.m_data;
 
   controller.updateSensorsData();
-  ControllerData secondData = controller.data;
+  ControllerData secondData = controller.m_data;
 
   EXPECT_TRUE(firstData != secondData);
 }

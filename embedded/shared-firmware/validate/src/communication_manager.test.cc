@@ -17,7 +17,7 @@ TEST(validateCommunicationManager, shouldReturnIfDead) {
       std::make_shared<StubController>();
   Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
   EXPECT_CALL(*controller, receiveMessage(_, _)).Times(1);
-  drone.getController()->state = State::kDead;
+  drone.getController()->m_state = State::kDead;
   auto asyncFuture = std::async(std::launch::async,
                                 [&drone] { drone.communicationManagerTask(); });
 
@@ -42,7 +42,7 @@ TEST(validateCommunicationManager, shouldNotHandleCommandIfNoMessage) {
   EXPECT_TRUE(asyncFuture.wait_for(std::chrono::milliseconds(
                   kRandomThreadDelay)) == std::future_status::timeout);
 
-  drone.getController()->state = State::kDead;
+  drone.getController()->m_state = State::kDead;
 }
 
 TEST(validateCommunicationManager, shouldHandleCommandIfMessage) {
@@ -63,5 +63,5 @@ TEST(validateCommunicationManager, shouldHandleCommandIfMessage) {
   EXPECT_TRUE(asyncFuture.wait_for(std::chrono::milliseconds(
                   kRandomThreadDelay)) == std::future_status::timeout);
 
-  drone.getController()->state = State::kDead;
+  drone.getController()->m_state = State::kDead;
 }

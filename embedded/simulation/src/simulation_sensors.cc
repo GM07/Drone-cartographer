@@ -7,7 +7,7 @@ float SimulationSensors::getFrontDistance() const {
   auto iterDistRead =
       m_ccrazyflieSensing->m_pcDistance->GetReadingsMap().begin();
 
-  std::advance(iterDistRead, SimulationReadingsMapSensorFront);
+  std::advance(iterDistRead, ReadingsMapSensorIndex::kFront);
   return iterDistRead->second;
 }
 
@@ -15,7 +15,7 @@ float SimulationSensors::getLeftDistance() const {
   auto iterDistRead =
       m_ccrazyflieSensing->m_pcDistance->GetReadingsMap().begin();
 
-  std::advance(iterDistRead, SimulationReadingsMapSensorLeft);
+  std::advance(iterDistRead, ReadingsMapSensorIndex::kLeft);
   return iterDistRead->second;
 }
 
@@ -23,7 +23,7 @@ float SimulationSensors::getRightDistance() const {
   auto iterDistRead =
       m_ccrazyflieSensing->m_pcDistance->GetReadingsMap().begin();
 
-  std::advance(iterDistRead, SimulationReadingsMapSensorRight);
+  std::advance(iterDistRead, ReadingsMapSensorIndex::kRight);
   return iterDistRead->second;
 }
 
@@ -31,7 +31,7 @@ float SimulationSensors::getBackDistance() const {
   auto iterDistRead =
       m_ccrazyflieSensing->m_pcDistance->GetReadingsMap().begin();
 
-  std::advance(iterDistRead, SimulationReadingsMapSensorBack);
+  std::advance(iterDistRead, ReadingsMapSensorIndex::kBack);
   return iterDistRead->second;
 }
 

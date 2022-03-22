@@ -3,7 +3,7 @@
 
 #include <functional>
 
-constexpr float kThreshold = 10e-3;
+constexpr float kThreshold = 10.0e-3;
 
 template <class T>
 [[nodiscard]] inline bool areAlmostEqual(const T& first, const T& second,

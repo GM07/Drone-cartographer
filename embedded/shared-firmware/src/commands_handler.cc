@@ -1,35 +1,25 @@
 #include "components/drone.h"
 #include "utils/commands.h"
 
-size_t constexpr PACKET_SIZE = 32;
-
 /////////////////////////////////////////////////////////////////////////
-bool Drone::handleCommand(Command command, const void* /*extraArgs*/,
-                          size_t /*extraArgsLength*/) {
-  if (m_controller->state == State::kCrash) {
+bool Drone::handleCommand(Command command) {
+  if (m_controller->m_state == State::kCrash) {
     return false;
   }
 
   switch (command) {
     case Command::kIdentify:
       m_controller->blinkLED(LED::kLedRedLeft);
-      break;
+      return true;
     case Command::kTakeOff:
-      if (m_controller->state == State::kCrash) {
-        return false;
-      }
       m_controller->takeOff(kHeight);
-      m_controller->state = State::kTakingOff;
-      break;
+      m_controller->m_state = State::kTakingOff;
+      return true;
     case Command::kLand:
       m_controller->land();
-      if (m_controller->state != State::kCrash) {
-        m_controller->state = State::kLanding;
-      }
-      break;
+      m_controller->m_state = State::kLanding;
+      return true;
     default:
       return false;
   }
-
-  return true;
 }

@@ -19,8 +19,8 @@ class StubController : public FirmwareController {
   MOCK_CONST_METHOD0(isTrajectoryFinished, bool());
   MOCK_CONST_METHOD2(sendP2PMessage, void(void*, size_t));
   MOCK_CONST_METHOD1(receiveP2PMessage,
-                     void(std::unordered_map<size_t, DroneData>*));
-  MOCK_METHOD0(getId, size_t());
-  MOCK_METHOD0(getMinCollisionAvoidanceDistance, float());
-  MOCK_METHOD0(getMaxCollisionAvoidanceDistance, float());
+                     void(std::unordered_map<size_t, DroneData>&));
+  MOCK_CONST_METHOD0(getId, size_t());
+  MOCK_CONST_METHOD0(getMinCollisionAvoidanceDistance, float());
+  MOCK_CONST_METHOD0(getMaxCollisionAvoidanceDistance, float());
 };

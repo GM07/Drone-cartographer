@@ -206,7 +206,7 @@ class CommSimulation(AbstractComm):
                         ])
                         self.send_drone_status([(self.drone_list[count]['name'],
                                                  data.state.name)])
-                        #print(data)
+                        print(data)
                     if is_socket_broken:
                         self.send_log([(datetime.now().isoformat(),
                                         f'Broken Socket no {count}')])
