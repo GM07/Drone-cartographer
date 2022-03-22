@@ -55,10 +55,20 @@ install_dependencies:
 
 lint_backend:
   stage: lint
+  cache:
+    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
+    paths:
+      - .cache/pip
+      - venv/
   script:
     - yapf --style google -rpd .
 
 test_backend:
   stage: test
+  cache:
+    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
+    paths:
+      - .cache/pip
+      - venv/
   script:
     - pytest
