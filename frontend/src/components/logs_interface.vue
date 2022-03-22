@@ -9,12 +9,22 @@
     >
       <template v-slot:default="{item}">
         <v-list-item :key="item[0]">
-          <v-list-item-title>{{ item[0] }} {{ item[1] }}</v-list-item-title>
+          <p style="display: inline-block; white-space: nowrap">
+            {{ item[0] }} {{ item[1] }}
+          </p>
         </v-list-item>
       </template>
     </v-virtual-scroll>
   </div>
 </template>
+
+<style scoped>
+#scroll {
+  min-width: 100%;
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+</style>
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
