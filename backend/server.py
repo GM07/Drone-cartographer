@@ -50,6 +50,15 @@ def identify_drone(drone_addr):
     COMM.send_command(COMMANDS.IDENTIFY.value, [drone_addr])
     return 'Identified drone'
 
+# Recompile firmware
+@SOCKETIO.on('recompile', namespace='/limitedAccess')
+def recompile():
+    if not AccessStatus.is_request_valid(request):
+        return ''
+
+    global COMM
+    COMM.recompile()
+    return 'Recompiled'
 
 # Launch mission
 @SOCKETIO.on('launch', namespace='/limitedAccess')

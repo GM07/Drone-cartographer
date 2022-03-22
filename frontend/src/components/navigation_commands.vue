@@ -24,6 +24,9 @@
         <v-list-item-title>Prendre contrôle</v-list-item-title>
       </v-list-item>
     </div>
+    <v-list-item @click="recompile()">
+      <v-list-item-title>Recompiler</v-list-item-title>
+    </v-list-item>
   </v-list>
 </template>
 
@@ -63,6 +66,10 @@ export default class NavigationCommands extends Vue {
 
   public returnToMainMenu(): void {
     ROUTER.push('/');
+  }
+
+  public recompile(): void {
+    if (this.accessStatus.isUserControlling) ServerCommunication.recompile();
   }
 
   public takeMissionControl(): void {

@@ -19,6 +19,16 @@ export class ServerCommunication {
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
+  public static recompile(): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.RECOMPILE_ADDRESS
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
   public static takeMissionControl(): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
