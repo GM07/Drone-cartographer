@@ -35,6 +35,7 @@ lint:
   <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
   script:
     - cd $WORKING_DIRECTORY
+    - npm ci
     - npm run lint
 
 test:
@@ -42,6 +43,7 @@ test:
   <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
   script:
     - cd $WORKING_DIRECTORY
+    - npm ci
     - npm run test
 
 build:
@@ -49,4 +51,5 @@ build:
   <<: *cache_configuration            # Merge the contents of the 'cache_configuration' alias
   script:
     - cd $WORKING_DIRECTORY
+    - npm ci
     - npm run build

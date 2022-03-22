@@ -7,6 +7,8 @@ docker-compose down --remove-orphans &> /dev/null
 
 mkdir /tmp/socket &> /dev/null
 
+docker rm embedded &> /dev/null
+
 git submodule update --init --recursive
 
 export DOCKER_CLIENT_TIMEOUT=240

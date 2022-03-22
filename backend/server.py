@@ -1,6 +1,7 @@
 from gevent import monkey
 
-monkey.patch_all()
+if __name__ == '__main__':
+    monkey.patch_all()
 
 from pickle import NONE
 """Root of the Flask Backend for the drone application
