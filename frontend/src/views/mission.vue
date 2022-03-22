@@ -151,11 +151,7 @@
       @setDroneMenuOpen="setDroneMenuOpen"
     ></drone-menu>
 
-    <div
-      v-if="isLogsMenuOpen"
-      justify-end
-      style="width: 100%; min-width: 1400px"
-    >
+    <div v-if="isLogsMenuOpen" justify-end style="width: 100%">
       <v-btn @click="isLogsMenuOpen = !isLogsMenuOpen">
         <v-icon color="black"> mdi-close </v-icon>Logs
       </v-btn>

@@ -1,5 +1,5 @@
 <template>
-  <div style="min-width: 1400px">
+  <div>
     <v-card>
       <v-app-bar
         id="scrolling-techniques-4"
@@ -151,13 +151,13 @@
               height="300"
               item-height="20"
               :items="item.logs"
-              style="min-width: 1400px; overflow-x: auto"
+              style="min-width: 100%; overflow-x: scroll; white-space: nowrap"
             >
               <template v-slot:default="{item}">
                 <v-list-item :key="item[0]">
-                  <v-list-item-title>
+                  <p style="display: inline-block; white-space: nowrap">
                     {{ item[0] }} {{ item[1] }}
-                  </v-list-item-title>
+                  </p>
                 </v-list-item>
               </template>
             </v-virtual-scroll>
