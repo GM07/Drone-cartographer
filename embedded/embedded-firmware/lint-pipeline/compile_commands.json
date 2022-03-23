@@ -260,7 +260,7 @@
         "-fno-strict-aliasing",
         "-fuse-ld=gold",
         "-o",
-        "bin/.o",
+        "bin/time.o",
         "src/time.cc"
     ],
     "directory": "/builds/polytechnique-montr-al/inf3995/20221/equipe-106/INF3995-106/embedded/embedded-firmware",
