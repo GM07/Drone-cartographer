@@ -114,6 +114,10 @@ CCrazyflieSensing::~CCrazyflieSensing() {
   if (m_communicationThread != nullptr) {
     m_communicationThread->join();
   }
+
+  if (m_P2PThread != nullptr) {
+    m_P2PThread->join();
+  }
 }
 
 /****************************************/
