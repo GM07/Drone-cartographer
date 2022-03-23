@@ -12,7 +12,6 @@
 using ::argos::CVector3;
 
 using ::boost::asio::buffer;
-using ::boost::asio::local::stream_protocol;
 using ::boost::system::system_error;
 
 //////////////////////////////////////////
@@ -77,7 +76,9 @@ void SimulationController::sendDroneDataToServerThread() {
   constexpr uint32_t kTryConnectionDelay = 250;
 
   while (m_threadContinueFlag) {
-    m_dataSocket = std::make_unique<stream_protocol::socket>(io_service);
+    m_dataSocket =
+        std::make_unique<boost::asio::local::stream_protocol::socket>(
+            io_service);
 
     while (m_threadContinueFlag) {
       try {
@@ -94,7 +95,7 @@ void SimulationController::sendDroneDataToServerThread() {
         if (m_controllerData.has_value()) {
           uint8_t ack = 0;
 
-          ControllerData dataToSend;
+          ControllerData dataToSend{};
           {
             std::lock_guard<decltype(m_controllerDataMutex)> guard(
                 m_controllerDataMutex);
@@ -120,7 +121,8 @@ void SimulationController::blinkLED(LED /*led*/) {
 
 ///////////////////////////////////////////////////
 void SimulationController::initCommunicationManager() {
-  m_socket = std::make_unique<stream_protocol::socket>(io_service);
+  m_socket =
+      std::make_unique<boost::asio::local::stream_protocol::socket>(io_service);
 
   m_socket->connect("/tmp/socket/" + m_ccrazyflieSensing->GetId());
 }
@@ -176,15 +178,14 @@ void SimulationController::sendP2PMessage(void* message, size_t size) {
 
 ///////////////////////////////////////////////////
 void SimulationController::receiveP2PMessage(
-    std::unordered_map<size_t, DroneData>& p2pData) {
+    std::unordered_map<size_t, DroneData>* p2pData) {
   std::vector<argos::CCI_RangeAndBearingSensor::SPacket> readings =
       m_ccrazyflieSensing->m_pcRABS->GetReadings();
 
   for (auto reading : readings) {
-    DroneData data(
-        *reinterpret_cast<DroneData*>(reading.Data.ToCArray()));  // NOLINT
+    DroneData data(*reinterpret_cast<DroneData*>(reading.Data.ToCArray()));
     data.m_range = reading.Range;
-    p2pData.insert_or_assign(data.m_id, data);
+    p2pData->insert_or_assign(data.m_id, data);
   }
 }
 

@@ -31,13 +31,13 @@ TEST(ValidateAppMain, updateCrashStatusFun) {
       .WillOnce(Return(false))
       .WillOnce(Return(true));
 
-  Drone::getEmbeddedDrone().getController()->state = State::kIdle;
+  Drone::getEmbeddedDrone().getController()->m_state = State::kIdle;
 
   updateCrashStatus();
-  EXPECT_EQ(Drone::getEmbeddedDrone().getController()->state, State::kIdle);
+  EXPECT_EQ(Drone::getEmbeddedDrone().getController()->m_state, State::kIdle);
 
   updateCrashStatus();
-  EXPECT_EQ(Drone::getEmbeddedDrone().getController()->state, State::kCrash);
+  EXPECT_EQ(Drone::getEmbeddedDrone().getController()->m_state, State::kCrash);
   delete mock;
 }
 

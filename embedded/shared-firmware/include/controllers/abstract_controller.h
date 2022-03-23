@@ -14,8 +14,6 @@
 #include "utils/state.h"
 #include "utils/vector3d.h"
 
-using std::unordered_map;
-
 class AbstractController {
  public:
   virtual ~AbstractController() = default;
@@ -42,7 +40,8 @@ class AbstractController {
   virtual void sendMessage(void* message, size_t size) const = 0;
 
   virtual void sendP2PMessage(void* message, size_t size) = 0;
-  virtual void receiveP2PMessage(unordered_map<size_t, DroneData>& p2pData) = 0;
+  virtual void receiveP2PMessage(
+      std::unordered_map<size_t, DroneData>* p2pData) = 0;
 
   virtual void log(const std::string& message) = 0;
   [[nodiscard]] virtual size_t getId() const = 0;

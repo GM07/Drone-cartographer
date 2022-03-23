@@ -12,8 +12,6 @@ extern "C" {
 #include "semphr.h"
 }
 
-using std::unordered_map;
-
 inline std::queue<P2PPacket> receivedP2PPacket;
 inline SemaphoreHandle_t p2pPacketMutex;
 
@@ -38,7 +36,8 @@ class FirmwareController : public AbstractController {
   void sendMessage(void* message, size_t size) const override;
 
   void sendP2PMessage(void* message, size_t size) override;
-  void receiveP2PMessage(unordered_map<size_t, DroneData>& p2pData) override;
+  void receiveP2PMessage(
+      std::unordered_map<size_t, DroneData>* p2pData) override;
 
   void blinkLED(LED led) override;
   [[nodiscard]] size_t getId() const override;

@@ -5,7 +5,11 @@
 
 struct DroneData {
   DroneData() = default;
+  ~DroneData() = default;
   DroneData(const DroneData& data) = default;
+  DroneData& operator=(const DroneData& other) = default;
+  DroneData& operator=(const DroneData&& other) = delete;
+  DroneData(const DroneData&& other) = delete;
 
   Vector3D m_direction;
   float m_distanceFromTakeoff{0};

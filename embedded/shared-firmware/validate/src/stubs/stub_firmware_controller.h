@@ -11,8 +11,8 @@ class StubController : public FirmwareController {
   MOCK_METHOD1(takeOff, void(float));
   MOCK_METHOD0(land, void());
   MOCK_METHOD1(blinkLED, void(LED));
-  MOCK_METHOD2(sendMessage, void(void*, size_t));
-  MOCK_METHOD2(receiveMessage, size_t(void*, size_t));
+  MOCK_CONST_METHOD2(sendMessage, void(void*, size_t));
+  MOCK_CONST_METHOD2(receiveMessage, size_t(void*, size_t));
   MOCK_METHOD0(updateSensorsData, void());
   MOCK_CONST_METHOD0(isDroneCrashed, bool());
   MOCK_METHOD2(setVelocity, void(const Vector3D&, float));

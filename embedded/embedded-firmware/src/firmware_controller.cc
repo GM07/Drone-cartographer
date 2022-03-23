@@ -138,14 +138,14 @@ void FirmwareController::sendP2PMessage(void* message, size_t size) {
 
 ///////////////////////////////////////
 void FirmwareController::receiveP2PMessage(
-    std::unordered_map<size_t, DroneData>& p2pData) {
+    std::unordered_map<size_t, DroneData>* p2pData) {
   xSemaphoreTake(p2pPacketMutex, portMAX_DELAY);
   {
     while (!receivedP2PPacket.empty()) {
       DroneData data(
           *reinterpret_cast<DroneData*>(&receivedP2PPacket.front().data));
       data.m_range = receivedP2PPacket.front().rssi;
-      p2pData.insert_or_assign(data.m_id, data);
+      p2pData->insert_or_assign(data.m_id, data);
       receivedP2PPacket.pop();
     }
   }

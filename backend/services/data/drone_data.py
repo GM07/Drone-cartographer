@@ -51,7 +51,7 @@ def log_data_to_drone_data(log_data):
 class DroneData:
     """This class regroups all the data taken from the drones"""
 
-    DATA_SIZE: int = 32
+    DATA_SIZE: int = 29
 
     def __init__(self, data: bytes, empty=False):
         self.position = Point2D(0, 0)

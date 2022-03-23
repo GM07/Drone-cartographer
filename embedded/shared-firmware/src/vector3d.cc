@@ -2,8 +2,7 @@
 
 #include <cmath>
 
-Vector3D::Vector3D(float x = 0, float y = 0, float z = 0)
-    : m_x(x), m_y(y), m_z(z) {}
+Vector3D::Vector3D(float x, float y, float z) : m_x(x), m_y(y), m_z(z) {}
 
 Vector3D Vector3D::operator+(const Vector3D& other) const {
   return Vector3D(m_x + other.m_x, m_y + other.m_y, m_z + other.m_z);

@@ -10,7 +10,7 @@ using ::testing::Return;
 TEST(ValidateNavigationSystem, stepTakingOff) {
   Drone drone(std::dynamic_pointer_cast<AbstractController>(
       std::make_shared<StubController>()));
-  drone.getController()->state = State::kTakingOff;
+  drone.getController()->m_state = State::kTakingOff;
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
               isTrajectoryFinished())
       .Times(1);
@@ -26,7 +26,7 @@ TEST(ValidateNavigationSystem, stepTakingOff) {
 TEST(ValidateNavigationSystem, stepLanding) {
   Drone drone(std::dynamic_pointer_cast<AbstractController>(
       std::make_shared<StubController>()));
-  drone.getController()->state = State::kLanding;
+  drone.getController()->m_state = State::kLanding;
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
               isTrajectoryFinished())
       .Times(1);
@@ -42,7 +42,7 @@ TEST(ValidateNavigationSystem, stepLanding) {
 TEST(ValidateNavigationSystem, stateIdle) {
   Drone drone(std::dynamic_pointer_cast<AbstractController>(
       std::make_shared<StubController>()));
-  drone.getController()->state = State::kIdle;
+  drone.getController()->m_state = State::kIdle;
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
               takeOff(_))
       .Times(0);
@@ -64,7 +64,7 @@ TEST(ValidateNavigationSystem, stateIdle) {
 TEST(ValidateNavigationSystem, stateExploring) {
   Drone drone(std::dynamic_pointer_cast<AbstractController>(
       std::make_shared<StubController>()));
-  drone.getController()->state = State::kExploring;
+  drone.getController()->m_state = State::kExploring;
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
               takeOff(_))
       .Times(0);
@@ -82,7 +82,7 @@ TEST(ValidateNavigationSystem, stateExploring) {
       .Times(testing::AtLeast(0));
 
   drone.step();
-  EXPECT_EQ(drone.getController()->state, State::kExploring);
+  EXPECT_EQ(drone.getController()->m_state, State::kExploring);
 }
 
 TEST(ValidateNavigationSystem, takingOffFinished) {
@@ -99,12 +99,12 @@ TEST(ValidateNavigationSystem, takingOffFinished) {
   EXPECT_CALL(*controller, updateSensorsData()).Times(testing::AtLeast(0));
 
   Drone drone(controller);
-  drone.getController()->state = State::kTakingOff;
+  drone.getController()->m_state = State::kTakingOff;
 
   drone.step();
   drone.step();
 
-  EXPECT_EQ(drone.getController()->state, State::kExploring);
+  EXPECT_EQ(drone.getController()->m_state, State::kExploring);
 }
 
 TEST(ValidateNavigationSystem, landingFinished) {
@@ -121,10 +121,10 @@ TEST(ValidateNavigationSystem, landingFinished) {
   EXPECT_CALL(*controller, updateSensorsData()).Times(testing::AtLeast(0));
 
   Drone drone(controller);
-  drone.getController()->state = State::kLanding;
+  drone.getController()->m_state = State::kLanding;
 
   drone.step();
   drone.step();
 
-  EXPECT_EQ(drone.getController()->state, State::kIdle);
+  EXPECT_EQ(drone.getController()->m_state, State::kIdle);
 }

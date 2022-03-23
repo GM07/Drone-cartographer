@@ -16,7 +16,7 @@ TEST(validateCommunicationManager, shouldReturnIfDead) {
   std::shared_ptr<StubController> controller =
       std::make_shared<StubController>();
   Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
-  EXPECT_CALL(*controller, receiveMessage(_, _)).Times(1);
+  EXPECT_CALL(*controller, receiveMessage(_, _)).Times(0);
   drone.getController()->m_state = State::kDead;
   auto asyncFuture = std::async(std::launch::async,
                                 [&drone] { drone.communicationManagerTask(); });

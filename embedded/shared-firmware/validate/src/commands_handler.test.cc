@@ -8,8 +8,12 @@
 using ::testing::_;
 
 TEST(ValidateCommandsHandler, handleCommandIdentify) {
-  Drone drone(std::dynamic_pointer_cast<AbstractController>(
-      std::make_shared<StubController>()));
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  EXPECT_CALL(*controller, blinkLED(_)).Times(1);
+
+  Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
+
   EXPECT_EQ(drone.handleCommand(Command::kIdentify), true);
 }
 

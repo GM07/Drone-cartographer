@@ -23,7 +23,7 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed) {}
 
 void FirmwareController::sendP2PMessage(void* message, size_t size){/**/};
 void FirmwareController::receiveP2PMessage(
-    std::unordered_map<size_t, DroneData>& p2pData){/**/};
+    std::unordered_map<size_t, DroneData>* p2pData){/**/};
 [[nodiscard]] size_t FirmwareController::getId() const { return 0; };
 
 [[nodiscard]] float FirmwareController::getMinCollisionAvoidanceDistance()
