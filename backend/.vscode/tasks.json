@@ -9,7 +9,12 @@
         {
             "label": "Run tests",
             "type": "shell",
-            "command": "pytest"
+            "command": "coverage run -m pytest"
+        },
+        {
+            "label": "Get coverage",
+            "type": "shell",
+            "command": "coverage report -m"
         },
         {
             "label": "Run autoformater",

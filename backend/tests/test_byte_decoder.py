@@ -28,10 +28,9 @@ class TestApplication(unittest.TestCase):
         decoder = ByteDecoder(byt, ['f', 'f', 'f', 'f'])
         self.assertEqual(decoder.get_values(), [0, 0, 0, 0])
 
-
-#Wait for values
-
-# def test_value_at_index(self):
-#    byt = bytes([1, 2, 3, 4])
-#   decoder = ByteDecoder(byt, ['f', 'f', 'f', 'f'])
-#  decoder.value_at_index(0, 'i', 1)
+    @mock.patch("services.communication.byte_decoder.struct.unpack")
+    def test_value_at_index(self, unpack_mock: mock.MagicMock):
+        byt = bytes([1, 2, 3, 4])
+        decoder = ByteDecoder(byt, ['f', 'f', 'f', 'f'])
+        decoder.value_at_index(0, 'i', 1)
+        unpack_mock.assert_called_once_with('i', b'\x01')
