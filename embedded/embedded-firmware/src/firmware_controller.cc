@@ -124,16 +124,11 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
 ///////////////////////////////////////
 void FirmwareController::sendP2PMessage(void* message, size_t size) {
   static P2PPacket p_reply;
-  static uint8_t p2pCounter = 0;
-  constexpr uint8_t kNbTickPerPackets = 50;
 
-  if (++p2pCounter > kNbTickPerPackets) {
-    p_reply.port = 0x00;
-    p_reply.size = size;
-    memcpy(&p_reply.data[0], message, size);
-    radiolinkSendP2PPacketBroadcast(&p_reply);
-    p2pCounter = 0;
-  }
+  p_reply.port = 0x00;
+  p_reply.size = size;
+  memcpy(&p_reply.data[0], message, size);
+  radiolinkSendP2PPacketBroadcast(&p_reply);
 }
 
 ///////////////////////////////////////

@@ -78,8 +78,9 @@ class Drone {
 
   static Drone& getEmbeddedDrone();
 
- protected:
   DroneData m_data;
+
+ protected:
   Vector3D m_normal;
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;

@@ -46,6 +46,7 @@ class SimulationController : public AbstractController {
   [[nodiscard]] bool isTrajectoryFinished() const override;
 
   void initCommunicationManager() override;
+
   size_t receiveMessage(void* message, size_t size) const override;
   void sendMessage(void* message, size_t size) const override;
   void sendDroneDataToServerThread();

@@ -1,7 +1,7 @@
 extern "C" {
 #include "FreeRTOS.h"
 #include "commander.h"
-#include "components/ccommunication_manager.h"
+#include "components/crazyflie_task.h"
 #include "config.h"
 #include "debug.h"
 #include "log.h"
@@ -15,10 +15,12 @@ extern "C" {
 #include "app_main.h"
 #include "components/drone.h"
 #include "controllers/firmware_controller.h"
+#include "utils/time.h"
 
 namespace {
 
-bool kIsInit = false;
+bool commIsInit = false;
+bool p2pIsInit = false;
 StaticSemaphore_t mutexBuffer;
 
 }  // namespace
@@ -37,14 +39,39 @@ void communicationManagerTaskWrapper(void* /*parameter*/) {
 }
 
 /////////////////////////////////////////////////////////////////////////
-void communicationManagerInit() {
-  xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
-              configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
-  kIsInit = true;
+void p2pTaskWrapper(void* /*parameter*/) {
+  constexpr int32_t kP2pTaskDelay = 50;
+  constexpr int32_t kInitDelay = 3000;
+
+  Time::delayMs(kInitDelay);
+  Drone& drone = Drone::getEmbeddedDrone();
+
+  while (true) {
+    drone.getController()->sendP2PMessage(static_cast<void*>(&drone.m_data),
+                                          sizeof(drone.m_data));
+    Time::delayMs(kP2pTaskDelay);
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////
-bool communicationManagerTest() { return kIsInit; }
+void communicationManagerInit() {
+  xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
+              configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
+  commIsInit = true;
+}
+
+/////////////////////////////////////////////////////////////////////////
+void p2pTaskInit() {
+  xTaskCreate(p2pTaskWrapper, "P2P_TASK_NAME", configMINIMAL_STACK_SIZE,
+              nullptr, 0, nullptr);
+  p2pIsInit = true;
+}
+
+/////////////////////////////////////////////////////////////////////////
+bool communicationManagerTest() { return commIsInit; }
+
+/////////////////////////////////////////////////////////////////////////
+bool p2pTaskTest() { return p2pIsInit; }
 
 /////////////////////////////////////////////////////////////////////////
 void updateCrashStatus() {

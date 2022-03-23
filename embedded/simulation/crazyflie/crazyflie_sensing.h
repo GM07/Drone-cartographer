@@ -101,8 +101,10 @@ class CCrazyflieSensing : public argos::CCI_Controller {
 #endif
   void attemptSocketConnection();
   void threadTasksWrapper();
+  void p2pTaskWrapper();
 
   std::unique_ptr<std::thread> m_communicationThread;
+  std::unique_ptr<std::thread> m_P2PThread;
   Drone m_drone;
 };
 

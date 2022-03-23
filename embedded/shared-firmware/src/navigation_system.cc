@@ -8,7 +8,6 @@ void Drone::step() {
 
   droneState = m_controller->m_state;
 
-  m_controller->sendP2PMessage(static_cast<void *>(&m_data), sizeof(m_data));
   m_controller->receiveP2PMessage(&m_peerData);
 
   switch (m_controller->m_state) {
