@@ -2,13 +2,14 @@
 #define DRONE_H
 
 #include <array>
+#include <chrono>
 #include <random>
 
 #include "controllers/abstract_controller.h"
 #include "utils/commands.h"
 #include "utils/drone_data.h"
 
-constexpr size_t kMessageMaxSize = 32;
+constexpr size_t kMessageMaxSize = 30;
 constexpr size_t kNbStartingDirection = 8;
 
 // Meters and seconds
@@ -29,8 +30,10 @@ class Drone {
       : m_messageRX(), m_controller(controller) {
     constexpr float kFirstNumber = 0.5F;
     constexpr float kSecondNumber = 1.225F;
+    uint32_t kSeed =
+        std::chrono::system_clock::now().time_since_epoch().count();
 
-    std::default_random_engine generator;
+    std::default_random_engine generator(kSeed);
     std::array<Vector3D, kNbStartingDirection> startingDirection{
         {Vector3D(kSecondNumber, kFirstNumber, 0.0F),
          Vector3D(kFirstNumber, kSecondNumber, 0.0F),

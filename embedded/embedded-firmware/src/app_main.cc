@@ -18,7 +18,7 @@ extern "C" {
 
 namespace {
 
-bool kIsInit = false;
+bool isInit = false;
 StaticSemaphore_t mutexBuffer;
 
 }  // namespace
@@ -40,11 +40,11 @@ void communicationManagerTaskWrapper(void* /*parameter*/) {
 void communicationManagerInit() {
   xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
               configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
-  kIsInit = true;
+  isInit = true;
 }
 
 /////////////////////////////////////////////////////////////////////////
-bool communicationManagerTest() { return kIsInit; }
+bool communicationManagerTest() { return isInit; }
 
 /////////////////////////////////////////////////////////////////////////
 void updateCrashStatus() {
@@ -76,8 +76,9 @@ void p2pcallbackHandler(P2PPacket* p) {
     P2PPacket packet;
     memcpy(&packet, p, sizeof(packet));
 
-    if (receivedP2PPacket.size() < kMaxQueueSize) {
-      receivedP2PPacket.push(packet);
+    receivedP2PPacket.push(packet);
+    if (receivedP2PPacket.size() >= kMaxQueueSize) {
+      receivedP2PPacket.pop();
     }
   }
   xSemaphoreGive(p2pPacketMutex);

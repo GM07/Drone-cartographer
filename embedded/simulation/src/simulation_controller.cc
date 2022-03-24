@@ -55,7 +55,8 @@ void SimulationController::updateSensorsData() {
 }
 
 ///////////////////////////////////////
-size_t SimulationController::receiveMessage(void* message, size_t size) const {
+[[nodiscard]] size_t SimulationController::receiveMessage(void* message,
+                                                          size_t size) const {
   size_t messageSize = m_socket->available();
 
   if (messageSize != 0) {
@@ -72,7 +73,6 @@ void SimulationController::sendMessage(void* message, size_t size_bytes) const {
 
 ///////////////////////////////////////
 void SimulationController::sendDroneDataToServerThread() {
-  constexpr size_t kPacketSize = 32;
   constexpr uint32_t kTryConnectionDelay = 250;
 
   while (m_threadContinueFlag) {
@@ -103,7 +103,7 @@ void SimulationController::sendDroneDataToServerThread() {
             m_controllerData.reset();
           }
 
-          m_dataSocket->send(buffer(&dataToSend, kPacketSize));
+          m_dataSocket->send(buffer(&dataToSend, kMessageMaxSize));
           m_dataSocket->receive(buffer(&ack, sizeof(ack)));
         }
 
@@ -146,20 +146,20 @@ void SimulationController::takeOff(float height) {
 ///////////////////////////////////////////////////
 void SimulationController::land() {
   Vector3D pos = getCurrentLocation();
-  m_targetPosition = Vector3D(pos.m_x, pos.m_z, 0.0);
+  m_targetPosition = Vector3D(pos.m_x, pos.m_y, 0.0);
   setVelocity(Vector3D::z(-pos.m_z), kLandingSpeed);
 }
 
 // All positions are relative to takeOff position
 ///////////////////////////////////////////////////
-Vector3D SimulationController::getCurrentLocation() const {
+[[nodiscard]] Vector3D SimulationController::getCurrentLocation() const {
   CVector3 cPos = m_ccrazyflieSensing->m_pcPos->GetReading().Position;
 
   return Vector3D(cPos.GetX(), cPos.GetY(), cPos.GetZ()) - m_takeOffPosition;
 }
 
 ///////////////////////////////////////////////////
-bool SimulationController::isTrajectoryFinished() const {
+[[nodiscard]] bool SimulationController::isTrajectoryFinished() const {
   return areAlmostEqual(getCurrentLocation(), m_targetPosition);
 }
 

@@ -3,7 +3,7 @@
 SimulationSensors::SimulationSensors(CCrazyflieSensing* ccrazyflieSensing)
     : m_ccrazyflieSensing(ccrazyflieSensing) {}
 
-float SimulationSensors::getFrontDistance() const {
+[[nodiscard]] float SimulationSensors::getFrontDistance() const {
   auto iterDistRead =
       m_ccrazyflieSensing->m_pcDistance->GetReadingsMap().begin();
 
@@ -11,7 +11,7 @@ float SimulationSensors::getFrontDistance() const {
   return iterDistRead->second;
 }
 
-float SimulationSensors::getLeftDistance() const {
+[[nodiscard]] float SimulationSensors::getLeftDistance() const {
   auto iterDistRead =
       m_ccrazyflieSensing->m_pcDistance->GetReadingsMap().begin();
 
@@ -19,7 +19,7 @@ float SimulationSensors::getLeftDistance() const {
   return iterDistRead->second;
 }
 
-float SimulationSensors::getRightDistance() const {
+[[nodiscard]] float SimulationSensors::getRightDistance() const {
   auto iterDistRead =
       m_ccrazyflieSensing->m_pcDistance->GetReadingsMap().begin();
 
@@ -27,7 +27,7 @@ float SimulationSensors::getRightDistance() const {
   return iterDistRead->second;
 }
 
-float SimulationSensors::getBackDistance() const {
+[[nodiscard]] float SimulationSensors::getBackDistance() const {
   auto iterDistRead =
       m_ccrazyflieSensing->m_pcDistance->GetReadingsMap().begin();
 
@@ -35,18 +35,18 @@ float SimulationSensors::getBackDistance() const {
   return iterDistRead->second;
 }
 
-float SimulationSensors::getPosX() const {
+[[nodiscard]] float SimulationSensors::getPosX() const {
   return m_ccrazyflieSensing->m_pcPos->GetReading().Position.GetX();
 }
 
-float SimulationSensors::getPosY() const {
+[[nodiscard]] float SimulationSensors::getPosY() const {
   return m_ccrazyflieSensing->m_pcPos->GetReading().Position.GetY();
 }
 
-float SimulationSensors::getPosZ() const {
+[[nodiscard]] float SimulationSensors::getPosZ() const {
   return m_ccrazyflieSensing->m_pcPos->GetReading().Position.GetZ();
 }
 
-float SimulationSensors::getBatteryLevel() const {
+[[nodiscard]] float SimulationSensors::getBatteryLevel() const {
   return m_ccrazyflieSensing->m_pcBattery->GetReading().AvailableCharge;
 }

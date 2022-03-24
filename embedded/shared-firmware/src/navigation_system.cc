@@ -85,7 +85,7 @@ void Drone::wallAvoidance() {
 
 /////////////////////////////////////////////////////////////////////
 void Drone::collisionAvoidance() {
-  for (const auto &[key, peerData] : m_peerData) {
+  for (const auto &[id, peerData] : m_peerData) {
     if (peerData.m_range <= m_controller->getMinCollisionAvoidanceDistance()) {
       if (m_usedPeerData.find(peerData.m_id) == m_usedPeerData.end()) {
         m_usedPeerData.insert_or_assign(peerData.m_id, peerData);
