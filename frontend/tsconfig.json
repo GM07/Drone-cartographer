@@ -9,6 +9,8 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
+    "allowJs": true,
+    "noImplicitAny": false,
     "jsx": "preserve",
     "lib": [
         "esnext",
@@ -33,7 +35,7 @@
     "target": "esnext",
     "types": [
         "jest",
-        "webpack-env"
+        "webpack-env",
     ]
   },
   "exclude": [
