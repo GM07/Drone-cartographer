@@ -14,8 +14,6 @@
 using ::argos::CARGoSException;
 using ::argos::CRandom;
 
-uint8_t droneState = State::kIdle;
-
 /****************************************/
 /****************************************/
 

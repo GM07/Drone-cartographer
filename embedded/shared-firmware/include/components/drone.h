@@ -22,8 +22,6 @@ constexpr float kRealMinCollisionAvoidanceRange = 45.0F;
 constexpr float kRealMaxCollisionAvoidanceRange = 45.0F;
 constexpr size_t kNbStartingDirection = 8;
 
-extern uint8_t droneState;
-
 class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
