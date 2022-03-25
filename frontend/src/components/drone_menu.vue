@@ -56,6 +56,23 @@
                   ></v-text-field>
                 </v-col>
               </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="newDrone.orientation"
+                    label="Orientation"
+                    :rules="[
+                      v =>
+                        !isNaN(parseFloat(Number(v))) ||
+                        'Le nombre entré n\'est pas valide',
+                      v =>
+                        (v < 360 && v >= 0) ||
+                        'La valeur doit être entre 0 et 360',
+                    ]"
+                    @change="validatePositionForm()"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
             </v-form>
           </v-container>
         </v-card-text>
@@ -83,6 +100,7 @@ export default class DroneMenu extends Vue {
     name: 'radio://0/80/2M/E7E7E7E761',
     xPos: 0,
     yPos: 0,
+    orientation: 0,
   };
 
   public submit(): void {
@@ -94,6 +112,7 @@ export default class DroneMenu extends Vue {
       this.newDrone.name = 'radio://0/80/2M/E7E7E7E761';
       this.newDrone.xPos = 0;
       this.newDrone.yPos = 0;
+      this.newDrone.orientation = 0;
       this.resetValidation();
       this.closeMenu();
     }
