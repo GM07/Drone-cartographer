@@ -33,5 +33,3 @@ size_t FirmwareController::getId() { return 0; };
 [[nodiscard]] float FirmwareController::getMaxCollisionAvoidanceDistance() {
   return 0.0F;
 };
-
-uint8_t droneState = State::kIdle;
