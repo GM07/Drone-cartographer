@@ -20,6 +20,8 @@ export const GET_MISSION_STATUS_NAMESPACE = '/getMissionStatus';
 export const LIMITED_ACCESS_NAMESPACE = '/limitedAccess';
 export const MAP_DATA_NAMESPACE = '/getMapData';
 export const GET_LOGS_NAMESPACE = '/getLogs';
+export const RECOMPILE_EMBEDDED_NAMESPACE = '/recompileEmbedded';
+export const RECOMPILE_SIMULATION_NAMESPACE = '/recompileSimulation';
 export const DRONE_STATUS_NAMESPACE = '/getDroneStatus';
 export const HTTP_OK = 200;
 export const TIME_MULTIPLIER = 60000;
@@ -31,6 +33,20 @@ export const SOCKETIO_SERVER_STATUS = SocketIO(
 export const SOCKETIO_GET_LOGS = SocketIO(SERVER_ADDRESS + GET_LOGS_NAMESPACE, {
   transports: ['websocket'],
 }).close();
+
+export const SOCKETIO_RECOMPILE_SIMULATION = SocketIO(
+  SERVER_ADDRESS + RECOMPILE_SIMULATION_NAMESPACE,
+  {
+    transports: ['websocket'],
+  }
+).close();
+
+export const SOCKETIO_RECOMPILE_EMBEDDED = SocketIO(
+  SERVER_ADDRESS + RECOMPILE_EMBEDDED_NAMESPACE,
+  {
+    transports: ['websocket'],
+  }
+).close();
 
 export const SOCKETIO_DRONE_STATUS = SocketIO(
   SERVER_ADDRESS + DRONE_STATUS_NAMESPACE,

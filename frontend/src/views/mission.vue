@@ -40,6 +40,12 @@
                 >Fermer logs</v-list-item-title
               >
             </v-list-item>
+            <v-list-item @click="recompile()">
+              <v-list-item-icon>
+                <v-icon color="blue">mdi-refresh</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>Recompiler</v-list-item-title>
+            </v-list-item>
           </v-list>
         </div>
         <div id="bottomSidebar" justify-end>
@@ -202,6 +208,8 @@ import {
   SERVER_ADDRESS,
   MAP_DATA_NAMESPACE,
   SOCKETIO_DRONE_STATUS,
+  SOCKETIO_RECOMPILE_SIMULATION,
+  SOCKETIO_RECOMPILE_EMBEDDED,
 } from '@/communication/server_constants';
 import {AccessStatus} from '@/communication/access_status';
 import {Drone, DroneStatus} from '@/communication/drone';
@@ -259,6 +267,10 @@ export default class Mission extends Vue {
     if (data.id === BASE_PATH + this.visualizedMaps[0]) this.mapData1 = data;
     else if (data.id === BASE_PATH + this.visualizedMaps[1])
       this.mapData2 = data;
+  }
+
+  public recompile(): void {
+    if (this.accessStatus.isUserControlling) ServerCommunication.recompile();
   }
 
   public limitNumMaps(input: string[]): void {
@@ -329,6 +341,16 @@ export default class Mission extends Vue {
       }
     );
 
+    SOCKETIO_RECOMPILE_SIMULATION.on(
+      'recompile_simulation',
+      (stdout: string) => {
+        console.log(stdout);
+      }
+    );
+    SOCKETIO_RECOMPILE_EMBEDDED.on('recompile_embedded', (stdout: string) => {
+      console.log(stdout);
+    });
+
     SOCKETIO_LIMITED_ACCESS.on('disconnect', () => {
       this.accessStatus.isUserControlling = false;
     });
@@ -354,11 +376,15 @@ export default class Mission extends Vue {
 
     SOCKETIO_LIMITED_ACCESS.open();
     SOCKETIO_DRONE_STATUS.open();
+    SOCKETIO_RECOMPILE_SIMULATION.open();
+    SOCKETIO_RECOMPILE_EMBEDDED.open();
   }
 
   private destroyed() {
     SOCKETIO_LIMITED_ACCESS.removeAllListeners().close();
     SOCKETIO_DRONE_STATUS.removeAllListeners().close();
+    SOCKETIO_RECOMPILE_SIMULATION.removeAllListeners().close();
+    SOCKETIO_RECOMPILE_EMBEDDED.removeAllListeners().close();
   }
 }
 </script>

@@ -1,3 +1,4 @@
+from asyncio.log import logger
 from gevent import monkey
 
 if __name__ == '__main__':
@@ -7,7 +8,7 @@ from pickle import NONE
 """Root of the Flask Backend for the drone application
 Defines all routes in this file"""
 
-from services.communication.comm_tasks import start_drone_status_task, start_logs_task
+from services.communication.comm_tasks import start_drone_status_task, start_logs_task, start_recompile_task
 from flask import jsonify, Flask, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
@@ -51,15 +52,16 @@ def identify_drone(drone_addr):
     COMM.send_command(COMMANDS.IDENTIFY.value, [drone_addr])
     return 'Identified drone'
 
+
 # Recompile firmware
 @SOCKETIO.on('recompile', namespace='/limitedAccess')
 def recompile():
     if not AccessStatus.is_request_valid(request):
         return ''
 
-    global COMM
-    COMM.recompile()
-    return 'Recompiled'
+    start_recompile_task(SOCKETIO)
+    return 'Recompiling'
+
 
 # Launch mission
 @SOCKETIO.on('launch', namespace='/limitedAccess')
