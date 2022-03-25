@@ -9,5 +9,7 @@
 
 void communicationManagerInit();
 bool communicationManagerTest();
+void initColorGradient();
+bool testColorGradient();
 
 #endif

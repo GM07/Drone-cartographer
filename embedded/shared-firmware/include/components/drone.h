@@ -88,13 +88,13 @@ class Drone {
   void initDrone();
 
   static Drone& getEmbeddedDrone();
+  std::unordered_map<size_t, DroneData> m_peerData;
+  DroneData m_data;
 
  protected:
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
-  DroneData m_data;
   std::unordered_map<size_t, DroneData> m_usedPeerData;
   Vector3D m_normal;
-  std::unordered_map<size_t, DroneData> m_peerData;
 };
 #endif

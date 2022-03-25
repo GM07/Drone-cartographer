@@ -13,7 +13,8 @@ PROJ_OBJ += commands_handler.o \
 	app_main.o \
 	vector3d.o \
 	firmware_sensors.o \
-	sensors_data_updater.o
+	sensors_data_updater.o \
+	colorGradient.o
 
 CRAZYFLIE_BASE=../crazyflie-firmware
 

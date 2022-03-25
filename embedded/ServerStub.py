@@ -5,6 +5,7 @@ import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from tkinter import *
 
+
 class CommCrazyflie: 
 
     def __init__(self):
@@ -28,14 +29,14 @@ nConnections = 9
 identifier = "s"
 
 # CHANGE TO FALSE TO CONTROL REAL DRONE
-is_simulation = True
+is_simulation = FALSE
 
 servers = []
 clients = []
 
 # For Drones
 # CHANGE TO PROPER DRONE ADDRESS
-URI = ['radio://0/80/2M/E7E7E7E761']
+URI = ['radio://0/80/2M/E7E7E7E762']
 COMM_CRAZYFLIE = CommCrazyflie()
 
 if is_simulation:
@@ -46,11 +47,15 @@ if is_simulation:
     server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     server.bind(file_name)
     servers.append(server)
+    
 
   for server in servers:
+    
     server.listen(1)
     client, addr = server.accept()
     clients.append(client)
+
+    
 
 
 def takeOff():
@@ -72,6 +77,7 @@ def send_command(data):
   else:
     for uri in URI:
       COMM_CRAZYFLIE.send_command(data, uri)
+
 
 window = Tk()
 
