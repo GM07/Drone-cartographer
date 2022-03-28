@@ -25,10 +25,11 @@ import {SERVER_ADDRESS} from '@/communication/server_constants';
 import {DefaultEventsMap} from 'socket.io/dist/typed-events';
 @Component({})
 export default class RemoteCommandOutput extends Vue {
+  @Prop() private namespace!: string;
+
   public isFinished = true;
   public hasErrors = false;
 
-  @Prop() private namespace!: string;
   private output: Array<[string, string]> = [];
   private socket: Socket<DefaultEventsMap, DefaultEventsMap>;
 
