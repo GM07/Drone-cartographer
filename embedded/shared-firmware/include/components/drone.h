@@ -30,21 +30,21 @@ class Drone {
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
       : m_messageRX(), m_controller(controller) {
     constexpr float kPI = std::acos(-1);
-    constexpr float kFirstNumber = std::sin(kPI / 6.0F);
-    constexpr float kSecondNumber = std::cos(kPI / 6.0F);
+    constexpr float kTrigoHalf = std::sin(kPI / 6.0F);
+    constexpr float kTrigoSqrt3On2 = std::cos(kPI / 6.0F);
     const uint32_t kSeed =
         std::chrono::system_clock::now().time_since_epoch().count();
 
     std::default_random_engine generator(kSeed);
     std::array<Vector3D, kNbStartingDirection> startingDirection{
-        {Vector3D(kSecondNumber, kFirstNumber, 0.0F),
-         Vector3D(kFirstNumber, kSecondNumber, 0.0F),
-         Vector3D(-kFirstNumber, kSecondNumber, 0.0F),
-         Vector3D(-kSecondNumber, kFirstNumber, 0.0F),
-         Vector3D(-kSecondNumber, -kFirstNumber, 0.0F),
-         Vector3D(-kFirstNumber, -kSecondNumber, 0.0F),
-         Vector3D(kFirstNumber, -kSecondNumber, 0.0F),
-         Vector3D(kSecondNumber, -kFirstNumber, 0.0F)}};
+        {Vector3D(kTrigoSqrt3On2, kTrigoHalf, 0.0F),     // PI / 3
+         Vector3D(kTrigoHalf, kTrigoSqrt3On2, 0.0F),     // PI / 6
+         Vector3D(-kTrigoHalf, kTrigoSqrt3On2, 0.0F),    // 2 * PI / 3
+         Vector3D(-kTrigoSqrt3On2, kTrigoHalf, 0.0F),    // 5 * PI / 6
+         Vector3D(-kTrigoSqrt3On2, -kTrigoHalf, 0.0F),   // 7 * PI / 6
+         Vector3D(-kTrigoHalf, -kTrigoSqrt3On2, 0.0F),   // 4 * PI / 3
+         Vector3D(kTrigoHalf, -kTrigoSqrt3On2, 0.0F),    // 5 * PI / 3
+         Vector3D(kTrigoSqrt3On2, -kTrigoHalf, 0.0F)}};  // 11 * PI / 6
 
     std::uniform_int_distribution<int> distribution(
         0, startingDirection.size() - 1);
