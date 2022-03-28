@@ -12,6 +12,8 @@ extern "C" {
 #include "task.h"
 }
 
+#include <cmath>
+
 #include "app_main.h"
 #include "components/drone.h"
 #include "controllers/firmware_controller.h"
@@ -61,9 +63,17 @@ void enableCrtpHighLevelCommander() {
 }
 
 /////////////////////////////////////////////////////////////////////////
-void addLoggingVariables() {
-  LOG_GROUP_START(custom)  // NOLINT
-  LOG_ADD(LOG_UINT8, droneCustomState, &droneState)
+uint8_t logDroneState(uint32_t /*timestamp*/, void* /*data*/) {
+  return static_cast<uint8_t>(
+      Drone::getEmbeddedDrone().getController()->m_state);
+}
+
+/////////////////////////////////////////////////////////////////////////
+void addCustomLoggingVariables() {
+  static logByFunction_t droneStateLogger = {.acquireUInt8 = logDroneState,
+                                             .data = nullptr};
+  LOG_GROUP_START(custom)                                              // NOLINT
+  LOG_ADD_BY_FUNCTION(LOG_UINT8, droneCustomState, &droneStateLogger)  // NOLINT
   LOG_GROUP_STOP(custom)
 }
 
@@ -87,7 +97,7 @@ void p2pcallbackHandler(P2PPacket* p) {
 /////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
   ledClearAll();
-  addLoggingVariables();
+  addCustomLoggingVariables();
   enableCrtpHighLevelCommander();
   Drone::getEmbeddedDrone().initDrone();
 

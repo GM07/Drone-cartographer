@@ -6,8 +6,6 @@ void Drone::step() {
   updateCrashStatus();
   m_controller->updateSensorsData();
 
-  droneState = m_controller->m_state;
-
   m_controller->sendP2PMessage(static_cast<void *>(&m_data), sizeof(m_data));
   m_controller->receiveP2PMessage(&m_peerData);
 

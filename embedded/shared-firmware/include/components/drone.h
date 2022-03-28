@@ -1,6 +1,8 @@
 #ifndef DRONE_H
 #define DRONE_H
 
+#include <utils/math.h>
+
 #include <array>
 #include <chrono>
 #include <cmath>
@@ -23,15 +25,13 @@ constexpr float kSimulationCollisionAvoidanceRange = 20.0F;
 constexpr float kRealMinCollisionAvoidanceRange = 45.0F;
 constexpr float kRealMaxCollisionAvoidanceRange = 45.0F;
 
-extern uint8_t droneState;
-
 class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
       : m_messageRX(), m_controller(controller) {
-    constexpr float kPI = std::acos(-1);
-    constexpr float kTrigoHalf = std::sin(kPI / 6.0F);
-    constexpr float kTrigoSqrt3On2 = std::cos(kPI / 6.0F);
+    constexpr float kPI = Math::acos(-1);
+    constexpr float kTrigoHalf = Math::sin(kPI / 6.0F);
+    constexpr float kTrigoSqrt3On2 = Math::cos(kPI / 6.0F);
     const uint32_t kSeed =
         std::chrono::system_clock::now().time_since_epoch().count();
 

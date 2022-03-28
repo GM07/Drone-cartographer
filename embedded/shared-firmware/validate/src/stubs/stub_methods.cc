@@ -35,5 +35,3 @@ void FirmwareController::receiveP2PMessage(
     const {
   return 0.0F;
 };
-
-uint8_t droneState = State::kIdle;

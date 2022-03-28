@@ -14,10 +14,6 @@
 using ::argos::CARGoSException;
 using ::argos::CRandom;
 
-using ::boost::system::system_error;
-
-uint8_t droneState = State::kIdle;
-
 /****************************************/
 /****************************************/
 
@@ -99,7 +95,7 @@ void CCrazyflieSensing::attemptSocketConnection() {
     try {
       m_drone.getController()->initCommunicationManager();
       break;
-    } catch (const system_error& error) {
+    } catch (const boost::system::system_error& error) {
       Time::delayMs(kDroneDelay);
     }
   }
