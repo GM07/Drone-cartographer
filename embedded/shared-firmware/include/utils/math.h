@@ -90,7 +90,7 @@ template <typename Number, typename Exponent>
 ///////////////////////////////////////////////
 // x^n / (n!)
 template <typename T>
-[[nodiscard]] constexpr T xn_nfac(T x, int n) {
+[[nodiscard]] constexpr T xnNFac(T x, int n) {
   return Math::pow(x, n) / factorial(n);
 }
 
@@ -102,11 +102,10 @@ template <std::size_t N, typename T>
   }
 
   if constexpr (isEven((N - 1) / 2)) {
-    return xn_nfac(value, N) + taylorSin < (N > kMaxDepth) ? 0
-                                                           : N + 2 > (value);
+    return xnNFac(value, N) + taylorSin < (N > kMaxDepth) ? 0 : N + 2 > (value);
   } else {
-    return -xn_nfac(value, N) + taylorSin < (N > kMaxDepth) ? 0
-                                                            : N + 2 > (value);
+    return -xnNFac(value, N) + taylorSin < (N > kMaxDepth) ? 0
+                                                           : N + 2 > (value);
   }
 }
 
@@ -118,11 +117,10 @@ template <std::size_t N, typename T>
   }
 
   if constexpr (isEven((N) / 2)) {
-    return xn_nfac(value, N) + taylorCos < (N > kMaxDepth) ? 0
-                                                           : N + 2 > (value);
+    return xnNFac(value, N) + taylorCos < (N > kMaxDepth) ? 0 : N + 2 > (value);
   } else {
-    return -xn_nfac(value, N) + taylorCos < (N > kMaxDepth) ? 0
-                                                            : N + 2 > (value);
+    return -xnNFac(value, N) + taylorCos < (N > kMaxDepth) ? 0
+                                                           : N + 2 > (value);
   }
 }
 
@@ -138,25 +136,6 @@ template <typename T>
 template <typename T>
 [[nodiscard]] constexpr T cos(T value) {
   return 1 + taylorCos<2>(value);
-}
-
-/////////////////////////////////////////////////////////
-// https://developer.download.nvidia.com/cg/acos.html
-// Je sais pas les constantes sortent de ou donc nolint !
-/////////////////////////////////////////////////////////
-template <typename T>
-[[nodiscard]] constexpr T acos(T value) {
-  T negate = T(value < 0);
-  value = Math::abs(value);
-  T ret = -0.0187293 * value;  // NOLINT
-  ret += 0.0742610;            // NOLINT
-  ret *= value;
-  ret -= 0.2121144;  // NOLINT
-  ret *= value;
-  ret += 1.5707288;  // NOLINT
-  ret *= Math::sqrt(1.0 - value);
-  ret = ret - 2 * negate * ret;  // NOLINT
-  return negate * Math::pi<T> + ret;
 }
 
 }  // namespace Math

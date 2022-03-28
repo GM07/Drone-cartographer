@@ -29,9 +29,8 @@ class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
       : m_messageRX(), m_controller(controller) {
-    constexpr float kPI = Math::acos(-1);
-    constexpr float kTrigoHalf = Math::sin(kPI / 6.0F);
-    constexpr float kTrigoSqrt3On2 = Math::cos(kPI / 6.0F);
+    constexpr float kTrigoHalf = Math::sin(Math::pi<float> / 6.0F);
+    constexpr float kTrigoSqrt3On2 = Math::cos(Math::pi<float> / 6.0F);
     const uint32_t kSeed =
         std::chrono::system_clock::now().time_since_epoch().count();
 
