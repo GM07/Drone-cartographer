@@ -39,7 +39,7 @@ void Drone::wallAvoidance() {
 
   if (m_controller->m_data.front > 0 &&
       m_controller->m_data.front <= kMinDistanceObstacle) {
-    m_normal.m_x -= 1.0F;
+    m_normal.m_x += -1.0F;
   }
 
   if (m_controller->m_data.back > 0 &&
@@ -49,7 +49,7 @@ void Drone::wallAvoidance() {
 
   if (m_controller->m_data.left > 0 &&
       m_controller->m_data.left <= kMinDistanceObstacle) {
-    m_normal.m_y -= 1.0F;
+    m_normal.m_y += -1.0F;
   }
 
   if (m_controller->m_data.right > 0 &&
