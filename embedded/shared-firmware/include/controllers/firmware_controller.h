@@ -39,7 +39,7 @@ class FirmwareController : public AbstractController {
   void receiveP2PMessage(
       std::unordered_map<size_t, DroneData>* p2pData) override;
 
-  void blinkLED(LED led) override;
+  void identify() override;
   [[nodiscard]] size_t getId() const override;
 
   void updateSensorsData() override;

@@ -115,7 +115,7 @@ void SimulationController::sendDroneDataToServerThread() {
 }
 
 ///////////////////////////////////////
-void SimulationController::blinkLED(LED /*led*/) {
+void SimulationController::identify() {
   log("Identify :" + m_ccrazyflieSensing->GetId());
 }
 

@@ -15,7 +15,7 @@ TEST(ValidateEmbeddedFirmware, setLEDStateShouldRegisterAndRun) {
   mock = new FunctionsMock;
   EXPECT_CALL(*mock, ledseqRegisterSequence(_)).Times(1);
   EXPECT_CALL(*mock, ledseqRun(_)).Times(1);
-  Drone::getEmbeddedDrone().getController()->blinkLED(LED::kLedBlueLeft);
+  Drone::getEmbeddedDrone().getController()->identify();
 
   delete mock;
 }

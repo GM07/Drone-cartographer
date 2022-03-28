@@ -19,9 +19,26 @@ extern "C" {
 #include "supervisor.h"
 }
 
+namespace {
+constexpr size_t kNbLEDSteps = 9;
+std::array<ledseqStep_t, kNbLEDSteps> ledStep{{{true, LEDSEQ_WAITMS(500)},
+                                               {false, LEDSEQ_WAITMS(500)},
+                                               {true, LEDSEQ_WAITMS(500)},
+                                               {false, LEDSEQ_WAITMS(500)},
+                                               {true, LEDSEQ_WAITMS(500)},
+                                               {false, LEDSEQ_WAITMS(500)},
+                                               {true, LEDSEQ_WAITMS(500)},
+                                               {false, LEDSEQ_WAITMS(500)},
+                                               {false, LEDSEQ_STOP}}};
+}  // namespace
+
 ////////////////////////////////////////////////
 FirmwareController::FirmwareController()
-    : AbstractController(std::make_unique<FirmwareSensors>()) {}
+    : AbstractController(std::make_unique<FirmwareSensors>()) {
+  m_seqLED.sequence = ledStep.data();
+  m_seqLED.led = static_cast<led_t>(LED::kLedBlueLeft);
+  ledseqRegisterSequence(&m_seqLED);
+}
 
 ////////////////////////////////////////////////
 [[nodiscard]] bool FirmwareController::isDroneCrashed() const {
@@ -85,25 +102,7 @@ void FirmwareController::sendMessage(void* message, size_t size) const {
 }
 
 ///////////////////////////////////////
-void FirmwareController::blinkLED(LED led) {
-  constexpr size_t kNbLEDSteps = 9;
-  static std::array<ledseqStep_t, kNbLEDSteps> ledStep{
-      {{true, LEDSEQ_WAITMS(500)},
-       {false, LEDSEQ_WAITMS(500)},
-       {true, LEDSEQ_WAITMS(500)},
-       {false, LEDSEQ_WAITMS(500)},
-       {true, LEDSEQ_WAITMS(500)},
-       {false, LEDSEQ_WAITMS(500)},
-       {true, LEDSEQ_WAITMS(500)},
-       {false, LEDSEQ_WAITMS(500)},
-       {false, LEDSEQ_STOP}}};
-
-  m_seqLED.sequence = ledStep.data();
-  m_seqLED.led = static_cast<led_t>(led);
-
-  ledseqRegisterSequence(&m_seqLED);
-  ledseqRun(&m_seqLED);
-}
+void FirmwareController::identify() { ledseqRun(&m_seqLED); }
 
 ///////////////////////////////////////
 void FirmwareController::setVelocity(const Vector3D& direction, float speed) {

@@ -3,6 +3,7 @@
 
 #include <array>
 #include <chrono>
+#include <cmath>
 #include <random>
 
 #include "controllers/abstract_controller.h"
@@ -28,9 +29,10 @@ class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
       : m_messageRX(), m_controller(controller) {
-    constexpr float kFirstNumber = 0.5F;
-    constexpr float kSecondNumber = 1.225F;
-    uint32_t kSeed =
+    constexpr float kPI = std::acos(-1);
+    constexpr float kFirstNumber = std::sin(kPI / 6.0F);
+    constexpr float kSecondNumber = std::cos(kPI / 6.0F);
+    const uint32_t kSeed =
         std::chrono::system_clock::now().time_since_epoch().count();
 
     std::default_random_engine generator(kSeed);

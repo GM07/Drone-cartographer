@@ -7,7 +7,7 @@
 
 /////////////////////////////////////////////////////////
 FirmwareController::FirmwareController() {}
-void FirmwareController::blinkLED(LED led) {}
+void FirmwareController::identify() {}
 size_t FirmwareController::receiveMessage(void* message, size_t size) const {
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
