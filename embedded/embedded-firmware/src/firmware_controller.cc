@@ -1,9 +1,5 @@
 #include "controllers/firmware_controller.h"
 
-#include <cstdint>
-#include <cstring>
-#include <iostream>
-
 #include "components/drone.h"
 #include "controllers/abstract_controller.h"
 #include "sensors/firmware_sensors.h"

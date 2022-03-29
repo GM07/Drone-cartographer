@@ -1,4 +1,4 @@
-image: mcr.microsoft.com/vscode/devcontainers/python:3.8
+image: altaric/inf3995-backend:latest
 
 variables:
   WORKING_DIRECTORY: "backend"
@@ -10,55 +10,16 @@ workflow:
         - $WORKING_DIRECTORY/**/*
 
 stages:
-  - install_dependencies
+
   - lint
   - test
-
-cache:
-  key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
-  paths:
-    - .cache/pip
-    - venv/
-
-before_script:
-  - python -V               # Print out python version for debugging
-  - pip install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
-  - cd $WORKING_DIRECTORY
- 
-
-prepare:
-  stage: .pre
-  script:
-    - pip install -r requirements.txt
-  cache:
-    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
-    paths:
-      - .cache/pip
-      - venv/
-
-install_dependencies:
-  stage: install_dependencies
-  cache:
-    key: $CI_COMMIT_REF_SLUG-$WORKING_DIRECTORY
-    paths:
-      - .cache/pip
-      - venv/
-  script:
-    - pip install -r requirements.txt
-  only:
-    changes:
-      - $WORKING_DIRECTORY/requirements.txt
-      - $WORKING_DIRECTORY/Dockerfile
-      - $WORKING_DIRECTORY/.devcontainer/Dockerfile
 
 lint_backend:
   stage: lint
   script:
-    - yapf --style google -rpd .
+    - cd backend && yapf --style google -rpd .
 
 test_backend:
   stage: test
   script:
-    - pytest
+    - cd backend && pytest

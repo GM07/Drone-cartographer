@@ -6,6 +6,8 @@
       scroll: canScroll,
       read_only: read_only,
       wrap_code: wrap_code,
+      atom_one_dark: theme == 'dark',
+      atom_one_light: theme == 'light',
     }"
     :style="{
       width: width,
@@ -21,6 +23,7 @@
     <div v-if="withoutHeader == true ? false : true" class="header">
       <Dropdown
         v-if="display_language"
+        :color="theme == 'dark' ? '#aaa' : '#999'"
         :default_display="selector_displayed_by_default"
         :disabled="language_selector == false ? true : false"
         :mark="mark"
@@ -38,6 +41,7 @@
       </Dropdown>
       <CopyCode
         v-if="copy_code"
+        :color="theme == 'dark' ? '#aaa' : '#999'"
         :content="content"
         height="16px"
         width="16px"
@@ -56,7 +60,8 @@
         v-if="
           read_only == true ? false : modelValue === undefined ? true : false
         "
-        v-model="staticValue"
+        ref="textarea"
+        v-model="value"
         :autofocus="autofocus"
         :style="{fontSize: font_size}"
         @input="calcContainerWidth"
@@ -67,6 +72,7 @@
         v-if="
           read_only == true ? false : modelValue === undefined ? false : true
         "
+        ref="textarea"
         :autofocus="autofocus"
         :style="{fontSize: font_size}"
         :value="modelValue"
@@ -91,7 +97,6 @@
 <script>
 /* eslint-disable */
 import hljs from 'highlight.js';
-import 'highlight.js/styles/atom-one-dark.css';
 import Dropdown from './dropdown.vue';
 import CopyCode from './copy_code.vue';
 
@@ -155,11 +160,13 @@ export default {
     },
     languages: {
       type: Array,
-      default: () => [
-        ['javascript', 'JS'],
-        ['cpp', 'C++'],
-        ['python', 'Python'],
-      ],
+      default: function () {
+        return [
+          ['javascript', 'JS'],
+          ['cpp', 'C++'],
+          ['python', 'Python'],
+        ];
+      },
     },
     selector_width: {
       type: String,
@@ -187,6 +194,10 @@ export default {
     font_size: {
       type: String,
       default: '17px',
+    },
+    theme: {
+      type: String,
+      default: 'dark',
     },
   },
   directives: {
@@ -224,7 +235,7 @@ export default {
           : this.languages[0][1],
       languageList: this.languages,
       content:
-        this.modelValue === undefined ? this.staticValue : this.modelValue,
+        this.modelValue === undefined ? this.value : this.modelValue,
     };
   },
   computed: {
@@ -232,17 +243,17 @@ export default {
       return this.read_only
         ? this.value
         : this.modelValue === undefined
-        ? this.staticValue + '\n'
+        ? this.value + '\n'
         : this.modelValue + '\n';
     },
     canScroll() {
-      return this.height === 'auto' ? false : true;
+      return this.height == 'auto' ? false : true;
     },
     withoutHeader() {
-      if (this.hide_header === true) {
+      if (this.hide_header == true) {
         return true;
       } else {
-        return this.display_language === false && this.copy_code === false
+        return this.display_language == false && this.copy_code == false
           ? true
           : false;
       }
@@ -254,6 +265,7 @@ export default {
       this.languageClass = 'language-' + lang[0];
     },
     calcContainerWidth(event) {
+      //  calculating the textarea's width while typing for syncing the width between textarea and highlight area
       this.containerWidth = event.target.clientWidth;
     },
     tab() {
@@ -263,21 +275,34 @@ export default {
       this.top = -event.target.scrollTop;
       this.left = -event.target.scrollLeft;
     },
+    resize() {
+      // listen to the change of the textarea's width to resize the highlight area
+      const resize = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          const obj = entry.contentRect;
+          this.containerWidth = obj.width + 40; // 40 is the padding
+        }
+      });
+      // only the textarea is rendered the listener will run
+      if (this.$refs.textarea) {
+        resize.observe(this.$refs.textarea);
+      }
+    },
   },
   mounted() {
     this.$nextTick(function () {
       hljs.highlightAll();
       hljs.configure({ignoreUnescapedHTML: true});
       this.content =
-        this.modelValue === undefined ? this.staticValue : this.modelValue;
+        this.modelValue === undefined ? this.value : this.modelValue;
     });
+    this.resize();
   },
   updated() {
     this.$nextTick(function () {
       hljs.highlightAll();
       this.content =
-        this.modelValue === undefined ? this.staticValue : this.modelValue;
-      this.$emit('changeValue', this.content);
+        this.modelValue === undefined ? this.value : this.modelValue;
     });
   },
 };
@@ -352,6 +377,8 @@ export default {
   border-radius: 0;
   box-sizing: border-box;
   display: block;
+  border: none;
+  margin: 0;
 }
 
 /* hide_header */
@@ -427,5 +454,144 @@ export default {
 .panel > .lang_list > li:hover {
   color: #111;
   background: #eee;
+}
+</style>
+
+<style>
+/*
+Atom One Dark by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+*/
+.atom_one_dark.hljs,
+.atom_one_dark .hljs {
+  color: #abb2bf;
+  background: #282c34;
+}
+.atom_one_dark .hljs-comment,
+.atom_one_dark .hljs-quote {
+  color: #5c6370;
+  font-style: italic;
+}
+.atom_one_dark .hljs-doctag,
+.atom_one_dark .hljs-keyword,
+.atom_one_dark .hljs-formula {
+  color: #c678dd;
+}
+.atom_one_dark .hljs-section,
+.atom_one_dark .hljs-name,
+.atom_one_dark .hljs-selector-tag,
+.atom_one_dark .hljs-deletion,
+.atom_one_dark .hljs-subst {
+  color: #e06c75;
+}
+.atom_one_dark .hljs-literal {
+  color: #56b6c2;
+}
+.atom_one_dark .hljs-string,
+.atom_one_dark .hljs-regexp,
+.atom_one_dark .hljs-addition,
+.atom_one_dark .hljs-attribute,
+.atom_one_dark .hljs-meta .hljs-string {
+  color: #98c379;
+}
+.atom_one_dark .hljs-attr,
+.atom_one_dark .hljs-variable,
+.atom_one_dark .hljs-template-variable,
+.atom_one_dark .hljs-type,
+.atom_one_dark .hljs-selector-class,
+.atom_one_dark .hljs-selector-attr,
+.atom_one_dark .hljs-selector-pseudo,
+.atom_one_dark .hljs-number {
+  color: #d19a66;
+}
+.atom_one_dark .hljs-symbol,
+.atom_one_dark .hljs-bullet,
+.atom_one_dark .hljs-link,
+.atom_one_dark .hljs-meta,
+.atom_one_dark .hljs-selector-id,
+.atom_one_dark .hljs-title {
+  color: #61aeee;
+}
+.atom_one_dark .hljs-built_in,
+.atom_one_dark .hljs-title .class_,
+.atom_one_dark .hljs-class .hljs-title {
+  color: #e6c07b;
+}
+.atom_one_dark .hljs-emphasis {
+  font-style: italic;
+}
+.atom_one_dark .hljs-strong {
+  font-weight: bold;
+}
+.atom_one_dark .hljs-link {
+  text-decoration: underline;
+}
+/*
+Atom One Light by Daniel Gamage
+Original One Light Syntax theme from https://github.com/atom/one-light-syntax
+*/
+.atom_one_light.hljs,
+.atom_one_light .hljs {
+  color: #383a42;
+  background: #fafafa;
+}
+.atom_one_light .hljs-comment,
+.atom_one_light .hljs-quote {
+  color: #a0a1a7;
+  font-style: italic;
+}
+.atom_one_light .hljs-doctag,
+.atom_one_light .hljs-keyword,
+.atom_one_light .hljs-formula {
+  color: #a626a4;
+}
+.atom_one_light .hljs-section,
+.atom_one_light .hljs-name,
+.atom_one_light .hljs-selector-tag,
+.atom_one_light .hljs-deletion,
+.atom_one_light .hljs-subst {
+  color: #e45649;
+}
+.atom_one_light .hljs-literal {
+  color: #0184bb;
+}
+.atom_one_light .hljs-string,
+.atom_one_light .hljs-regexp,
+.atom_one_light .hljs-addition,
+.atom_one_light .hljs-attribute,
+.atom_one_light .hljs-meta .hljs-string {
+  color: #50a14f;
+}
+.atom_one_light .hljs-attr,
+.atom_one_light .hljs-variable,
+.atom_one_light .hljs-template-variable,
+.atom_one_light .hljs-type,
+.atom_one_light .hljs-selector-class,
+.atom_one_light .hljs-selector-attr,
+.atom_one_light .hljs-selector-pseudo,
+.atom_one_light .hljs-number {
+  color: #986801;
+}
+.atom_one_light .hljs-symbol,
+.atom_one_light .hljs-bullet,
+.atom_one_light .hljs-link,
+.atom_one_light .hljs-meta,
+.atom_one_light .hljs-selector-id,
+.atom_one_light .hljs-title {
+  color: #4078f2;
+}
+.atom_one_light .hljs-built_in,
+.atom_one_light .hljs-title .class_,
+.atom_one_light .hljs-class .hljs-title {
+  color: #c18401;
+}
+.atom_one_light .hljs-emphasis {
+  font-style: italic;
+}
+.atom_one_light .hljs-strong {
+  font-weight: bold;
+}
+.atom_one_light .hljs-link {
+  text-decoration: underline;
 }
 </style>

@@ -1,15 +1,14 @@
 <template>
   <div id="content" @keydown.ctrl.83.prevent.stop="save">
     <CodeEditor
+      v-model="fileContent"
       border_radius="0px"
       :copy_code="true"
       :display_language="false"
       :language_selector="true"
       :languages="[['cpp', 'C++']]"
-      v-bind:value="content"
       width="100%"
       z_index="3"
-      @changeValue="changeValue($event)"
       @input="save"
     ></CodeEditor>
   </div>
@@ -19,6 +18,7 @@
 #content {
   width: 100%;
   height: 100vm;
+  overflow-y: scroll;
 }
 
 .hljs {
@@ -27,7 +27,7 @@
 </style>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import CodeEditor from '@/components/code_editor/code_editor.vue';
 
 require('highlight.js');
@@ -36,20 +36,21 @@ require('highlight.js');
   components: {CodeEditor},
 })
 export default class FileEditor extends Vue {
+  @Prop() private fileContent;
   public attemptedLimitedConnection = false;
-  public content;
 
   constructor() {
     super();
-    this.content = '// This is your code in C++';
   }
 
-  changeValue(value: string): void {
-    this.content = value;
+  @Watch('fileContent', {immediate: true})
+  public update(): void {
+    console.log('fileContent changed');
+    console.log(this.fileContent);
   }
 
-  save(): void {
-    console.log(this.content);
+  public save(): void {
+    console.log(this.fileContent);
   }
 }
 </script>

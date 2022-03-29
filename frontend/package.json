@@ -19,6 +19,7 @@
     "lodash": "^4.17.21",
     "socket.io-client": "^4.4.1",
     "typed-vuex": "^0.2.0",
+    "typeface-roboto": "^1.1.13",
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.1",
     "vue-class-component": "^7.2.3",
@@ -30,6 +31,7 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@mdi/font": "^6.5.95",
     "@types/jest": "^24.0.19",
     "@types/lodash": "^4.14.180",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
@@ -54,6 +56,7 @@
     "jest": "^24.9.0",
     "jest-fetch-mock": "^3.0.3",
     "jest-serializer-vue": "^2.0.2",
+    "material-design-icons": "^3.0.1",
     "prettier": "^2.2.1",
     "sass": "~1.32.0",
     "sass-loader": "^10.0.0",

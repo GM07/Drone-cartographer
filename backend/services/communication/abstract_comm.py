@@ -2,6 +2,7 @@
 is used to communicate """
 from abc import ABCMeta, abstractmethod
 import gevent.queue
+import os
 from flask_socketio import SocketIO
 from services.communication.comm_tasks import LOGS_QUEUE
 from flask_socketio import SocketIO
@@ -40,6 +41,11 @@ class AbstractComm(metaclass=ABCMeta):
 
     def get_drones(self):
         return self.drone_list
+
+    def recompile(self):
+        recompileSimulation = "cd /workspaces/INF3995-106/embedded/simulation && if test -d build; then rm -rf build; fi && mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../../ && ninja"
+        recompileFirmware = "cd /workspaces/INF3995-106/embedded/embedded-firmware make clean && make -j`nproc`"
+        os.system(f"rm -f out.log && touch out.log && docker exec -t embedded sh -c '{recompileSimulation} && {recompileFirmware}' > out.log 2>&1")
 
     @abstractmethod
     def send_command(self, command: COMMANDS, links=[]) -> None:
