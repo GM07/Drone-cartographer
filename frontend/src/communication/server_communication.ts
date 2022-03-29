@@ -29,8 +29,10 @@ export class ServerCommunication {
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
-  public static getFiles(): Promise<Response> {
-    return fetch(SERVER_CONSTANTS.GET_FILES_ADDRESS);
+  public static async getFiles(): Promise<Response> {
+    return (
+      await fetch(SERVER_CONSTANTS.GET_FILES_ADDRESS, {method: 'GET'})
+    ).json();
   }
 
   public static takeMissionControl(): boolean {

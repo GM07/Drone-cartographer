@@ -1,16 +1,18 @@
 <template>
   <div id="content">
     <div id="files">
-      <button id="te" class="primary" @click="save"></button>
-
       <treeselect
         id="tree"
-        :alwaysOpen="true"
+        :alwaysOpen="treeOpen"
+        :disableBranchNodes="true"
         :flatten-search-results="true"
+        height="100%"
+        :maxHeight="NaN"
         name="Files"
         noChildrenText="Empty"
         :options="options"
         :searchable="false"
+        @select="onFileSelected"
       />
     </div>
     <div id="file" @keydown.ctrl.83.prevent.stop="save">
@@ -87,7 +89,6 @@
 </style>
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import FileEditor from '@/components/file_editor.vue';
 import Treeselect from '@riophae/vue-treeselect';
 import '@riophae/vue-treeselect/dist/vue-treeselect.css';
 import {ServerCommunication} from '@/communication/server_communication';
@@ -95,38 +96,33 @@ import CodeEditor from '@/components/code_editor/code_editor.vue';
 
 require('highlight.js');
 
+class TreeNode {
+  public id: string;
+  public label: string;
+  public children: TreeNode[] | undefined;
+
+  constructor(id: string, label: string, children?: TreeNode[]) {
+    this.id = id;
+    this.label = label;
+    this.children = children;
+  }
+
+  public clone(): TreeNode {
+    const CHILDREN = this.children?.map(node => node.clone());
+    return new TreeNode(this.id, this.label, CHILDREN);
+  }
+}
+
 @Component({
-  components: {FileEditor, CodeEditor, Treeselect},
+  components: {CodeEditor, Treeselect},
 })
 export default class Editor extends Vue {
   public attemptedLimitedConnection = false;
   public value = null;
   public fileContent = 'test';
-  public options = [
-    {
-      id: 'a',
-      label: 'src',
-      children: [
-        {
-          id: 'aa',
-          label: 'embedded.cc',
-        },
-        {
-          id: 'ab',
-          label: 'navigationSystem.cc',
-        },
-      ],
-    },
-    {
-      id: 'app',
-      label: 'appMain.cc',
-    },
-    {
-      id: 'folder',
-      label: 'include',
-      children: [],
-    },
-  ];
+  public files: Map<string, string> = new Map();
+  public options: TreeNode[] = [];
+  public treeOpen = false;
 
   constructor() {
     super();
@@ -135,28 +131,68 @@ export default class Editor extends Vue {
   async created(): Promise<void> {
     this.fileContent = '// this is a comment';
     const RESPONSE = await ServerCommunication.getFiles();
-    const NEW_FILE_CONTENT = await RESPONSE.json();
-    this.changeFileContent(NEW_FILE_CONTENT['test.cpp']);
+    this.computeHierarchy(RESPONSE);
+    // this.changeFileContent();
+  }
+
+  public computeHierarchy(response: Response): void {
+    const PATHS: string[] = response['keys'];
+    const VALUES: string[] = response['values'];
+
+    this.files.clear();
+    for (let i = 0; i < PATHS.length; i++) {
+      this.files.set(PATHS[i], VALUES[i]);
+    }
+
+    const FIRST_NODE = new TreeNode('/', '/', []);
+
+    for (const PATH of PATHS) {
+      const SUBPATHS: string[] = PATH.split('/');
+      let lastNode = FIRST_NODE;
+      for (const SUBPATH of SUBPATHS.slice(1)) {
+        const ID = PATH.substring(0, PATH.indexOf(SUBPATH) + SUBPATH.length);
+
+        if (SUBPATH.indexOf('.') !== -1) {
+          // File
+          lastNode.children?.push(new TreeNode(ID, SUBPATH));
+        } else if (lastNode.children !== undefined) {
+          // Folder
+          const CURRENT_NODE = new TreeNode(ID, SUBPATH, []);
+          const INDEX = lastNode.children?.findIndex(node => {
+            return node.label === CURRENT_NODE.label;
+          });
+          if (INDEX !== -1) {
+            // Current node in current directory
+            lastNode = lastNode.children[INDEX];
+          } else {
+            // Current node not in current directory
+            // Adding it to current directory
+            lastNode.children.push(CURRENT_NODE);
+            lastNode = CURRENT_NODE;
+          }
+        }
+      }
+    }
+
+    this.options = [FIRST_NODE]; // Start at /INF3995 instead of /workspaces
+    this.treeOpen = true;
+  }
+
+  public onFileSelected(node: TreeNode): void {
+    if (this.files.has(node.id)) {
+      this.changeFileContent(this.files.get(node.id)!); // We already verify that the id is in the map... Compiler is dumb
+    }
   }
 
   public save(): void {
     console.log('Saving');
   }
 
-  // private beforeCreate() {
-  //   ServerCommunication.getFiles().then((response: Response) => {
-  //     response.json().then(res => {
-  //       this.changeFileContent(res['test.cpp']);
-  //     });
-  //   });
-  // }
-
   private changeFileContent(value: string): void {
     this.fileContent = value;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.$refs.codeEditor as any).$forceUpdate();
     // this.$forceUpdate();
-    console.log('new content : ', this.fileContent);
   }
 }
 </script>

@@ -465,7 +465,7 @@ Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
 .atom_one_dark.hljs,
 .atom_one_dark .hljs {
   color: #abb2bf;
-  background: #282c34;
+  background: #1e1e1e;
 }
 .atom_one_dark .hljs-comment,
 .atom_one_dark .hljs-quote {
