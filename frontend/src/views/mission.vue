@@ -42,9 +42,20 @@
             </v-list-item>
             <v-list-item :disabled="!isUserControlling()" @click="recompile()">
               <v-list-item-icon>
-                <v-icon color="blue">mdi-refresh</v-icon>
+                <v-icon color="blue">mdi-cog-refresh-outline</v-icon>
               </v-list-item-icon>
               <v-list-item-title>Recompiler</v-list-item-title>
+            </v-list-item>
+            <v-list-item
+              :disabled="
+                !isUserControlling() && !this.accessStatus.isMissionSimulated
+              "
+              @click="flash()"
+            >
+              <v-list-item-icon>
+                <v-icon color="blue">mdi-upload-outline</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>Programmer</v-list-item-title>
             </v-list-item>
           </v-list>
         </div>
@@ -157,8 +168,9 @@
       @setDroneMenuOpen="setDroneMenuOpen"
     ></drone-menu>
 
-    <recompile-interface namespace="/recompileSimulation"></recompile-interface>
-    <!-- <recompile-interface namespace="/recompileEmbedded"></recompile-interface> -->
+    <remote-command-output namespace="/flashDrones"></remote-command-output>
+    <!-- <remote-command-output namespace="/recompileSimulation"></remote-command-output> -->
+    <!-- <remote-command-output namespace="/recompileEmbedded"></remote-command-output> -->
   </v-layout>
 </template>
 
@@ -207,7 +219,7 @@ import {
 } from '@/communication/server_constants';
 import {AccessStatus} from '@/communication/access_status';
 import {Drone, DroneStatus} from '@/communication/drone';
-import RecompileInterface from '@/components/remote_command_output.vue';
+import RemoteCommandOutput from '@/components/remote_command_output.vue';
 import LogsInterface from '@/components/logs_interface.vue';
 import {ServerCommunication} from '@/communication/server_communication';
 import SocketIO from 'socket.io-client';
@@ -221,7 +233,7 @@ import {MapData, EMPTY_MAP} from '@/utils/map_constants';
     DroneMenu,
     Map,
     LogsInterface,
-    RecompileInterface,
+    RemoteCommandOutput,
   },
 })
 export default class Mission extends Vue {
@@ -267,6 +279,10 @@ export default class Mission extends Vue {
 
   public recompile(): void {
     if (this.accessStatus.isUserControlling) ServerCommunication.recompile();
+  }
+
+  public flash(): void {
+    if (this.accessStatus.isUserControlling) ServerCommunication.flash();
   }
 
   public limitNumMaps(input: string[]): void {

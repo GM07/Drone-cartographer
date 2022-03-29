@@ -3,7 +3,7 @@
     ref="console"
     bench="5"
     height="200"
-    item-height="15"
+    item-height="20"
     :items="this.output"
     style="background-color: black"
   >
@@ -26,6 +26,7 @@ import {DefaultEventsMap} from 'socket.io/dist/typed-events';
 @Component({})
 export default class RemoteCommandOutput extends Vue {
   @Prop() private namespace!: string;
+  @Prop() private height = 200;
 
   public isFinished = true;
   public hasErrors = false;

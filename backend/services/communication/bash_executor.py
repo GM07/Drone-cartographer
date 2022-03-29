@@ -23,6 +23,9 @@ class BashExecutor:
         if (self.process != None):
             self.process.kill()
 
+    def changeCommand(self, bashCommand: str):
+        self.bashCommand = bashCommand
+
     def start(self):
         # Make sure we are not running the same process twice
         self.stop()

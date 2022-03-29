@@ -44,6 +44,7 @@ RECOMPILE_SIMULATION = BashExecutor(RECOMPILE_SIMULATION_COMMAND, SOCKETIO,
                                     "/recompileSimulation")
 RECOMPILE_EMBEDDED = BashExecutor(RECOMPILE_EMBEDDED_COMMAND, SOCKETIO,
                                   "/recompileEmbedded")
+FLASH_ALL_DRONES = BashExecutor("", SOCKETIO, "/flashDrones")
 
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
@@ -71,6 +72,27 @@ def recompile():
     RECOMPILE_SIMULATION.start()
     RECOMPILE_EMBEDDED.start()
     return 'Recompiling'
+
+# Reflash firmware
+@SOCKETIO.on('flash', namespace='/limitedAccess')
+def flash():
+    if not AccessStatus.is_request_valid(request):
+        return ''
+    
+    if AccessStatus.get_mission_simulated():
+        return ''
+
+    drone_list = COMM.get_drones()
+
+    # Create the command to flash all drones
+    flashDrone = []
+    for drone in drone_list:
+        flashDrone.append("make cload radio=" + drone["name"])
+
+    bashCommand = f"docker exec embedded sh -c 'cd workspaces/INF3995-106/embedded/embedded-firmware" + " && " + " && ".join(flashDrone) + "'"
+    FLASH_ALL_DRONES.changeCommand(bashCommand)
+    FLASH_ALL_DRONES.start()
+    return 'Flashing'
 
 
 # Launch mission
