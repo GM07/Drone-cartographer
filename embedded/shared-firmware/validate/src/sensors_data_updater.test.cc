@@ -15,7 +15,7 @@ TEST(ValidateSensorsDataUpdater, UpdateSensorsDataShouldForward) {
               updateSensorsData())
       .Times(1);
 
-  drone.updateSensorsData();
+  drone.getController()->updateSensorsData();
 }
 
 TEST(ValidateSensorsDataUpdater, updateCrashStatusIfNotCrashed) {
@@ -24,11 +24,11 @@ TEST(ValidateSensorsDataUpdater, updateCrashStatusIfNotCrashed) {
   EXPECT_CALL(*controller, isDroneCrashed()).Times(1).WillOnce(Return(false));
 
   Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
-  drone.getController()->state = State::kIdle;
+  drone.getController()->m_state = State::kIdle;
 
   drone.updateCrashStatus();
 
-  EXPECT_EQ(drone.getController()->state, State::kIdle);
+  EXPECT_EQ(drone.getController()->m_state, State::kIdle);
 }
 
 TEST(ValidateSensorsDataUpdater, updateCrashStatusIfCrashed) {
@@ -39,5 +39,5 @@ TEST(ValidateSensorsDataUpdater, updateCrashStatusIfCrashed) {
   Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
   drone.updateCrashStatus();
 
-  EXPECT_EQ(drone.getController()->state, State::kCrash);
+  EXPECT_EQ(drone.getController()->m_state, State::kCrash);
 }

@@ -51,7 +51,7 @@ def log_data_to_drone_data(log_data):
 class DroneData:
     """This class regroups all the data taken from the drones"""
 
-    DATA_SIZE: int = 32
+    DATA_SIZE: int = 29
 
     def __init__(self, data: bytes, empty=False):
         self.position = Point2D(0, 0)
@@ -66,7 +66,7 @@ class DroneData:
 
     def __from_bytes(self, data: bytes):
         decoder: ByteDecoder = ByteDecoder(
-            data, ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'i'])
+            data, ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'b'])
         values = decoder.get_values()
         self.sensors = DroneSensors(values[0], values[1], values[2], values[3])
         self.position = Point2D(values[4], values[5])

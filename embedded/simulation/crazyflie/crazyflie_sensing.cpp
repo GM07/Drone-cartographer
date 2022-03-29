@@ -9,7 +9,7 @@
 /* Logging */
 #include <argos3/core/utility/logging/argos_log.h>
 
-#include "utils/timer.h"
+#include "utils/time.h"
 
 using ::argos::CARGoSException;
 using ::argos::CRandom;
@@ -55,9 +55,6 @@ void CCrazyflieSensing::Init(argos::TConfigurationNode& /*t_node*/) {
             << GetId() << "\"",
         ex);
   }
-  /*
-   * Initialize other stuff
-   */
   /* Create a random number generator. We use the 'argos' category so
      that creation, reset, seeding and cleanup are managed by ARGoS. */
   m_pcRNG = CRandom::CreateRNG("argos");
@@ -72,12 +69,9 @@ void CCrazyflieSensing::Init(argos::TConfigurationNode& /*t_node*/) {
 
 /****************************************/
 /****************************************/
-
 void CCrazyflieSensing::ControlStep() {
-  m_drone.updateSensorsData();
-
+  m_drone.getController()->updateSensorsData();
   m_drone.step();
-
   printLogs();
 
   ++m_uiCurrentStep;
@@ -85,37 +79,32 @@ void CCrazyflieSensing::ControlStep() {
 
 /****************************************/
 /****************************************/
-
-void CCrazyflieSensing::Reset() {}
-
-/****************************************/
-/****************************************/
 void CCrazyflieSensing::printLogs() {
-  std::lock_guard<std::mutex> logMutex(logBufferMutex);
+  std::lock_guard<decltype(logBufferMutex)> logMutex(logBufferMutex);
   argos::LOG << logBuffer.str();
   logBuffer.str(std::string());
 }
 
 /****************************************/
 void CCrazyflieSensing::attemptSocketConnection() {
-  constexpr uint32_t kDroneDelay = 25;
-  while (true) {
+  // We try to connect to socket 4 times per second
+  // Don't need to try more
+  constexpr uint32_t kDroneDelay = 250;
+
+  while (m_drone.getController()->m_state != State::kDead) {
     try {
-      if (m_drone.getController()->state != State::kDead) {
-        m_drone.getController()->initCommunicationManager();
-      }
-      return;
+      m_drone.getController()->initCommunicationManager();
+      break;
     } catch (const boost::system::system_error& error) {
-      // We try to connect to socket 4 times per second
-      // Don't need to try more
-      Timer::delayMs(kDroneDelay);
+      Time::delayMs(kDroneDelay);
     }
   }
 }
 
+/****************************************/
 CCrazyflieSensing::~CCrazyflieSensing() {
-  m_drone.getController()->state = State::kDead;
-  if (m_communicationThread) {
+  m_drone.getController()->m_state = State::kDead;
+  if (m_communicationThread != nullptr) {
     m_communicationThread->join();
   }
 }

@@ -9,7 +9,7 @@ PROJ_OBJ += commands_handler.o \
 	communication_manager.o \
 	firmware_controller.o \
 	navigation_system.o \
-	timer.o \
+	time.o \
 	app_main.o \
 	vector3d.o \
 	firmware_sensors.o \

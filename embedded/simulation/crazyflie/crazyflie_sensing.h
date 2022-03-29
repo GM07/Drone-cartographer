@@ -48,19 +48,17 @@
  */
 class CCrazyflieSensing : public argos::CCI_Controller {
  public:
-  /* Class constructor. */
   CCrazyflieSensing();
   CCrazyflieSensing(const CCrazyflieSensing& other) = delete;
   CCrazyflieSensing(CCrazyflieSensing&& other) = delete;
   CCrazyflieSensing operator=(const CCrazyflieSensing& other) = delete;
   CCrazyflieSensing operator=(CCrazyflieSensing&& other) = delete;
-  /* Class destructor. */
   ~CCrazyflieSensing() override;
 
   /*
    * This function initializes the controller.
    * The 't_node' variable points to the <parameters> section in the XML
-   * file in the <controllers><footbot_foraging_controller> section.
+   * file in the <controllers><crazyflie_sensing_controller> section.
    */
   void Init(argos::TConfigurationNode& t_node) override;
 
@@ -75,7 +73,7 @@ class CCrazyflieSensing : public argos::CCI_Controller {
    * Init().
    * It is called when you press the reset button in the GUI.
    */
-  void Reset() override;
+  void Reset() override{};
 
   /*
    * Called to cleanup what done by Init() when the experiment finishes.
@@ -87,28 +85,15 @@ class CCrazyflieSensing : public argos::CCI_Controller {
 
   static void printLogs();
 
-  /* Pointer to the crazyflie distance sensor */
   argos::CCI_CrazyflieDistanceScannerSensor* m_pcDistance{nullptr};
-
-  /* Pointer to the speed actuator */
   argos::CCI_QuadRotorSpeedActuator* m_pcPropellers{nullptr};
-
-  /* Pointer to the range and bearing actuator */
   argos::CCI_RangeAndBearingActuator* m_pcRABA{nullptr};
-
-  /* Pointer to the range and bearing sensor */
   argos::CCI_RangeAndBearingSensor* m_pcRABS{nullptr};
-
-  /* Pointer to the positioning sensor */
   argos::CCI_PositioningSensor* m_pcPos{nullptr};
-
-  /* Pointer to the battery sensor */
   argos::CCI_BatterySensor* m_pcBattery{nullptr};
 
-  /* The random number generator */
   argos::CRandom::CRNG* m_pcRNG{nullptr};
 
-  /* Current step */
   uint32_t m_uiCurrentStep{0};
 
 #ifndef GTEST

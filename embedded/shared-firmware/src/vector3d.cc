@@ -48,7 +48,7 @@ Vector3D Vector3D::toUnitVector() const {
 }
 
 float Vector3D::length() const {
-  return static_cast<float>(std::sqrt(m_x * m_x + m_y * m_y + m_z * m_z));
+  return std::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);
 }
 
 Vector3D& Vector3D::operator+=(const Vector3D& other) {

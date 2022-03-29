@@ -12,9 +12,8 @@ extern "C" {
 #include "semphr.h"
 }
 
-extern std::queue<P2PPacket> receivedP2PPacket;
-extern SemaphoreHandle_t p2pPacketMutex;
-constexpr uint64_t kRadioAddressMask = 0x00000000ff;
+inline std::queue<P2PPacket> receivedP2PPacket;
+inline SemaphoreHandle_t p2pPacketMutex;
 
 class FirmwareController : public AbstractController {
  public:
@@ -33,22 +32,23 @@ class FirmwareController : public AbstractController {
   [[nodiscard]] Vector3D getCurrentLocation() const override;
   [[nodiscard]] bool isTrajectoryFinished() const override;
 
-  void initCommunicationManager() override{/**/};
-  size_t receiveMessage(void* message, size_t size) override;
-  void sendMessage(void* message, size_t size) override;
+  size_t receiveMessage(void* message, size_t size) const override;
+  void sendMessage(void* message, size_t size) const override;
 
   void sendP2PMessage(void* message, size_t size) override;
   void receiveP2PMessage(
       std::unordered_map<size_t, DroneData>* p2pData) override;
 
-  void log(const std::string& message) override{/**/};
-  void blinkLED(LED led) override;
-  size_t getId() override;
+  void identify() override;
+  [[nodiscard]] size_t getId() const override;
 
   void updateSensorsData() override;
-  [[nodiscard]] float getMinCollisionAvoidanceDistance() override;
-  [[nodiscard]] float getMaxCollisionAvoidanceDistance() override;
+  [[nodiscard]] float getMinCollisionAvoidanceDistance() const override;
+  [[nodiscard]] float getMaxCollisionAvoidanceDistance() const override;
   [[nodiscard]] bool isDroneCrashed() const override;
+
+  void initCommunicationManager() override{/**/};
+  void log(const std::string& message) override{/**/};
 
  private:
   ledseqContext_t m_seqLED{};
