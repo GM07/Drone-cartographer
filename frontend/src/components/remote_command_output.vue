@@ -57,6 +57,7 @@ export default class RemoteCommandOutput extends Vue {
     this.socket.on('start', () => {
       this.isFinished = false;
       this.hasErrors = false;
+      this.output = [];
     });
 
     this.socket.open();
