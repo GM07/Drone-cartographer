@@ -49,13 +49,13 @@
 
 .vue-treeselect__option--highlight {
   color: #d4d4d4;
-  background-color: #add6ff14;
+  background-color: #d7ebff7a;
 }
 
 .vue-treeselect--single .vue-treeselect__option--selected,
 .vue-treeselect--single .vue-treeselect__option--selected:hover {
   color: #d4d4d4;
-  background-color: #add6ff26;
+  background-color: #d7ebff7a;
 }
 
 .vue-treeselect--open.vue-treeselect--open-below .vue-treeselect__control {
