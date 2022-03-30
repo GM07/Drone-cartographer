@@ -3,7 +3,9 @@
     <div id="files">
       <treeselect
         id="tree"
+        :always-open="true"
         :alwaysOpen="treeOpen"
+        :default-expand-level="10"
         :disableBranchNodes="true"
         :flatten-search-results="true"
         height="100%"
@@ -39,11 +41,6 @@
   display: flex;
 }
 
-#te {
-  width: 100px;
-  height: 20px;
-}
-
 .vue-treeselect__menu {
   border: none;
   color: #d4d4d4;
@@ -73,18 +70,15 @@
 }
 
 #files {
-  width: 15%;
-  border-color: #3a3d41;
+  width: 10%;
+  border-color: #cccccc33;
+  border-width: 2px;
   background-color: #252526;
 }
 
 #file {
   width: 100%;
   height: 100%;
-}
-
-.hljs {
-  background-color: #1e1e1e;
 }
 </style>
 <script lang="ts">

@@ -464,18 +464,18 @@ Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
 */
 .atom_one_dark.hljs,
 .atom_one_dark .hljs {
-  color: #abb2bf;
+  color: #d4d4d4;
   background: #1e1e1e;
 }
 .atom_one_dark .hljs-comment,
 .atom_one_dark .hljs-quote {
-  color: #5c6370;
+  color: #6A9955;
   font-style: italic;
 }
 .atom_one_dark .hljs-doctag,
 .atom_one_dark .hljs-keyword,
 .atom_one_dark .hljs-formula {
-  color: #c678dd;
+  color: #539dd3;
 }
 .atom_one_dark .hljs-section,
 .atom_one_dark .hljs-name,
@@ -492,7 +492,7 @@ Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
 .atom_one_dark .hljs-addition,
 .atom_one_dark .hljs-attribute,
 .atom_one_dark .hljs-meta .hljs-string {
-  color: #98c379;
+  color: #ce917a;
 }
 .atom_one_dark .hljs-attr,
 .atom_one_dark .hljs-variable,
@@ -501,19 +501,21 @@ Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
 .atom_one_dark .hljs-selector-class,
 .atom_one_dark .hljs-selector-attr,
 .atom_one_dark .hljs-selector-pseudo,
+.atom_one_dark .hljs-meta,
 .atom_one_dark .hljs-number {
-  color: #d19a66;
+  color: #539dd3;
 }
+
 .atom_one_dark .hljs-symbol,
 .atom_one_dark .hljs-bullet,
-.atom_one_dark .hljs-link,
-.atom_one_dark .hljs-meta,
-.atom_one_dark .hljs-selector-id,
-.atom_one_dark .hljs-title {
-  color: #61aeee;
+.atom_one_dark .hljs-link ,
+  .atom_one_dark .hljs-title .class_,
+.atom_one_dark .hljs-selector-id {
+  color: #52C9B1;
 }
+
 .atom_one_dark .hljs-built_in,
-.atom_one_dark .hljs-title .class_,
+.atom_one_dark .hljs-title, 
 .atom_one_dark .hljs-class .hljs-title {
   color: #e6c07b;
 }

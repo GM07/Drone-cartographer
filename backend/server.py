@@ -71,10 +71,8 @@ def get_files():
     keys = []
     values = []
     for (key, value) in files_content.items():
-        keys.append(key)
+        keys.append(key.replace('/workspaces/INF3995-106/', ''))
         values.append(value)
-
-    print(keys)
 
     return jsonify({'keys': keys, 'values': values})
 
