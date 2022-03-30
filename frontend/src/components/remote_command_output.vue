@@ -2,10 +2,8 @@
   <v-virtual-scroll
     ref="console"
     bench="5"
-    height="200"
     item-height="20"
     :items="this.output"
-    style="background-color: black"
   >
     <template v-slot:default="{item}">
       <v-list-item v-if="item[0] === 'stdout'">

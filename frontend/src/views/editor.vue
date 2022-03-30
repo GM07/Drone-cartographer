@@ -23,7 +23,7 @@
         border_radius="0px"
         :copy_code="true"
         :display_language="false"
-        height="100%"
+        height="80%"
         :language_selector="true"
         :languages="[['cpp', 'C++']]"
         :value="fileContent"
@@ -31,6 +31,12 @@
         z_index="3"
         @input="save"
       ></CodeEditor>
+
+      <remote-command-output id="terminal" namespace="/recompileSimulation">
+      </remote-command-output>
+      <v-btn id="recompile" color="green" icon @click="recompile()">
+        <v-icon>mdi-home</v-icon>
+      </v-btn>
     </div>
   </div>
 </template>
@@ -76,9 +82,25 @@
   background-color: #252526;
 }
 
+#terminal {
+  height: 20%;
+  position: absolute;
+  top: 80%;
+  width: 90%;
+  background-color: #1e1e1e;
+  border-top: 2px solid #d4d4d4;
+}
+
+#recompile {
+  position: absolute;
+  right: 0;
+  top: 80%;
+}
+
 #file {
-  width: 100%;
+  width: 90%;
   height: 100%;
+  display: flex;
 }
 </style>
 <script lang="ts">
@@ -88,7 +110,6 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css';
 import {ServerCommunication} from '@/communication/server_communication';
 import CodeEditor from '@/components/code_editor/code_editor.vue';
 import RemoteCommandOutput from '@/components/remote_command_output.vue';
-
 require('highlight.js');
 
 class TreeNode {
@@ -181,6 +202,10 @@ export default class Editor extends Vue {
 
   public save(): void {
     console.log('Saving');
+  }
+
+  public recompile(): void {
+    ServerCommunication.recompile();
   }
 
   private changeFileContent(value: string): void {

@@ -10,6 +10,7 @@
     "test": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "@mdi/js": "^6.6.96",
     "@riophae/vue-treeselect": "^0.4.0",
     "ag-charts-community": "^5.0.0",
     "ag-charts-vue": "^5.1.0",
