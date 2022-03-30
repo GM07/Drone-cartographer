@@ -11,6 +11,7 @@ export const SET_DRONE_ADDRESS = SERVER_ADDRESS + 'set_drone';
 export const GET_FILES_ADDRESS = SERVER_ADDRESS + '/getFiles';
 export const IDENTIFY_DRONE_ADDRESS = 'identify_drone';
 export const RECOMPILE_ADDRESS = 'recompile';
+export const FLASH_ADDRESS = 'flash';
 export const TAKE_CONTROL_ADDRESS = 'take_control';
 export const REVOKE_CONTROL_ADDRESS = 'revoke_control';
 export const LAUNCH_MISSION_ADDRESS = 'launch';

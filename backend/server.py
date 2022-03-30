@@ -1,7 +1,7 @@
-from asyncio import subprocess
 import os
-from sys import stdout
 from gevent import monkey
+
+from services.communication.bash_executor import BashExecutor
 
 if __name__ == '__main__':
     monkey.patch_all()
@@ -20,7 +20,7 @@ import services.status.mission_status as MissionStatus
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
 from services.communication.simulation_configuration import SimulationConfiguration
-from constants import MAX_TIMEOUT, COMMANDS, URI
+from constants import COMMANDS, RECOMPILE_EMBEDDED_COMMAND, RECOMPILE_SIMULATION_COMMAND
 from services.communication.database.mongo_interface import Database
 from services.communication.file_reader import FileReader
 
@@ -36,7 +36,15 @@ SOCKETIO = SocketIO(
     APP,
     async_mode='gevent',
     cors_allowed_origins='*',
+    logger=True,
 )
+
+# Bash executor instance to execute commands and transmit stderr and stdout over websocket
+RECOMPILE_SIMULATION = BashExecutor(RECOMPILE_SIMULATION_COMMAND, SOCKETIO,
+                                    "/recompileSimulation")
+RECOMPILE_EMBEDDED = BashExecutor(RECOMPILE_EMBEDDED_COMMAND, SOCKETIO,
+                                  "/recompileEmbedded")
+FLASH_ALL_DRONES = BashExecutor("", SOCKETIO, "/flashDrones")
 
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
@@ -51,7 +59,6 @@ def identify_drone(drone_addr):
     if not AccessStatus.is_request_valid(request):
         return ''
 
-    global COMM
     COMM.send_command(COMMANDS.IDENTIFY.value, [drone_addr])
     return 'Identified drone'
 
@@ -83,9 +90,32 @@ def recompile():
     if not AccessStatus.is_request_valid(request):
         return ''
 
-    global COMM
-    COMM.recompile()
-    return 'Recompiled'
+    RECOMPILE_SIMULATION.start()
+    RECOMPILE_EMBEDDED.start()
+    return 'Recompiling'
+
+
+# Reflash firmware
+@SOCKETIO.on('flash', namespace='/limitedAccess')
+def flash():
+    if not AccessStatus.is_request_valid(request):
+        return ''
+
+    if AccessStatus.get_mission_simulated():
+        return ''
+
+    drone_list = COMM.get_drones()
+
+    # Create the command to flash all drones
+    flashDrone = []
+    for drone in drone_list:
+        flashDrone.append("make cload radio=" + drone["name"])
+
+    bashCommand = f"docker exec embedded sh -c 'cd workspaces/INF3995-106/embedded/embedded-firmware" + " && " + " && ".join(
+        flashDrone) + "'"
+    FLASH_ALL_DRONES.changeCommand(bashCommand)
+    FLASH_ALL_DRONES.start()
+    return 'Flashing'
 
 
 # Launch mission

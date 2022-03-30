@@ -87,6 +87,7 @@ import Treeselect from '@riophae/vue-treeselect';
 import '@riophae/vue-treeselect/dist/vue-treeselect.css';
 import {ServerCommunication} from '@/communication/server_communication';
 import CodeEditor from '@/components/code_editor/code_editor.vue';
+import RemoteCommandOutput from '@/components/remote_command_output.vue';
 
 require('highlight.js');
 
@@ -108,7 +109,7 @@ class TreeNode {
 }
 
 @Component({
-  components: {CodeEditor, Treeselect},
+  components: {CodeEditor, Treeselect, RemoteCommandOutput},
 })
 export default class Editor extends Vue {
   public attemptedLimitedConnection = false;
