@@ -5,7 +5,7 @@
     height="200"
     item-height="20"
     :items="this.output"
-    style="background-color: black"
+    style="background-color: black; overflow-x: auto; width: 100%"
   >
     <template v-slot:default="{item}">
       <v-list-item v-if="item[0] === 'stdout'">
