@@ -62,7 +62,7 @@ class SimulationConfiguration:
         body = ET.SubElement(crazyflie, 'body')
         body.set('position',
                  str(drone['xPos']) + ',' + str(drone['yPos']) + ',0')
-        body.set('orientation', '0,0,0')
+        body.set('orientation', str(drone['orientation']) + ',0,0')
 
         tree.write(current_path + '/crazyflie_sensing.argos')
 
