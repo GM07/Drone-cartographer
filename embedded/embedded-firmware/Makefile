@@ -9,12 +9,13 @@ PROJ_OBJ += commands_handler.o \
 	communication_manager.o \
 	firmware_controller.o \
 	navigation_system.o \
-	timer.o \
+	time.o \
 	app_main.o \
 	vector3d.o \
 	firmware_sensors.o \
 	sensors_data_updater.o \
-	colorGradient.o
+	colorGradient.o \
+	p2p_task.o
 
 CRAZYFLIE_BASE=../crazyflie-firmware
 

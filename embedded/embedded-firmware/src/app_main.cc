@@ -1,25 +1,28 @@
 extern "C" {
 #include "FreeRTOS.h"
 #include "commander.h"
-#include "components/ccommunication_manager.h"
+#include "components/crazyflie_task.h"
 #include "config.h"
 #include "debug.h"
 #include "log.h"
 #include "param_logic.h"
-#include "semphr.h"
 #include "static_mem.h"
 #include "supervisor.h"
 #include "task.h"
 }
 
+#include <cmath>
+
 #include "app_main.h"
 #include "components/drone.h"
 #include "controllers/firmware_controller.h"
+#include "utils/time.h"
 
-static bool isInit = false;
-StaticSemaphore_t mutexBuffer;
-SemaphoreHandle_t p2pPacketMutex;
-std::queue<P2PPacket> receivedP2PPacket;
+namespace {
+
+bool commIsInit = false;
+
+}  // namespace
 
 /////////////////////////////////////////////////////////////////////////
 Drone& Drone::getEmbeddedDrone() {
@@ -36,16 +39,16 @@ void communicationManagerTaskWrapper(void* /*parameter*/) {
 void communicationManagerInit() {
   xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
               configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
-  isInit = true;
+  commIsInit = true;
 }
 
 /////////////////////////////////////////////////////////////////////////
-bool communicationManagerTest() { return isInit; }
+bool communicationManagerTest() { return commIsInit; }
 
 /////////////////////////////////////////////////////////////////////////
 void updateCrashStatus() {
   if (supervisorIsTumbled()) {
-    Drone::getEmbeddedDrone().getController()->state = State::kCrash;
+    Drone::getEmbeddedDrone().getController()->m_state = State::kCrash;
   }
 }
 
@@ -56,42 +59,30 @@ void enableCrtpHighLevelCommander() {
   paramSetInt(paramIdCommanderEnHighLevel, 1);
 }
 
-uint8_t droneState = State::kIdle;
 /////////////////////////////////////////////////////////////////////////
-void addLoggingVariables() {
-  LOG_GROUP_START(custom)  // NOLINT
-  LOG_ADD(LOG_UINT8, droneCustomState, &droneState)
-
-  LOG_GROUP_STOP(custom)
+uint8_t logDroneState(uint32_t /*timestamp*/, void* /*data*/) {
+  return static_cast<uint8_t>(
+      Drone::getEmbeddedDrone().getController()->m_state);
 }
 
-constexpr uint8_t MAX_QUEUE_SIZE = 50;
 /////////////////////////////////////////////////////////////////////////
-void p2pcallbackHandler(P2PPacket* p) {
-  xSemaphoreTake(p2pPacketMutex, portMAX_DELAY);
-  P2PPacket packet;
-  memcpy(&packet, p, sizeof(P2PPacket));
-
-  if (receivedP2PPacket.size() >= MAX_QUEUE_SIZE) {
-    receivedP2PPacket.pop();
-  }
-  receivedP2PPacket.push(packet);
-  xSemaphoreGive(p2pPacketMutex);
+void addCustomLoggingVariables() {
+  static logByFunction_t droneStateLogger = {.acquireUInt8 = logDroneState,
+                                             .data = nullptr};
+  LOG_GROUP_START(custom)                                              // NOLINT
+  LOG_ADD_BY_FUNCTION(LOG_UINT8, droneCustomState, &droneStateLogger)  // NOLINT
+  LOG_GROUP_STOP(custom)
 }
 
 /////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
   ledClearAll();
-  addLoggingVariables();
+  addCustomLoggingVariables();
   enableCrtpHighLevelCommander();
   Drone::getEmbeddedDrone().initDrone();
 
-  p2pPacketMutex = xSemaphoreCreateMutexStatic(&mutexBuffer);
-  configASSERT(p2pPacketMutex);  // Verify that the mutex is created
-  p2pRegisterCB(p2pcallbackHandler);
-
   while (true) {
-    Drone::getEmbeddedDrone().updateSensorsData();
+    Drone::getEmbeddedDrone().getController()->updateSensorsData();
     updateCrashStatus();
 
     Drone::getEmbeddedDrone().step();

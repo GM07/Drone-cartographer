@@ -1,9 +1,9 @@
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef TIME_H
+#define TIME_H
 
 #include <cstdint>
 
-namespace Timer {
+namespace Time {
 void delayMs(uint32_t delayMS);
 }
 

@@ -67,12 +67,12 @@ lint_simulation:
     - dpkg -i $WORKING_DIRECTORY/argos3*.deb
   script:
     - cd $WORKING_DIRECTORY/simulation/build/
-    - ../../run-clang-tidy.py -quiet -header-filter='.*simulation|shared-firmware.*' -checks="-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes"
+    - ../../run-clang-tidy.py -quiet -header-filter='.*simulation|shared-firmware.*' -checks="-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes, -cppcoreguidelines-pro-type-reinterpret-cast"
 
 
 lint_embedded:
   stage: lint
   script:
     - cd $WORKING_DIRECTORY/embedded-firmware/lint-pipeline
-    - ../../run-clang-tidy.py -quiet -header-filter='.*simulation|shared-firmware.*' -checks="-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes"
+    - ../../run-clang-tidy.py -quiet -header-filter='.*simulation|shared-firmware.*' -checks="-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes, -cppcoreguidelines-pro-type-union-access, -cppcoreguidelines-pro-type-reinterpret-cast"
     

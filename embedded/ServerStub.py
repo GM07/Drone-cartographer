@@ -29,7 +29,7 @@ nConnections = 9
 identifier = "s"
 
 # CHANGE TO FALSE TO CONTROL REAL DRONE
-is_simulation = FALSE
+is_simulation = False
 
 servers = []
 clients = []
@@ -90,22 +90,3 @@ landButton.grid(column=1, row=0)
 identifyButton = Button(window, text='Identify', command=identify)
 identifyButton.grid(column=2, row=0)
 window.mainloop()
-
-# while True:
-#   command = input("Send message through socket ")
-#   data = 0
-
-#   if command == "TAKEOFF":
-#     data = [Commands.kTakeOff]
-#   elif command == "LAND":
-#     data = [Commands.kLand]
-#   elif command == "IDENTIFY":
-#     data = [Commands.kIdentify]
-  
-#   if is_simulation:
-#     for client in clients:
-#       client.send(bytearray(data))
-#   else:
-#     for uri in URI:
-#       COMM_CRAZYFLIE.send_command(data, uri)
-  

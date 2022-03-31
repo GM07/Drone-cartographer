@@ -3,11 +3,11 @@
 #include <vector>
 
 #include "components/drone.h"
-#include "utils/timer.h"
+#include "utils/time.h"
 
 extern "C" {
 #include "FreeRTOS.h"
-#include "components/ccommunication_manager.h"
+#include "components/crazyflie_task.h"
 #include "ledseq.h"
 #include "task.h"
 }
@@ -67,7 +67,7 @@ void registerColors() {
 }
 
 void flashCorrectLed(void *) {
-  Timer::delayMs(3000);
+  Time::delayMs(3000);
   registerColors();
   while (true) {
     std::vector<float> droneDistances;
@@ -76,11 +76,11 @@ void flashCorrectLed(void *) {
                    Drone::getEmbeddedDrone().m_peerData.end(),
                    std::back_inserter(droneDistances),
                    [](std::pair<size_t, DroneData> const &pair) {
-                     return pair.second.distanceFromTakeoff;
+                     return pair.second.m_distanceFromTakeoff;
                    });
 
     droneDistances.push_back(
-        Drone::getEmbeddedDrone().m_data.distanceFromTakeoff);
+        Drone::getEmbeddedDrone().m_data.m_distanceFromTakeoff);
     std::sort(droneDistances.begin(), droneDistances.end());
 
     //  std::vector<float>::iterator itr =
@@ -89,7 +89,8 @@ void flashCorrectLed(void *) {
 
     // float distance = std::distance(droneDistances.begin(), itr);
 
-    if (droneDistances.size() != 1) {
+    if (droneDistances.size() != 1 ||
+        Drone::getEmbeddedDrone().m_peerData.size() != 0) {
       // float divisionSize =
       //    (((float)context.size()) / ((float)droneDistances.size() - 1));
 
@@ -100,7 +101,7 @@ void flashCorrectLed(void *) {
       ledseqRunBlocking(&context[0]);
     }
 
-    Timer::delayMs(1000);
+    Time::delayMs(1000);
   }
 }
 }  // namespace P2P

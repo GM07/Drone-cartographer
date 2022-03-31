@@ -4,7 +4,7 @@ from services.communication.byte_decoder import ByteDecoder
 
 class PhysDroneData:
 
-    DATA_SIZE: int = 32
+    DATA_SIZE: int = 29
 
     def __init__(self, data: bytes):
         self.__from_bytes(data)

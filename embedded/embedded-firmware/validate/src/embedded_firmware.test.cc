@@ -13,9 +13,8 @@ using ::testing::Return;
 
 TEST(ValidateEmbeddedFirmware, setLEDStateShouldRegisterAndRun) {
   mock = new FunctionsMock;
-  EXPECT_CALL(*mock, ledseqRegisterSequence(_)).Times(1);
   EXPECT_CALL(*mock, ledseqRun(_)).Times(1);
-  Drone::getEmbeddedDrone().getController()->blinkLED(LED::kLedBlueLeft);
+  Drone::getEmbeddedDrone().getController()->identify();
 
   delete mock;
 }
@@ -124,6 +123,7 @@ TEST(ValidateEmbeddedFirmware, land) {
 }
 
 TEST(ValidateEmbeddedFirmware, updateSensorsData) {
+  mock = new FunctionsMock;
   FirmwareController controller;
   std::unique_ptr<StubFirmwareSensors> sensor =
       std::make_unique<StubFirmwareSensors>();
@@ -148,10 +148,12 @@ TEST(ValidateEmbeddedFirmware, updateSensorsData) {
   controller.m_abstractSensors = std::move(sensor);
 
   controller.updateSensorsData();
-  ControllerData firstData = controller.data;
+  ControllerData firstData = controller.m_data;
 
   controller.updateSensorsData();
-  ControllerData secondData = controller.data;
+  ControllerData secondData = controller.m_data;
 
   EXPECT_TRUE(firstData != secondData);
+
+  delete mock;
 }
