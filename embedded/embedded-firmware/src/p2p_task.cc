@@ -4,6 +4,8 @@ extern "C" {
 #include "task.h"
 }
 
+#include <algorithm>
+
 #include "components/drone.h"
 #include "controllers/firmware_controller.h"
 #include "utils/time.h"
@@ -13,16 +15,23 @@ bool p2pIsInit = false;
 }
 
 /////////////////////////////////////////////////////////////////////////
+bool isValidP2PPacket(DroneData& data) {
+  return std::equal(data.m_magicHeader.begin(), data.m_magicHeader.end(),
+                    Drone::getEmbeddedDrone().m_data.m_magicHeader.begin());
+}
+
+/////////////////////////////////////////////////////////////////////////
 void p2pcallbackHandler(P2PPacket* p) {
   {
     P2PPacket packet;
     memcpy(&packet, p, sizeof(packet));
-
     DroneData data(*reinterpret_cast<DroneData*>(&packet.data));  // NOLINT
+
+    if (!isValidP2PPacket(data)) {
+      return;
+    }
+
     data.m_range = p->rssi;
-
-
-
     Drone::getEmbeddedDrone().m_peerData.insert_or_assign(data.m_id, data);
   }
 }
