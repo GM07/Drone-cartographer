@@ -168,8 +168,10 @@
       @setDroneMenuOpen="setDroneMenuOpen"
     ></drone-menu>
 
-    <remote-command-output namespace="/flashDrones"></remote-command-output>
-    <!-- <remote-command-output namespace="/recompileSimulation"></remote-command-output> -->
+    <!-- <remote-command-output namespace="/flashDrones"></remote-command-output> -->
+    <remote-command-output
+      namespace="/recompileSimulation"
+    ></remote-command-output>
     <!-- <remote-command-output namespace="/recompileEmbedded"></remote-command-output> -->
   </v-layout>
 </template>
