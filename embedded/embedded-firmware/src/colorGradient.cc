@@ -40,7 +40,6 @@ namespace P2P {
 //}
 
 std::array<ledseqContext_t, 10> context;
-std::vector<std::array<ledseqStep_t, 3>> ledSteps;
 
 void registerColors() {
   for (int i = 0; i < 5; ++i) {
@@ -84,17 +83,18 @@ void flashCorrectLed(void *) {
         Drone::getEmbeddedDrone().m_data.distanceFromTakeoff);
     std::sort(droneDistances.begin(), droneDistances.end());
 
-    std::vector<float>::iterator itr =
-        std::find(droneDistances.begin(), droneDistances.end(),
-                  Drone::getEmbeddedDrone().m_data.distanceFromTakeoff);
+    //  std::vector<float>::iterator itr =
+    //      std::find(droneDistances.begin(), droneDistances.end(),
+    //               Drone::getEmbeddedDrone().m_data.distanceFromTakeoff);
 
-    float distance = std::distance(droneDistances.begin(), itr);
+    // float distance = std::distance(droneDistances.begin(), itr);
 
-    if (distance != 0 && droneDistances.size() != 0) {
-      float divisionSize =
-          (((float)context.size()) / ((float)droneDistances.size() - 1));
+    if (droneDistances.size() != 1) {
+      // float divisionSize =
+      //    (((float)context.size()) / ((float)droneDistances.size() - 1));
 
-      ledseqRunBlocking(&context[round(distance * divisionSize)]);
+      ledseqRunBlocking(&context[9]);
+      // ledseqRunBlocking(&context[round(distance * divisionSize)]);
 
     } else {
       ledseqRunBlocking(&context[0]);

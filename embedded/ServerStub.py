@@ -36,7 +36,7 @@ clients = []
 
 # For Drones
 # CHANGE TO PROPER DRONE ADDRESS
-URI = ['radio://0/80/2M/E7E7E7E762']
+URI = ['radio://0/80/2M/E7E7E7E762','radio://0/80/2M/E7E7E7E761']
 COMM_CRAZYFLIE = CommCrazyflie()
 
 if is_simulation:
