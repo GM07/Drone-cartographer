@@ -8,8 +8,6 @@ void Drone::step() {
 
   m_controller->receiveP2PMessage(&m_peerData);
 
-  collisionAvoidance();
-
   switch (m_controller->m_state) {
     case State::kTakingOff:
       if (m_controller->isTrajectoryFinished()) {

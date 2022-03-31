@@ -42,8 +42,8 @@ void communicationManagerTaskWrapper(void* /*parameter*/) {
 
 /////////////////////////////////////////////////////////////////////////
 void p2pTaskWrapper(void* /*parameter*/) {
-  constexpr int32_t kP2pTaskDelay = 500;
-  constexpr int32_t kInitDelay = 3000;
+  constexpr int32_t kP2pTaskDelay = 200;
+  constexpr uint32_t kInitDelay = 3000;
 
   Time::delayMs(kInitDelay);
   Drone& drone = Drone::getEmbeddedDrone();
