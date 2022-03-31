@@ -22,7 +22,7 @@ constexpr float kLandingSpeed = 0.25F;
 constexpr float kHeight = 0.3F;
 
 constexpr float kSimulationCollisionAvoidanceRange = 20.0F;
-constexpr float kRealMinCollisionAvoidanceRange = 60.0F;
+constexpr float kRealMinCollisionAvoidanceRange = 47.28F;
 constexpr float kRealMaxCollisionAvoidanceRange = 45.0F;
 
 class Drone {

@@ -113,6 +113,8 @@ void p2pcallbackHandler(P2PPacket* p) {
     memcpy(&packet, p, sizeof(packet));
 
     DroneData data(*reinterpret_cast<DroneData*>(&packet.data));  // NOLINT
+    data.m_range = p->rssi;
+
     Drone::getEmbeddedDrone().m_peerData.insert_or_assign(data.m_id, data);
   }
   xSemaphoreGive(p2pPacketMutex);
