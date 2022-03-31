@@ -19,26 +19,6 @@ bool isInit;
 
 namespace P2P {
 
-// void blinkLED(LED led) {
-//  constexpr size_t kNbLEDSteps = 9;
-//  static std::array<ledseqStep_t, kNbLEDSteps> ledStep{
-//      {{true, LEDSEQ_WAITMS(500)},
-//       {false, LEDSEQ_WAITMS(500)},
-//       {true, LEDSEQ_WAITMS(500)},
-//       {false, LEDSEQ_WAITMS(500)},
-//       {true, LEDSEQ_WAITMS(500)},
-//       {false, LEDSEQ_WAITMS(500)},
-//       {true, LEDSEQ_WAITMS(500)},
-//       {false, LEDSEQ_WAITMS(500)},
-//       {false, LEDSEQ_STOP}}};
-//
-//  // context[0].sequence = ledStep.data();
-//  // context[0].led = static_cast<led_t>(led);
-//
-//  // ledseqRegisterSequence(&context[0]);
-//  // ledseqRun(&context[0]);
-//}
-
 std::array<ledseqContext_t, 10> context;
 
 void registerColors() {
@@ -68,8 +48,8 @@ void registerColors() {
 
 void flashCorrectLed(void *) {
   Time::delayMs(3000);
+
   int lastContextId = 0;
-  registerColors();
   while (true) {
     std::vector<float> droneDistances;
 
@@ -90,7 +70,8 @@ void flashCorrectLed(void *) {
 
     int distance = std::distance(droneDistances.begin(), itr);
 
-    if (droneDistances.size() != 1) {
+    if (droneDistances.size() != 1 &&
+        Drone::getEmbeddedDrone().m_peerData.size() == 1) {
       float divisionSize = context.size() / ((float)droneDistances.size() - 1);
 
       ledseqStop(&context[lastContextId]);
@@ -111,8 +92,10 @@ void flashCorrectLed(void *) {
 }  // namespace P2P
 
 void initColorGradient() {
+  P2P::registerColors();
+
   xTaskCreate(P2P::flashCorrectLed, "ColorGradientTask",
-              configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
+              configMINIMAL_STACK_SIZE * 2, nullptr, 0, nullptr);
   isInit = true;
 }
 bool testColorGradient() { return isInit; };
