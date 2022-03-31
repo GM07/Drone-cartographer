@@ -38,36 +38,32 @@ namespace P2P {
 //  // ledseqRegisterSequence(&context[0]);
 //  // ledseqRun(&context[0]);
 //}
-std::vector<ledseqContext_t *> test;
+
 std::array<ledseqContext_t, 10> context;
 std::vector<std::array<ledseqStep_t, 3>> ledSteps;
 
 void registerColors() {
-  for (int i = 0; i < 5; i++) {
-    std::array<ledseqStep_t, 3> ledStep{{{true, LEDSEQ_WAITMS(1)},
-                                         {false, LEDSEQ_WAITMS(5 * i - 1)},
+  for (int i = 0; i < 5; ++i) {
+    std::array<ledseqStep_t, 3> *ledStep =
+        new std::array<ledseqStep_t, 3>{{{true, LEDSEQ_WAITMS(1)},
+                                         {false, LEDSEQ_WAITMS(abs(5 * i - 1))},
                                          {true, LEDSEQ_LOOP}}};
 
-    ledSteps.emplace_back(ledStep);
-
-    context[i] = {.sequence = ledSteps.back().data(),
+    context[i] = {.sequence = reinterpret_cast<ledseqStep_t *>(ledStep),
                   .led = static_cast<led_t>(LED(kLedGreenLeft))};
 
-    test.push_back(&context[i]);
-
-    ledseqRegisterSequence(test.back());
+    ledseqRegisterSequence(&context[i]);
   }
-
-  for (int i = 4; i < 0; i--) {
-    std::array<ledseqStep_t, 3> ledStep{{{true, LEDSEQ_WAITMS(1)},
-                                         {false, LEDSEQ_WAITMS(5 * i - 1)},
+  for (int i = 4; i >= 0; --i) {
+    std::array<ledseqStep_t, 3> *ledStep =
+        new std::array<ledseqStep_t, 3>{{{true, LEDSEQ_WAITMS(1)},
+                                         {false, LEDSEQ_WAITMS(abs(5 * i - 1))},
                                          {true, LEDSEQ_LOOP}}};
 
-    context[9 - i] = {.sequence = ledSteps.back().data(),
-                      .led = static_cast<led_t>(LED(kLedGreenLeft))};
-    test.push_back(&context[i]);
+    context[9 - i] = {.sequence = reinterpret_cast<ledseqStep_t *>(ledStep),
+                      .led = static_cast<led_t>(LED(kLedRedLeft))};
 
-    ledseqRegisterSequence(test.back());
+    ledseqRegisterSequence(&context[9 - i]);
   }
 }
 
@@ -94,14 +90,14 @@ void flashCorrectLed(void *) {
 
     float distance = std::distance(droneDistances.begin(), itr);
 
-    if (distance != 0) {
-      // float divisionSize =
-      //  (((float)sequences.size()) / ((float)droneDistances.size() - 1));
-      // ledseqRun(test[0]);
+    if (distance != 0 && droneDistances.size() != 0) {
+      float divisionSize =
+          (((float)context.size()) / ((float)droneDistances.size() - 1));
 
-      // ledseqRun(sequences[round(distance * divisionSize)]);
+      ledseqRunBlocking(&context[round(distance * divisionSize)]);
+
     } else {
-      ledseqRun(test[4]);
+      ledseqRunBlocking(&context[0]);
     }
 
     Timer::delayMs(1000);
