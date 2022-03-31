@@ -83,19 +83,18 @@ void flashCorrectLed(void *) {
         Drone::getEmbeddedDrone().m_data.m_distanceFromTakeoff);
     std::sort(droneDistances.begin(), droneDistances.end());
 
-    //  std::vector<float>::iterator itr =
-    //      std::find(droneDistances.begin(), droneDistances.end(),
-    //               Drone::getEmbeddedDrone().m_data.distanceFromTakeoff);
+    std::vector<float>::iterator itr =
+        std::find(droneDistances.begin(), droneDistances.end(),
+                  Drone::getEmbeddedDrone().m_data.m_distanceFromTakeoff);
 
-    // float distance = std::distance(droneDistances.begin(), itr);
+    int distance = std::distance(droneDistances.begin(), itr);
 
-    if (droneDistances.size() != 1 ||
-        Drone::getEmbeddedDrone().m_peerData.size() != 0) {
-      // float divisionSize =
-      //    (((float)context.size()) / ((float)droneDistances.size() - 1));
-
+    if (droneDistances.size() != 1 && distance != 0) {
+      float divisionSize = context.size() / ((float)droneDistances.size() - 1);
+      divisionSize = distance * divisionSize;
       ledseqRunBlocking(&context[9]);
-      // ledseqRunBlocking(&context[round(distance * divisionSize)]);
+      // ledseqRunBlocking(&context[(int)std::clamp<double>(
+      //    round(distance * divisionSize), 0, 9)]);
 
     } else {
       ledseqRunBlocking(&context[0]);
