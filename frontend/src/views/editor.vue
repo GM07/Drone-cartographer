@@ -1,42 +1,54 @@
 <template>
   <div id="content">
-    <div id="files">
-      <treeselect
-        id="tree"
-        :always-open="true"
-        :alwaysOpen="treeOpen"
-        :default-expand-level="10"
-        :disableBranchNodes="true"
-        :flatten-search-results="true"
-        height="100%"
-        :maxHeight="NaN"
-        name="Files"
-        noChildrenText="Empty"
-        :options="options"
-        :searchable="false"
-        @select="onFileSelected"
-      />
-    </div>
-    <div id="file" @keydown.ctrl.83.prevent.stop="save">
-      <CodeEditor
-        ref="codeEditor"
-        border_radius="0px"
-        :copy_code="true"
-        :display_language="false"
-        height="80%"
-        :language_selector="true"
-        :languages="[['cpp', 'C++']]"
-        :value="fileContent"
-        width="100%"
-        z_index="3"
-        @input="save"
-      ></CodeEditor>
+    <vue-resizable
+      id="resizableDiv"
+      :active="['r']"
+      :width="400"
+      @resize:move="resizeMove"
+    >
+      <div id="files">
+        <vue-custom-scrollbar class="scroll-area" :settings="settings">
+          <treeselect
+            id="tree"
+            :always-open="true"
+            :alwaysOpen="treeOpen"
+            :default-expand-level="10"
+            :disableBranchNodes="true"
+            :flatten-search-results="true"
+            :maxHeight="NaN"
+            name="Files"
+            noChildrenText="Empty"
+            :options="options"
+            :searchable="false"
+            @select="onFileSelected"
+          />
+        </vue-custom-scrollbar>
+      </div>
+    </vue-resizable>
+    <div id="file" ref="fileDiv" @keydown.ctrl.83.prevent.stop="save">
+      <div id="editor" class="scroll-area">
+        <CodeEditor
+          ref="codeEditor"
+          border_radius="0px"
+          :copy_code="true"
+          :display_language="false"
+          height="100%"
+          :language_selector="true"
+          :languages="[['cpp', 'C++']]"
+          :value="fileContent"
+          width="100%"
+          z_index="3"
+          @input="save"
+        ></CodeEditor>
+      </div>
 
-      <remote-command-output id="terminal" namespace="/recompileSimulation">
-      </remote-command-output>
-      <v-btn id="recompile" color="green" icon @click="recompile()">
-        <v-icon>mdi-home</v-icon>
-      </v-btn>
+      <div id="terminal">
+        <remote-command-output namespace="/recompileSimulation">
+          <v-btn id="recompile" color="green" icon @click="recompile()">
+            <v-icon>mdi-home</v-icon>
+          </v-btn>
+        </remote-command-output>
+      </div>
     </div>
   </div>
 </template>
@@ -45,6 +57,7 @@
 #content {
   height: 100vh;
   display: flex;
+  flex-direction: row;
 }
 
 .vue-treeselect__menu {
@@ -76,31 +89,33 @@
 }
 
 #files {
-  width: 10%;
-  border-color: #cccccc33;
-  border-width: 2px;
-  background-color: #252526;
+  width: 100%;
+  height: 100%;
+}
+
+.scroll-area {
+  width: 100%;
+  height: 100vh;
+}
+
+#editor {
+  width: 100%;
+  height: 80%;
+  background-color: yellow;
 }
 
 #terminal {
+  width: 100%;
   height: 20%;
-  position: absolute;
-  top: 80%;
-  width: 90%;
   background-color: #1e1e1e;
   border-top: 2px solid #d4d4d4;
 }
 
-#recompile {
-  position: absolute;
-  right: 0;
-  top: 80%;
-}
-
 #file {
-  width: 90%;
   height: 100%;
   display: flex;
+  flex-direction: column;
+  width: calc(100% - 400px);
 }
 </style>
 <script lang="ts">
@@ -110,6 +125,10 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css';
 import {ServerCommunication} from '@/communication/server_communication';
 import CodeEditor from '@/components/code_editor/code_editor.vue';
 import RemoteCommandOutput from '@/components/remote_command_output.vue';
+import vueCustomScrollbar from 'vue-custom-scrollbar';
+import VueResizable from 'vue-resizable';
+import 'vue-custom-scrollbar/dist/vueScrollbar.css';
+
 require('highlight.js');
 
 class TreeNode {
@@ -130,7 +149,13 @@ class TreeNode {
 }
 
 @Component({
-  components: {CodeEditor, Treeselect, RemoteCommandOutput},
+  components: {
+    CodeEditor,
+    Treeselect,
+    RemoteCommandOutput,
+    vueCustomScrollbar,
+    VueResizable,
+  },
 })
 export default class Editor extends Vue {
   public attemptedLimitedConnection = false;
@@ -139,6 +164,12 @@ export default class Editor extends Vue {
   public files: Map<string, string> = new Map();
   public options: TreeNode[] = [];
   public treeOpen = false;
+  public fileWidth = 1000;
+  public settings = {
+    suppressScrollY: false,
+    suppressScrollX: false,
+    wheelPropagation: false,
+  };
 
   constructor() {
     super();
@@ -198,6 +229,12 @@ export default class Editor extends Vue {
     if (this.files.has(node.id)) {
       this.changeFileContent(this.files.get(node.id)!); // We already verify that the id is in the map... Compiler is dumb
     }
+  }
+
+  public resizeMove(data): void {
+    const ELEM = document.getElementById('file') as HTMLElement;
+    const WIDTH = 'calc(100% - ' + data.width + 'px)'; // Pro CSS
+    ELEM.style.width = WIDTH;
   }
 
   public save(): void {

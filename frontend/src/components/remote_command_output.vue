@@ -24,7 +24,6 @@ import {DefaultEventsMap} from 'socket.io/dist/typed-events';
 @Component({})
 export default class RemoteCommandOutput extends Vue {
   @Prop() private namespace!: string;
-  @Prop() private height = 200;
 
   public isFinished = true;
   public hasErrors = false;
@@ -55,7 +54,6 @@ export default class RemoteCommandOutput extends Vue {
     this.socket.on('start', () => {
       this.isFinished = false;
       this.hasErrors = false;
-      // this.output = [];
     });
 
     this.socket.open();

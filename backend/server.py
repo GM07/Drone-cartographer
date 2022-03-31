@@ -85,11 +85,8 @@ def get_files():
 
 
 # Recompile firmware
-@SOCKETIO.on('recompile', namespace='/limitedAccess')
+@SOCKETIO.on('recompile', namespace='/getMissionStatus')
 def recompile():
-    if not AccessStatus.is_request_valid(request):
-        return ''
-
     RECOMPILE_SIMULATION.start()
     RECOMPILE_EMBEDDED.start()
     return 'Recompiling'
