@@ -50,7 +50,7 @@ TEST(ValidateNavigationSystem, stateIdle) {
               land())
       .Times(0);
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              blinkLED(_))
+              identify())
       .Times(0);
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
               isDroneCrashed())
@@ -72,7 +72,7 @@ TEST(ValidateNavigationSystem, stateExploring) {
               land())
       .Times(0);
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              blinkLED(_))
+              identify())
       .Times(0);
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
               isDroneCrashed())
@@ -90,7 +90,7 @@ TEST(ValidateNavigationSystem, takingOffFinished) {
       std::make_shared<StubController>();
   EXPECT_CALL(*controller, takeOff(_)).Times(0);
   EXPECT_CALL(*controller, land()).Times(0);
-  EXPECT_CALL(*controller, blinkLED(_)).Times(0);
+  EXPECT_CALL(*controller, identify()).Times(0);
   EXPECT_CALL(*controller, isTrajectoryFinished())
       .Times(2)
       .WillOnce(Return(false))
@@ -112,7 +112,7 @@ TEST(ValidateNavigationSystem, landingFinished) {
       std::make_shared<StubController>();
   EXPECT_CALL(*controller, takeOff(_)).Times(0);
   EXPECT_CALL(*controller, land()).Times(0);
-  EXPECT_CALL(*controller, blinkLED(_)).Times(0);
+  EXPECT_CALL(*controller, identify()).Times(0);
   EXPECT_CALL(*controller, isTrajectoryFinished())
       .Times(2)
       .WillOnce(Return(false))

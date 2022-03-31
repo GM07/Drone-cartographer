@@ -21,7 +21,9 @@ TEST(ValidateAppMain, CommunicationManagerInitShouldCreateTask) {
 }
 
 TEST(ValidateAppMain, GetDroneShouldAlwaysReturnTheSameInstance) {
+  mock = new FunctionsMock;
   EXPECT_EQ(&Drone::getEmbeddedDrone(), &Drone::getEmbeddedDrone());
+  delete mock;
 }
 
 TEST(ValidateAppMain, updateCrashStatusFun) {

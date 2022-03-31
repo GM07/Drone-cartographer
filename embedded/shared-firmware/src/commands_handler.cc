@@ -9,7 +9,7 @@ bool Drone::handleCommand(Command command) {
 
   switch (command) {
     case Command::kIdentify:
-      m_controller->blinkLED(LED::kLedRedLeft);
+      m_controller->identify();
       return true;
     case Command::kTakeOff:
       m_controller->takeOff(kHeight);

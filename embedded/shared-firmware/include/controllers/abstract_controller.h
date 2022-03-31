@@ -45,7 +45,7 @@ class AbstractController {
 
   virtual void log(const std::string& message) = 0;
   [[nodiscard]] virtual size_t getId() const = 0;
-  virtual void blinkLED(LED led) = 0;
+  virtual void identify() = 0;
 
   virtual void updateSensorsData() = 0;
   [[nodiscard]] virtual float getMinCollisionAvoidanceDistance() const = 0;

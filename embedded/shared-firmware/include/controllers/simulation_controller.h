@@ -56,7 +56,7 @@ class SimulationController : public AbstractController {
       std::unordered_map<size_t, DroneData>* p2pData) override;
 
   void log(const std::string& message) override;
-  void blinkLED(LED /*led*/) override;
+  void identify() override;
   [[nodiscard]] size_t getId() const override;
 
   void updateSensorsData() override;

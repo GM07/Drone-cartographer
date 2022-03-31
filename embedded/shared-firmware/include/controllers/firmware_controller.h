@@ -12,7 +12,7 @@ extern "C" {
 #include "semphr.h"
 }
 
-inline std::queue<P2PPacket> receivedP2PPacket;
+// inline std::unordered<P2PPacket> receivedP2PPacket;
 inline SemaphoreHandle_t p2pPacketMutex;
 
 class FirmwareController : public AbstractController {
@@ -37,9 +37,9 @@ class FirmwareController : public AbstractController {
 
   void sendP2PMessage(void* message, size_t size) override;
   void receiveP2PMessage(
-      std::unordered_map<size_t, DroneData>* p2pData) override;
+      std::unordered_map<size_t, DroneData>* p2pData) override{};
 
-  void blinkLED(LED led) override;
+  void identify() override;
   [[nodiscard]] size_t getId() const override;
 
   void updateSensorsData() override;
