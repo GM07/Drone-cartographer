@@ -87,8 +87,6 @@ void Drone::collisionAvoidance() {
       if (m_usedPeerData.find(peerData.m_id) == m_usedPeerData.end()) {
         m_usedPeerData.insert_or_assign(peerData.m_id, peerData);
         m_normal += peerData.m_direction - m_data.m_direction;
-
-        m_controller->identify();
       }
     } else {
       m_usedPeerData.erase(peerData.m_id);

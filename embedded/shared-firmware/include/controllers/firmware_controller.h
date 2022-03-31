@@ -9,11 +9,7 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "ledseq.h"
 #include "radiolink.h"
-#include "semphr.h"
 }
-
-// inline std::unordered<P2PPacket> receivedP2PPacket;
-inline SemaphoreHandle_t p2pPacketMutex;
 
 class FirmwareController : public AbstractController {
  public:
