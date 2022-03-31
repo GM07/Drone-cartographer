@@ -68,6 +68,7 @@ void registerColors() {
 
 void flashCorrectLed(void *) {
   Time::delayMs(3000);
+  int lastContextId = 0;
   registerColors();
   while (true) {
     std::vector<float> droneDistances;
@@ -89,15 +90,19 @@ void flashCorrectLed(void *) {
 
     int distance = std::distance(droneDistances.begin(), itr);
 
-    if (droneDistances.size() != 1 && distance != 0) {
+    if (droneDistances.size() != 1) {
       float divisionSize = context.size() / ((float)droneDistances.size() - 1);
-      divisionSize = distance * divisionSize;
-      ledseqRunBlocking(&context[9]);
-      // ledseqRunBlocking(&context[(int)std::clamp<double>(
-      //    round(distance * divisionSize), 0, 9)]);
+
+      ledseqStop(&context[lastContextId]);
+      int index = (int)std::clamp<double>(round(distance * divisionSize), 0, 9);
+      lastContextId = index;
+
+      ledseqRunBlocking(&context[index]);
 
     } else {
-      ledseqRunBlocking(&context[0]);
+      Drone::getEmbeddedDrone().getController()->identify();
+
+      // ledseqRunBlocking(&context[0]);
     }
 
     Time::delayMs(1000);
