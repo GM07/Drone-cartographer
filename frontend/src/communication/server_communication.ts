@@ -21,6 +21,7 @@ export class ServerCommunication {
 
   public static recompile(): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      console.log('yoooo');
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
         SERVER_CONSTANTS.RECOMPILE_ADDRESS
       );
