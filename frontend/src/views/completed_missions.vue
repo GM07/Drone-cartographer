@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card>
+    <v-card style="min-width: min-content">
       <v-app-bar
         id="scrolling-techniques-4"
         class="app"
@@ -12,9 +12,17 @@
           <v-toolbar-title>Historique</v-toolbar-title>
         </v-col>
 
-        <div style="float: right; margin-right: 150px">
+        <div class="mr-16" style="float: right">
           <template>
-            <p style="color: black; float: left; margin: 5px">
+            <p
+              class="mt-6"
+              style="
+                color: black;
+                float: left;
+
+                white-space: nowrap;
+              "
+            >
               Recherche de missions par date
             </p>
             <v-menu
@@ -24,16 +32,18 @@
               min-width="auto"
               offset-y
               :return-value.sync="date"
-              style="width: 200px; float: right"
+              style="float: right; white-space: nowrap"
               transition="scale-transition"
             >
               <template v-slot:activator="{on, attrs}">
                 <v-text-field
                   v-model="date"
                   v-bind="attrs"
+                  class="mt-5"
                   prepend-icon="mdi-calendar"
-                  style="width: 200px,float:right"
+                  style="float: right"
                   v-on="on"
+                  @click:prepend="() => (isSearchMenuOpen = true)"
                 ></v-text-field>
               </template>
 
@@ -66,35 +76,38 @@
             <v-tab @click="changeFilterMode(filter.physical)">Embarqué</v-tab>
             <v-tab @click="changeFilterMode(filter.date)">Date</v-tab>
             <v-spacer></v-spacer>
-            <div style="margin-right: 150px">
-              <p style="color: black; float: left; margin-top: 5px">
-                Triage des missions affichées
-              </p>
-
-              <v-icon v-if="isAscending" class="ma-2" @click="swapOrder()">
-                mdi-arrow-down
-              </v-icon>
-              <v-icon v-else class="ma-2" @click="swapOrder()">
-                mdi-arrow-up
-              </v-icon>
-
-              <v-select
-                v-model="currentFilter"
-                :items="sorts"
-                scrollable
-                style="width: 200px; float: right"
-                @change="sortMissions()"
-              ></v-select>
-            </div>
           </v-tabs>
         </template>
       </v-app-bar>
 
-      <v-sheet
-        id="scrolling-techniques-4"
-        class="overflow-y-auto pa-4"
-        min-height="96px"
-      >
+      <v-sheet class="overflow-y-auto pa-4" style="min-width: min-content">
+        <div
+          v-if="showedMissions.length != 0"
+          class="ma-1"
+          style="float: right; min-width: min-content"
+        >
+          <p class="ma-2" style="color: black; float: left">
+            Triage des missions affichées
+          </p>
+
+          <v-icon v-if="isAscending" class="ma-2" @click="swapOrder()">
+            mdi-arrow-down
+          </v-icon>
+          <v-icon v-else class="ma-2" @click="swapOrder()">
+            mdi-arrow-up
+          </v-icon>
+
+          <v-select
+            v-model="currentFilter"
+            attach
+            auto
+            class="pa-0"
+            :items="sorts"
+            scrollable
+            style="max-width: 300px; float: right; display: flex"
+            @change="sortMissions()"
+          ></v-select>
+        </div>
         <div v-for="item in showedMissions" :key="item._id" class="ma-5">
           <v-card
             class="pa-5"
@@ -165,8 +178,21 @@
         </div>
       </v-sheet>
     </v-card>
-    <v-navigation-drawer app permanent touchless>
+    <v-navigation-drawer
+      app
+      :mini-variant="this.$vuetify.breakpoint.smAndDown && miniVariant"
+      permanent
+      touchless
+    >
       <div id="top">
+        <v-list v-if="this.$vuetify.breakpoint.smAndDown" dense>
+          <v-list-item @click="miniVariant = !miniVariant">
+            <v-list-item-icon>
+              <v-icon color="blue">mdi-format-list-bulleted</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title></v-list-item-title>
+          </v-list-item>
+        </v-list>
         <v-list-item to="/">
           <v-list-item-icon>
             <v-icon color="blue">mdi-home</v-icon>
@@ -187,6 +213,16 @@
 .app >>> .v-toolbar__content {
   padding-right: 0px !important;
 }
+.v-menu__content {
+  z-index: 100 !important;
+}
+
+.v-select-list {
+  z-index: 100 !important;
+}
+.animated {
+  animation-fill-mode: none;
+}
 </style>
 
 <script lang="ts">
@@ -206,6 +242,7 @@ enum Filters {
 export default class CompletedMissions extends Vue {
   private missions: Mission[] = [];
   private showedMissions: Mission[] = [];
+  private miniVariant = true;
   private mode: Filters = Filters.all;
   private isSearchMenuOpen = false;
   private currentTab = 0;
@@ -229,6 +266,7 @@ export default class CompletedMissions extends Vue {
 
   private changeFilterMode(mode: Filters): void {
     this.mode = mode;
+    this.openLogId = '';
     this.getCompletedMissions().then(() => {
       this.updateFilteredMissions();
       this.sortMissions();
@@ -337,12 +375,16 @@ export default class CompletedMissions extends Vue {
   }
 
   private setLogsMenu(logs: boolean, item: Mission) {
-    if (logs)
+    if (logs) {
+      if (item.logs !== undefined) {
+        this.openLogId = item._id;
+        return;
+      }
       this.getMissionInfo(item).then((mission: Mission) => {
         item.logs = mission.logs;
         this.openLogId = mission._id;
       });
-    else this.openLogId = ' ';
+    } else this.openLogId = ' ';
   }
 
   private getMissionInfo(item: Mission): Promise<Mission> {

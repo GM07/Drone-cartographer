@@ -148,7 +148,7 @@ describe('completed_missions.vue', () => {
 
     const SPY = spyOn(wrapper.vm, 'getMissionInfo').and.callThrough();
     const DEFAULT_ID = 'id';
-    const DEFAULT_MISSION = {_id: 'id', logs: [['a', 'b']]} as Mission;
+    const DEFAULT_MISSION = {_id: 'id'} as Mission;
     wrapper.vm['openLogId'] = DEFAULT_ID;
     wrapper.vm['setLogsMenu'](false, DEFAULT_MISSION);
     expect(wrapper.vm['openLogId']).not.toEqual(DEFAULT_ID);
