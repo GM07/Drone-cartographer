@@ -9,6 +9,29 @@
       >
       </v-switch>
     </div>
+    <v-list-item
+      v-if="!this.$store.state.missionStatus.isP2Prunning"
+      :disabled="!this.$store.state.missionStatus.isMissionStarted"
+      v-on:click="startP2P()"
+    >
+      <v-list-item-icon>
+        <v-icon color="blue">mdi-led-on</v-icon>
+      </v-list-item-icon>
+      <v-list-item-title>Pair à pair</v-list-item-title>
+    </v-list-item>
+
+    <v-list-item
+      v-if="
+        this.$store.state.missionStatus.isP2Prunning &&
+        this.$store.state.missionStatus.isMissionStarted
+      "
+      v-on:click="endP2P()"
+    >
+      <v-list-item-icon>
+        <v-icon color="blue">mdi-led-off</v-icon>
+      </v-list-item-icon>
+      <v-list-item-title>Arrêter pair à pair</v-list-item-title>
+    </v-list-item>
 
     <v-list-item
       :disabled="
@@ -63,8 +86,6 @@ export default class MissionCommands extends Vue {
   public isLaunchMissionSelected = false;
   public isTerminateMissionSelected = false;
   public isReturnToBaseSelected = false;
-  public isStartP2PSelected = false;
-  public isEndP2PSelected = false;
 
   set simulatedMission(isSimulated: boolean) {
     if (!ACCESSOR.missionStatus.isMissionStarted) {
@@ -104,8 +125,15 @@ export default class MissionCommands extends Vue {
     }
   }
   public startP2P(): void {
-    if (ACCESSOR.missionStatus.isMissionStarted) return;
-    //ServerCommunication
+    if (!ACCESSOR.missionStatus.isMissionStarted) return;
+
+    ServerCommunication.startP2PMode();
+  }
+
+  public endP2P(): void {
+    if (!ACCESSOR.missionStatus.isMissionStarted) return;
+
+    ServerCommunication.stopP2PMode();
   }
 
   public terminateMission(): void {

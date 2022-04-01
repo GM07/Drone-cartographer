@@ -11,6 +11,9 @@ export const IDENTIFY_DRONE_ADDRESS = 'identify_drone';
 export const TAKE_CONTROL_ADDRESS = 'take_control';
 export const REVOKE_CONTROL_ADDRESS = 'revoke_control';
 export const LAUNCH_MISSION_ADDRESS = 'launch';
+export const START_P2P_ADDRESS = 'startP2P';
+export const END_P2P_ADDRESS = 'endP2P';
+
 export const RETURN_TO_BASE_ADDRESS = 'return_to_base';
 export const TERMINATE_MISSION_ADDRESS = 'terminate';
 export const SET_MISSION_TYPE_ADDRESS = 'set_mission_type';

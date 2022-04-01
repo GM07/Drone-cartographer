@@ -75,6 +75,26 @@ export class ServerCommunication {
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
+  public static startP2PMode(): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.START_P2P_ADDRESS
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
+  public static stopP2PMode(): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.END_P2P_ADDRESS
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
   public static returnToBase(callback: () => void): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(

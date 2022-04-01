@@ -12,6 +12,7 @@ const STATE = () => ({
   missionStatus: {
     isMissionStarted: false,
     isSomeoneControlling: false,
+    isP2Prunning: false,
   } as MissionStatus,
 });
 

@@ -28,11 +28,9 @@ APP.config['SECRET_KEY'] = 'dev'
 
 # Socketio instance to communicate with frontend
 
-SOCKETIO = SocketIO(
-    APP,
-    async_mode='gevent',
-    cors_allowed_origins='*',
-)
+SOCKETIO = SocketIO(APP,
+                    async_mode='gevent',
+                    cors_allowed_origins='*')
 
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
@@ -199,7 +197,7 @@ def send_logs():
     return ''
 
 
-@SOCKETIO.on('startP2P', namespace='limitedAccess')
+@SOCKETIO.on('startP2P', namespace='/limitedAccess')
 def start_p2p():
     if not MissionStatus.get_mission_started():
         return ''
@@ -210,7 +208,7 @@ def start_p2p():
     MissionStatus.update_all_clients(SOCKETIO)
 
 
-@SOCKETIO.on('endP2P', namespace='limitedAccess')
+@SOCKETIO.on('endP2P', namespace='/limitedAccess')
 def end_p2p():
     if not MissionStatus.get_mission_started():
         return ''
