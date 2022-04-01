@@ -63,6 +63,8 @@ export default class MissionCommands extends Vue {
   public isLaunchMissionSelected = false;
   public isTerminateMissionSelected = false;
   public isReturnToBaseSelected = false;
+  public isStartP2PSelected = false;
+  public isEndP2PSelected = false;
 
   set simulatedMission(isSimulated: boolean) {
     if (!ACCESSOR.missionStatus.isMissionStarted) {
@@ -100,6 +102,10 @@ export default class MissionCommands extends Vue {
     if (!COMMAND_SENT) {
       this.isReturnToBaseSelected = false;
     }
+  }
+  public startP2P(): void {
+    if (ACCESSOR.missionStatus.isMissionStarted) return;
+    //ServerCommunication
   }
 
   public terminateMission(): void {

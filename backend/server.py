@@ -204,7 +204,8 @@ def start_p2p():
     if not MissionStatus.get_mission_started():
         return ''
 
-    MissionStatus.is_p2p_running = True
+    MissionStatus.set_is_p2p_running(True)
+
     COMM.send_command(COMMANDS.START_P2P.value)
     MissionStatus.update_all_clients(SOCKETIO)
 
@@ -214,7 +215,7 @@ def end_p2p():
     if not MissionStatus.get_mission_started():
         return ''
 
-    MissionStatus.is_p2p_running = False
+    MissionStatus.set_is_p2p_running(False)
     COMM.send_command(COMMANDS.END_P2P.value)
     MissionStatus.update_all_clients(SOCKETIO)
 

@@ -38,7 +38,9 @@ def launch_mission(socket_io: SocketIO):
 
 def terminate_mission(socket_io: SocketIO):
     global is_mission_started
+    global is_p2p_running
     is_mission_started = False
+    is_p2p_running = False
     update_all_clients(socket_io)
 
 
@@ -60,6 +62,11 @@ def update_specific_client(socket_io: SocketIO, request_session_id):
                    get_mission_status(),
                    namespace=NAMESPACE,
                    room=request_session_id)
+
+
+def set_is_p2p_running(value):
+    global is_p2p_running
+    is_p2p_running = value
 
 
 def get_mission_status():
