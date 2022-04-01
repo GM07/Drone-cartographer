@@ -19,37 +19,31 @@ bool isInit;
 
 namespace P2P {
 
-std::array<ledseqContext_t, 10> context;
+std::array<ledseqContext_t, 10> greenContext;
+std::array<ledseqContext_t, 10> redContext;
 
 void registerColors() {
-  for (int i = 0; i < 5; ++i) {
+  for (int i = 0; i < 10; ++i) {
     std::array<ledseqStep_t, 3> *ledStep =
-        new std::array<ledseqStep_t, 3>{{{true, LEDSEQ_WAITMS(1)},
-                                         {false, LEDSEQ_WAITMS(abs(5 * i - 1))},
+        new std::array<ledseqStep_t, 3>{{{true, LEDSEQ_WAITMS(1 - i / 9)},
+                                         {false, LEDSEQ_WAITMS(abs(i * 2))},
                                          {true, LEDSEQ_LOOP}}};
 
-    context[i] = {.sequence = reinterpret_cast<ledseqStep_t *>(ledStep),
-                  .led = static_cast<led_t>(LED(kLedGreenLeft))};
+    greenContext[i] = {.sequence = reinterpret_cast<ledseqStep_t *>(ledStep),
+                       .led = static_cast<led_t>(LED(kLedGreenLeft))};
 
-    ledseqRegisterSequence(&context[i]);
-  }
-  for (int i = 4; i >= 0; --i) {
-    std::array<ledseqStep_t, 3> *ledStep =
-        new std::array<ledseqStep_t, 3>{{{true, LEDSEQ_WAITMS(1)},
-                                         {false, LEDSEQ_WAITMS(abs(5 * i - 1))},
-                                         {true, LEDSEQ_LOOP}}};
+    redContext[i] = {.sequence = reinterpret_cast<ledseqStep_t *>(ledStep),
+                     .led = static_cast<led_t>(LED(kLedRedLeft))};
 
-    context[9 - i] = {.sequence = reinterpret_cast<ledseqStep_t *>(ledStep),
-                      .led = static_cast<led_t>(LED(kLedRedLeft))};
-
-    ledseqRegisterSequence(&context[9 - i]);
+    ledseqRegisterSequence(&redContext[i]);
+    ledseqRegisterSequence(&greenContext[i]);
   }
 }
 
 void flashCorrectLed(void *) {
   Time::delayMs(3000);
-
-  int lastContextId = 0;
+  const int CONTEXT_ARRAY_MAX_INDEX = 9;
+  int lastGreenContextId = 0;
   while (true) {
     std::vector<float> droneDistances;
 
@@ -69,21 +63,23 @@ void flashCorrectLed(void *) {
                   Drone::getEmbeddedDrone().m_data.m_distanceFromTakeoff);
 
     int distance = std::distance(droneDistances.begin(), itr);
+    ledseqStop(&greenContext[lastGreenContextId]);
+    ledseqStop(&redContext[CONTEXT_ARRAY_MAX_INDEX - lastGreenContextId]);
+    if (droneDistances.size() != 1) {
+      float divisionSize =
+          (CONTEXT_ARRAY_MAX_INDEX + 1) / ((float)droneDistances.size() - 1);
 
-    if (droneDistances.size() != 1 &&
-        Drone::getEmbeddedDrone().m_peerData.size() == 1) {
-      float divisionSize = context.size() / ((float)droneDistances.size() - 1);
+      int index =
+          (int)std::clamp<double>(round(distance * divisionSize - 1), 0, 9);
+      lastGreenContextId = index;
 
-      ledseqStop(&context[lastContextId]);
-      int index = (int)std::clamp<double>(round(distance * divisionSize), 0, 9);
-      lastContextId = index;
-
-      ledseqRunBlocking(&context[index]);
+      ledseqRunBlocking(&greenContext[index]);
+      ledseqRunBlocking(&redContext[CONTEXT_ARRAY_MAX_INDEX - index]);
 
     } else {
-      Drone::getEmbeddedDrone().getController()->identify();
-
-      // ledseqRunBlocking(&context[0]);
+      lastGreenContextId = 0;
+      ledseqRunBlocking(&greenContext[0]);
+      ledseqRunBlocking(&redContext[CONTEXT_ARRAY_MAX_INDEX - 0]);
     }
 
     Time::delayMs(1000);
