@@ -18,7 +18,6 @@ bool isInit;
 }  // namespace
 
 namespace P2P {
-
 std::array<ledseqContext_t, 10> greenContext;
 std::array<ledseqContext_t, 10> redContext;
 
@@ -45,6 +44,13 @@ void flashCorrectLed(void *) {
   const int CONTEXT_ARRAY_MAX_INDEX = 9;
   int lastGreenContextId = 0;
   while (true) {
+    if (!Drone::getEmbeddedDrone().m_p2pIsActive) {
+      ledseqStop(&greenContext[lastGreenContextId]);
+      ledseqStop(&redContext[CONTEXT_ARRAY_MAX_INDEX - lastGreenContextId]);
+      Time::delayMs(1000);
+
+      continue;
+    }
     std::vector<float> droneDistances;
 
     std::transform(Drone::getEmbeddedDrone().m_peerData.begin(),

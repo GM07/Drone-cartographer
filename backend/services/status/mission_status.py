@@ -11,6 +11,7 @@ import services.status.access_status as AccessStatus
 
 NAMESPACE = '/getMissionStatus'
 is_mission_started = False
+is_p2p_running = False
 
 # TODO : Discuter si c'est vraiment necessaire d'avoir ces fonctions
 #        puisque les variables sont globales
@@ -65,4 +66,5 @@ def get_mission_status():
     return {
         'isMissionStarted': is_mission_started,
         'isSomeoneControlling': AccessStatus.is_someone_controlling(),
+        'isP2Prunning': is_p2p_running,
     }

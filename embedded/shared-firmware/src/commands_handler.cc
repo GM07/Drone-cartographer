@@ -19,6 +19,13 @@ bool Drone::handleCommand(Command command) {
       m_controller->land();
       m_controller->m_state = State::kLanding;
       return true;
+    case Command::kStartP2P:
+      m_p2pIsActive = true;
+      return true;
+    case Command::kEndP2P:
+      m_p2pIsActive = false;
+      return true;
+
     default:
       return false;
   }
