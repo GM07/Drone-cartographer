@@ -1,12 +1,11 @@
 extern "C" {
 #include "FreeRTOS.h"
 #include "commander.h"
-#include "components/ccommunication_manager.h"
+#include "components/crazyflie_task.h"
 #include "config.h"
 #include "debug.h"
 #include "log.h"
 #include "param_logic.h"
-#include "semphr.h"
 #include "static_mem.h"
 #include "supervisor.h"
 #include "task.h"
@@ -17,15 +16,13 @@ extern "C" {
 #include "app_main.h"
 #include "components/drone.h"
 #include "controllers/firmware_controller.h"
+#include "utils/time.h"
 
 namespace {
 
-bool isInit = false;
-StaticSemaphore_t mutexBuffer;
+bool commIsInit = false;
 
 }  // namespace
-
-uint8_t droneState = State::kIdle;
 
 /////////////////////////////////////////////////////////////////////////
 Drone& Drone::getEmbeddedDrone() {
@@ -42,11 +39,11 @@ void communicationManagerTaskWrapper(void* /*parameter*/) {
 void communicationManagerInit() {
   xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
               configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
-  isInit = true;
+  commIsInit = true;
 }
 
 /////////////////////////////////////////////////////////////////////////
-bool communicationManagerTest() { return isInit; }
+bool communicationManagerTest() { return commIsInit; }
 
 /////////////////////////////////////////////////////////////////////////
 void updateCrashStatus() {
@@ -78,32 +75,11 @@ void addCustomLoggingVariables() {
 }
 
 /////////////////////////////////////////////////////////////////////////
-void p2pcallbackHandler(P2PPacket* p) {
-  constexpr size_t kMaxQueueSize = 50;
-
-  xSemaphoreTake(p2pPacketMutex, portMAX_DELAY);
-  {
-    P2PPacket packet;
-    memcpy(&packet, p, sizeof(packet));
-
-    receivedP2PPacket.push(packet);
-    if (receivedP2PPacket.size() >= kMaxQueueSize) {
-      receivedP2PPacket.pop();
-    }
-  }
-  xSemaphoreGive(p2pPacketMutex);
-}
-
-/////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
   ledClearAll();
   addCustomLoggingVariables();
   enableCrtpHighLevelCommander();
   Drone::getEmbeddedDrone().initDrone();
-
-  p2pPacketMutex = xSemaphoreCreateMutexStatic(&mutexBuffer);
-  configASSERT(p2pPacketMutex);  // Verify that the mutex is created
-  p2pRegisterCB(p2pcallbackHandler);
 
   while (true) {
     Drone::getEmbeddedDrone().getController()->updateSensorsData();

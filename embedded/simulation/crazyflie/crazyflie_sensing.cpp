@@ -29,6 +29,9 @@ void CCrazyflieSensing::Init(argos::TConfigurationNode& /*t_node*/) {
   m_communicationThread = std::make_unique<std::thread>(
       &CCrazyflieSensing::threadTasksWrapper, this);
 
+  m_P2PThread =
+      std::make_unique<std::thread>(&CCrazyflieSensing::p2pTaskWrapper, this);
+
   try {
     /*
      * Initialize sensors/actuators
@@ -107,12 +110,25 @@ CCrazyflieSensing::~CCrazyflieSensing() {
   if (m_communicationThread != nullptr) {
     m_communicationThread->join();
   }
+
+  if (m_P2PThread != nullptr) {
+    m_P2PThread->join();
+  }
 }
 
 /****************************************/
 void CCrazyflieSensing::threadTasksWrapper() {
   attemptSocketConnection();
   m_drone.communicationManagerTask();
+}
+
+void CCrazyflieSensing::p2pTaskWrapper() {
+  constexpr int32_t kDelayBetweenP2PMessage = 50;
+  while (m_drone.getController()->m_state != State::kDead) {
+    Time::delayMs(kDelayBetweenP2PMessage);
+    m_drone.getController()->sendP2PMessage(static_cast<void*>(&m_drone.m_data),
+                                            sizeof(m_drone.m_data));
+  }
 }
 
 /*

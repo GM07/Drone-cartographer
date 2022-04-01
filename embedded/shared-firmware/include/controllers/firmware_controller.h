@@ -9,11 +9,7 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "ledseq.h"
 #include "radiolink.h"
-#include "semphr.h"
 }
-
-inline std::queue<P2PPacket> receivedP2PPacket;
-inline SemaphoreHandle_t p2pPacketMutex;
 
 class FirmwareController : public AbstractController {
  public:
@@ -37,7 +33,7 @@ class FirmwareController : public AbstractController {
 
   void sendP2PMessage(void* message, size_t size) override;
   void receiveP2PMessage(
-      std::unordered_map<size_t, DroneData>* p2pData) override;
+      std::unordered_map<size_t, DroneData>* p2pData) override{};
 
   void identify() override;
   [[nodiscard]] size_t getId() const override;

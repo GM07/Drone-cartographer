@@ -122,33 +122,12 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
 
 ///////////////////////////////////////
 void FirmwareController::sendP2PMessage(void* message, size_t size) {
-  static P2PPacket p_reply;
-  static uint8_t p2pCounter = 0;
-  constexpr uint8_t kNbTickPerPackets = 50;
+  P2PPacket p_reply;
 
-  if (++p2pCounter > kNbTickPerPackets) {
-    p_reply.port = 0x00;
-    p_reply.size = size;
-    memcpy(&p_reply.data[0], message, size);
-    radiolinkSendP2PPacketBroadcast(&p_reply);
-    p2pCounter = 0;
-  }
-}
-
-///////////////////////////////////////
-void FirmwareController::receiveP2PMessage(
-    std::unordered_map<size_t, DroneData>* p2pData) {
-  xSemaphoreTake(p2pPacketMutex, portMAX_DELAY);
-  {
-    while (!receivedP2PPacket.empty()) {
-      DroneData data(
-          *reinterpret_cast<DroneData*>(&receivedP2PPacket.front().data));
-      data.m_range = receivedP2PPacket.front().rssi;
-      p2pData->insert_or_assign(data.m_id, data);
-      receivedP2PPacket.pop();
-    }
-  }
-  xSemaphoreGive(p2pPacketMutex);
+  p_reply.port = 0x00;
+  p_reply.size = size;
+  memcpy(&p_reply.data[0], message, size);
+  radiolinkSendP2PPacketBroadcast(&p_reply);
 }
 
 ///////////////////////////////////////

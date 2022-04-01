@@ -22,7 +22,7 @@ constexpr float kLandingSpeed = 0.25F;
 constexpr float kHeight = 0.3F;
 
 constexpr float kSimulationCollisionAvoidanceRange = 20.0F;
-constexpr float kRealMinCollisionAvoidanceRange = 45.0F;
+constexpr float kRealMinCollisionAvoidanceRange = 42.0F;
 constexpr float kRealMaxCollisionAvoidanceRange = 45.0F;
 
 class Drone {
@@ -82,12 +82,13 @@ class Drone {
 
   static Drone& getEmbeddedDrone();
 
- protected:
   DroneData m_data;
+  std::unordered_map<size_t, DroneData> m_peerData;
+
+ protected:
   Vector3D m_normal;
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
-  std::unordered_map<size_t, DroneData> m_peerData;
   std::unordered_map<size_t, DroneData> m_usedPeerData;
 };
 #endif

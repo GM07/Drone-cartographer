@@ -1,5 +1,5 @@
-#ifndef CCOMMUNICATION_MANAGER_H  // NOLINT
-#define CCOMMUNICATION_MANAGER_H
+#ifndef CRAZYFLIE_TASK_H  // NOLINT
+#define CRAZYFLIE_TASK_H
 
 /**
  * This header will be included in a c source file.
@@ -9,5 +9,8 @@
 
 void communicationManagerInit();
 bool communicationManagerTest();
+
+void p2pTaskInit();
+bool p2pTaskTest();
 
 #endif

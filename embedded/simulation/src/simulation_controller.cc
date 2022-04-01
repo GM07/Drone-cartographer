@@ -133,6 +133,7 @@ void SimulationController::log(const std::string& message) {
   logBuffer << message << std::endl;
 }
 
+///////////////////////////////////////////////////
 void SimulationController::takeOff(float height) {
   // Since getCurrentLocation() is relative to the old m_takeOffPosition
   // We need to add the old m_takeOffPosition to get the new one.

@@ -4,7 +4,7 @@
 #include "../../src/app_main.h"
 
 extern "C" {
-#include "components/ccommunication_manager.h"
+#include "components/crazyflie_task.h"
 }
 #include "components/drone.h"
 #include "mock_functions.h"
