@@ -1,23 +1,29 @@
 <template>
   <div id="content">
-    <v-btn id="action" color="orange" dark icon small>
-      <v-icon dark> mdi-cog-play</v-icon>
-    </v-btn>
-    <v-virtual-scroll
+  <div style="height: 100%; position: relative">
+    <div
       ref="console"
-      bench="5"
-      item-height="20"
-      :items="this.output"
+      style="
+        position: absolute;
+        inset: 0px;
+        background-color: black;
+        overflow: auto;
+        display: flex;
+        flex-direction: column-reverse;
+      "
     >
-      <template v-slot:default="{item}">
-        <v-list-item v-if="item[0] === 'stdout'">
-          <p style="color: white">{{ item[1] }}</p>
-        </v-list-item>
-        <v-list-item v-if="item[0] === 'stderr'">
-          <p style="color: red">{{ item[1] }}</p>
-        </v-list-item>
-      </template>
-    </v-virtual-scroll>
+      <p
+        v-for="item in this.output"
+        :key="item[1]"
+        :style="
+          item[0] === 'stdout'
+            ? 'color: white; margin: 0px'
+            : 'color: red; margin: 0px'
+        "
+      >
+        {{ item[1] }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -54,12 +60,20 @@ export default class RemoteCommandOutput extends Vue {
     }).close();
 
     this.socket.on('stdout', (stdout: string) => {
-      this.output.push(['stdout', stdout]);
+      if (stdout === '\n' || this.output.length === 0) {
+        this.output.unshift(['stdout', '']);
+      } else {
+        this.output[0][1] += stdout;
+      }
     });
 
     this.socket.on('stderr', (stderr: string) => {
       this.hasErrors = true;
-      this.output.push(['stderr', stderr]);
+      if (stderr === '\n' || this.output.length === 0) {
+        this.output.unshift(['stderr', '']);
+      } else {
+        this.output[0][1] += stderr;
+      }
     });
 
     this.socket.on('stop', () => {
