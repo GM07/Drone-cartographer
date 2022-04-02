@@ -51,6 +51,7 @@ class FirmwareController : public AbstractController {
   void log(const std::string& message) override{/**/};
 
  private:
+  float m_height;
   ledseqContext_t m_seqLED{};
 };
 #endif

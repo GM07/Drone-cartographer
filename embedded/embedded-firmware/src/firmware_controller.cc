@@ -34,7 +34,8 @@ std::array<ledseqStep_t, kNbLEDSteps> ledStep{{{true, LEDSEQ_WAITMS(500)},
 
 ////////////////////////////////////////////////
 FirmwareController::FirmwareController()
-    : AbstractController(std::make_unique<FirmwareSensors>()) {
+    : AbstractController(std::make_unique<FirmwareSensors>()),
+      m_height(kHeight) {
   m_seqLED.sequence = ledStep.data();
   m_seqLED.led = static_cast<led_t>(LED::kLedBlueLeft);
   ledseqRegisterSequence(&m_seqLED);
@@ -109,11 +110,18 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed,
                                      bool absZ) {
   Vector3D speedVector = direction.toUnitVector() * speed;
 
+  // If there is an abrupt change in zPosition adjust height to avoid crash
+  float currentHeight = m_abstractSensors->getPosZ();
+  if (abs(currentHeight - m_height) > 0.3f) {
+    if (currentHeight < 0.05f) currentHeight = 0.05f;
+    m_height = currentHeight;
+  }
+
   static setpoint_t setpoint;
 
   if (absZ) {
     setpoint.mode.z = modeAbs;
-    setpoint.position.z = kHeight;
+    setpoint.position.z = m_height;
   } else {
     setpoint.mode.z = modeVelocity;
     setpoint.velocity.z = speedVector.m_z;
