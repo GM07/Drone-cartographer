@@ -46,7 +46,12 @@ class TestApplication(unittest.TestCase):
         et_mock.parse = mock.MagicMock()
         et_mock.SubElement = mock.MagicMock()
 
-        config.add_drone({'name': 'test', 'xPos': 1, 'yPos': 2})
+        config.add_drone({
+            'name': 'test',
+            'xPos': 1,
+            'yPos': 2,
+            'orientation': 127
+        })
         path_mock.assert_called()
         et_mock.parse.assert_called()
         et_mock.SubElement.assert_called()

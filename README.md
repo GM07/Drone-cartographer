@@ -58,6 +58,13 @@ If the file is not recognized as an executable please run this next command from
 chmod u+x start.sh
 ```
 
+## Running tests
+
+You can test each component of the project by running the start script with the test option (-t).
+```
+./start.sh -t
+```
+The test results will then be available in the terminal.
 ## Manual Launch
 
 This next part explains how to manually launch and configure the containers as Docker devcontainers

@@ -15,7 +15,7 @@ bool p2pIsInit = false;
 }
 
 /////////////////////////////////////////////////////////////////////////
-bool isValidP2PPacket(DroneData& data) {
+[[nodiscard]] bool isValidP2PPacket(DroneData& data) {
   return std::equal(data.m_magicHeader.begin(), data.m_magicHeader.end(),
                     Drone::getEmbeddedDrone().m_data.m_magicHeader.begin());
 }

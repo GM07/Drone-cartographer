@@ -1,7 +1,7 @@
 #ifndef DRONE_DATA_H
 #define DRONE_DATA_H
 
-#include <vector>
+#include <array>
 
 #include "utils/vector3d.h"
 
