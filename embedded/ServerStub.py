@@ -23,12 +23,13 @@ class Commands:
   kIdentify = 0x01
   kTakeOff = 0x02
   kLand = 0x03
+  kReturnToBase = 0x04
 
 nConnections = 9
 identifier = "s"
 
 # CHANGE TO FALSE TO CONTROL REAL DRONE
-is_simulation = True
+is_simulation = False
 
 servers = []
 clients = []
@@ -65,6 +66,10 @@ def identify():
   data = [Commands.kIdentify]
   send_command(data)
 
+def returnToBase():
+  data = [Commands.kReturnToBase]
+  send_command(data)
+
 def send_command(data):
   if is_simulation:
     for client in clients:
@@ -83,4 +88,6 @@ landButton = Button(window, text='Land', command=land)
 landButton.grid(column=1, row=0)
 identifyButton = Button(window, text='Identify', command=identify)
 identifyButton.grid(column=2, row=0)
+identifyButton = Button(window, text='Return to Base', command=returnToBase)
+identifyButton.grid(column=3, row=0)
 window.mainloop()

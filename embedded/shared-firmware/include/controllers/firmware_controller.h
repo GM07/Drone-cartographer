@@ -25,7 +25,7 @@ class FirmwareController : public AbstractController {
   FirmwareController(const FirmwareController& other) = delete;
   FirmwareController operator=(const FirmwareController& other) = delete;
 
-  void setVelocity(const Vector3D& direction, float speed) override;
+  void setVelocity(const Vector3D& direction, float speed, bool absZ) override;
   void takeOff(float height) override;
   void land() override;
 

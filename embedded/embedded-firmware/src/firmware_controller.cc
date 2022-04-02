@@ -105,12 +105,19 @@ void FirmwareController::sendMessage(void* message, size_t size) const {
 void FirmwareController::identify() { ledseqRun(&m_seqLED); }
 
 ///////////////////////////////////////
-void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
+void FirmwareController::setVelocity(const Vector3D& direction, float speed,
+                                     bool absZ) {
   Vector3D speedVector = direction.toUnitVector() * speed;
 
   static setpoint_t setpoint;
-  setpoint.mode.z = modeAbs;
-  setpoint.position.z = kHeight;
+
+  if (absZ) {
+    setpoint.mode.z = modeAbs;
+    setpoint.position.z = kHeight;
+  } else {
+    setpoint.mode.z = modeVelocity;
+    setpoint.velocity.z = speedVector.m_z;
+  }
   setpoint.mode.x = modeVelocity;
   setpoint.mode.y = modeVelocity;
   setpoint.velocity.x = speedVector.m_x;

@@ -9,11 +9,13 @@ void Drone::step() {
   m_controller->sendP2PMessage(static_cast<void *>(&m_data), sizeof(m_data));
   m_controller->receiveP2PMessage(&m_peerData);
 
+  m_normal = Vector3D();
+
   switch (m_controller->m_state) {
     case State::kTakingOff:
       if (m_controller->isTrajectoryFinished()) {
         m_controller->m_state = State::kExploring;
-        m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
+        m_controller->setVelocity(m_data.m_direction, kDroneSpeed, true);
       }
       break;
     case State::kLanding:
@@ -22,11 +24,22 @@ void Drone::step() {
       }
       break;
     case State::kExploring:
-      m_normal = Vector3D();
       wallAvoidance();
       collisionAvoidance();
       changeDirection();
-      m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
+      m_controller->setVelocity(m_data.m_direction, kDroneSpeed, true);
+      break;
+    case State::kReturnToBase:
+      wallAvoidance();
+      // If there is a wall jump over it
+      if (!areAlmostEqual(m_normal, Vector3D())) {
+        m_controller->setVelocity(Vector3D::z(1.0), kDroneSpeed, false);
+      } else {
+        m_data.m_direction = Vector3D() - m_controller->getCurrentLocation();
+        m_data.m_direction.m_z = 0;
+        m_controller->setVelocity(m_data.m_direction, kDroneSpeed, false);
+      }
+      break;
     case State::kIdle:  // Fallthrough
     default:
       break;

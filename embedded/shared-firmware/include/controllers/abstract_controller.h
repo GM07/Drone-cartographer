@@ -27,7 +27,8 @@ class AbstractController {
       std::unique_ptr<AbstractSensors>&& abstractSensors)
       : m_abstractSensors(std::move(abstractSensors)){};
 
-  virtual void setVelocity(const Vector3D& direction, float speed) = 0;
+  virtual void setVelocity(const Vector3D& direction, float speed,
+                           bool absZ) = 0;
   virtual void takeOff(float height) = 0;
   virtual void land() = 0;
 
