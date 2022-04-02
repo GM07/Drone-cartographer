@@ -1,28 +1,53 @@
 <template>
-  <div id="content">
-  <div style="height: 100%; position: relative">
-    <div
-      ref="console"
-      style="
-        position: absolute;
-        inset: 0px;
-        background-color: black;
-        overflow: auto;
-        display: flex;
-        flex-direction: column-reverse;
-      "
-    >
-      <p
-        v-for="item in this.output"
-        :key="item[1]"
-        :style="
-          item[0] === 'stdout'
-            ? 'color: white; margin: 0px'
-            : 'color: red; margin: 0px'
-        "
+  <div id="container" style="height: 100%; position: relative">
+    <div id="actions">
+      <v-btn
+        class="ma-2 white--text action-button"
+        color="orange"
+        :loading="loading3"
+        x-small
+        @click="recompile"
       >
-        {{ item[1] }}
-      </p>
+        Recompile
+        <v-icon dark right> mdi-cog-play </v-icon>
+      </v-btn>
+      <v-btn
+        class="ma-2 white--text action-button"
+        color="green"
+        :loading="loading3"
+        x-small
+        @click="recompile"
+      >
+        Flash
+        <v-icon dark right> mdi-play </v-icon>
+      </v-btn>
+    </div>
+    <div id="console">
+      <vue-custom-scrollbar class="scroll-area" :settings="settings">
+        <div
+          ref="console"
+          style="
+            position: absolute;
+            inset: 0px;
+            background-color: #1e1e1e;
+            overflow: auto;
+            display: flex;
+            flex-direction: column-reverse;
+          "
+        >
+          <p
+            v-for="item in this.output"
+            :key="item[1]"
+            :style="
+              item[0] === 'stdout'
+                ? 'color: white; margin: 0px'
+                : 'color: red; margin: 0px'
+            "
+          >
+            {{ item[1] }}
+          </p>
+        </div>
+      </vue-custom-scrollbar>
     </div>
   </div>
 </template>
@@ -32,8 +57,27 @@
   display: flex;
 }
 
-#action {
-  margin: 10px;
+#container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+#console {
+  height: 90%;
+  width: 100%;
+  position: absolute;
+  top: 10%;
+}
+
+#actions {
+  height: 10%;
+  display: flex;
+  flex-direction: row;
+}
+
+.action-button {
+  margin: 1%;
 }
 </style>
 
@@ -42,10 +86,16 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import SocketIO, {Socket} from 'socket.io-client';
 import {SERVER_ADDRESS} from '@/communication/server_constants';
 import {DefaultEventsMap} from 'socket.io/dist/typed-events';
+import {ServerCommunication} from '@/communication/server_communication';
 @Component({})
 export default class RemoteCommandOutput extends Vue {
   @Prop() private namespace!: string;
 
+  public settings = {
+    suppressScrollY: false,
+    suppressScrollX: false,
+    wheelPropagation: false,
+  };
   public isFinished = true;
   public hasErrors = false;
 
@@ -88,7 +138,9 @@ export default class RemoteCommandOutput extends Vue {
     this.socket.open();
   }
 
-  public;
+  public recompile(): void {
+    ServerCommunication.recompile();
+  }
 
   private updated() {
     const CONSOLE_OUTPUT = (this.$refs.console as Vue).$el as HTMLElement;

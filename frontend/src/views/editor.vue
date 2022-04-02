@@ -30,10 +30,10 @@
         <CodeEditor
           ref="codeEditor"
           border_radius="0px"
-          :copy_code="true"
+          :copy_code="false"
           :display_language="false"
           height="100%"
-          :language_selector="true"
+          :language_selector="false"
           :languages="[['cpp', 'C++']]"
           :value="fileContent"
           width="100%"
@@ -53,6 +53,7 @@
 <style>
 #content {
   height: 100vh;
+  background-color: #252526;
   display: flex;
   flex-direction: row;
 }
@@ -65,13 +66,13 @@
 
 .vue-treeselect__option--highlight {
   color: #d4d4d4;
-  background-color: #d7ebff7a;
+  background-color: #37373d50;
 }
 
 .vue-treeselect--single .vue-treeselect__option--selected,
 .vue-treeselect--single .vue-treeselect__option--selected:hover {
   color: #d4d4d4;
-  background-color: #d7ebff7a;
+  background-color: #37373dff;
 }
 
 .vue-treeselect--open.vue-treeselect--open-below .vue-treeselect__control {
@@ -87,7 +88,6 @@
 
 #files {
   width: 100%;
-  height: 100%;
 }
 
 .scroll-area {
@@ -98,14 +98,13 @@
 #editor {
   width: 100%;
   height: 80%;
-  background-color: yellow;
 }
 
 #terminal {
   width: 100%;
   height: 20%;
   background-color: #1e1e1e;
-  border-top: 2px solid #d4d4d4;
+  border-top: 1px solid #d7ebff7a;
 }
 
 #file {
