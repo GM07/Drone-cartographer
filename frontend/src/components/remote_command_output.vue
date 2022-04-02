@@ -1,20 +1,35 @@
 <template>
-  <v-virtual-scroll
-    ref="console"
-    bench="5"
-    item-height="20"
-    :items="this.output"
-  >
-    <template v-slot:default="{item}">
-      <v-list-item v-if="item[0] === 'stdout'">
-        <p style="color: white">{{ item[1] }}</p>
-      </v-list-item>
-      <v-list-item v-if="item[0] === 'stderr'">
-        <p style="color: red">{{ item[1] }}</p>
-      </v-list-item>
-    </template>
-  </v-virtual-scroll>
+  <div id="content">
+    <v-btn id="action" color="orange" dark icon small>
+      <v-icon dark> mdi-cog-play</v-icon>
+    </v-btn>
+    <v-virtual-scroll
+      ref="console"
+      bench="5"
+      item-height="20"
+      :items="this.output"
+    >
+      <template v-slot:default="{item}">
+        <v-list-item v-if="item[0] === 'stdout'">
+          <p style="color: white">{{ item[1] }}</p>
+        </v-list-item>
+        <v-list-item v-if="item[0] === 'stderr'">
+          <p style="color: red">{{ item[1] }}</p>
+        </v-list-item>
+      </template>
+    </v-virtual-scroll>
+  </div>
 </template>
+
+<style>
+#content {
+  display: flex;
+}
+
+#action {
+  margin: 10px;
+}
+</style>
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
@@ -58,6 +73,8 @@ export default class RemoteCommandOutput extends Vue {
 
     this.socket.open();
   }
+
+  public;
 
   private updated() {
     const CONSOLE_OUTPUT = (this.$refs.console as Vue).$el as HTMLElement;

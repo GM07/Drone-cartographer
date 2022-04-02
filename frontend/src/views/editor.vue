@@ -44,9 +44,6 @@
 
       <div id="terminal">
         <remote-command-output namespace="/recompileSimulation">
-          <v-btn id="recompile" color="green" icon @click="recompile()">
-            <v-icon>mdi-home</v-icon>
-          </v-btn>
         </remote-command-output>
       </div>
     </div>
