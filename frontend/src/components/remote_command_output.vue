@@ -1,21 +1,29 @@
 <template>
-  <v-virtual-scroll
-    ref="console"
-    bench="5"
-    height="200"
-    item-height="20"
-    :items="this.output"
-    style="background-color: black; overflow-x: auto; width: 100%"
-  >
-    <template v-slot:default="{item}">
-      <v-list-item v-if="item[0] === 'stdout'">
-        <p style="color: white">{{ item[1] }}</p>
-      </v-list-item>
-      <v-list-item v-if="item[0] === 'stderr'">
-        <p style="color: red">{{ item[1] }}</p>
-      </v-list-item>
-    </template>
-  </v-virtual-scroll>
+  <div style="height: 100%; position: relative">
+    <div
+      ref="console"
+      style="
+        position: absolute;
+        inset: 0px;
+        background-color: black;
+        overflow: auto;
+        display: flex;
+        flex-direction: column-reverse;
+      "
+    >
+      <p
+        v-for="item in this.output"
+        :key="item[1]"
+        :style="
+          item[0] === 'stdout'
+            ? 'color: white; margin: 0px'
+            : 'color: red; margin: 0px'
+        "
+      >
+        {{ item[1] }}
+      </p>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -41,19 +49,29 @@ export default class RemoteCommandOutput extends Vue {
     }).close();
 
     this.socket.on('stdout', (stdout: string) => {
-      this.output.push(['stdout', stdout]);
+      if (stdout === '\n' || this.output.length === 0) {
+        this.output.unshift(['stdout', '']);
+      } else {
+        this.output[0][1] += stdout;
+      }
     });
 
     this.socket.on('stderr', (stderr: string) => {
       this.hasErrors = true;
-      this.output.push(['stderr', stderr]);
+      if (stderr === '\n' || this.output.length === 0) {
+        this.output.unshift(['stderr', '']);
+      } else {
+        this.output[0][1] += stderr;
+      }
     });
 
     this.socket.on('stop', () => {
       this.isFinished = true;
+      this.$forceUpdate();
     });
 
     this.socket.on('start', () => {
+      this.output.splice(0);
       this.isFinished = false;
       this.hasErrors = false;
     });
@@ -63,8 +81,7 @@ export default class RemoteCommandOutput extends Vue {
 
   private updated() {
     const CONSOLE_OUTPUT = (this.$refs.console as Vue).$el as HTMLElement;
-    CONSOLE_OUTPUT.scrollTop =
-      CONSOLE_OUTPUT.scrollHeight - CONSOLE_OUTPUT.clientHeight;
+    console.log(CONSOLE_OUTPUT);
   }
 
   private destroyed() {

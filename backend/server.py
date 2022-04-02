@@ -70,15 +70,16 @@ def recompile():
         return ''
 
     RECOMPILE_SIMULATION.start()
-    RECOMPILE_EMBEDDED.start()
+    #RECOMPILE_EMBEDDED.start()
     return 'Recompiling'
+
 
 # Reflash firmware
 @SOCKETIO.on('flash', namespace='/limitedAccess')
 def flash():
     if not AccessStatus.is_request_valid(request):
         return ''
-    
+
     if AccessStatus.get_mission_simulated():
         return ''
 
@@ -89,7 +90,8 @@ def flash():
     for drone in drone_list:
         flashDrone.append("make cload radio=" + drone["name"])
 
-    bashCommand = f"docker exec embedded sh -c 'cd workspaces/INF3995-106/embedded/embedded-firmware" + " && " + " && ".join(flashDrone) + "'"
+    bashCommand = f"docker exec embedded sh -c 'cd workspaces/INF3995-106/embedded/embedded-firmware" + " && " + " && ".join(
+        flashDrone) + "'"
     FLASH_ALL_DRONES.changeCommand(bashCommand)
     FLASH_ALL_DRONES.start()
     return 'Flashing'
