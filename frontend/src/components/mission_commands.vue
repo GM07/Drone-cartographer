@@ -10,7 +10,10 @@
       </v-switch>
     </div>
     <v-list-item
-      v-if="!this.$store.state.missionStatus.isP2Prunning"
+      v-if="
+        !this.$store.state.missionStatus.isP2Prunning &&
+        !accessStatus.isMissionSimulated
+      "
       :disabled="!this.$store.state.missionStatus.isMissionStarted"
       v-on:click="startP2P()"
     >
@@ -23,7 +26,8 @@
     <v-list-item
       v-if="
         this.$store.state.missionStatus.isP2Prunning &&
-        this.$store.state.missionStatus.isMissionStarted
+        this.$store.state.missionStatus.isMissionStarted &&
+        !accessStatus.isMissionSimulated
       "
       v-on:click="endP2P()"
     >
