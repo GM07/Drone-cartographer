@@ -49,6 +49,7 @@ void flashCorrectLed(void *) {
       if (isActiveContext) {
         ledseqStop(&greenContext[lastGreenContextId]);
         ledseqStop(&redContext[CONTEXT_ARRAY_MAX_INDEX - lastGreenContextId]);
+        isActiveContext = false;
       }
       Time::delayMs(1000);
 
