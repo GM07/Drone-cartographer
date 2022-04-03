@@ -65,6 +65,8 @@ struct FunctionsMock {
                           UBaseType_t, TaskHandle_t* const));
   MOCK_METHOD1(ledseqRegisterSequence, void(ledseqContext_t*));
   MOCK_METHOD1(ledseqRun, bool(ledseqContext_t*));
+  MOCK_METHOD1(ledseqRunBlocking, bool(ledseqContext_t*));
+  MOCK_METHOD1(ledseqStop, bool(ledseqContext_t*));
   MOCK_METHOD1(vTaskDelay, void(const TickType_t));
   MOCK_METHOD0(supervisorIsTumbled, bool());
   MOCK_METHOD3(appchannelReceiveDataPacket, size_t(void*, size_t, int));
