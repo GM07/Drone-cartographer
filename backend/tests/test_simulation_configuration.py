@@ -8,19 +8,22 @@ import services.communication.simulation_configuration as Config
 class TestApplication(unittest.TestCase):
 
     def test_box_dataclass(self):
-        box = Config.Box(0, 1, 2, 3)
-        expected_width = 2 * math.sin(3)
-        expected_height = 2 * math.cos(3)
+        width = 3
+        length = 1
+        box = Config.Box(0, 0, length, width, 0)
+        expected_width = width + Config.WALL_SPACING
+        expected_height = length + Config.WALL_SPACING
         expected_real_x_pos = 0 - expected_width / 2
-        expected_real_y_pos = 1 - expected_height / 2
+        expected_real_y_pos = 0 - expected_height / 2
+        expected_orientation = 0
 
         self.assertEqual(box.x_pos_argos, 0)
-        self.assertEqual(box.y_pos_argos, 1)
-        self.assertEqual(box.orientation, 3)
+        self.assertEqual(box.y_pos_argos, 0)
         self.assertEqual(box.width, expected_width)
         self.assertEqual(box.height, expected_height)
         self.assertEqual(box.x_pos, expected_real_x_pos)
         self.assertEqual(box.y_pos, expected_real_y_pos)
+        self.assertEqual(box.orientation, expected_orientation)
 
     @mock.patch('services.communication.simulation_configuration.pathlib.Path')
     @mock.patch(
@@ -68,7 +71,12 @@ class TestApplication(unittest.TestCase):
         config = Config.SimulationConfiguration()
         et_mock.parse = mock.MagicMock()
         et_mock.SubElement = mock.MagicMock()
-        config.add_obstacles([{'name': 'test', 'xPos': 1, 'yPos': 2}])
+        config.add_obstacles([{
+            'name': 'test',
+            'xPos': 1,
+            'yPos': 2,
+            'orientation': 0
+        }])
 
         self.assertEqual(path_mock.call_count, 2)
         self.assertEqual(et_mock.parse.call_count, 1)
@@ -82,9 +90,9 @@ class TestApplication(unittest.TestCase):
     def test_is_colliding(self, shut: mock.MagicMock, et: mock.MagicMock,
                           path: mock.MagicMock, element: mock.MagicMock):
         config = Config.SimulationConfiguration()
-        box1 = Config.Box(1, 1, 2, 1)
-        box2 = Config.Box(1, 1, 2, 1)
-        box3 = Config.Box(0, 0, 0.5, 0)
+        box1 = Config.Box(1, 1, 2, 1, 0)
+        box2 = Config.Box(1, 1, 2, 1, 0)
+        box3 = Config.Box(0, 0, 0.5, 0, 0)
         self.assertTrue(
             config._SimulationConfiguration__is_colliding(box1, box2))
         self.assertFalse(
