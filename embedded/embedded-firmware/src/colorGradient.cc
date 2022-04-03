@@ -43,10 +43,13 @@ void flashCorrectLed(void *) {
   Time::delayMs(3000);
   const int CONTEXT_ARRAY_MAX_INDEX = 9;
   int lastGreenContextId = 0;
+  bool isActiveContext = false;
   while (true) {
     if (!Drone::getEmbeddedDrone().m_p2pIsActive) {
-      ledseqStop(&greenContext[lastGreenContextId]);
-      ledseqStop(&redContext[CONTEXT_ARRAY_MAX_INDEX - lastGreenContextId]);
+      if (isActiveContext) {
+        ledseqStop(&greenContext[lastGreenContextId]);
+        ledseqStop(&redContext[CONTEXT_ARRAY_MAX_INDEX - lastGreenContextId]);
+      }
       Time::delayMs(1000);
 
       continue;
@@ -87,6 +90,7 @@ void flashCorrectLed(void *) {
       ledseqRunBlocking(&greenContext[0]);
       ledseqRunBlocking(&redContext[CONTEXT_ARRAY_MAX_INDEX - 0]);
     }
+    isActiveContext = true;
 
     Time::delayMs(1000);
   }
