@@ -41,6 +41,12 @@ size_t appchannelReceiveDataPacket(void* buffer, size_t max_length,
 ///////////////////////////////////////////////////////////////
 bool ledseqRun(ledseqContext_t* context) { return mock->ledseqRun(context); }
 
+void ledseqRunBlocking(ledseqContext_t* context) {
+  return mock->ledseqRunBlocking(context);
+}
+
+bool ledseqStop(ledseqContext_t* context) { return mock->ledseqStop(context); }
+
 ////////////////////////////////////////////////////////////////
 void vTaskDelay(const TickType_t xTicksToDelay) {
   mock->vTaskDelay(xTicksToDelay);
