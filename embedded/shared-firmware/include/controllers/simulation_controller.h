@@ -45,9 +45,6 @@ class SimulationController : public AbstractController {
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
   [[nodiscard]] bool isTrajectoryFinished() const override;
-  [[nodiscard]] inline bool isTakeOffOrLandingFinished() const override {
-    return isTrajectoryFinished();
-  }
 
   void initCommunicationManager() override;
 

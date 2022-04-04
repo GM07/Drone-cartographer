@@ -5,6 +5,8 @@
 
 constexpr float kThreshold = 10.0e-3;
 
+namespace Math {
+
 ///////////////////////////////////////////////
 template <class T>
 [[nodiscard]] constexpr inline bool areAlmostEqual(
@@ -12,8 +14,6 @@ template <class T>
   T const diff = std::minus<>{}(first, second);
   return diff < threshold && diff > -threshold;
 }
-
-namespace Math {
 
 template <typename T>
 constexpr T pi = static_cast<T>(3.14159265358979323846L);  // NOLINT

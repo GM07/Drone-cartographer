@@ -12,13 +12,13 @@ void Drone::step() {
 
   switch (m_controller->m_state) {
     case State::kTakingOff:
-      if (m_controller->isTakeOffOrLandingFinished()) {
+      if (m_controller->isAltitudeReached()) {
         m_controller->m_state = State::kExploring;
         m_data.m_direction = m_initialDirection;
       }
       break;
     case State::kLanding:
-      if (m_controller->isTakeOffOrLandingFinished()) {
+      if (m_controller->isAltitudeReached()) {
         m_controller->m_state = State::kIdle;
         m_controller->stopMotors();
       }
@@ -29,13 +29,35 @@ void Drone::step() {
       changeDirection();
       break;
     case State::kReturnToBase:
+      static bool jumpingWall = false;
       wallAvoidance();
       // If there is a wall jump over it
-      if (!areAlmostEqual(m_normal, Vector3D())) {
+      if (!Math::areAlmostEqual(m_normal, Vector3D())) {
         m_data.m_direction = Vector3D::z(1.0f);
+
+        // Ensures we go twice as high as the obstacle
+        m_controller->m_targetPosition = m_controller->getCurrentLocation();
+        m_controller->m_targetPosition.m_z *= 2;
+        jumpingWall = true;
+
+      } else if (jumpingWall) {
+        if (m_controller->isAltitudeReached()) jumpingWall = false;
       } else {
         m_data.m_direction = Vector3D() - m_controller->getCurrentLocation();
         m_data.m_direction.m_z = 0;
+
+        // If there are no walls and we are above our origin land
+        m_controller->m_targetPosition =
+            Vector3D::z(m_controller->getCurrentLocation().m_z);
+        m_controller->log("target " +
+                          m_controller->m_targetPosition.toString());
+        m_controller->log("current" +
+                          m_controller->getCurrentLocation().toString());
+        if (m_controller->isTrajectoryFinished()) {
+          m_controller->land();
+          m_data.m_direction = Vector3D::z(-1.0f);
+          m_controller->m_state = State::kLanding;
+        }
       }
       break;
     case State::kIdle:  // Fallthrough
@@ -88,7 +110,7 @@ void Drone::wallAvoidance() {
         m_controller->m_data.left < m_controller->m_data.right ? -1.0F : 1.0F;
   }
 
-  if (areAlmostEqual<Vector3D>(m_normal, m_data.m_direction) ||
+  if (Math::areAlmostEqual<Vector3D>(m_normal, m_data.m_direction) ||
       Vector3D::areSameDirection(m_data.m_direction, m_normal)) {
     m_normal = Vector3D();
   }
@@ -110,10 +132,10 @@ void Drone::collisionAvoidance() {
 
 /////////////////////////////////////////////////////////////////////
 void Drone::changeDirection() {
-  if (!areAlmostEqual(m_normal, Vector3D())) {
+  if (!Math::areAlmostEqual(m_normal, Vector3D())) {
     Vector3D newDirection = m_data.m_direction.reflect(m_normal);
 
-    if (!areAlmostEqual(m_data.m_direction, newDirection)) {
+    if (!Math::areAlmostEqual(m_data.m_direction, newDirection)) {
       m_data.m_direction = newDirection;
     }
   }

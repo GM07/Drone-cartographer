@@ -66,11 +66,6 @@ void FirmwareController::updateSensorsData() {
                         kRealTrajectoryFinishedTreshold);
 }
 
-[[nodiscard]] bool FirmwareController::isTakeOffOrLandingFinished() const {
-  return areAlmostEqual(getCurrentLocation().m_z, m_targetPosition.m_z,
-                        kRealTrajectoryFinishedTreshold);
-}
-
 ////////////////////////////////////////////////
 [[nodiscard]] Vector3D FirmwareController::getCurrentLocation() const {
   point_t point;

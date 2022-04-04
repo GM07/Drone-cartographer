@@ -23,6 +23,7 @@ bool Drone::handleCommand(Command command) {
       return true;
     case Command::kReturnToBase:
       m_controller->m_state = State::kReturnToBase;
+      return true;
     default:
       return false;
   }

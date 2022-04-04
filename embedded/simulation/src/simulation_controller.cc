@@ -161,7 +161,7 @@ void SimulationController::land() {
 
 ///////////////////////////////////////////////////
 [[nodiscard]] bool SimulationController::isTrajectoryFinished() const {
-  return areAlmostEqual(getCurrentLocation(), m_targetPosition);
+  return Math::areAlmostEqual(getCurrentLocation(), m_targetPosition);
 }
 
 ///////////////////////////////////////////////////
