@@ -78,7 +78,6 @@ void addCustomLoggingVariables() {
 extern "C" void appMain() {
   ledClearAll();
   addCustomLoggingVariables();
-  enableCrtpHighLevelCommander();
   Drone::getEmbeddedDrone().initDrone();
 
   while (true) {

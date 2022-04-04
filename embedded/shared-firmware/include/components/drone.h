@@ -48,7 +48,7 @@ class Drone {
     std::uniform_int_distribution<int> distribution(
         0, startingDirection.size() - 1);
 
-    m_data.m_direction = startingDirection.at(distribution(generator));
+    m_initialDirection = startingDirection.at(distribution(generator));
   }
 
   Drone(const Drone& other) = delete;
@@ -87,6 +87,7 @@ class Drone {
 
  protected:
   Vector3D m_normal;
+  Vector3D m_initialDirection;
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
   std::unordered_map<size_t, DroneData> m_usedPeerData;

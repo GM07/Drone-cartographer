@@ -61,7 +61,7 @@ void FirmwareController::updateSensorsData() {
 
 ////////////////////////////////////////////////
 [[nodiscard]] bool FirmwareController::isTrajectoryFinished() const {
-  return crtpCommanderHighLevelIsTrajectoryFinished();
+  return areAlmostEqual(getCurrentLocation(), m_targetPosition, 0.05f);
 }
 
 ////////////////////////////////////////////////
@@ -75,19 +75,12 @@ void FirmwareController::updateSensorsData() {
 void FirmwareController::takeOff(float height) {
   m_takeOffPosition += getCurrentLocation();
   m_targetPosition = Vector3D::z(height);
-  float time =
-      m_targetPosition.distanceTo(getCurrentLocation()) / kTakeOffSpeed;
-  crtpCommanderHighLevelTakeoff(height, time);
 }
 
 ///////////////////////////////
 void FirmwareController::land() {
-  commanderNotifySetpointsStop(0);
   m_targetPosition = getCurrentLocation();
   m_targetPosition.m_z = 0;
-  float time =
-      m_targetPosition.distanceTo(getCurrentLocation()) / kLandingSpeed;
-  crtpCommanderHighLevelLand(m_targetPosition.m_z, time);
 }
 
 ///////////////////////////////////////
@@ -109,10 +102,10 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
   Vector3D speedVector = direction.toUnitVector() * speed;
 
   static setpoint_t setpoint;
-  setpoint.mode.z = modeAbs;
-  setpoint.position.z = kHeight;
+  setpoint.mode.z = modeVelocity;
   setpoint.mode.x = modeVelocity;
   setpoint.mode.y = modeVelocity;
+  setpoint.velocity.z = speedVector.m_z;
   setpoint.velocity.x = speedVector.m_x;
   setpoint.velocity.y = speedVector.m_y;
   setpoint.velocity_body = false;

@@ -12,12 +12,13 @@ void Drone::step() {
     case State::kTakingOff:
       if (m_controller->isTrajectoryFinished()) {
         m_controller->m_state = State::kExploring;
-        m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
+        m_data.m_direction = m_initialDirection;
       }
       break;
     case State::kLanding:
       if (m_controller->isTrajectoryFinished()) {
         m_controller->m_state = State::kIdle;
+        m_data.m_direction = Vector3D();
       }
       break;
     case State::kExploring:
@@ -25,11 +26,13 @@ void Drone::step() {
       wallAvoidance();
       collisionAvoidance();
       changeDirection();
-      m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
+      break;
     case State::kIdle:  // Fallthrough
     default:
-      break;
+      return;
   }
+
+  m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
 }
 
 /////////////////////////////////////////////////////////////////////
