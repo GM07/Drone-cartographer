@@ -210,7 +210,7 @@ export default class Editor extends Vue {
   public attemptedLimitedConnection = false;
   public value = null;
   public tab = null; // Used by the tab component
-  public fileContent = 'test';
+  public fileContent = '';
   public files: Map<string, string> = new Map();
   public options: TreeNode[] = [];
   public treeOpen = false;
