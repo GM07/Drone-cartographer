@@ -103,7 +103,7 @@ void SimulationController::sendDroneDataToServerThread() {
             m_controllerData.reset();
           }
 
-          m_dataSocket->send(buffer(&dataToSend, kMessageMaxSize));
+          m_dataSocket->send(buffer(&dataToSend, sizeof(dataToSend)));
           m_dataSocket->receive(buffer(&ack, sizeof(ack)));
         }
 
