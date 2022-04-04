@@ -14,7 +14,7 @@ PROJ_OBJ += commands_handler.o \
 	vector3d.o \
 	firmware_sensors.o \
 	sensors_data_updater.o \
-	colorGradient.o \
+	color_gradient.o \
 	p2p_task.o
 
 CRAZYFLIE_BASE=../crazyflie-firmware
