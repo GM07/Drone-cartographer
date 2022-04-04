@@ -55,31 +55,22 @@ void flashP2PLed(void *) {
       continue;
     }
     std::vector<float> droneDistances;
+    int positionCounter = 0;
+    for (auto itr = Drone::getEmbeddedDrone().m_peerData.begin();
+         itr != Drone::getEmbeddedDrone().m_peerData.end(); ++itr) {
+      if (Drone::getEmbeddedDrone().m_data.m_distanceFromTakeoff >
+          itr->second.m_distanceFromTakeoff)
+        positionCounter++;
+    }
 
-    std::transform(Drone::getEmbeddedDrone().m_peerData.begin(),
-                   Drone::getEmbeddedDrone().m_peerData.end(),
-                   std::back_inserter(droneDistances),
-                   [](std::pair<size_t, DroneData> const &pair) {
-                     return pair.second.m_distanceFromTakeoff;
-                   });
-
-    droneDistances.push_back(
-        Drone::getEmbeddedDrone().m_data.m_distanceFromTakeoff);
-    std::sort(droneDistances.begin(), droneDistances.end());
-
-    std::vector<float>::iterator itr =
-        std::find(droneDistances.begin(), droneDistances.end(),
-                  Drone::getEmbeddedDrone().m_data.m_distanceFromTakeoff);
-
-    int distance = std::distance(droneDistances.begin(), itr);
     ledseqStop(&greenContext[lastGreenContextId]);
     ledseqStop(&redContext[kContextArrayMaxIndex - lastGreenContextId]);
     if (droneDistances.size() != 1) {
       float divisionSize =
           (kContextArrayMaxIndex + 1) / ((float)droneDistances.size() - 1);
 
-      int index =
-          (int)std::clamp<double>(round(distance * divisionSize - 1), 0, 9);
+      int index = (int)std::clamp<double>(
+          round(positionCounter * divisionSize - 1), 0, 9);
       lastGreenContextId = index;
 
       ledseqRunBlocking(&greenContext[index]);
