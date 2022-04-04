@@ -37,7 +37,7 @@ void Drone::step() {
       } else {
         m_data.m_direction = Vector3D() - m_controller->getCurrentLocation();
         m_data.m_direction.m_z = 0;
-        m_controller->setVelocity(m_data.m_direction, kDroneSpeed, true);
+        m_controller->setVelocity(m_data.m_direction, kDroneSpeed, false);
       }
       break;
     case State::kIdle:  // Fallthrough
