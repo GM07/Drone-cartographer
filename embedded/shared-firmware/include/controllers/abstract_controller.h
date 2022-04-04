@@ -30,9 +30,11 @@ class AbstractController {
   virtual void setVelocity(const Vector3D& direction, float speed) = 0;
   virtual void takeOff(float height) = 0;
   virtual void land() = 0;
+  virtual void stopMotors() = 0;
 
   [[nodiscard]] virtual Vector3D getCurrentLocation() const = 0;
   [[nodiscard]] virtual bool isTrajectoryFinished() const = 0;
+  [[nodiscard]] virtual bool isTakeOffOrLandingFinished() const = 0;
   [[nodiscard]] virtual bool isDroneCrashed() const = 0;
 
   virtual void initCommunicationManager() = 0;
@@ -55,9 +57,11 @@ class AbstractController {
   std::unique_ptr<AbstractSensors> m_abstractSensors;
   ControllerData m_data{};
 
+ public:
+  Vector3D m_targetPosition;
+
  protected:
   Vector3D m_takeOffPosition;
-  Vector3D m_targetPosition;
 };
 
 #endif

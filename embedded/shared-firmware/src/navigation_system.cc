@@ -12,15 +12,15 @@ void Drone::step() {
 
   switch (m_controller->m_state) {
     case State::kTakingOff:
-      if (m_controller->isTrajectoryFinished()) {
+      if (m_controller->isTakeOffOrLandingFinished()) {
         m_controller->m_state = State::kExploring;
         m_data.m_direction = m_initialDirection;
       }
       break;
     case State::kLanding:
-      if (m_controller->isTrajectoryFinished()) {
+      if (m_controller->isTakeOffOrLandingFinished()) {
         m_controller->m_state = State::kIdle;
-        m_data.m_direction = Vector3D();
+        m_controller->stopMotors();
       }
       break;
     case State::kExploring:

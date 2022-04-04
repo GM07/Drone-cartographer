@@ -41,9 +41,13 @@ class SimulationController : public AbstractController {
   void setVelocity(const Vector3D& direction, float speed) override;
   void takeOff(float height) override;
   void land() override;
+  inline void stopMotors() override{/**/};
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
   [[nodiscard]] bool isTrajectoryFinished() const override;
+  [[nodiscard]] inline bool isTakeOffOrLandingFinished() const override {
+    return isTrajectoryFinished();
+  }
 
   void initCommunicationManager() override;
 

@@ -24,9 +24,11 @@ class FirmwareController : public AbstractController {
   void setVelocity(const Vector3D& direction, float speed) override;
   void takeOff(float height) override;
   void land() override;
+  void stopMotors() override;
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
   [[nodiscard]] bool isTrajectoryFinished() const override;
+  [[nodiscard]] bool isTakeOffOrLandingFinished() const override;
 
   size_t receiveMessage(void* message, size_t size) const override;
   void sendMessage(void* message, size_t size) const override;
