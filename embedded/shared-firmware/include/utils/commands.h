@@ -5,6 +5,7 @@ enum class Command : uint8_t {
   kIdentify = 0x01,
   kTakeOff,
   kLand,
+  kReturnToBase,
 };
 
 #endif

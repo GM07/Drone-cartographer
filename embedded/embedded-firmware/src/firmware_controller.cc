@@ -34,7 +34,8 @@ std::array<ledseqStep_t, kNbLEDSteps> ledStep{{{true, LEDSEQ_WAITMS(500)},
 
 ////////////////////////////////////////////////
 FirmwareController::FirmwareController()
-    : AbstractController(std::make_unique<FirmwareSensors>()) {
+    : AbstractController(std::make_unique<FirmwareSensors>()),
+      m_height(kHeight) {
   m_seqLED.sequence = ledStep.data();
   m_seqLED.led = static_cast<led_t>(LED::kLedBlueLeft);
   ledseqRegisterSequence(&m_seqLED);
@@ -61,7 +62,7 @@ void FirmwareController::updateSensorsData() {
 
 ////////////////////////////////////////////////
 [[nodiscard]] bool FirmwareController::isTrajectoryFinished() const {
-  return areAlmostEqual(getCurrentLocation(), m_targetPosition, 0.05f);
+  return areAlmostEqual(getCurrentLocation().m_z, m_targetPosition.m_z, 0.05f);
 }
 
 ////////////////////////////////////////////////
@@ -101,6 +102,8 @@ void FirmwareController::identify() { ledseqRun(&m_seqLED); }
 void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
   Vector3D speedVector = direction.toUnitVector() * speed;
 
+  static float currentHeight = 0.0F;
+
   static setpoint_t setpoint;
   setpoint.mode.z = modeVelocity;
   setpoint.mode.x = modeVelocity;
@@ -109,6 +112,14 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
   setpoint.velocity.x = speedVector.m_x;
   setpoint.velocity.y = speedVector.m_y;
   setpoint.velocity_body = false;
+
+  float newHeight = m_abstractSensors->getPosZ();
+  if (abs(newHeight - currentHeight) > 0.05) {
+    identify();
+    setpoint.mode.z = modeDisable;
+  }
+
+  currentHeight = newHeight;
 
   commanderSetSetpoint(&setpoint, 3);
 }

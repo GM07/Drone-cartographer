@@ -8,6 +8,7 @@ enum State : uint8_t {
   kDead = 0x03,
   kExploring = 0x04,
   kCrash = 0x05,
+  kReturnToBase = 0x06
 };
 
 #endif

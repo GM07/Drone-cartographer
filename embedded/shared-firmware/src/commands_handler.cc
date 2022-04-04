@@ -21,6 +21,8 @@ bool Drone::handleCommand(Command command) {
       m_data.m_direction = Vector3D::z(-1.0F);
       m_controller->m_state = State::kLanding;
       return true;
+    case Command::kReturnToBase:
+      m_controller->m_state = State::kReturnToBase;
     default:
       return false;
   }
