@@ -60,7 +60,7 @@
           <v-btn class="action" color="orange" icon @click="recompile">
             <v-icon dark>mdi-cog-play</v-icon>
           </v-btn>
-          <v-btn class="action" color="green" icon @click="recompile">
+          <v-btn class="action" color="green" icon @click="flash">
             <v-icon dark>mdi-play</v-icon>
           </v-btn>
         </div>
@@ -294,6 +294,11 @@ export default class Editor extends Vue {
 
   public recompile(): void {
     ServerCommunication.recompile();
+  }
+
+  public flash(): void {
+    console.log('flash');
+    ServerCommunication.flash();
   }
 
   private changeFileContent(value: string): void {
