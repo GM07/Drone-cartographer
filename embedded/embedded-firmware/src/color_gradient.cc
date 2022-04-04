@@ -18,15 +18,21 @@ bool isInit;
 }  // namespace
 
 namespace P2PColorGradient {
-std::array<ledseqContext_t, 10> greenContext;
-std::array<ledseqContext_t, 10> redContext;
+
+constexpr int kContextArraySize = 10;
+
+std::array<ledseqContext_t, kContextArraySize> greenContext;
+std::array<ledseqContext_t, kContextArraySize> redContext;
 
 void registerColors() {
-  for (int i = 0; i < 10; ++i) {
-    std::array<ledseqStep_t, 3> *ledStep =
-        new std::array<ledseqStep_t, 3>{{{true, LEDSEQ_WAITMS(1 - i / 9)},
-                                         {false, LEDSEQ_WAITMS(i * 2)},
-                                         {true, LEDSEQ_LOOP}}};
+  constexpr int kStepCount = 3;
+
+  for (int i = 0; i < kContextArraySize; ++i) {
+    std::array<ledseqStep_t, kStepCount> *ledStep =
+        new std::array<ledseqStep_t, kStepCount>{
+            {{true, LEDSEQ_WAITMS(1 - i / kContextArraySize - 1)},
+             {false, LEDSEQ_WAITMS(i * 2)},
+             {true, LEDSEQ_LOOP}}};
 
     greenContext[i] = {.sequence = ledStep->data(),
                        .led = static_cast<led_t>(LED(kLedGreenLeft))};
@@ -70,7 +76,7 @@ void flashP2PLed(void *) {
           (kContextArrayMaxIndex + 1) / ((float)droneDistances.size() - 1);
 
       int index = (int)std::clamp<double>(
-          round(positionCounter * divisionSize - 1), 0, 9);
+          round(positionCounter * divisionSize - 1), 0, kContextArrayMaxIndex);
       lastGreenContextId = index;
 
       ledseqRunBlocking(&greenContext[index]);
