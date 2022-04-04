@@ -17,7 +17,7 @@ bool isInit;
 
 }  // namespace
 
-namespace P2P {
+namespace P2PColorGradient {
 std::array<ledseqContext_t, 10> greenContext;
 std::array<ledseqContext_t, 10> redContext;
 
@@ -25,13 +25,13 @@ void registerColors() {
   for (int i = 0; i < 10; ++i) {
     std::array<ledseqStep_t, 3> *ledStep =
         new std::array<ledseqStep_t, 3>{{{true, LEDSEQ_WAITMS(1 - i / 9)},
-                                         {false, LEDSEQ_WAITMS(abs(i * 2))},
+                                         {false, LEDSEQ_WAITMS(i * 2)},
                                          {true, LEDSEQ_LOOP}}};
 
-    greenContext[i] = {.sequence = reinterpret_cast<ledseqStep_t *>(ledStep),
+    greenContext[i] = {.sequence = ledStep->data(),
                        .led = static_cast<led_t>(LED(kLedGreenLeft))};
 
-    redContext[i] = {.sequence = reinterpret_cast<ledseqStep_t *>(ledStep),
+    redContext[i] = {.sequence = ledStep->data(),
                      .led = static_cast<led_t>(LED(kLedRedLeft))};
 
     ledseqRegisterSequence(&redContext[i]);
@@ -39,16 +39,15 @@ void registerColors() {
   }
 }
 
-void flashCorrectLed(void *) {
-  Time::delayMs(3000);
-  const int CONTEXT_ARRAY_MAX_INDEX = 9;
+void flashP2PLed(void *) {
+  constexpr int kContextArrayMaxIndex = 9;
   int lastGreenContextId = 0;
   bool isActiveContext = false;
   while (true) {
-    if (!Drone::getEmbeddedDrone().m_p2pIsActive) {
+    if (!Drone::getEmbeddedDrone().m_p2pColorGradientIsActive) {
       if (isActiveContext) {
         ledseqStop(&greenContext[lastGreenContextId]);
-        ledseqStop(&redContext[CONTEXT_ARRAY_MAX_INDEX - lastGreenContextId]);
+        ledseqStop(&redContext[kContextArrayMaxIndex - lastGreenContextId]);
         isActiveContext = false;
       }
       Time::delayMs(1000);
@@ -74,35 +73,35 @@ void flashCorrectLed(void *) {
 
     int distance = std::distance(droneDistances.begin(), itr);
     ledseqStop(&greenContext[lastGreenContextId]);
-    ledseqStop(&redContext[CONTEXT_ARRAY_MAX_INDEX - lastGreenContextId]);
+    ledseqStop(&redContext[kContextArrayMaxIndex - lastGreenContextId]);
     if (droneDistances.size() != 1) {
       float divisionSize =
-          (CONTEXT_ARRAY_MAX_INDEX + 1) / ((float)droneDistances.size() - 1);
+          (kContextArrayMaxIndex + 1) / ((float)droneDistances.size() - 1);
 
       int index =
           (int)std::clamp<double>(round(distance * divisionSize - 1), 0, 9);
       lastGreenContextId = index;
 
       ledseqRunBlocking(&greenContext[index]);
-      ledseqRunBlocking(&redContext[CONTEXT_ARRAY_MAX_INDEX - index]);
+      ledseqRunBlocking(&redContext[kContextArrayMaxIndex - index]);
 
     } else {
       lastGreenContextId = 0;
       ledseqRunBlocking(&greenContext[0]);
-      ledseqRunBlocking(&redContext[CONTEXT_ARRAY_MAX_INDEX - 0]);
+      ledseqRunBlocking(&redContext[kContextArrayMaxIndex - 0]);
     }
     isActiveContext = true;
 
     Time::delayMs(1000);
   }
 }
-}  // namespace P2P
+}  // namespace P2PColorGradient
 
 void initColorGradient() {
-  P2P::registerColors();
+  P2PColorGradient::registerColors();
 
-  xTaskCreate(P2P::flashCorrectLed, "ColorGradientTask",
+  xTaskCreate(P2PColorGradient::flashP2PLed, "ColorGradientTask",
               configMINIMAL_STACK_SIZE * 2, nullptr, 0, nullptr);
   isInit = true;
 }
-bool testColorGradient() { return isInit; };
+bool ColorGradientTest() { return isInit; };
