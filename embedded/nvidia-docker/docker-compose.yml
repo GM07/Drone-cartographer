@@ -16,9 +16,10 @@ services:
       - QT_X11_NO_MITSHM=1
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - /tmp/socket
+      - /tmp/socket:/tmp/socket
     network_mode: host
-    
+    devices:
+      - /dev/dri:/dev/dri
     deploy:
       resources:
         reservations:

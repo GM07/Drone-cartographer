@@ -2,11 +2,13 @@ import Vue from 'vue';
 import VueRouter, {RouteConfig} from 'vue-router';
 import Home from '@/views/home.vue';
 import Mission from '@/views/mission.vue';
+import CompletedMissions from '@/views/completed_missions.vue';
 
 Vue.use(VueRouter);
 
 export const HOME_ROUTE = '/';
 export const MISSION_ROUTE = '/Mission';
+export const COMPLETED_ROUTE = '/History';
 
 const ROUTES: Array<RouteConfig> = [
   {
@@ -18,6 +20,11 @@ const ROUTES: Array<RouteConfig> = [
     path: MISSION_ROUTE,
     name: 'Mission',
     component: Mission,
+  },
+  {
+    path: COMPLETED_ROUTE,
+    name: 'CompletedMissions',
+    component: CompletedMissions,
   },
   {
     path: '*',

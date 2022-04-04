@@ -1,6 +1,10 @@
 # Demonstration of the requirements
-R.F.1 : https://youtu.be/0blojlENKxA
-R.F.2 : https://youtu.be/TizYuNy4m-8
+R.F.1 : https://youtu.be/jW5N3KHpleM  
+R.F.2 : https://youtu.be/exyVJGXXqWs and https://youtu.be/910Vv9pmuNg  
+R.F.3 : https://youtu.be/zdT6yJBZk_A and https://youtu.be/r0D-aA17_5Q  
+R.F.4-R.F.5 : https://youtu.be/xhmPRty4eb4 and https://youtu.be/Kp2DKjgZOGI  
+R.F.10 : https://youtu.be/eavHEMG_ItM  
+R.C.1 : https://youtu.be/0A95FmTyeaU  
 # Project Configuration for Ubuntu
 
 ## Cloning project
@@ -10,6 +14,7 @@ This command requires a valid ssh key that is registered in GitLab
 ```
 git clone git@gitlab.com:polytechnique-montr-al/inf3995/20221/equipe-106/INF3995-106.git --recursive
 ```
+
 
 ## Installing Dependencies
 ### Docker:
@@ -41,6 +46,29 @@ The minimum required version of docker-composed is 1.25.* unless you are using n
 
 Additional information about the installation is provided:[Docker-Compose documentation](https://docs.docker.com/compose/install/)
 
+## Automatic Launch
+In order to launch the application you can simply execute the shell script present in the repository
+```
+./start.sh
+```
+The script will launch and configure all of the Docker containers
+
+If the file is not recognized as an executable please run this next command from the root of the project
+```
+chmod u+x start.sh
+```
+
+## Running tests
+
+You can test each component of the project by running the start script with the test option (-t).
+```
+./start.sh -t
+```
+The test results will then be available in the terminal.
+## Manual Launch
+
+This next part explains how to manually launch and configure the containers as Docker devcontainers
+
 ### Graphic Card Configuration (OPTIONAL)
 If you are using an NVIDIA GPU you must install additionnal software for the simulation to display properly in the container
 
@@ -60,7 +88,7 @@ You also need to modify the `devcontainer.json` file located in `INF3995-106/emb
 ```
 
 
-## Lauching the project
+### Manually Lauching the project
 To launch all the components of the project, you need the folders `backend`, `frontend` and `embedded` opened in vscode. Then using the Remote-Explorer extension from vscode, re-open all three folders in their respective container.
 
 ### Launching the Client

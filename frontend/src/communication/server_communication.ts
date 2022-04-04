@@ -1,4 +1,5 @@
 import * as SERVER_CONSTANTS from '@/communication/server_constants';
+import {Drone} from '@/communication/drone';
 
 export class ServerCommunication {
   public static getConnectedDrones(): Promise<Response> {
@@ -94,5 +95,23 @@ export class ServerCommunication {
     }
 
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
+  public static setDrone(drone: Drone[], isMissionSimulated: boolean): void {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.SET_DRONE_ADDRESS,
+        drone,
+        isMissionSimulated
+      );
+    }
+  }
+
+  public static getCompletedMissions(): Promise<Response> {
+    return fetch(SERVER_CONSTANTS.GET_COMPLETED_MISSIONS);
+  }
+
+  public static getSpecificMission(id: string): Promise<Response> {
+    return fetch(SERVER_CONSTANTS.GET_SPECIFIC_MISSION + '/' + id);
   }
 }

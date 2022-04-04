@@ -1,121 +1,142 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "Compile Simulation Firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/simulation"
-			},
-			"command": [
-				"if test -d build; then rm -rf build; fi &&",
-				"mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../../ && ninja"
-			]
-		},
-		{
-			"label": "Compile Shared Firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/shared-firmware"
-			},
-			"command": [
-				"if test -d build; then rm -rf build; fi &&",
-				"mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja"
-			]
-		},
-		{
-			"label": "Install Argos3 Package",
-			"type": "shell",
-			"detail": "Install argos3 from .deb package",
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"command": "dpkg -i argos3*.deb",
-			"runOptions": { 
-				"runOn": "folderOpen" 
-			}
-		},
-		{
-			"label": "Flash embedded firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/embedded-firmware"
-			},
-			"command": "make clean && make -j`nproc` && make cload radio=${input:radio}"
-		},
-		{
-			"label": "Compile Embedded Firmware",
-			"type": "shell",
-			"detail": "Clean and compile embedded firmware",
-			"options": {
-				"cwd": "${workspaceFolder}/embedded-firmware"
-			},
-			"command": "make clean && make -j`nproc`"
-		},
-		{
-			"label": "Test embedded firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/embedded-firmware/validate"
-			},
-			"command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./embedded_firmware"
-		},
-		{
-			"label": "Test shared firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/shared-firmware/validate"
-			},
-			"command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./shared_firmware"
-		},
-		{
-			"label": "Test simulation firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/simulation/validate"
-			},
-			"command": "rm -r build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./simulation_firmware"
-		},
-		{
-			"label": "Test all",
-			"type": "shell",
-			"dependsOn": [
-				"Test embedded firmware",
-				"Test shared firmware",
-				"Test simulation firmware"
-			]
-		},
-		{
-			"label": "lint simulation firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/simulation/"
-			},
-			"dependsOn" : [
-				"Compile Simulation Firmware"
-			],
-			"command": "cd build && ../../run-clang-tidy.py -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type\""
-		},
-		
-		{
-			"label": "lint embedded firmware",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceFolder}/embedded-firmware/"
-			},
-			"command": "../run-clang-tidy.py -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type\""
-		}
-	],
-	"inputs": [
-		{
-			"id": "radio",
-			"type": "pickString",
-			"default": "radio://0/80/2M/E7E7E7E761",
-			"description": "Radio adress to flash drone",
-			"options": [
-				"radio://0/80/2M/E7E7E7E761",
-				"radio://0/80/2M/E7E7E7E762"
-			]
-		}
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Compile Simulation Firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/simulation"
+      },
+      "command": [
+        "if test -d build; then rm -rf build; fi &&",
+        "mkdir build && cd build && cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../../ && ninja"
+      ]
+    },
+    {
+      "label": "Install Argos3 Package",
+      "type": "shell",
+      "detail": "Install argos3 from .deb package",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "command": "dpkg -i argos3*.deb",
+      "runOptions": { 
+        "runOn": "folderOpen" 
+      }
+    },
+    {
+      "label": "Flash embedded firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/embedded-firmware"
+      },
+      "command": "make clean && make -j`nproc` && make cload radio=${input:radio}"
+    },
+    {
+      "label": "Compile Embedded Firmware",
+      "type": "shell",
+      "detail": "Clean and compile embedded firmware",
+      "options": {
+        "cwd": "${workspaceFolder}/embedded-firmware"
+      },
+      "command": "make clean && make -j`nproc`"
+    },
+    {
+      "label": "Test embedded firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/embedded-firmware/validate"
+      },
+      "command": "rm -rf build/bin && mkdir -p build && cd build && cmake ../ && make -j`nproc` && ./embedded_firmware"
+    },
+    {
+      "label": "Test shared firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/shared-firmware/validate"
+      },
+      "command": "rm -rf build/bin && mkdir -p build && cd build && cmake ../ && make -j`nproc` && ./shared_firmware"
+    },
+    {
+      "label": "Test simulation firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/simulation/validate"
+      },
+      "command": "rm -rf build && mkdir build && cd build && cmake ../ && make -j`nproc` && ./simulation_firmware"
+    },
+    {
+      "label": "Test All",
+      "type": "shell",
+      "dependsOn": [
+        "Test embedded firmware",
+        "Test shared firmware",
+        "Test simulation firmware"
+      ]
+    },
+    {
+      "label": "Lint Simulation Firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/simulation/"
+      },
+      "dependsOn" : [
+        "Compile Simulation Firmware"
+      ],
+      "command": "cd build && ../../run-clang-tidy.py -quiet -header-filter='.*simulation|shared-firmware.*' -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes, -cppcoreguidelines-pro-type-reinterpret-cast\""
+    },
+    
+    {
+      "label": "Lint Embedded Firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/embedded-firmware/lint-workspace"
+      },
+      "command": "../../run-clang-tidy.py -quiet -header-filter='.*embedded-firmware|shared-firmware.*' -checks=\"-*,boost-*,,bugprone-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes, -cppcoreguidelines-pro-type-union-access, -cppcoreguidelines-pro-type-reinterpret-cast\""
+    },
+    {
+      "label": "Run Pipeline",
+      "type": "shell",
+      "dependsOn": [
+        "Compile Embedded Firmware",
+        "Test All",
+        "Lint Simulation Firmware",
+        "Lint Embedded Firmware"
+      ]
+    },
+    {
+      "label": "Coverage Embedded Firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/embedded-firmware/validate"
+      },
+      "dependsOn": [
+        "Test embedded firmware"
+      ],
+      "command": "lcov --directory ../src -c -d build/CMakeFiles -o cov.info --no-external && genhtml cov.info -o out"
+    },
+    {
+      "label": "Coverage Shared Firmware",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/shared-firmware/validate"
+      },
+      "dependsOn": [
+        "Test shared firmware"
+      ],
+      "command": "lcov --directory ../src -c -d build/CMakeFiles -o cov.info --no-external && genhtml cov.info -o out"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "radio",
+      "type": "pickString",
+      "default": "radio://0/80/2M/E7E7E7E761",
+      "description": "Radio adress to flash drone",
+      "options": [
+        "radio://0/80/2M/E7E7E7E761",
+        "radio://0/80/2M/E7E7E7E762"
+      ]
+    }
+  ]
 }

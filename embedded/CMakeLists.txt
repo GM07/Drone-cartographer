@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_C_FLAGS "-g -O0")
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -g -O0")
 
 # These includes are needed by the shared-firmware and by the simulation-firmware

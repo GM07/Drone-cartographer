@@ -2,20 +2,24 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Lint all services",
+            "label": "Lint Backend Server",
             "type": "shell",
-            "command": "pylint services --rcfile pylintrc"
-        },
-        {
-            "label": "Lint all tests",
-            "type": "shell",
-            "command": "pylint test --rcfile pylintrc"
+            "command": "find . -type f -name '*.py' | xargs pylint  --rcfile pylintrc"
         },
         {
             "label": "Run tests",
             "type": "shell",
-            "command": "pytest"
+            "command": "coverage run -m pytest"
+        },
+        {
+            "label": "Get coverage",
+            "type": "shell",
+            "command": "coverage report -m"
+        },
+        {
+            "label": "Run autoformater",
+            "type": "shell",
+            "command": "yapf --style google -rpi ."
         }
     ]
-
 }

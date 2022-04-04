@@ -12,6 +12,7 @@
         ],
         "cwd": "${workspaceFolder}/simulation",
         "MIMode": "gdb",
+        "preLaunchTask": "Compile Simulation Firmware",
         "setupCommands": 
         [
           {
@@ -19,7 +20,7 @@
             "text": "-enable-pretty-printing",
             "ignoreFailures": true
           }
-        ]
+      ]
       },
       {
         "name": "Stub Server",
@@ -30,28 +31,27 @@
       },
       {
         "name": "Embedded",
-        "cwd": "${workspaceRoot}",
+        "cwd": "${workspaceFolder}",
         "executable": "${workspaceFolder}/embedded-firmware/cf2.elf",
         "request": "launch",
         "type": "cortex-debug",
         "device": "STM32F405",
         "svdFile": "${workspaceFolder}/embedded-firmware/STM32F405.svd",
         "servertype": "openocd",
-        "configFiles": ["${workspaceFolder}/embedded-firmware/stlink-v2.cfg"],
-        "armToolchainPath": "usr/",
-        "runToMain": true,
+        "configFiles": ["interface/stlink-v2-1.cfg", "target/stm32f4x.cfg"],
+        "runToEntryPoint": "main",
+        "gdbPath": "/usr/bin/gdb-multiarch",
         "preLaunchCommands": [
           "set mem inaccessible-by-default off",
           "enable breakpoint",
           "monitor reset"
-        ]
+        ],
       }
     ],
     "compounds": [
       {
         "name": "Debug Simulation",
         "configurations": ["Argos", "Stub Server"],
-        "preLaunchTask": "Setup Simulation",
         "stopAll": true,
         "presentation": {
           "hidden": false,

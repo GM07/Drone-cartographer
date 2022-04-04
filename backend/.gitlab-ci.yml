@@ -1,0 +1,25 @@
+image: altaric/inf3995-backend:latest
+
+variables:
+  WORKING_DIRECTORY: "backend"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+workflow:
+  rules:
+    - changes:
+        - $WORKING_DIRECTORY/**/*
+
+stages:
+
+  - lint
+  - test
+
+lint_backend:
+  stage: lint
+  script:
+    - cd backend && yapf --style google -rpd .
+
+test_backend:
+  stage: test
+  script:
+    - cd backend && pytest

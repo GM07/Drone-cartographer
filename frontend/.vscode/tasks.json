@@ -9,5 +9,38 @@
 			},
 			"command": [ "npm run serve" ]
 		},
+    {
+			"label": "Lint",
+			"type": "shell",
+            "options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"command": [ "npm run lint" ]
+		},
+    {
+			"label": "Test",
+			"type": "shell",
+            "options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"command": [ "npm run test;echo Detailed information at coverage/lcov-report/index.html" ]
+		},
+    {
+			"label": "Build",
+			"type": "shell",
+            "options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"command": [ "npm run build" ]
+		},
+    {
+      "label": "Run Pipeline",
+      "type": "shell",
+      "dependsOn": [
+        "Lint",
+        "Test",
+        "Build"
+      ]
+    }
     ]
 }

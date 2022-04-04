@@ -30,14 +30,15 @@
 <script lang="ts">
 import {AccessStatus} from '@/communication/access_status';
 import {ServerCommunication} from '@/communication/server_communication';
-import {SOCKETIO_LIMITED_ACCESS} from '@/communication/server_constants';
 import {ROUTER} from '@/router';
 import {ACCESSOR} from '@/store';
 import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Drone} from '@/communication/drone';
 
 @Component({})
 export default class NavigationCommands extends Vue {
   @Prop() private accessStatus!: AccessStatus;
+  @Prop() private droneList!: Drone[];
   public attemptedLimitedConnection = false;
 
   constructor() {

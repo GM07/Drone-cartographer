@@ -17,7 +17,10 @@
       "
       v-on:click="launchMission()"
     >
-      <v-list-item-title class="title">Lancer la mission</v-list-item-title>
+      <v-list-item-icon>
+        <v-icon color="blue">mdi-airplane-takeoff</v-icon>
+      </v-list-item-icon>
+      <v-list-item-title>Lancer la mission</v-list-item-title>
     </v-list-item>
     <v-list-item
       :disabled="
@@ -26,7 +29,10 @@
       "
       v-on:click="returnToBase()"
     >
-      <v-list-item-title class="title">Retourner à la base</v-list-item-title>
+      <v-list-item-icon>
+        <v-icon color="blue">mdi-airplane-landing</v-icon>
+      </v-list-item-icon>
+      <v-list-item-title>Retourner à la base</v-list-item-title>
     </v-list-item>
     <v-list-item
       :disabled="
@@ -35,7 +41,10 @@
       "
       v-on:click="terminateMission()"
     >
-      <v-list-item-title class="title">Terminer la mission</v-list-item-title>
+      <v-list-item-icon>
+        <v-icon color="blue">mdi-airplane-off</v-icon>
+      </v-list-item-icon>
+      <v-list-item-title>Terminer la mission</v-list-item-title>
     </v-list-item>
   </v-list>
 </template>
@@ -45,9 +54,11 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import {ACCESSOR} from '@/store';
 import {ServerCommunication} from '@/communication/server_communication';
 import {AccessStatus} from '@/communication/access_status';
+import {Drone} from '@/communication/drone';
 
 @Component({})
 export default class MissionCommands extends Vue {
+  @Prop() private droneList!: Drone[];
   @Prop() private accessStatus!: AccessStatus;
   public isLaunchMissionSelected = false;
   public isTerminateMissionSelected = false;
@@ -67,7 +78,6 @@ export default class MissionCommands extends Vue {
   public launchMission(): void {
     if (ACCESSOR.missionStatus.isMissionStarted) return;
     this.isLaunchMissionSelected = true;
-
     const COMMAND_SENT = ServerCommunication.launchMission(
       this.accessStatus.isMissionSimulated,
       () => {

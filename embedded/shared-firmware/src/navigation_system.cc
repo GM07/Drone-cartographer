@@ -1,59 +1,106 @@
 #include "components/drone.h"
+#include "utils/math.h"
 
+/////////////////////////////////////////////////////////////////////
 void Drone::step() {
-  constexpr float radius = 0.5;
-  switch (m_controller->state) {
-    case State::kIdle:
-      break;
+  updateCrashStatus();
+  m_controller->updateSensorsData();
+
+  m_controller->receiveP2PMessage(&m_peerData);
+
+  switch (m_controller->m_state) {
     case State::kTakingOff:
       if (m_controller->isTrajectoryFinished()) {
-        // DEBUG ONLY REMOVE AFTER
-        explorationDirection = Direction::kFront;
-        m_controller->state = State::kExploring;
+        m_controller->m_state = State::kExploring;
+        m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
       }
       break;
     case State::kLanding:
       if (m_controller->isTrajectoryFinished()) {
-        m_controller->state = State::kIdle;
+        m_controller->m_state = State::kIdle;
       }
       break;
-    // DEBUG ONLY REMOVE AFTER
     case State::kExploring:
-      squareTrajectory(radius, false);
+      m_normal = Vector3D();
+      wallAvoidance();
+      collisionAvoidance();
+      changeDirection();
+      m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
+    case State::kIdle:  // Fallthrough
     default:
       break;
   }
 }
 
-void Drone::squareTrajectory(float sideLength, bool relative) {
-  if (m_controller->isTrajectoryFinished()) {
-    Vector3D destination;
-    switch (explorationDirection) {
-      case Direction::kFront:
-        destination = Vector3D(sideLength, 0.0, 0.0);
-        explorationDirection = Direction::kRight;
-        break;
-      case Direction::kRight:
-        destination = Vector3D(0.0, sideLength, 0.0);
-        explorationDirection = Direction::kBack;
-        break;
-      case Direction::kBack:
-        destination = Vector3D(-sideLength, 0.0, 0.0);
-        explorationDirection = Direction::kLeft;
-        break;
-      case Direction::kLeft:
-        destination = Vector3D(0.0, -sideLength, 0.0);
-        explorationDirection = Direction::kFront;
-        break;
-      default:
-        destination = Vector3D(0.0, 0.0, 0.0);
-        break;
-    }
+/////////////////////////////////////////////////////////////////////
+void Drone::wallAvoidance() {
+  constexpr float kMinDistanceObstacle = 200.0F;  // Millimeters
 
-    // Absolute position are relative to m_takeOffPosition
-    if (!relative) {
-      destination += m_controller->getCurrentLocation();
+  if (m_controller->m_data.front > 0 &&
+      m_controller->m_data.front <= kMinDistanceObstacle) {
+    m_normal.m_x += -1.0F;
+  }
+
+  if (m_controller->m_data.back > 0 &&
+      m_controller->m_data.back <= kMinDistanceObstacle) {
+    m_normal.m_x += 1.0F;
+  }
+
+  if (m_controller->m_data.left > 0 &&
+      m_controller->m_data.left <= kMinDistanceObstacle) {
+    m_normal.m_y += -1.0F;
+  }
+
+  if (m_controller->m_data.right > 0 &&
+      m_controller->m_data.right <= kMinDistanceObstacle) {
+    m_normal.m_y += 1.0F;
+  }
+
+  // This extra condition makes sure that if we are trapped between walls we
+  // move away from the closest one
+  if (m_controller->m_data.back > 0 && m_controller->m_data.front > 0 &&
+      m_controller->m_data.back <= kMinDistanceObstacle &&
+      m_controller->m_data.front <= kMinDistanceObstacle) {
+    m_normal.m_x +=
+        m_controller->m_data.back < m_controller->m_data.front ? 1.0F : -1.0F;
+  }
+
+  // This extra condition makes sure that if we are trapped between walls we
+  // move away from the closest one
+  if (m_controller->m_data.left > 0 && m_controller->m_data.right > 0 &&
+      m_controller->m_data.left <= kMinDistanceObstacle &&
+      m_controller->m_data.right <= kMinDistanceObstacle) {
+    m_normal.m_y +=
+        m_controller->m_data.left < m_controller->m_data.right ? -1.0F : 1.0F;
+  }
+
+  if (areAlmostEqual<Vector3D>(m_normal, m_data.m_direction) ||
+      Vector3D::areSameDirection(m_data.m_direction, m_normal)) {
+    m_normal = Vector3D();
+  }
+}
+
+/////////////////////////////////////////////////////////////////////
+void Drone::collisionAvoidance() {
+  for (const auto &[id, peerData] : m_peerData) {
+    if (peerData.m_range <= m_controller->getMinCollisionAvoidanceDistance()) {
+      if (m_usedPeerData.find(peerData.m_id) == m_usedPeerData.end()) {
+        m_usedPeerData.insert_or_assign(peerData.m_id, peerData);
+        m_normal += peerData.m_direction - m_data.m_direction;
+      }
+    } else {
+      m_usedPeerData.erase(peerData.m_id);
     }
-    m_controller->goTo(destination, relative);
+  }
+}
+
+/////////////////////////////////////////////////////////////////////
+void Drone::changeDirection() {
+  if (!areAlmostEqual(m_normal, Vector3D())) {
+    Vector3D newDirection = m_data.m_direction.reflect(m_normal);
+
+    if (!areAlmostEqual(m_data.m_direction, newDirection)) {
+      m_data.m_direction = newDirection;
+    }
   }
 }
