@@ -36,13 +36,13 @@ export class ServerCommunication {
   }
 
   public static flash(): boolean {
-    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
-      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
-        SERVER_CONSTANTS.FLASH_ADDRESS
-      );
-    }
+    // if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+    SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+      SERVER_CONSTANTS.FLASH_ADDRESS
+    );
+    // }
 
-    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+    return true;
   }
 
   public static takeMissionControl(): boolean {

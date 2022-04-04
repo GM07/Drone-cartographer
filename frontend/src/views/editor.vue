@@ -43,20 +43,51 @@
       </div>
 
       <div id="terminal">
-        <remote-command-output namespace="/recompileSimulation">
-        </remote-command-output>
+        <v-tabs v-model="tab" content-class="mt-3">
+          <v-tab>Compilation</v-tab>
+          <v-tab>Output</v-tab>
+        </v-tabs>
+        <v-tabs-items v-model="tab" class="full-height-tab">
+          <v-tab-item key="recompile" :transition="false">
+            <remote-command-output namespace="/recompileSimulation">
+            </remote-command-output>
+          </v-tab-item>
+          <v-tab-item key="flash" :transition="false">
+            <remote-command-output namespace="/flash"> </remote-command-output>
+          </v-tab-item>
+        </v-tabs-items>
+        <div id="actions">
+          <v-btn class="action" color="orange" icon @click="recompile">
+            <v-icon dark>mdi-cog-play</v-icon>
+          </v-btn>
+          <v-btn class="action" color="green" icon @click="recompile">
+            <v-icon dark>mdi-play</v-icon>
+          </v-btn>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style>
-#content {
-  height: 100vh;
-  background-color: #252526;
-  display: flex;
-  flex-direction: row;
+/* Tabs */
+.v-tabs-items.full-height-tab .v-window-item {
+  height: calc(
+    20vh - 52px
+  ); /* 48 px is default height of tabs + Default padding */
+  overflow-y: auto;
 }
+
+.theme--light.v-tabs > .v-tabs-bar .v-tab:not(.v-tab--active) {
+  color: #d4d4d488;
+}
+
+.v-slide-group__content {
+  color: #d4d4d4;
+  background-color: #1e1e1e;
+}
+
+/* Tree view */
 
 .vue-treeselect__menu {
   border: none;
@@ -86,13 +117,35 @@
   display: none;
 }
 
-#files {
-  width: 100%;
-}
+/* Scrollbar */
 
 .scroll-area {
   width: 100%;
   height: 100vh;
+}
+
+/* Custom */
+
+.action {
+  padding: auto;
+}
+
+#actions {
+  bottom: calc(20vh - 48px); /* Size of tabs */
+  right: 0%;
+  position: absolute;
+  padding: 4px;
+}
+
+#content {
+  height: 100vh;
+  background-color: #252526;
+  display: flex;
+  flex-direction: row;
+}
+
+#files {
+  width: 100%;
 }
 
 #editor {
@@ -121,8 +174,8 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css';
 import {ServerCommunication} from '@/communication/server_communication';
 import CodeEditor from '@/components/code_editor/code_editor.vue';
 import RemoteCommandOutput from '@/components/remote_command_output.vue';
-import vueCustomScrollbar from 'vue-custom-scrollbar';
 import VueResizable from 'vue-resizable';
+import vueCustomScrollbar from 'vue-custom-scrollbar';
 import 'vue-custom-scrollbar/dist/vueScrollbar.css';
 
 require('highlight.js');
@@ -156,11 +209,13 @@ class TreeNode {
 export default class Editor extends Vue {
   public attemptedLimitedConnection = false;
   public value = null;
+  public tab = null; // Used by the tab component
   public fileContent = 'test';
   public files: Map<string, string> = new Map();
   public options: TreeNode[] = [];
   public treeOpen = false;
   public fileWidth = 1000;
+
   public settings = {
     suppressScrollY: false,
     suppressScrollX: false,

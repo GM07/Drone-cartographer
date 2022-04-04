@@ -1,53 +1,30 @@
 <template>
   <div id="container" style="height: 100%; position: relative">
-    <div id="actions">
-      <v-btn
-        class="ma-2 white--text action-button"
-        color="orange"
-        :loading="loading3"
-        x-small
-        @click="recompile"
-      >
-        Recompile
-        <v-icon dark right> mdi-cog-play </v-icon>
-      </v-btn>
-      <v-btn
-        class="ma-2 white--text action-button"
-        color="green"
-        :loading="loading3"
-        x-small
-        @click="recompile"
-      >
-        Flash
-        <v-icon dark right> mdi-play </v-icon>
-      </v-btn>
-    </div>
     <div id="console">
-      <vue-custom-scrollbar class="scroll-area" :settings="settings">
-        <div
-          ref="console"
-          style="
-            position: absolute;
-            inset: 0px;
-            background-color: #1e1e1e;
-            overflow: auto;
-            display: flex;
-            flex-direction: column-reverse;
+      <div
+        ref="console"
+        style="
+          position: absolute;
+          inset: 0px;
+          padding-left: 20px;
+          background-color: #1e1e1e;
+          overflow: scroll;
+          display: flex;
+          flex-direction: column-reverse;
+        "
+      >
+        <p
+          v-for="item in this.output"
+          :key="item[1]"
+          :style="
+            item[0] === 'stdout'
+              ? 'color: white; margin: 0px; font-family: Consolas, Monaco, monospace;'
+              : 'color: red; margin: 0px; font-family: Consolas, Monaco, monospace;'
           "
         >
-          <p
-            v-for="item in this.output"
-            :key="item[1]"
-            :style="
-              item[0] === 'stdout'
-                ? 'color: white; margin: 0px'
-                : 'color: red; margin: 0px'
-            "
-          >
-            {{ item[1] }}
-          </p>
-        </div>
-      </vue-custom-scrollbar>
+          {{ item[1] }}
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -64,20 +41,21 @@
 }
 
 #console {
-  height: 90%;
+  height: 100%;
   width: 100%;
   position: absolute;
-  top: 10%;
+  padding: 10px;
+  overflow: hidden;
 }
 
-#actions {
-  height: 10%;
-  display: flex;
-  flex-direction: row;
+.scroll-area {
+  width: 100%;
+  height: 100vh;
 }
 
-.action-button {
-  margin: 1%;
+::-webkit-scrollbar {
+  width: 0; /* Remove scrollbar space */
+  background: transparent; /* Optional: just make scrollbar invisible */
 }
 </style>
 
@@ -86,10 +64,13 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import SocketIO, {Socket} from 'socket.io-client';
 import {SERVER_ADDRESS} from '@/communication/server_constants';
 import {DefaultEventsMap} from 'socket.io/dist/typed-events';
-import {ServerCommunication} from '@/communication/server_communication';
-@Component({})
+import vueCustomScrollbar from 'vue-custom-scrollbar';
+import 'vue-custom-scrollbar/dist/vueScrollbar.css';
+
+@Component({components: {vueCustomScrollbar}})
 export default class RemoteCommandOutput extends Vue {
   @Prop() private namespace!: string;
+  @Prop() private icon!: string;
 
   public settings = {
     suppressScrollY: false,
@@ -136,10 +117,6 @@ export default class RemoteCommandOutput extends Vue {
     });
 
     this.socket.open();
-  }
-
-  public recompile(): void {
-    ServerCommunication.recompile();
   }
 
   private updated() {
