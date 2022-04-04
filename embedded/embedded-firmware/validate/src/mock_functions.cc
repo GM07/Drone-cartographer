@@ -19,12 +19,14 @@ extern "C" {
 FunctionsMock* mock;
 
 ///////////////////////////////////////////////////////////////
-BaseType_t xTaskCreate(TaskFunction_t pxTaskCode, const char* const pcName,
-                       const configSTACK_DEPTH_TYPE usStackDepth,
-                       void* const pvParameters, UBaseType_t uxPriority,
-                       TaskHandle_t* const pxCreatedTask) {
-  return mock->xTaskCreate(pxTaskCode, pcName, usStackDepth, pvParameters,
-                           uxPriority, pxCreatedTask);
+TaskHandle_t xTaskCreateStatic(TaskFunction_t pxTaskCode,
+                               const char* const pcName,
+                               const uint32_t usStackDepth,
+                               void* const pvParameters, UBaseType_t uxPriority,
+                               StackType_t* const puxStackBuffer,
+                               StaticTask_t* const pxTaskBuffer) {
+  return mock->xTaskCreateStatic(pxTaskCode, pcName, usStackDepth, pvParameters,
+                                 uxPriority, puxStackBuffer, pxTaskBuffer);
 }
 
 ///////////////////////////////////////////////////////////////

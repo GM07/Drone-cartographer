@@ -14,7 +14,7 @@ using ::testing::Return;
 
 TEST(ValidateAppMain, CommunicationManagerInitShouldCreateTask) {
   mock = new FunctionsMock;
-  EXPECT_CALL(*mock, xTaskCreate(_, _, _, _, _, _)).Times(1);
+  EXPECT_CALL(*mock, xTaskCreateStatic(_, _, _, _, _, _, _)).Times(1);
   communicationManagerInit();
   EXPECT_EQ(true, communicationManagerTest());
   delete mock;

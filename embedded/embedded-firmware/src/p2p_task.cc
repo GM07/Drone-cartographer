@@ -11,8 +11,11 @@ extern "C" {
 #include "utils/time.h"
 
 namespace {
+constexpr size_t kStackSize = configMINIMAL_STACK_SIZE * 2;
+StackType_t xStack[kStackSize];
 bool p2pIsInit = false;
-}
+StaticTask_t xTaskBuffer;
+}  // namespace
 
 /////////////////////////////////////////////////////////////////////////
 [[nodiscard]] bool isValidP2PPacket(DroneData& data) {
@@ -57,8 +60,8 @@ bool p2pTaskTest() { return p2pIsInit; }
 
 /////////////////////////////////////////////////////////////////////////
 void p2pTaskInit() {
-  xTaskCreate(p2pTaskWrapper, "P2P_TASK_NAME", configMINIMAL_STACK_SIZE,
-              nullptr, 0, nullptr);
+  xTaskCreateStatic(p2pTaskWrapper, "P2P_TASK_NAME", kStackSize * 2, nullptr, 0,
+                    xStack, &xTaskBuffer);
 
   p2pRegisterCB(p2pcallbackHandler);
 

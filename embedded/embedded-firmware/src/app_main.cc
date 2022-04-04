@@ -19,9 +19,9 @@ extern "C" {
 #include "utils/time.h"
 
 namespace {
-
+StackType_t xStack[configMINIMAL_STACK_SIZE];
 bool commIsInit = false;
-
+StaticTask_t xTaskBuffer;
 }  // namespace
 
 /////////////////////////////////////////////////////////////////////////
@@ -37,8 +37,9 @@ void communicationManagerTaskWrapper(void* /*parameter*/) {
 
 /////////////////////////////////////////////////////////////////////////
 void communicationManagerInit() {
-  xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
-              configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
+  xTaskCreateStatic(communicationManagerTaskWrapper,
+                    "COMMUNICATION_MANAGER_NAME", configMINIMAL_STACK_SIZE,
+                    nullptr, tskIDLE_PRIORITY + 1, xStack, &xTaskBuffer);
   commIsInit = true;
 }
 
