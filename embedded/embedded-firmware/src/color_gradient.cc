@@ -17,7 +17,7 @@ bool isInit;
 
 }  // namespace
 
-namespace P2PColorGradient {
+namespace P2PGradient {
 
 constexpr int kContextArraySize = 10;
 
@@ -92,12 +92,12 @@ void flashP2PLed(void *) {
     Time::delayMs(1000);
   }
 }
-}  // namespace P2PColorGradient
+}  // namespace P2PGradient
 
 void initColorGradient() {
-  P2PColorGradient::registerColors();
+  P2PGradient::registerColors();
 
-  xTaskCreate(P2PColorGradient::flashP2PLed, "ColorGradientTask",
+  xTaskCreate(P2PGradient::flashP2PLed, "ColorGradientTask",
               configMINIMAL_STACK_SIZE * 2, nullptr, 0, nullptr);
   isInit = true;
 }

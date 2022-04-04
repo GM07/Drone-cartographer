@@ -195,24 +195,15 @@ def send_logs():
     return ''
 
 
-@SOCKETIO.on('startP2P', namespace='/limitedAccess')
-def start_p2p():
-    if not MissionStatus.get_mission_started():
+@SOCKETIO.on('setP2PGradient', namespace='/limitedAccess')
+def set_p2p(run_color_gradient: bool):
+    if not MissionStatus.get_mission_started(
+    ) or not AccessStatus.is_request_valid(request):
         return ''
 
-    MissionStatus.set_is_p2p_running(True)
+    MissionStatus.is_p2p_gradient_running = run_color_gradient
 
     COMM.send_command(COMMANDS.START_P2P.value)
-    MissionStatus.update_all_clients(SOCKETIO)
-
-
-@SOCKETIO.on('endP2P', namespace='/limitedAccess')
-def end_p2p():
-    if not MissionStatus.get_mission_started():
-        return ''
-
-    MissionStatus.set_is_p2p_running(False)
-    COMM.send_command(COMMANDS.END_P2P.value)
     MissionStatus.update_all_clients(SOCKETIO)
 
 

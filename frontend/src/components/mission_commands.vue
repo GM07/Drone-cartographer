@@ -11,11 +11,11 @@
     </div>
     <v-list-item
       v-if="
-        !this.$store.state.missionStatus.isP2Prunning &&
+        !this.$store.state.missionStatus.isP2PGradientRunning &&
         !accessStatus.isMissionSimulated
       "
       :disabled="!this.$store.state.missionStatus.isMissionStarted"
-      v-on:click="startP2P()"
+      v-on:click="setP2PGradient(true)"
     >
       <v-list-item-icon>
         <v-icon color="blue">mdi-led-on</v-icon>
@@ -25,11 +25,11 @@
 
     <v-list-item
       v-if="
-        this.$store.state.missionStatus.isP2Prunning &&
+        this.$store.state.missionStatus.isP2PGradientRunning &&
         this.$store.state.missionStatus.isMissionStarted &&
         !accessStatus.isMissionSimulated
       "
-      v-on:click="endP2P()"
+      v-on:click="setP2PGradient(false)"
     >
       <v-list-item-icon>
         <v-icon color="blue">mdi-led-off</v-icon>
@@ -128,16 +128,10 @@ export default class MissionCommands extends Vue {
       this.isReturnToBaseSelected = false;
     }
   }
-  public startP2P(): void {
+  public setP2PGradient(value: boolean): void {
     if (!ACCESSOR.missionStatus.isMissionStarted) return;
 
-    ServerCommunication.startP2PMode();
-  }
-
-  public endP2P(): void {
-    if (!ACCESSOR.missionStatus.isMissionStarted) return;
-
-    ServerCommunication.stopP2PMode();
+    ServerCommunication.setP2PGradient(value);
   }
 
   public terminateMission(): void {
