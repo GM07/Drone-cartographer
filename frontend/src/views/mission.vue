@@ -130,17 +130,13 @@
         </v-container>
       </v-item-group>
 
-      <v-select
-        v-bind:items="droneNameList"
-        label="Sélectionner les cartes individuelles voulues"
-        multiple
-        no-data-text="Aucun drone disponible"
-        style="padding: 20px"
-        v-on:input="limitNumMaps"
-      ></v-select>
-      <div style="display: flex; flex-direction: row">
-        <Map v-bind:mapData="mapData1" />
-        <Map v-bind:mapData="mapData2" />
+      <div>
+        <Map
+          :indexDrone="indexDrone"
+          v-bind:mapData="mapData"
+          :mapName="mapName"
+          :missionLaunched="missionLaunched"
+        />
       </div>
     </div>
 
@@ -202,6 +198,7 @@ import {
   SERVER_ADDRESS,
   MAP_DATA_NAMESPACE,
   SOCKETIO_DRONE_STATUS,
+  SOCKETIO_MAP_DATA,
 } from '@/communication/server_constants';
 import {AccessStatus} from '@/communication/access_status';
 import {Drone, DroneStatus} from '@/communication/drone';
@@ -236,11 +233,12 @@ export default class Mission extends Vue {
     isUserControlling: false,
   } as AccessStatus;
 
-  public mapData1: MapData = EMPTY_MAP;
-  public mapData2: MapData = EMPTY_MAP;
+  private mapData: MapData[][] = [[EMPTY_MAP]];
+  private indexDrone = 0;
+  private mapName = 'générale';
+  private missionLaunched = false;
 
   private droneNameList: string[] = [];
-  private visualizedMaps: string[] = [];
 
   private chosenOption = -1;
 
@@ -252,20 +250,31 @@ export default class Mission extends Vue {
   }
 
   public changeData(data: MapData): void {
-    const BASE_PATH = this.accessStatus.isMissionSimulated
-      ? '/tmp/socket/data'
-      : '';
+    this.droneList.forEach(() => this.mapData.push([EMPTY_MAP]));
+    const TEMP_MAP_DATA: MapData[][] = this.fillEmptyMap();
 
-    if (data.id === BASE_PATH + this.visualizedMaps[0]) this.mapData1 = data;
-    else if (data.id === BASE_PATH + this.visualizedMaps[1])
-      this.mapData2 = data;
+    for (let j = 0; j < this.mapData.length; j++) {
+      TEMP_MAP_DATA[j].push(...this.mapData[j]);
+    }
+
+    if (TEMP_MAP_DATA[0][0].id === '') TEMP_MAP_DATA[0][0] = data;
+    else TEMP_MAP_DATA[0].push(data);
+
+    for (let i = 0; i < this.droneList.length; i++) {
+      if (this.droneList[i].drone.name === data.id.slice(16)) {
+        if (TEMP_MAP_DATA[++i][0].id === '') TEMP_MAP_DATA[i][0] = data;
+        else TEMP_MAP_DATA[i].push(data);
+      }
+    }
+    this.mapData = TEMP_MAP_DATA;
   }
 
-  public limitNumMaps(input: string[]): void {
-    if (input.length > 2) {
-      input.pop();
+  public fillEmptyMap(): MapData[][] {
+    const MAP_DATA: MapData[][] = [];
+    for (let i = 0; i < this.mapData.length; i++) {
+      MAP_DATA[i] = [EMPTY_MAP];
     }
-    this.visualizedMaps = input;
+    return MAP_DATA;
   }
 
   public deleteDrone(index: number): void {
@@ -281,7 +290,15 @@ export default class Mission extends Vue {
   }
 
   public setSelected(index: number): void {
+    this.mapData[this.indexDrone] = [EMPTY_MAP];
+
     this.chosenOption = index;
+    this.indexDrone = index + 1;
+
+    this.mapName =
+      this.indexDrone !== 0
+        ? this.droneNameList[this.chosenOption]
+        : 'générale';
   }
 
   public setDroneMenuOpen(value: boolean): void {
@@ -289,6 +306,11 @@ export default class Mission extends Vue {
   }
 
   public getDrones(): Drone[] {
+    this.mapName =
+      this.indexDrone !== 0
+        ? this.droneList[this.chosenOption].drone.name
+        : 'générale';
+
     return this.droneList.map(droneStatus => droneStatus.drone);
   }
 
@@ -299,6 +321,8 @@ export default class Mission extends Vue {
       this.getDrones(),
       this.accessStatus.isMissionSimulated
     );
+
+    this.mapData.push([EMPTY_MAP]);
   }
 
   public isDroneCommandsEnabled(): boolean {
@@ -338,7 +362,6 @@ export default class Mission extends Vue {
       (statusList: Array<[string, string]>) => {
         statusList.forEach(statusTuple => {
           for (let i = 0; i < this.droneList.length; i++) {
-            console.log(this.droneList[i].drone.name, statusTuple[0]);
             if (this.droneList[i].drone.name === statusTuple[0])
               this.droneList[i].status = statusTuple[1];
           }
@@ -352,13 +375,33 @@ export default class Mission extends Vue {
       });
     });
 
+    SOCKETIO_MAP_DATA.on('getAllMapData', res => {
+      const TEMP_MAP_DATA: MapData[][] = [[EMPTY_MAP]];
+      this.droneList.forEach(() => TEMP_MAP_DATA.push([EMPTY_MAP]));
+      this.mapData = TEMP_MAP_DATA;
+      res.forEach((droneData: MapData) => {
+        this.changeData(droneData);
+      });
+    });
+
+    SOCKETIO_MAP_DATA.on('clear_all_maps', isMissionLaunched => {
+      if (isMissionLaunched) {
+        const TEMP_MAP_DATA: MapData[][] = [[EMPTY_MAP]];
+        this.droneList.forEach(() => TEMP_MAP_DATA.push([EMPTY_MAP]));
+        this.mapData = TEMP_MAP_DATA;
+      }
+      this.missionLaunched = isMissionLaunched;
+    });
+
     SOCKETIO_LIMITED_ACCESS.open();
     SOCKETIO_DRONE_STATUS.open();
+    SOCKETIO_MAP_DATA.open();
   }
 
   private destroyed() {
     SOCKETIO_LIMITED_ACCESS.removeAllListeners().close();
     SOCKETIO_DRONE_STATUS.removeAllListeners().close();
+    SOCKETIO_MAP_DATA.removeAllListeners().close();
   }
 }
 </script>
