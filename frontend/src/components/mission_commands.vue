@@ -10,11 +10,11 @@
       </v-switch>
     </div>
     <v-list-item
-      v-if="
-        !this.$store.state.missionStatus.isP2PGradientRunning &&
-        !accessStatus.isMissionSimulated
+      v-if="!isP2PGradientRunning"
+      :disabled="
+        !this.$store.state.missionStatus.isMissionStarted ||
+        accessStatus.isMissionSimulated
       "
-      :disabled="!this.$store.state.missionStatus.isMissionStarted"
       v-on:click="setP2PGradient(true)"
     >
       <v-list-item-icon>
@@ -25,7 +25,7 @@
 
     <v-list-item
       v-if="
-        this.$store.state.missionStatus.isP2PGradientRunning &&
+        isP2PGradientRunning &&
         this.$store.state.missionStatus.isMissionStarted &&
         !accessStatus.isMissionSimulated
       "
@@ -82,6 +82,10 @@ import {ACCESSOR} from '@/store';
 import {ServerCommunication} from '@/communication/server_communication';
 import {AccessStatus} from '@/communication/access_status';
 import {Drone} from '@/communication/drone';
+import {
+  SOCKETIO_LIMITED_ACCESS,
+  UPDATE_P2P_GRADIENT,
+} from '@/communication/server_constants';
 
 @Component({})
 export default class MissionCommands extends Vue {
@@ -90,6 +94,7 @@ export default class MissionCommands extends Vue {
   public isLaunchMissionSelected = false;
   public isTerminateMissionSelected = false;
   public isReturnToBaseSelected = false;
+  public isP2PGradientRunning = false;
 
   set simulatedMission(isSimulated: boolean) {
     if (!ACCESSOR.missionStatus.isMissionStarted) {
@@ -145,6 +150,16 @@ export default class MissionCommands extends Vue {
     if (!COMMAND_SENT) {
       this.isTerminateMissionSelected = false;
     }
+  }
+  private beforeCreate() {
+    SOCKETIO_LIMITED_ACCESS.on(UPDATE_P2P_GRADIENT, (newValue: boolean) => {
+      this.isP2PGradientRunning = newValue;
+    });
+
+    SOCKETIO_LIMITED_ACCESS.open();
+  }
+  private destroyed() {
+    SOCKETIO_LIMITED_ACCESS.removeListener(UPDATE_P2P_GRADIENT);
   }
 }
 </script>

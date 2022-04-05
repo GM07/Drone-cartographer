@@ -338,7 +338,6 @@ export default class Mission extends Vue {
       (statusList: Array<[string, string]>) => {
         statusList.forEach(statusTuple => {
           for (let i = 0; i < this.droneList.length; i++) {
-            console.log(this.droneList[i].drone.name, statusTuple[0]);
             if (this.droneList[i].drone.name === statusTuple[0])
               this.droneList[i].status = statusTuple[1];
           }

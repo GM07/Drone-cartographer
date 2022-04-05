@@ -51,16 +51,21 @@ void flashP2PLed(void *) {
   bool isActiveContext = false;
   while (true) {
     if (!Drone::getEmbeddedDrone().m_p2pColorGradientIsActive) {
+      Drone::getEmbeddedDrone().getController()->identify();
       if (isActiveContext) {
-        ledseqStop(&greenContext[lastGreenContextId]);
-        ledseqStop(&redContext[kContextArrayMaxIndex - lastGreenContextId]);
+        ledseqStopBlocking(&greenContext[lastGreenContextId]);
+        ledseqStopBlocking(
+            &redContext[kContextArrayMaxIndex - lastGreenContextId]);
+
+        ledClearAll();
         isActiveContext = false;
       }
+
       Time::delayMs(1000);
 
       continue;
     }
-    std::vector<float> droneDistances;
+
     int positionCounter = 0;
     for (auto itr = Drone::getEmbeddedDrone().m_peerData.begin();
          itr != Drone::getEmbeddedDrone().m_peerData.end(); ++itr) {
@@ -69,11 +74,11 @@ void flashP2PLed(void *) {
         positionCounter++;
     }
 
-    ledseqStop(&greenContext[lastGreenContextId]);
-    ledseqStop(&redContext[kContextArrayMaxIndex - lastGreenContextId]);
-    if (droneDistances.size() != 1) {
-      float divisionSize =
-          (kContextArrayMaxIndex + 1) / ((float)droneDistances.size() - 1);
+    ledseqStopBlocking(&greenContext[lastGreenContextId]);
+    ledseqStopBlocking(&redContext[kContextArrayMaxIndex - lastGreenContextId]);
+    if (Drone::getEmbeddedDrone().m_peerData.size() != 0) {
+      float divisionSize = (kContextArrayMaxIndex + 1) /
+                           Drone::getEmbeddedDrone().m_peerData.size();
 
       int index = (int)std::clamp<double>(
           round(positionCounter * divisionSize - 1), 0, kContextArrayMaxIndex);
@@ -85,7 +90,7 @@ void flashP2PLed(void *) {
     } else {
       lastGreenContextId = 0;
       ledseqRunBlocking(&greenContext[0]);
-      ledseqRunBlocking(&redContext[kContextArrayMaxIndex - 0]);
+      ledseqRunBlocking(&redContext[kContextArrayMaxIndex]);
     }
     isActiveContext = true;
 
@@ -94,11 +99,11 @@ void flashP2PLed(void *) {
 }
 }  // namespace P2PGradient
 
-void initColorGradient() {
+void colorGradientTaskInit() {
   P2PGradient::registerColors();
 
   xTaskCreate(P2PGradient::flashP2PLed, "ColorGradientTask",
               configMINIMAL_STACK_SIZE * 2, nullptr, 0, nullptr);
   isInit = true;
 }
-bool ColorGradientTest() { return isInit; };
+bool colorGradientTest() { return isInit; };

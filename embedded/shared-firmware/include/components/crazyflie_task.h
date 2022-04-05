@@ -9,8 +9,8 @@
 
 void communicationManagerInit();
 bool communicationManagerTest();
-void initColorGradient();
-bool testColorGradient();
+void colorGradientTaskInit();
+bool colorGradientTest();
 
 void p2pTaskInit();
 bool p2pTaskTest();

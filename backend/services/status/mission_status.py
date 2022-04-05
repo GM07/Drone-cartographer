@@ -56,6 +56,13 @@ def update_all_clients(socket_io: SocketIO, exception=None):
                    skip_sid=exception_list)
 
 
+def update_p2p_gradient_value(socket_io: SocketIO,):
+    socket_io.emit('updateP2PGradient',
+                   is_p2p_gradient_running,
+                   namespace='/limitedAccess',
+                   broadcast=True)
+
+
 def update_specific_client(socket_io: SocketIO, request_session_id):
     socket_io.emit('update_status',
                    get_mission_status(),
@@ -66,6 +73,5 @@ def update_specific_client(socket_io: SocketIO, request_session_id):
 def get_mission_status():
     return {
         'isMissionStarted': is_mission_started,
-        'isSomeoneControlling': AccessStatus.is_someone_controlling(),
-        'isP2PGradientRunning': is_p2p_gradient_running,
+        'isSomeoneControlling': AccessStatus.is_someone_controlling()
     }
