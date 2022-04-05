@@ -96,7 +96,7 @@ def get_files():
 @SOCKETIO.on('recompile', namespace='/getMissionStatus')
 def recompile():
     RECOMPILE_SIMULATION.start()
-    # RECOMPILE_EMBEDDED.start()
+    RECOMPILE_EMBEDDED.start()
     return 'Recompiling'
 
 

@@ -26,6 +26,7 @@ void Drone::step() {
       collisionAvoidance();
       changeDirection();
       m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
+      break;
     case State::kIdle:  // Fallthrough
     default:
       break;

@@ -46,16 +46,25 @@
 
       <div id="terminal">
         <v-tabs v-model="tab" content-class="mt-3">
-          <v-tab>Compilation</v-tab>
+          <v-tab>Compilation Simulation</v-tab>
+          <v-tab>Compilation Embedded</v-tab>
           <v-tab>Output</v-tab>
         </v-tabs>
         <v-tabs-items v-model="tab" class="full-height-tab">
-          <v-tab-item key="recompile" :transition="false">
-            <remote-command-output id="please" namespace="/recompileSimulation">
+          <v-tab-item
+            key="recompileSimulation"
+            :eager="true"
+            :transition="false"
+          >
+            <remote-command-output namespace="/recompileSimulation">
             </remote-command-output>
           </v-tab-item>
-          <v-tab-item key="flash" :transition="false">
-            <remote-command-output id="work" namespace="/flashDrones">
+          <v-tab-item key="recompileEmbedded" :eager="true" :transition="false">
+            <remote-command-output namespace="/recompileEmbedded">
+            </remote-command-output>
+          </v-tab-item>
+          <v-tab-item key="flash" :eager="true" :transition="false">
+            <remote-command-output namespace="/flashDrones">
             </remote-command-output>
           </v-tab-item>
         </v-tabs-items>

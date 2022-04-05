@@ -1,5 +1,7 @@
+from operator import mod
 import os
 from pathlib import Path
+import shlex
 import subprocess
 from typing import Dict, List
 
@@ -42,7 +44,9 @@ class FileHelper:
     @staticmethod
     def update_files(paths: List, contents: List) -> None:
         for index, path in enumerate(paths):
-            content: str = contents[index].replace("'", "\'")
+            content: str = contents[index]
             os.system(f'rm ../{path}')
             os.system(f'touch ../{path}')
-            os.system(f'echo \'{content}\' > ../{path}')
+            file = open('../' + path, 'w')
+            file.write(content)
+            file.close()

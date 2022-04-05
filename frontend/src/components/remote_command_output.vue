@@ -95,10 +95,10 @@ export default class RemoteCommandOutput extends Vue {
       } else {
         this.output[0][1] += stdout;
       }
+      this.$forceUpdate();
     });
 
     this.socket.on('stderr', (stderr: string) => {
-      console.log(this.output);
       this.hasErrors = true;
       if (
         stderr === '\n' ||
@@ -109,6 +109,7 @@ export default class RemoteCommandOutput extends Vue {
       } else {
         this.output[0][1] += stderr;
       }
+      this.$forceUpdate();
     });
 
     this.socket.on('stop', () => {
