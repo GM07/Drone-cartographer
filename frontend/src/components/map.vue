@@ -16,13 +16,20 @@
 <script lang="ts">
 import {Component, Vue, Prop, Watch} from 'vue-property-decorator';
 import {Vec2d} from '../utils/vec2d';
-import {MapData, MM_TO_CM, M_TO_CM, MAP_SIZE} from '../utils/map_constants';
+import {
+  MapData,
+  MM_TO_CM,
+  M_TO_CM,
+  MAP_SIZE,
+  DEGREE_TO_RAD,
+} from '../utils/map_constants';
 import SocketIO from 'socket.io-client';
 
 import {
   SERVER_ADDRESS,
   MAP_DATA_NAMESPACE,
 } from '@/communication/server_constants';
+import {DroneStatus} from '@/communication/drone';
 
 @Component({})
 export default class Map extends Vue {
@@ -30,7 +37,7 @@ export default class Map extends Vue {
   @Prop() public indexDrone!: number;
   @Prop() public mapName!: string;
   @Prop() public missionLaunched!: boolean;
-  @Prop() public missionTerminated!: boolean;
+  @Prop() public droneList!: DroneStatus[];
   readonly SOCKETIO = SocketIO(SERVER_ADDRESS + MAP_DATA_NAMESPACE, {
     transports: ['websocket', 'polling'],
   });
@@ -79,6 +86,13 @@ export default class Map extends Vue {
 
     for (let i = 0; i < this.mapData[this.indexDrone].length; i++) {
       const CURRENT_DATA = this.mapData[this.indexDrone][i];
+      const COS_ORIENTATION = Math.cos(
+        this.droneList[this.indexDrone].drone.orientation * DEGREE_TO_RAD
+      );
+      const SIN_ORIENTATION = Math.sin(
+        this.droneList[this.indexDrone].drone.orientation * DEGREE_TO_RAD
+      );
+
       // Get new drone position
       this.dronePos = [
         new Vec2d(
@@ -93,36 +107,41 @@ export default class Map extends Vue {
       CANVAS_CTX.fillRect(NEW_POS.x, NEW_POS.y, 1, 1);
 
       const TEMPARRAYPERIM: Vec2d[] = [];
+
       if (CURRENT_DATA.sensors.front > 0)
         TEMPARRAYPERIM.push(
           new Vec2d(
             CURRENT_DATA.position[0] * M_TO_CM +
-              CURRENT_DATA.sensors.front / MM_TO_CM,
-            CURRENT_DATA.position[1] * M_TO_CM
+              (CURRENT_DATA.sensors.front * COS_ORIENTATION) / MM_TO_CM,
+            CURRENT_DATA.position[1] * M_TO_CM +
+              (CURRENT_DATA.sensors.front * SIN_ORIENTATION) / MM_TO_CM
           )
         );
       if (CURRENT_DATA.sensors.right > 0)
         TEMPARRAYPERIM.push(
           new Vec2d(
-            CURRENT_DATA.position[0] * M_TO_CM,
+            CURRENT_DATA.position[0] * M_TO_CM +
+              (CURRENT_DATA.sensors.right * SIN_ORIENTATION) / MM_TO_CM,
             CURRENT_DATA.position[1] * M_TO_CM -
-              CURRENT_DATA.sensors.right / MM_TO_CM
+              (CURRENT_DATA.sensors.right * COS_ORIENTATION) / MM_TO_CM
           )
         );
       if (CURRENT_DATA.sensors.back > 0)
         TEMPARRAYPERIM.push(
           new Vec2d(
             CURRENT_DATA.position[0] * M_TO_CM -
-              CURRENT_DATA.sensors.back / MM_TO_CM,
-            CURRENT_DATA.position[1] * M_TO_CM
+              (CURRENT_DATA.sensors.back * COS_ORIENTATION) / MM_TO_CM,
+            CURRENT_DATA.position[1] * M_TO_CM -
+              (CURRENT_DATA.sensors.back * SIN_ORIENTATION) / MM_TO_CM
           )
         );
       if (CURRENT_DATA.sensors.left > 0)
         TEMPARRAYPERIM.push(
           new Vec2d(
-            CURRENT_DATA.position[0] * M_TO_CM,
+            CURRENT_DATA.position[0] * M_TO_CM -
+              (CURRENT_DATA.sensors.left * SIN_ORIENTATION) / MM_TO_CM,
             CURRENT_DATA.position[1] * M_TO_CM +
-              CURRENT_DATA.sensors.left / MM_TO_CM
+              (CURRENT_DATA.sensors.left * COS_ORIENTATION) / MM_TO_CM
           )
         );
 
