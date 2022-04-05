@@ -132,6 +132,7 @@
 
       <div>
         <Map
+          :droneList="droneList"
           :indexDrone="indexDrone"
           v-bind:mapData="mapData"
           :mapName="mapName"

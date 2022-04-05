@@ -1,6 +1,7 @@
 export const MM_TO_CM = 10;
 export const M_TO_CM = 100;
 export const MAP_SIZE = 250;
+export const DEGREE_TO_RAD = Math.PI / 180;
 
 export const EMPTY_MAP: MapData = {
   id: '',
