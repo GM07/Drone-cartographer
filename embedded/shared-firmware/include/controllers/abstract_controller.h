@@ -33,6 +33,7 @@ class AbstractController {
   virtual void setVelocity(const Vector3D& direction, float speed) = 0;
   virtual void takeOff(float height) = 0;
   virtual void land() = 0;
+  virtual void returnToBase() = 0;
   virtual void stopMotors() = 0;
 
   [[nodiscard]] virtual Vector3D getCurrentLocation() const = 0;

@@ -49,10 +49,6 @@ void Drone::step() {
         // If there are no walls and we are above our origin land
         m_controller->m_targetPosition =
             Vector3D::z(m_controller->getCurrentLocation().m_z);
-        m_controller->log("target " +
-                          m_controller->m_targetPosition.toString());
-        m_controller->log("current" +
-                          m_controller->getCurrentLocation().toString());
         if (m_controller->isTrajectoryFinished()) {
           m_controller->land();
           m_data.m_direction = Vector3D::z(-1.0f);

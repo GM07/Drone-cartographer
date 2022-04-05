@@ -78,6 +78,11 @@ void addCustomLoggingVariables() {
 extern "C" void appMain() {
   ledClearAll();
   addCustomLoggingVariables();
+
+  // Disable useF for the start
+  paramVarId_t paramIdUseF = paramGetVarId("kalman", "useF");
+  paramSetInt(paramIdUseF, 0);
+
   Drone::getEmbeddedDrone().initDrone();
 
   while (true) {

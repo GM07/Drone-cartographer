@@ -62,8 +62,8 @@ void FirmwareController::updateSensorsData() {
 
 ////////////////////////////////////////////////
 [[nodiscard]] bool FirmwareController::isTrajectoryFinished() const {
-  return areAlmostEqual(getCurrentLocation(), m_targetPosition,
-                        kRealTrajectoryFinishedTreshold);
+  return Math::areAlmostEqual(getCurrentLocation(), m_targetPosition,
+                              kRealTrajectoryFinishedTreshold);
 }
 
 ////////////////////////////////////////////////
