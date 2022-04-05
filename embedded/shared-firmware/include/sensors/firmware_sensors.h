@@ -24,3 +24,15 @@ class FirmwareSensors : public AbstractSensors {
 };
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+

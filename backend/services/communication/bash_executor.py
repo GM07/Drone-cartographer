@@ -12,6 +12,7 @@ class BashExecutor:
         self.process = None
         self.transmitStdoutTask = None
         self.transmitStderrTask = None
+        self.nbOutputFinished = 0
 
     def stop(self):
         self.SOCKETIO.emit('stop',
@@ -29,6 +30,7 @@ class BashExecutor:
     def start(self):
         # Make sure we are not running the same process twice
         self.stop()
+        self.nbOutputFinished = 0
 
         self.process = subprocess.Popen(shlex.split(self.bashCommand),
                                         stdout=subprocess.PIPE,
@@ -68,7 +70,9 @@ class BashExecutor:
                                broadcast=True,
                                include_self=False,
                                skip_sid=True)
-        self.stop()
+        self.nbOutputFinished += 1
+        if (self.nbOutputFinished == 2):
+            self.stop()
 
     def __transmit_stderr(self):
         while (self.process.poll() is None):
@@ -90,8 +94,9 @@ class BashExecutor:
                                broadcast=True,
                                include_self=False,
                                skip_sid=True)
-
-        self.stop()
+        self.nbOutputFinished += 1
+        if self.nbOutputFinished == 2:
+            self.stop()
 
     def __del__(self):
         self.stop()

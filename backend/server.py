@@ -20,9 +20,9 @@ import services.status.mission_status as MissionStatus
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
 from services.communication.simulation_configuration import SimulationConfiguration
-from constants import COMMANDS, RECOMPILE_EMBEDDED_COMMAND, RECOMPILE_SIMULATION_COMMAND
+from constants import COMMANDS, RECOMPILE_EMBEDDED_COMMAND, RECOMPILE_SIMULATION_COMMAND, URI
 from services.communication.database.mongo_interface import Database
-from services.communication.file_reader import FileReader
+from services.communication.file_helper import FileHelper
 
 # Flask application
 APP = Flask(__name__)
@@ -63,6 +63,14 @@ def identify_drone(drone_addr):
     return 'Identified drone'
 
 
+@APP.route('/setFiles', methods=['POST'])
+def set_files():
+    files = request.get_json()['keys']
+    contents = request.get_json()['values']
+    FileHelper.update_files(files, contents)
+    return {'output': 'File updated'}
+
+
 @APP.route('/getFiles')
 def get_files():
     abs_path = os.path.abspath(__file__ + '/../../embedded')
@@ -71,9 +79,9 @@ def get_files():
         abs_path + '/shared-firmware/include',
         abs_path + '/embedded-firmware/src'
     ]
-    files = FileReader.get_files(directories)
+    files = FileHelper.get_files(directories)
 
-    files_content = FileReader.get_files_content(files)
+    files_content = FileHelper.get_files_content(files)
 
     keys = []
     values = []
@@ -88,25 +96,25 @@ def get_files():
 @SOCKETIO.on('recompile', namespace='/getMissionStatus')
 def recompile():
     RECOMPILE_SIMULATION.start()
-    #RECOMPILE_EMBEDDED.start()
+    # RECOMPILE_EMBEDDED.start()
     return 'Recompiling'
 
 
 # Reflash firmware
-@SOCKETIO.on('flash', namespace='/limitedAccess')
+@SOCKETIO.on('flash', namespace='/getMissionStatus')
 def flash():
-    if not AccessStatus.is_request_valid(request):
-        return ''
+    # if not AccessStatus.is_request_valid(request):
+    #     return ''
 
-    if AccessStatus.get_mission_simulated():
-        return ''
+    # if AccessStatus.get_mission_simulated():
+    #     return ''
 
-    drone_list = COMM.get_drones()
+    drone_list = URI  #COMM.get_drones()
 
     # Create the command to flash all drones
     flashDrone = []
     for drone in drone_list:
-        flashDrone.append("make cload radio=" + drone["name"])
+        flashDrone.append("make cload radio=" + drone)
 
     bashCommand = f"docker exec embedded sh -c 'cd workspaces/INF3995-106/embedded/embedded-firmware" + " && " + " && ".join(
         flashDrone) + "'"

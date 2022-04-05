@@ -303,6 +303,7 @@ export default {
       hljs.highlightAll();
       this.content =
         this.modelValue === undefined ? this.value : this.modelValue;
+        this.$emit('changeValue', this.content);
     });
   },
 };

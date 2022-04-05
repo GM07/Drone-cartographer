@@ -108,7 +108,7 @@ describe('mission.vue', () => {
     wrapper.vm['chosenOption'] = -1;
     expect(wrapper.vm.getSelectedDrone()).toEqual('');
     const EXPECTED_DRONE = {
-      drone: {name: 'expectedDrone', xPos: 0, yPos: 0},
+      drone: {name: 'expectedDrone', xPos: 0, yPos: 0, orientation: 0},
       status: 'stat',
     };
     wrapper.vm.droneList[0] = EXPECTED_DRONE;

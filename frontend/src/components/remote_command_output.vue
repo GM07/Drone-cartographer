@@ -2,7 +2,6 @@
   <div id="container" style="height: 100%; position: relative">
     <div id="console">
       <div
-        ref="console"
         style="
           position: absolute;
           inset: 0px;
@@ -44,8 +43,7 @@
   height: 100%;
   width: 100%;
   position: absolute;
-  padding: 10px;
-  overflow: hidden;
+  /* padding-left: 10px; */
 }
 
 .scroll-area {
@@ -54,8 +52,8 @@
 }
 
 ::-webkit-scrollbar {
-  width: 0; /* Remove scrollbar space */
-  background: transparent; /* Optional: just make scrollbar invisible */
+  width: 0;
+  background: transparent;
 }
 </style>
 
@@ -64,13 +62,10 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import SocketIO, {Socket} from 'socket.io-client';
 import {SERVER_ADDRESS} from '@/communication/server_constants';
 import {DefaultEventsMap} from 'socket.io/dist/typed-events';
-import vueCustomScrollbar from 'vue-custom-scrollbar';
-import 'vue-custom-scrollbar/dist/vueScrollbar.css';
 
-@Component({components: {vueCustomScrollbar}})
+@Component({})
 export default class RemoteCommandOutput extends Vue {
   @Prop() private namespace!: string;
-  @Prop() private icon!: string;
 
   public settings = {
     suppressScrollY: false,
@@ -91,7 +86,11 @@ export default class RemoteCommandOutput extends Vue {
     }).close();
 
     this.socket.on('stdout', (stdout: string) => {
-      if (stdout === '\n' || this.output.length === 0) {
+      if (
+        stdout === '\n' ||
+        this.output.length === 0 ||
+        this.output[0][0] === 'stderr'
+      ) {
         this.output.unshift(['stdout', '']);
       } else {
         this.output[0][1] += stdout;
@@ -99,8 +98,13 @@ export default class RemoteCommandOutput extends Vue {
     });
 
     this.socket.on('stderr', (stderr: string) => {
+      console.log(this.output);
       this.hasErrors = true;
-      if (stderr === '\n' || this.output.length === 0) {
+      if (
+        stderr === '\n' ||
+        this.output.length === 0 ||
+        this.output[0][0] === 'stdout'
+      ) {
         this.output.unshift(['stderr', '']);
       } else {
         this.output[0][1] += stderr;
@@ -109,6 +113,7 @@ export default class RemoteCommandOutput extends Vue {
 
     this.socket.on('stop', () => {
       this.isFinished = true;
+      this.$forceUpdate();
     });
 
     this.socket.on('start', () => {
@@ -117,16 +122,6 @@ export default class RemoteCommandOutput extends Vue {
     });
 
     this.socket.open();
-  }
-
-  private updated() {
-    const CONSOLE_OUTPUT = (this.$refs.console as Vue).$el as HTMLElement;
-    CONSOLE_OUTPUT.scrollTop =
-      CONSOLE_OUTPUT.scrollHeight - CONSOLE_OUTPUT.clientHeight;
-  }
-
-  private destroyed() {
-    this.socket.close();
   }
 }
 </script>

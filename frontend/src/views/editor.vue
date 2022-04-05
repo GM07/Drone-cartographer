@@ -25,7 +25,8 @@
         </vue-custom-scrollbar>
       </div>
     </vue-resizable>
-    <div id="file" ref="fileDiv" @keydown.ctrl.83.prevent.stop="save">
+    <!-- @keydown.ctrl.83.prevent.stop="save" -->
+    <div id="file" ref="fileDiv">
       <div id="editor" class="scroll-area">
         <CodeEditor
           ref="codeEditor"
@@ -35,9 +36,10 @@
           height="100%"
           :language_selector="false"
           :languages="[['cpp', 'C++']]"
-          :value="fileContent"
+          :value="this.fileContent"
           width="100%"
           z_index="3"
+          @changeValue="save"
           @input="save"
         ></CodeEditor>
       </div>
@@ -49,11 +51,12 @@
         </v-tabs>
         <v-tabs-items v-model="tab" class="full-height-tab">
           <v-tab-item key="recompile" :transition="false">
-            <remote-command-output namespace="/recompileSimulation">
+            <remote-command-output id="please" namespace="/recompileSimulation">
             </remote-command-output>
           </v-tab-item>
           <v-tab-item key="flash" :transition="false">
-            <remote-command-output namespace="/flash"> </remote-command-output>
+            <remote-command-output id="work" namespace="/flashDrones">
+            </remote-command-output>
           </v-tab-item>
         </v-tabs-items>
         <div id="actions">
@@ -211,6 +214,7 @@ export default class Editor extends Vue {
   public value = null;
   public tab = null; // Used by the tab component
   public fileContent = '';
+  public currentFileSelected = '';
   public files: Map<string, string> = new Map();
   public options: TreeNode[] = [];
   public treeOpen = false;
@@ -227,10 +231,9 @@ export default class Editor extends Vue {
   }
 
   async created(): Promise<void> {
-    this.fileContent = '// this is a comment';
+    this.fileContent = '// Select a file ! ';
     const RESPONSE = await ServerCommunication.getFiles();
     this.computeHierarchy(RESPONSE);
-    // this.changeFileContent();
   }
 
   public computeHierarchy(response: Response): void {
@@ -279,25 +282,32 @@ export default class Editor extends Vue {
   public onFileSelected(node: TreeNode): void {
     if (this.files.has(node.id)) {
       this.changeFileContent(this.files.get(node.id)!); // We already verify that the id is in the map... Compiler is dumb
+      this.currentFileSelected = node.id;
+      this.$forceUpdate();
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public resizeMove(data): void {
     const ELEM = document.getElementById('file') as HTMLElement;
     const WIDTH = 'calc(100% - ' + data.width + 'px)'; // Pro CSS
     ELEM.style.width = WIDTH;
   }
 
-  public save(): void {
-    console.log('Saving');
+  public save(value: string): void {
+    if (value !== '') {
+      this.files.set(this.currentFileSelected, value);
+      this.fileContent = this.files.get(this.currentFileSelected) as string; // Compiler is dumb, the entry has to exist. I put it on the line before
+    }
   }
 
-  public recompile(): void {
+  public async recompile(): Promise<void> {
+    await ServerCommunication.sendFiles(this.files);
     ServerCommunication.recompile();
   }
 
-  public flash(): void {
-    console.log('flash');
+  public async flash(): Promise<void> {
+    await ServerCommunication.sendFiles(this.files);
     ServerCommunication.flash();
   }
 

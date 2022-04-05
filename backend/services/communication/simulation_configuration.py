@@ -9,6 +9,8 @@ from dataclasses import dataclass
 import random
 import xml.etree.ElementTree as ET
 
+WALL_SPACING: float = 0.05
+
 
 @dataclass
 class Box:
@@ -20,10 +22,12 @@ class Box:
     height: float
     orientation: float
 
-    def __init__(self, x_pos: float, y_pos: float, length: float,
+    def __init__(self, x_pos: float, y_pos: float, length: float, width: float,
                  orientation: float):
-        self.width = length * math.sin(orientation)
-        self.height = length * math.cos(orientation)
+        self.width = width * math.cos(orientation) + length * math.sin(
+            orientation) + WALL_SPACING
+        self.height = length * math.cos(orientation) + width * math.sin(
+            orientation) + WALL_SPACING
         self.x_pos_argos = x_pos
         self.y_pos_argos = y_pos
         self.x_pos = x_pos - self.width / 2
@@ -62,22 +66,22 @@ class SimulationConfiguration:
         body = ET.SubElement(crazyflie, 'body')
         body.set('position',
                  str(drone['xPos']) + ',' + str(drone['yPos']) + ',0')
-        body.set('orientation', '0,0,0')
+        body.set('orientation', str(drone['orientation']) + ',0,0')
 
         tree.write(current_path + '/crazyflie_sensing.argos')
 
     def add_obstacles(self, drone_list):
         box_list = list()
-        WALL_LENGTH = 2  # 0.5 Meters ?
+        WALL_LENGTH = 2
         NB_WALLS = 5
         DRONE_SIZE = 0.2
         ROOM_SIZE = 2.5
         for drone in drone_list:
-            # TODO drone rotation is not implemented yet
-            box: Box = Box(
-                float(drone['xPos']) - DRONE_SIZE / 2,
-                float(drone['yPos']) - DRONE_SIZE / 2, DRONE_SIZE, 0)
-            box_list.append(box)
+            box_list.append(
+                Box(
+                    float(drone['xPos']) - DRONE_SIZE / 2,
+                    float(drone['yPos']) - DRONE_SIZE / 2, DRONE_SIZE,
+                    DRONE_SIZE, drone['orientation']))
 
         while (len(box_list) < len(drone_list) + NB_WALLS):
             # Generate random point
@@ -86,7 +90,7 @@ class SimulationConfiguration:
             pos_y = random.uniform(-(ROOM_SIZE - WALL_LENGTH / 2),
                                    (ROOM_SIZE - WALL_LENGTH / 2))
             direction = random.uniform(0, math.pi / 2)
-            box: Box = Box(pos_x, pos_y, WALL_LENGTH, direction)
+            box: Box = Box(pos_x, pos_y, WALL_LENGTH, 0.05, direction)
 
             is_invalid = False
             for box_test in box_list:
@@ -104,7 +108,7 @@ class SimulationConfiguration:
         while index < len(box_list):
             box = ET.SubElement(arena, 'box')
             box.set('id', 'b' + str(index))
-            box.set('size', '0.01,2,1')
+            box.set('size', '0.05,2,1')
             box.set('movable', 'false')
 
             body = ET.SubElement(box, 'body')

@@ -9,6 +9,7 @@ export const GET_COMPLETED_MISSIONS = SERVER_ADDRESS + '/getCompletedMissions';
 export const GET_SPECIFIC_MISSION = SERVER_ADDRESS + '/getSpecificMission';
 export const SET_DRONE_ADDRESS = SERVER_ADDRESS + 'set_drone';
 export const GET_FILES_ADDRESS = SERVER_ADDRESS + '/getFiles';
+export const SET_FILES_ADDRESS = SERVER_ADDRESS + '/setFiles';
 export const IDENTIFY_DRONE_ADDRESS = 'identify_drone';
 export const RECOMPILE_ADDRESS = 'recompile';
 export const FLASH_ADDRESS = 'flash';
