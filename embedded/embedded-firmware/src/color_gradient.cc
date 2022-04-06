@@ -27,7 +27,7 @@ std::array<ledseqContext_t, kContextArraySize> redContext;
 void registerColors() {
   constexpr size_t kStepCount = 3;
 
-  for (size_t i = 0; i < kContextArraySize; ++i) {
+  for (int i = 0; i < kContextArraySize; ++i) {
     std::array<ledseqStep_t, kStepCount> *ledStep{
         new std::array<ledseqStep_t, kStepCount>{
             {{true, LEDSEQ_WAITMS(1 - i / (kContextArraySize - 1))},
