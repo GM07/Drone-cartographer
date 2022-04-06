@@ -10,6 +10,7 @@ from services.communication.comm_tasks import DRONE_STATUS_QUEUE, LOGS_QUEUE
 from typing import List, Tuple
 from constants import COMMANDS
 from services.communication.database.mongo_interface import Mission
+from datetime import datetime
 
 
 class AbstractComm(metaclass=ABCMeta):
@@ -21,9 +22,11 @@ class AbstractComm(metaclass=ABCMeta):
         self.SOCKETIO = socket_io
         self.drone_list = drone_list
 
-    def send_log(self, log: List[Tuple[str, str]]):
+    def send_log(self, log: str):
+
+        dated_log = [(datetime.now().isoformat(), log)]
         try:
-            LOGS_QUEUE.put_nowait(log)
+            LOGS_QUEUE.put_nowait(dated_log)
         except gevent.queue.Full:
             pass
 
