@@ -129,7 +129,7 @@ class CommCrazyflie(AbstractComm):
         Map().add_data(MapData(logconf.name, drone_data), self.SOCKETIO)
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         # print(f'{timestamp}{logconf.id}:{data}')
-        self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
+        self.send_log(f'{logconf.id}{data} ')
         self.send_drone_status([(logconf.name,
                                  DroneState(drone_data.state).name)])
 
