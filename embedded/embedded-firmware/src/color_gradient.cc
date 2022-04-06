@@ -19,15 +19,15 @@ bool isInit;
 
 namespace P2PGradient {
 
-constexpr int kContextArraySize = 10;
+constexpr size_t kContextArraySize = 10;
 
 std::array<ledseqContext_t, kContextArraySize> greenContext;
 std::array<ledseqContext_t, kContextArraySize> redContext;
 
 void registerColors() {
-  constexpr int kStepCount = 3;
+  constexpr size_t kStepCount = 3;
 
-  for (int i = 0; i < kContextArraySize; ++i) {
+  for (size_t i = 0; i < kContextArraySize; ++i) {
     std::array<ledseqStep_t, kStepCount> *ledStep{
         new std::array<ledseqStep_t, kStepCount>{
             {{true, LEDSEQ_WAITMS(1 - i / (kContextArraySize - 1))},
@@ -46,8 +46,8 @@ void registerColors() {
 }
 
 void flashP2PLed(void * /*parameter*/) {
-  constexpr int kContextArrayMaxIndex = 9;
-  int lastGreenContextId = 0;
+  constexpr size_t kContextArrayMaxIndex = kContextArraySize - 1;
+  size_t lastGreenContextId = 0;
   bool isActiveContext = false;
   constexpr uint32_t kTaskDelay = 1000;
 
@@ -76,7 +76,7 @@ void flashP2PLed(void * /*parameter*/) {
     ledseqStop(&greenContext.at(lastGreenContextId));
     ledseqStop(&redContext.at(kContextArrayMaxIndex - lastGreenContextId));
     if (!Drone::getEmbeddedDrone().m_peerData.empty()) {
-      const float divisionSize = static_cast<float>(kContextArrayMaxIndex + 1) /
+      const float divisionSize = static_cast<float>(kContextArraySize) /
                                  Drone::getEmbeddedDrone().m_peerData.size();
 
       const size_t index = std::min<size_t>(

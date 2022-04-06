@@ -25,7 +25,6 @@ bool Drone::handleCommand(Command command) {
     case Command::kEndP2PGradient:
       m_p2pColorGradientIsActive = false;
       return true;
-
     default:
       return false;
   }
