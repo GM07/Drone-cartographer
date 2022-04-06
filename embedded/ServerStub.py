@@ -24,6 +24,8 @@ class Commands:
   kIdentify = 0x01
   kTakeOff = 0x02
   kLand = 0x03
+  kStartGradient=0x04
+  kEndGradient= 0x05
 
 nConnections = 9
 identifier = "s"
@@ -70,6 +72,14 @@ def identify():
   data = [Commands.kIdentify]
   send_command(data)
 
+def startGradient():
+  data = [Commands.kStartGradient]
+  send_command(data)
+
+def endGradient():
+  data = [Commands.kEndGradient]
+  send_command(data)
+
 def send_command(data):
   if is_simulation:
     for client in clients:
@@ -82,11 +92,15 @@ def send_command(data):
 window = Tk()
 
 window.title('Server stub - Dream team')
-window.geometry('300x50')
+window.geometry('500x50')
 takeOffButton = Button(window, text='Take off', command=takeOff)
 takeOffButton.grid(column=0, row=0)
 landButton = Button(window, text='Land', command=land)
 landButton.grid(column=1, row=0)
 identifyButton = Button(window, text='Identify', command=identify)
 identifyButton.grid(column=2, row=0)
+identifyButton = Button(window, text='Start Gradient', command=startGradient)
+identifyButton.grid(column=3, row=0)
+identifyButton = Button(window, text='End Gradient', command=endGradient)
+identifyButton.grid(column=4, row=0)
 window.mainloop()

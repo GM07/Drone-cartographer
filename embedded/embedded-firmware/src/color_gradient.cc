@@ -30,7 +30,7 @@ void registerColors() {
   for (int i = 0; i < kContextArraySize; ++i) {
     std::array<ledseqStep_t, kStepCount> *ledStep =
         new std::array<ledseqStep_t, kStepCount>{
-            {{true, LEDSEQ_WAITMS(1 - i / kContextArraySize - 1)},
+            {{true, LEDSEQ_WAITMS(1 - i / (kContextArraySize - 1))},
              {false, LEDSEQ_WAITMS(i * 2)},
              {true, LEDSEQ_LOOP}}};
 
@@ -49,19 +49,17 @@ void flashP2PLed(void *) {
   constexpr int kContextArrayMaxIndex = 9;
   int lastGreenContextId = 0;
   bool isActiveContext = false;
-  while (true) {
-    if (!Drone::getEmbeddedDrone().m_p2pColorGradientIsActive) {
-      Drone::getEmbeddedDrone().getController()->identify();
-      if (isActiveContext) {
-        ledseqStopBlocking(&greenContext[lastGreenContextId]);
-        ledseqStopBlocking(
-            &redContext[kContextArrayMaxIndex - lastGreenContextId]);
 
-        ledClearAll();
+  while (true) {
+    Time::delayMs(1000);
+
+    if (!Drone::getEmbeddedDrone().m_p2pColorGradientIsActive) {
+      if (isActiveContext) {
+        ledseqStop(&greenContext[lastGreenContextId]);
+        ledseqStop(&redContext[kContextArrayMaxIndex - lastGreenContextId]);
+
         isActiveContext = false;
       }
-
-      Time::delayMs(1000);
 
       continue;
     }
@@ -74,8 +72,8 @@ void flashP2PLed(void *) {
         positionCounter++;
     }
 
-    ledseqStopBlocking(&greenContext[lastGreenContextId]);
-    ledseqStopBlocking(&redContext[kContextArrayMaxIndex - lastGreenContextId]);
+    ledseqStop(&greenContext[lastGreenContextId]);
+    ledseqStop(&redContext[kContextArrayMaxIndex - lastGreenContextId]);
     if (Drone::getEmbeddedDrone().m_peerData.size() != 0) {
       float divisionSize = (kContextArrayMaxIndex + 1) /
                            Drone::getEmbeddedDrone().m_peerData.size();
@@ -84,19 +82,18 @@ void flashP2PLed(void *) {
           round(positionCounter * divisionSize - 1), 0, kContextArrayMaxIndex);
       lastGreenContextId = index;
 
-      ledseqRunBlocking(&greenContext[index]);
-      ledseqRunBlocking(&redContext[kContextArrayMaxIndex - index]);
+      ledseqRun(&greenContext[index]);
+      ledseqRun(&redContext[kContextArrayMaxIndex - index]);
 
     } else {
       lastGreenContextId = 0;
-      ledseqRunBlocking(&greenContext[0]);
-      ledseqRunBlocking(&redContext[kContextArrayMaxIndex]);
+      ledseqRun(&greenContext[0]);
+      ledseqRun(&redContext[kContextArrayMaxIndex]);
     }
     isActiveContext = true;
-
-    Time::delayMs(1000);
   }
 }
+
 }  // namespace P2PGradient
 
 void colorGradientTaskInit() {
@@ -106,4 +103,5 @@ void colorGradientTaskInit() {
               configMINIMAL_STACK_SIZE * 2, nullptr, 0, nullptr);
   isInit = true;
 }
+
 bool colorGradientTest() { return isInit; };
