@@ -78,8 +78,8 @@ void flashP2PLed(void *) {
       float divisionSize = (kContextArrayMaxIndex + 1) /
                            Drone::getEmbeddedDrone().m_peerData.size();
 
-      size_t index = std::clamp<size_t>(
-          round(positionCounter * divisionSize - 1), 0, kContextArrayMaxIndex);
+      size_t index = std::min<size_t>(round(positionCounter * divisionSize - 1),
+                                      kContextArrayMaxIndex);
       lastGreenContextId = index;
 
       ledseqRun(&greenContext[index]);
