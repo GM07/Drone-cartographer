@@ -14,18 +14,17 @@ extern "C" {
 
 namespace {
 bool isInit;
-
-}  // namespace
-
-namespace P2PGradient {
-
 constexpr size_t kStepCount = 3;
 constexpr int kContextArraySize = 10;
 std::array<std::array<ledseqStep_t, kStepCount>, kContextArraySize> ledSteps;
 std::array<ledseqContext_t, kContextArraySize> greenContext;
 std::array<ledseqContext_t, kContextArraySize> redContext;
+}  // namespace
+
+namespace P2PGradient {
 
 void registerColors() {
+  if (isInit) return;
   for (int i = 0; i < kContextArraySize; ++i) {
     ledSteps.at(i) = std::array<ledseqStep_t, kStepCount>{
         {{true, LEDSEQ_WAITMS(1 - i / (kContextArraySize - 1))},
