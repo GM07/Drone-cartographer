@@ -19,7 +19,7 @@ bool isInit;
 
 namespace P2PGradient {
 
-constexpr size_t kContextArraySize = 10;
+constexpr int kContextArraySize = 10;
 
 std::array<ledseqContext_t, kContextArraySize> greenContext;
 std::array<ledseqContext_t, kContextArraySize> redContext;
