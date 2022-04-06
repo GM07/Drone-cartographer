@@ -19,25 +19,23 @@ bool isInit;
 
 namespace P2PGradient {
 
+constexpr size_t kStepCount = 3;
 constexpr int kContextArraySize = 10;
-
+std::array<std::array<ledseqStep_t, kStepCount>, kContextArraySize> ledSteps;
 std::array<ledseqContext_t, kContextArraySize> greenContext;
 std::array<ledseqContext_t, kContextArraySize> redContext;
 
 void registerColors() {
-  constexpr size_t kStepCount = 3;
-
   for (int i = 0; i < kContextArraySize; ++i) {
-    std::array<ledseqStep_t, kStepCount> *ledStep{
-        new std::array<ledseqStep_t, kStepCount>{
-            {{true, LEDSEQ_WAITMS(1 - i / (kContextArraySize - 1))},
-             {false, LEDSEQ_WAITMS(i * 2)},
-             {true, LEDSEQ_LOOP}}}};
+    ledSteps.at(i) = std::array<ledseqStep_t, kStepCount>{
+        {{true, LEDSEQ_WAITMS(1 - i / (kContextArraySize - 1))},
+         {false, LEDSEQ_WAITMS(i * 2)},
+         {true, LEDSEQ_LOOP}}};
 
-    greenContext.at(i) = {.sequence = ledStep->data(),
+    greenContext.at(i) = {.sequence = ledSteps.at(i).data(),
                           .led = static_cast<led_t>(LED(kLedGreenLeft))};
 
-    redContext.at(i) = {.sequence = ledStep->data(),
+    redContext.at(i) = {.sequence = ledSteps.at(i).data(),
                         .led = static_cast<led_t>(LED(kLedRedLeft))};
 
     ledseqRegisterSequence(&redContext.at(i));
