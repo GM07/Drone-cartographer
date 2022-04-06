@@ -28,30 +28,31 @@ void registerColors() {
   constexpr int kStepCount = 3;
 
   for (int i = 0; i < kContextArraySize; ++i) {
-    std::array<ledseqStep_t, kStepCount> *ledStep =
+    std::array<ledseqStep_t, kStepCount> *ledStep{
         new std::array<ledseqStep_t, kStepCount>{
             {{true, LEDSEQ_WAITMS(1 - i / (kContextArraySize - 1))},
              {false, LEDSEQ_WAITMS(i * 2)},
-             {true, LEDSEQ_LOOP}}};
+             {true, LEDSEQ_LOOP}}}};
 
-    greenContext[i] = {.sequence = ledStep->data(),
-                       .led = static_cast<led_t>(LED(kLedGreenLeft))};
+    greenContext.at(i) = {.sequence = ledStep->data(),
+                          .led = static_cast<led_t>(LED(kLedGreenLeft))};
 
-    redContext[i] = {.sequence = ledStep->data(),
-                     .led = static_cast<led_t>(LED(kLedRedLeft))};
+    redContext.at(i) = {.sequence = ledStep->data(),
+                        .led = static_cast<led_t>(LED(kLedRedLeft))};
 
     ledseqRegisterSequence(&redContext.at(i));
     ledseqRegisterSequence(&greenContext.at(i));
   }
 }
 
-void flashP2PLed(void *) {
+void flashP2PLed(void * /*parameter*/) {
   constexpr int kContextArrayMaxIndex = 9;
   int lastGreenContextId = 0;
   bool isActiveContext = false;
+  constexpr uint32_t kTaskDelay = 1000;
 
   while (true) {
-    Time::delayMs(1000);
+    Time::delayMs(kTaskDelay);
 
     if (!Drone::getEmbeddedDrone().m_p2pColorGradientIsActive) {
       if (isActiveContext) {
@@ -64,22 +65,23 @@ void flashP2PLed(void *) {
       continue;
     }
 
-    int positionCounter = 0;
-    for (auto itr = Drone::getEmbeddedDrone().m_peerData.begin();
-         itr != Drone::getEmbeddedDrone().m_peerData.end(); ++itr) {
-      if (Drone::getEmbeddedDrone().m_data.m_distanceFromTakeoff >
-          itr->second.m_distanceFromTakeoff)
-        positionCounter++;
-    }
+    int positionCounter = std::count_if(
+        Drone::getEmbeddedDrone().m_peerData.begin(),
+        Drone::getEmbeddedDrone().m_peerData.end(),
+        [&](std::pair<size_t, DroneData> const &pair) {
+          return Drone::getEmbeddedDrone().m_data.m_distanceFromTakeoff >
+                 pair.second.m_distanceFromTakeoff;
+        });
 
     ledseqStop(&greenContext.at(lastGreenContextId));
     ledseqStop(&redContext.at(kContextArrayMaxIndex - lastGreenContextId));
-    if (Drone::getEmbeddedDrone().m_peerData.size() != 0) {
-      float divisionSize = (kContextArrayMaxIndex + 1) /
-                           Drone::getEmbeddedDrone().m_peerData.size();
+    if (!Drone::getEmbeddedDrone().m_peerData.empty()) {
+      const float divisionSize = static_cast<float>(kContextArrayMaxIndex + 1) /
+                                 Drone::getEmbeddedDrone().m_peerData.size();
 
-      size_t index = std::min<size_t>(round(positionCounter * divisionSize - 1),
-                                      kContextArrayMaxIndex);
+      const size_t index = std::min<size_t>(
+          std::round(static_cast<float>(positionCounter) * divisionSize - 1),
+          kContextArrayMaxIndex);
       lastGreenContextId = index;
 
       ledseqRun(&greenContext.at(index));
