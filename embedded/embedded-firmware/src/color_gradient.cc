@@ -40,8 +40,8 @@ void registerColors() {
     redContext[i] = {.sequence = ledStep->data(),
                      .led = static_cast<led_t>(LED(kLedRedLeft))};
 
-    ledseqRegisterSequence(&redContext[i]);
-    ledseqRegisterSequence(&greenContext[i]);
+    ledseqRegisterSequence(&redContext.at(i));
+    ledseqRegisterSequence(&greenContext.at(i));
   }
 }
 
@@ -55,8 +55,8 @@ void flashP2PLed(void *) {
 
     if (!Drone::getEmbeddedDrone().m_p2pColorGradientIsActive) {
       if (isActiveContext) {
-        ledseqStop(&greenContext[lastGreenContextId]);
-        ledseqStop(&redContext[kContextArrayMaxIndex - lastGreenContextId]);
+        ledseqStop(&greenContext.at(lastGreenContextId));
+        ledseqStop(&redContext.at(kContextArrayMaxIndex - lastGreenContextId));
 
         isActiveContext = false;
       }
@@ -72,8 +72,8 @@ void flashP2PLed(void *) {
         positionCounter++;
     }
 
-    ledseqStop(&greenContext[lastGreenContextId]);
-    ledseqStop(&redContext[kContextArrayMaxIndex - lastGreenContextId]);
+    ledseqStop(&greenContext.at(lastGreenContextId));
+    ledseqStop(&redContext.at(kContextArrayMaxIndex - lastGreenContextId));
     if (Drone::getEmbeddedDrone().m_peerData.size() != 0) {
       float divisionSize = (kContextArrayMaxIndex + 1) /
                            Drone::getEmbeddedDrone().m_peerData.size();
@@ -82,13 +82,13 @@ void flashP2PLed(void *) {
                                       kContextArrayMaxIndex);
       lastGreenContextId = index;
 
-      ledseqRun(&greenContext[index]);
-      ledseqRun(&redContext[kContextArrayMaxIndex - index]);
+      ledseqRun(&greenContext.at(index));
+      ledseqRun(&redContext.at(kContextArrayMaxIndex - index));
 
     } else {
       lastGreenContextId = 0;
-      ledseqRun(&greenContext[0]);
-      ledseqRun(&redContext[kContextArrayMaxIndex]);
+      ledseqRun(&greenContext.at(0));
+      ledseqRun(&redContext.at(kContextArrayMaxIndex));
     }
     isActiveContext = true;
   }
