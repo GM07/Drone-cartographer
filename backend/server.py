@@ -1,5 +1,5 @@
 from gevent import monkey
-from numpy import gradient
+
 
 if __name__ == '__main__':
     monkey.patch_all()
@@ -20,6 +20,7 @@ from services.communication.comm_simulation import CommSimulation
 from services.communication.simulation_configuration import SimulationConfiguration
 from constants import MAX_TIMEOUT, COMMANDS, URI
 from services.communication.database.mongo_interface import Database
+from services.data.map import Map
 
 # Flask application
 APP = Flask(__name__)
@@ -77,6 +78,10 @@ def launch(is_simulated: bool):
     COMM.send_command(COMMANDS.LAUNCH.value)
     AccessStatus.set_mission_type(SOCKETIO, is_simulated)
     MissionStatus.launch_mission(SOCKETIO)
+    SOCKETIO.emit('clear_all_maps',
+                  True,
+                  namespace='/getAllMapData',
+                  broadcast=True)
     return 'Launched'
 
 
@@ -123,6 +128,13 @@ def terminate():
     COMM.send_command(COMMANDS.LAND.value)
 
     MissionStatus.terminate_mission(SOCKETIO)
+    Map.raw_data.clear()
+    Map.filtered_data.clear()
+
+    SOCKETIO.emit('clear_all_maps',
+                  False,
+                  namespace='/getAllMapData',
+                  broadcast=True)
     return 'Terminated'
 
 
@@ -183,6 +195,15 @@ def connect():
 @SOCKETIO.on('connect', namespace='/getDroneStatus')
 def send_drone_status():
     start_drone_status_task(SOCKETIO)
+    return ''
+
+
+@SOCKETIO.on('connect', namespace='/getAllMapData')
+def send_all_map_data():
+    SOCKETIO.emit('getAllMapData',
+                  Map.get_all_filtered_data(),
+                  namespace='/getAllMapData',
+                  broadcast=True)
     return ''
 
 

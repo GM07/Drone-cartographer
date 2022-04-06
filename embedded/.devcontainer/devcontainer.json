@@ -39,5 +39,5 @@
 	"remoteEnv": {
 		"QT_X11_NO_MITSHM": "1"
 	},
-	"initializeCommand": "mkdir /tmp/socket/ &> /dev/null && xhost +local:docker && docker rm embedded || true"
+	"initializeCommand": "mkdir /tmp/socket/ &> /dev/null && xhost +local:docker && (docker rm embedded || true) "
 }
