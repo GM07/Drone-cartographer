@@ -24,7 +24,9 @@ std::array<ledseqContext_t, kContextArraySize> redContext;
 namespace P2PGradient {
 
 void registerColors() {
-  if (isInit) return;
+  if (isInit) {
+    return;
+  }
   for (int i = 0; i < kContextArraySize; ++i) {
     ledSteps.at(i) = std::array<ledseqStep_t, kStepCount>{
         {{true, LEDSEQ_WAITMS(1 - i / (kContextArraySize - 1))},
