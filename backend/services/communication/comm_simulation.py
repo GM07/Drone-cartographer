@@ -99,7 +99,7 @@ class CommSimulation(AbstractComm):
                 command_to_send = CommandWrapper(link, command, args)
                 self.__COMMANDS_QUEUE.put_nowait(command_to_send)
         except queue.Full:
-            self.send_log([(datetime.now().isoformat(), "Command queue full")])
+            self.send_log("Command queue full")
             print("Command queue is full")
             pass
 
@@ -204,15 +204,12 @@ class CommSimulation(AbstractComm):
                         data = DroneData(received)
                         Map().add_data(MapData(str(server.getsockname()), data),
                                        self.SOCKETIO)
-                        self.send_log([
-                            (datetime.now().isoformat(),
-                             f'Drone {self.drone_list[count]}' + data.__str__())
-                        ])
+                        self.send_log(f'Drone {self.drone_list[count]}' +
+                                      data.__str__())
                         self.send_drone_status([(self.drone_list[count]['name'],
                                                  data.state.name)])
                     if is_socket_broken:
-                        self.send_log([(datetime.now().isoformat(),
-                                        f'Broken Socket no {count}')])
+                        self.send_log(f'Broken Socket no {count}')
                         print("Socket broken")
                         self.data_servers[server] = None
                     count += 1
@@ -248,15 +245,14 @@ class CommSimulation(AbstractComm):
                 self.command_servers[command_wrapper.link].conn.send(
                     bytearray(full_command))
 
-                self.send_log([(datetime.now().isoformat(),
-                                COMMANDS(command_wrapper.command).name)])
+                self.send_log(COMMANDS(command_wrapper.command).name)
             except BrokenPipeError:
                 print('Command could not be sent, BrokenPipeError')
-                self.send_log([(datetime.now().isoformat(), 'Broken Pipe')])
+                self.send_log('Broken Pipe')
                 self.command_servers[command_wrapper.link].conn = None
                 missing_connection = True
             except socket.error:
-                self.send_log([(datetime.now().isoformat(), 'Socket error')])
+                self.send_log('Socket error')
                 return
 
             if command_wrapper.command == COMMANDS.LAND.value:

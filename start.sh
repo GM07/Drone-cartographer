@@ -35,19 +35,19 @@ launchBackendTests(){
 }
 
 launchEmbeddedTests(){
-   docker stop test_embedded  &> /dev/null  
-   docker rm test_embedded  &> /dev/null 
+   docker stop test_embedded  &> /dev/null
+   docker rm test_embedded  &> /dev/null
    echo "Preparing embedded tests" &&
    docker run -dt --name test_embedded zedfly/inf3995:embedded  &> /dev/null &&
    docker cp ./embedded test_embedded:./  &> /dev/null &&
-   docker exec -it test_embedded sh -c  "cd embedded && rm -r crazyflie-firmware && git clone --recursive https://github.com/zedfly/crazyflie-firmware.git && cd embedded-firmware/validate && mkdir build && cd build && cmake ../ && make -j`nproc`" &> /dev/null  &&
+   docker exec -it test_embedded sh -c  "cd embedded && rm -r crazyflie-firmware && git clone --recursive https://github.com/zedfly/crazyflie-firmware.git && cd embedded-firmware/validate && rm -r build && mkdir -p build && cd build && cmake ../ && make -j`nproc`"  &> /dev/null && 
    docker exec -it test_embedded sh -c "cd embedded/embedded-firmware/validate/build && ./embedded_firmware"
   
-   docker exec -it test_embedded sh -c "cd embedded/shared-firmware/validate && mkdir build && cd build && cmake ../ && make -j`nproc`" &> /dev/null &&
-   docker exec -it test_embedded sh -c "cd embedded/shared-firmware/validate/build && ./shared_firmware" &&
+   docker exec -it test_embedded sh -c "cd embedded/shared-firmware/validate &&  rm -r build && mkdir -p build && cd build && cmake ../ && make -j`nproc`" &> /dev/null &&
+   docker exec -it test_embedded sh -c "cd embedded/shared-firmware/validate/build && ./shared_firmware" 
    
    docker exec -it test_embedded sh -c " dpkg -i embedded/argos3*.deb"  &> /dev/null &&
-   docker exec -it test_embedded sh -c "cd embedded/simulation/validate && mkdir build && cd build && cmake ../ && make -j`nproc`" &> /dev/null  &&
+   docker exec -it test_embedded sh -c "cd embedded/simulation/validate &&  rm -r build && mkdir -p build && cd build && cmake ../ && make -j`nproc`" &> /dev/null  &&
    docker exec -it test_embedded sh -c "cd embedded/simulation/validate/build && ./simulation_firmware" 
    
    docker stop test_embedded  &> /dev/null  
@@ -70,8 +70,8 @@ launchFrontendTests(){
 
 launchTests(){
 
-   launchBackendTests &&
-   launchEmbeddedTests &&
+   launchBackendTests 
+   launchEmbeddedTests 
    launchFrontendTests
 
 }
