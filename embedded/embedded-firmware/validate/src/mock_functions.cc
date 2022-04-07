@@ -55,11 +55,6 @@ int appchannelSendDataPacket(void* data, size_t length) {
 }
 
 ////////////////////////////////////////////////////////////////
-bool crtpCommanderHighLevelIsTrajectoryFinished() {
-  return mock->crtpCommanderHighLevelIsTrajectoryFinished();
-}
-
-////////////////////////////////////////////////////////////////
 void estimatorKalmanGetEstimatedPos(point_t* pos) {
   return mock->estimatorKalmanGetEstimatedPos(pos);
 }
@@ -67,18 +62,6 @@ void estimatorKalmanGetEstimatedPos(point_t* pos) {
 ////////////////////////////////////////////////////////////////
 void commanderSetSetpoint(setpoint_t* setpoint, int priority) {
   return mock->commanderSetSetpoint(setpoint, priority);
-}
-
-////////////////////////////////////////////////////////////////
-int crtpCommanderHighLevelTakeoff(const float absoluteHeight_m,
-                                  const float duration_s) {
-  return mock->crtpCommanderHighLevelTakeoff(absoluteHeight_m, duration_s);
-}
-
-////////////////////////////////////////////////////////////////
-int crtpCommanderHighLevelLand(const float absoluteHeight_m,
-                               const float duration_s) {
-  return mock->crtpCommanderHighLevelLand(absoluteHeight_m, duration_s);
 }
 
 ////////////////////////////////////////////////////////////////

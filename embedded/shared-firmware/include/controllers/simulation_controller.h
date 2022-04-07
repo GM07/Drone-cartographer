@@ -43,6 +43,9 @@ class SimulationController : public AbstractController {
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
   [[nodiscard]] bool isTrajectoryFinished() const override;
+  [[nodiscard]] bool isAltitudeReached() const override {
+    return Math::areAlmostEqual(getCurrentLocation().m_z, m_targetPosition.m_z);
+  };
 
   void initCommunicationManager() override;
 

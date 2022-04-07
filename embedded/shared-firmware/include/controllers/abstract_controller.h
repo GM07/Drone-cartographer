@@ -36,14 +36,14 @@ class AbstractController {
 
   virtual void setVelocity(const Vector3D& direction, float speed) = 0;
 
-  inline void takeOff(float height) {
+  inline virtual void takeOff(float height) {
     m_takeOffPosition += getCurrentLocation();
     m_targetPosition = Vector3D::z(height);
     m_state = State::kTakingOff;
     setVelocity(Vector3D::z(1.0F), kSpeed);
   };
 
-  inline void land() {
+  inline virtual void land() {
     m_targetPosition = getCurrentLocation();
     m_targetPosition.m_z = 0;
     m_state = State::kLanding;
@@ -54,11 +54,7 @@ class AbstractController {
 
   [[nodiscard]] virtual Vector3D getCurrentLocation() const = 0;
   [[nodiscard]] virtual bool isTrajectoryFinished() const = 0;
-
-  [[nodiscard]] inline bool isAltitudeReached() const {
-    return Math::areAlmostEqual(getCurrentLocation().m_z, m_targetPosition.m_z,
-                                kRealTrajectoryFinishedTreshold);
-  };
+  [[nodiscard]] virtual bool isAltitudeReached() const = 0;
 
   [[nodiscard]] virtual bool isDroneCrashed() const = 0;
 

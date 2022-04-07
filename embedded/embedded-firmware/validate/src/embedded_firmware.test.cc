@@ -57,14 +57,19 @@ TEST(ValidateEmbeddedFirmware, checkIfDroneCrashed) {
 
 TEST(ValidateEmbeddedFirmware, isTrajectoryFinished) {
   mock = new FunctionsMock;
-  EXPECT_CALL(*mock, crtpCommanderHighLevelIsTrajectoryFinished)
+  constexpr point_t kPointRef1{0, 1, 1, 1};
+  constexpr point_t kPointRef2{0, 0, 0, 0};
+  EXPECT_CALL(*mock, estimatorKalmanGetEstimatedPos)
       .Times(2)
-      .WillOnce(Return(false))
-      .WillOnce(Return(true));
+      .WillOnce([&](point_t* point) { *point = kPointRef1; })
+      .WillRepeatedly([&](point_t* point) { *point = kPointRef2; });
 
-  EXPECT_FALSE(
-      Drone::getEmbeddedDrone().getController()->isTrajectoryFinished());
+  Drone::getEmbeddedDrone().getController()->m_targetPosition =
+      Vector3D(1.0F, 1.0F, 1.0F);
+
   EXPECT_TRUE(
+      Drone::getEmbeddedDrone().getController()->isTrajectoryFinished());
+  EXPECT_FALSE(
       Drone::getEmbeddedDrone().getController()->isTrajectoryFinished());
 
   delete mock;
@@ -99,9 +104,9 @@ TEST(ValidateEmbeddedFirmware, takeoff) {
   constexpr point_t kPointRef{0, 0, 1, 0};
   constexpr float kHeight = 1.0F;
   EXPECT_CALL(*mock, estimatorKalmanGetEstimatedPos)
-      .Times(2)
+      .Times(1)
       .WillRepeatedly([&](point_t* point) { *point = kPointRef; });
-  EXPECT_CALL(*mock, crtpCommanderHighLevelTakeoff(kHeight, _)).Times(1);
+  EXPECT_CALL(*mock, commanderSetSetpoint(_, 3)).Times(1);
 
   Drone::getEmbeddedDrone().getController()->takeOff(kHeight);
 
@@ -114,9 +119,9 @@ TEST(ValidateEmbeddedFirmware, land) {
   constexpr point_t kPointRef{0, 0, 1, 1};
 
   EXPECT_CALL(*mock, estimatorKalmanGetEstimatedPos)
-      .Times(2)
+      .Times(1)
       .WillRepeatedly([&](point_t* point) { *point = kPointRef; });
-  EXPECT_CALL(*mock, crtpCommanderHighLevelLand(0, _)).Times(1);
+  EXPECT_CALL(*mock, commanderSetSetpoint(_, 3)).Times(1);
 
   Drone::getEmbeddedDrone().getController()->land();
   delete mock;

@@ -27,6 +27,10 @@ class FirmwareController : public AbstractController {
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
   [[nodiscard]] bool isTrajectoryFinished() const override;
+  [[nodiscard]] bool isAltitudeReached() const override {
+    return Math::areAlmostEqual(getCurrentLocation().m_z, m_targetPosition.m_z,
+                                kRealTrajectoryFinishedTreshold);
+  };
 
   size_t receiveMessage(void* message, size_t size) const override;
   void sendMessage(void* message, size_t size) const override;
