@@ -75,6 +75,17 @@ export class ServerCommunication {
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
+  public static setP2PGradient(newValue: boolean): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.SET_P2P_ADDRESS,
+        newValue
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
   public static returnToBase(callback: () => void): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(

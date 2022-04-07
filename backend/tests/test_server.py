@@ -454,11 +454,12 @@ class TestApplication(unittest.TestCase):
         self.assertTrue(client.is_connected('/limitedAccess'))
         update_mock.assert_called_once()
         get_drones_mock.assert_called_once_with()
-        self.assertEqual(client.get_received('/limitedAccess'), [{
-            'name': 'droneList',
-            'args': [['test']],
-            'namespace': '/limitedAccess'
-        }])
+        self.assertEqual(
+            client.get_received('/limitedAccess')[1], {
+                'name': 'droneList',
+                'args': [['test']],
+                'namespace': '/limitedAccess'
+            })
 
     @mock.patch('server.start_drone_status_task')
     def test_send_drone_status(self, start_drone_mock: mock.MagicMock):

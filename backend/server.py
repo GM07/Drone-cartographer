@@ -1,5 +1,4 @@
 from gevent import monkey
-from numpy import broadcast
 
 if __name__ == '__main__':
     monkey.patch_all()
@@ -30,11 +29,10 @@ APP.config['SECRET_KEY'] = 'dev'
 
 # Socketio instance to communicate with frontend
 
-SOCKETIO = SocketIO(
-    APP,
-    async_mode='gevent',
-    cors_allowed_origins='*',
-)
+SOCKETIO = SocketIO(APP,
+                    async_mode='gevent',
+                    cors_allowed_origins='*',
+                    logger=False)
 
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
@@ -189,6 +187,7 @@ def mission_connect():
 @SOCKETIO.on('connect', namespace='/limitedAccess')
 def connect():
     AccessStatus.update_specific_client(SOCKETIO, request.sid)
+    MissionStatus.update_p2p_gradient_value(SOCKETIO)
     SOCKETIO.emit('droneList',
                   COMM.get_drones(),
                   namespace='/limitedAccess',
@@ -225,6 +224,22 @@ def send_logs():
     return ''
 
 
+@SOCKETIO.on('setP2PGradient', namespace='/limitedAccess')
+def set_p2p(run_color_gradient: bool):
+    if not MissionStatus.get_mission_started(
+    ) or not AccessStatus.is_request_valid(request):
+        return ''
+
+    MissionStatus.is_p2p_gradient_running = run_color_gradient
+
+    if run_color_gradient:
+        COMM.send_command(COMMANDS.START_P2P.value)
+    else:
+        COMM.send_command(COMMANDS.END_P2P.value)
+
+    MissionStatus.update_p2p_gradient_value(SOCKETIO)
+
+
 if __name__ == '__main__':
     print('The backend is running on port 5000')
-    SOCKETIO.run(APP, debug=False, host='0.0.0.0', port=5000)
+    SOCKETIO.run(APP, debug=False, host='0.0.0.0', port=5000, log_output=True)
