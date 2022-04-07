@@ -18,6 +18,7 @@ struct DroneData {
   float m_range{0};
   std::array<char, 5> m_magicHeader{{'D', 'R', 'E', 'A', 'M'}};
   size_t m_id{0};
+  float m_randomAngleRad{0.0F};
 } __attribute__((packed));
 
 #endif

@@ -29,32 +29,10 @@ void Drone::step() {
       changeDirection();
       break;
     case State::kReturnToBase:
-      static bool jumpingWall = false;
       wallAvoidance();
-      // If there is a wall jump over it
-      if (!Math::areAlmostEqual(m_normal, Vector3D())) {
-        m_data.m_direction = Vector3D::z(1.0f);
-
-        // Ensures we go twice as high as the obstacle
-        m_controller->m_targetPosition = m_controller->getCurrentLocation();
-        m_controller->m_targetPosition.m_z *= 2;
-        jumpingWall = true;
-
-      } else if (jumpingWall) {
-        if (m_controller->isAltitudeReached()) jumpingWall = false;
-      } else {
-        m_data.m_direction = Vector3D() - m_controller->getCurrentLocation();
-        m_data.m_direction.m_z = 0;
-
-        // If there are no walls and we are above our origin land
-        m_controller->m_targetPosition =
-            Vector3D::z(m_controller->getCurrentLocation().m_z);
-        if (m_controller->isTrajectoryFinished()) {
-          m_controller->land();
-          m_data.m_direction = Vector3D::z(-1.0f);
-          m_controller->m_state = State::kLanding;
-        }
-      }
+      collisionAvoidance();
+      changeDirection();
+      returnToBase();
       break;
     case State::kIdle:  // Fallthrough
     default:
@@ -62,6 +40,44 @@ void Drone::step() {
   }
 
   m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
+}
+
+void Drone::returnToBase() {
+  static bool jumpingWall = false;
+
+  // Peer collision should be prioritized over returning to base
+  if (m_peerCollision) return;
+
+  if (!Math::areAlmostEqual(m_normal, Vector3D())) {
+    m_data.m_direction = Vector3D::z(1.0f);
+
+    // Ensures we go twice as high as the obstacle
+    m_controller->m_targetPosition = m_controller->getCurrentLocation();
+    m_controller->m_targetPosition.m_z *= 2;
+
+    // Ensures we are not going to high with the real drones
+    if (m_controller->m_targetPosition.m_z > kMaxHeight) {
+      m_controller->m_targetPosition.m_z = kMaxHeight;
+    }
+
+    jumpingWall = true;
+
+  } else if (jumpingWall) {
+    m_data.m_direction = Vector3D::z(1.0f);
+    if (m_controller->isAltitudeReached()) jumpingWall = false;
+  } else {
+    m_data.m_direction = Vector3D() - m_controller->getCurrentLocation();
+    m_data.m_direction.m_z = 0;
+
+    // If there are no walls and we are above our origin land
+    m_controller->m_targetPosition =
+        Vector3D::z(m_controller->getCurrentLocation().m_z);
+    if (m_controller->isTrajectoryFinished()) {
+      m_controller->land();
+      m_data.m_direction = Vector3D::z(-1.0f);
+      m_controller->m_state = State::kLanding;
+    }
+  }
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -114,15 +130,43 @@ void Drone::wallAvoidance() {
 
 /////////////////////////////////////////////////////////////////////
 void Drone::collisionAvoidance() {
+  m_peerCollision = false;
+
   for (const auto &[id, peerData] : m_peerData) {
     if (peerData.m_range <= m_controller->getMinCollisionAvoidanceDistance()) {
+      m_peerCollision = true;
       if (m_usedPeerData.find(peerData.m_id) == m_usedPeerData.end()) {
         m_usedPeerData.insert_or_assign(peerData.m_id, peerData);
-        m_normal += peerData.m_direction - m_data.m_direction;
+
+        // Makes sure both drone use the same random angle
+        float angle = peerData.m_id <= m_data.m_id ? m_data.m_randomAngleRad
+                                                   : peerData.m_randomAngleRad;
+
+        // Rotate normals by the random angle
+        Vector3D peerNormal = peerData.m_direction - m_data.m_direction;
+        peerNormal.m_x =
+            cosf(angle) * peerNormal.m_x - sinf(angle) * peerNormal.m_y;
+        peerNormal.m_y =
+            sinf(angle) * peerNormal.m_x + cosf(angle) * peerNormal.m_y;
+
+        // Add the normal so the drone can dodge
+        m_normal += peerNormal;
       }
     } else {
       m_usedPeerData.erase(peerData.m_id);
     }
+  }
+
+  if (!m_peerCollision) {
+    constexpr float maxRange = M_PI * 2;
+    constexpr float minRange = 0;
+    static const uint32_t kSeed =
+        std::chrono::system_clock::now().time_since_epoch().count();
+
+    std::default_random_engine generator(kSeed);
+    std::uniform_real_distribution<float> distribution(minRange, maxRange);
+
+    m_data.m_randomAngleRad = distribution(generator);
   }
 }
 

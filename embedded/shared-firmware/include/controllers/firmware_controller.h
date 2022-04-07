@@ -26,6 +26,7 @@ class FirmwareController : public AbstractController {
   void takeOff(float height) override;
   void land() override;
   inline void returnToBase() override {
+    // Enable variable zRanger
     paramVarId_t paramIdUseF = paramGetVarId("kalman", "useF");
     paramSetInt(paramIdUseF, 1);
   };
