@@ -53,13 +53,6 @@ void updateCrashStatus() {
 }
 
 /////////////////////////////////////////////////////////////////////////
-void enableCrtpHighLevelCommander() {
-  paramVarId_t paramIdCommanderEnHighLevel =
-      paramGetVarId("commander", "enHighLevel");
-  paramSetInt(paramIdCommanderEnHighLevel, 1);
-}
-
-/////////////////////////////////////////////////////////////////////////
 uint8_t logDroneState(uint32_t /*timestamp*/, void* /*data*/) {
   return static_cast<uint8_t>(
       Drone::getEmbeddedDrone().getController()->m_state);

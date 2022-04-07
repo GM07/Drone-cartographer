@@ -43,28 +43,15 @@ void Drone::step() {
 }
 
 void Drone::returnToBase() {
-  static bool jumpingWall = false;
+  // Peer or wall-collision should be prioritized over returning to base
+  if (m_peerCollision || !Math::areAlmostEqual(m_normal, Vector3D())) return;
 
-  // Peer collision should be prioritized over returning to base
-  if (m_peerCollision) return;
+  // Set the height
+  m_controller->m_targetPosition = m_controller->getCurrentLocation();
+  m_controller->m_targetPosition.m_z = kMaxHeight;
 
-  if (!Math::areAlmostEqual(m_normal, Vector3D())) {
+  if (!m_controller->isAltitudeReached()) {
     m_data.m_direction = Vector3D::z(1.0f);
-
-    // Ensures we go twice as high as the obstacle
-    m_controller->m_targetPosition = m_controller->getCurrentLocation();
-    m_controller->m_targetPosition.m_z *= 2;
-
-    // Ensures we are not going to high with the real drones
-    if (m_controller->m_targetPosition.m_z > kMaxHeight) {
-      m_controller->m_targetPosition.m_z = kMaxHeight;
-    }
-
-    jumpingWall = true;
-
-  } else if (jumpingWall) {
-    m_data.m_direction = Vector3D::z(1.0f);
-    if (m_controller->isAltitudeReached()) jumpingWall = false;
   } else {
     m_data.m_direction = Vector3D() - m_controller->getCurrentLocation();
     m_data.m_direction.m_z = 0;
