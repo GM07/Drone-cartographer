@@ -27,7 +27,7 @@
               <v-row>
                 <v-col cols="12">
                   <v-text-field
-                    v-model="newDrone.xPos"
+                    v-model.number="newDrone.startingXPos"
                     label="Position X"
                     :rules="[
                       validateDistance,
@@ -43,7 +43,7 @@
               <v-row>
                 <v-col cols="12">
                   <v-text-field
-                    v-model="newDrone.yPos"
+                    v-model.number="newDrone.startingYPos"
                     label="Position Y"
                     :rules="[
                       validateDistance,
@@ -59,7 +59,7 @@
               <v-row>
                 <v-col cols="12">
                   <v-text-field
-                    v-model="newDrone.orientation"
+                    v-model.number="newDrone.startingOrientation"
                     label="Orientation"
                     :rules="[
                       v =>
@@ -90,31 +90,27 @@
 
 <script lang="ts">
 import {Component, Vue, Prop} from 'vue-property-decorator';
-import {Drone} from '@/communication/drone';
+import {
+  DEFAULT_NEW_DRONE_DATA,
+  DroneData,
+  NewDroneData,
+} from '@/communication/drone';
 
 @Component({})
 export default class DroneMenu extends Vue {
-  @Prop() private droneList!: Drone[];
+  @Prop() private droneList!: DroneData[];
   @Prop() private isDroneMenuOpen!: boolean;
-  private newDrone: Drone = {
-    name: 'radio://0/80/2M/E7E7E7E761',
-    xPos: 0,
-    yPos: 0,
-    orientation: 0,
-  };
+  private newDrone: NewDroneData = {...DEFAULT_NEW_DRONE_DATA};
 
   public submit(): void {
     if (
       (this.$refs.form as Vue & {validate: () => boolean}).validate() &&
       (this.$refs.pos as Vue & {validate: () => boolean}).validate()
     ) {
-      this.$emit('addDrone', this.newDrone);
-      this.newDrone.name = 'radio://0/80/2M/E7E7E7E761';
-      this.newDrone.xPos = 0;
-      this.newDrone.yPos = 0;
-      this.newDrone.orientation = 0;
-      this.resetValidation();
+      this.$emit('addDrone', {...this.newDrone} as NewDroneData);
       this.closeMenu();
+      this.resetValidation();
+      this.newDrone = {...DEFAULT_NEW_DRONE_DATA};
     }
   }
 
@@ -152,8 +148,8 @@ export default class DroneMenu extends Vue {
       this.droneList.filter(drone => {
         return (
           Math.sqrt(
-            Math.pow(drone.xPos - this.newDrone.xPos, 2) +
-              Math.pow(drone.yPos - this.newDrone.yPos, 2)
+            Math.pow(drone.startingXPos - this.newDrone.startingXPos, 2) +
+              Math.pow(drone.startingYPos - this.newDrone.startingYPos, 2)
           ) < 0.5
         );
       }).length === 0 ||

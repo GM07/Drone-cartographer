@@ -41,7 +41,7 @@ class TestApplication(unittest.TestCase):
 
     @mock.patch('services.data.drone_data.DroneData._DroneData__from_bytes')
     def test_drone_data(self, byte: mock.MagicMock):
-        Drone.DroneData({})
+        Drone.DroneData('', {})
         byte.assert_called()
 
     @mock.patch('services.data.drone_data.DroneState', mock.MagicMock)
@@ -53,7 +53,7 @@ class TestApplication(unittest.TestCase):
         data = [0, 1, 2, 3, 4, 5, 6, 4]
 
         byte_decoder.return_value = FakeByteDecoder()
-        drone_data = Drone.DroneData({})
+        drone_data = Drone.DroneData('', {})
         drone_data._DroneData__from_bytes(data)
         self.assertEqual(data[6], drone_data.battery_level)
 
@@ -61,7 +61,7 @@ class TestApplication(unittest.TestCase):
     def test__str__(self, byte_decoder: mock.MagicMock):
 
         byte_decoder.return_value = FakeByteDecoder()
-        drone_data = Drone.DroneData({})
+        drone_data = Drone.DroneData('', {})
 
         self.assertTrue(drone_data.__str__().find('Exploring'))
 

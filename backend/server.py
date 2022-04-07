@@ -1,4 +1,7 @@
+from typing import Any, Dict, List
 from gevent import monkey
+
+from services.data.starting_drone_data import StartingDroneData
 
 if __name__ == '__main__':
     monkey.patch_all()
@@ -89,12 +92,16 @@ def launch(is_simulated: bool):
 
 
 @SOCKETIO.on('set_drone', namespace='/limitedAccess')
-def set_drone(drone_list, is_simulated):
+def set_drone(drone_list: List[Dict[str, Any]], is_simulated):
+    starting_drone_data_list: List[StartingDroneData] = []
+    for drone in drone_list:
+        starting_drone_data_list.append(StartingDroneData(drone))
+
     global COMM
-    COMM.set_drone(drone_list)
+    COMM.set_drone(starting_drone_data_list)
 
     SOCKETIO.emit('droneList',
-                  COMM.get_drones(),
+                  COMM.get_full_drone_data(),
                   namespace='/limitedAccess',
                   broadcast=True,
                   include_self=False,
@@ -103,7 +110,8 @@ def set_drone(drone_list, is_simulated):
     if not is_simulated:
         COMM.shutdown()
         COMM = CommCrazyflie(
-            SOCKETIO, drone_list)  # Recreate object to reconnect to drones
+            SOCKETIO,
+            starting_drone_data_list)  # Recreate object to reconnect to drones
     return ''
 
 
@@ -189,7 +197,7 @@ def connect():
     AccessStatus.update_specific_client(SOCKETIO, request.sid)
     MissionStatus.update_p2p_gradient_value(SOCKETIO)
     SOCKETIO.emit('droneList',
-                  COMM.get_drones(),
+                  COMM.get_full_drone_data(),
                   namespace='/limitedAccess',
                   room=request.sid)
     return ''

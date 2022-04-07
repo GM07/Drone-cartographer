@@ -81,7 +81,6 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import {ACCESSOR} from '@/store';
 import {ServerCommunication} from '@/communication/server_communication';
 import {AccessStatus} from '@/communication/access_status';
-import {Drone} from '@/communication/drone';
 import {
   SOCKETIO_LIMITED_ACCESS,
   UPDATE_P2P_GRADIENT,
@@ -89,7 +88,6 @@ import {
 
 @Component({})
 export default class MissionCommands extends Vue {
-  @Prop() private droneList!: Drone[];
   @Prop() private accessStatus!: AccessStatus;
   public isLaunchMissionSelected = false;
   public isTerminateMissionSelected = false;

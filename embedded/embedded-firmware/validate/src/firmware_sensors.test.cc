@@ -24,13 +24,13 @@ TEST(ValidateFirmwareSensors, getFrontDistance) {
       .WillOnce(Return(kDistanceFront))
       .WillOnce(Return(kDistanceLeft))
       .WillOnce(Return(kDistanceRight))
-      .WillOnce(Return(kDistanceBack));
+      .WillOnce(Return(kDistanceBack))
+      .WillOnce(Return(kBatteryLevel));
 
   EXPECT_CALL(*mock, logGetFloat)
       .WillOnce(Return(kPosX))
       .WillOnce(Return(kPosY))
-      .WillOnce(Return(kPosZ))
-      .WillOnce(Return(kBatteryLevel));
+      .WillOnce(Return(kPosZ));
 
   FirmwareSensors sensors;
   EXPECT_EQ(sensors.getFrontDistance(), kDistanceFront);
@@ -40,7 +40,7 @@ TEST(ValidateFirmwareSensors, getFrontDistance) {
   EXPECT_EQ(sensors.getPosX(), kPosX);
   EXPECT_EQ(sensors.getPosY(), kPosY);
   EXPECT_EQ(sensors.getPosZ(), kPosZ);
-  EXPECT_EQ(sensors.getBatteryLevel(), kBatteryLevel);
+  EXPECT_EQ(sensors.getBatteryLevel(), kBatteryLevel / 10.0F);
 
   delete mock;
 }

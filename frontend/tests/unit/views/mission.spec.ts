@@ -9,17 +9,19 @@ import Vuetify from 'vuetify';
 import SocketIO from 'socket.io-client';
 import {Server} from 'socket.io';
 import {createServer} from 'http';
-import {DroneStatus} from '@/communication/drone';
+import {
+  DEFAULT_DRONE_DATA,
+  DroneData,
+  NewDroneData,
+} from '@/communication/drone';
 
 describe('mission.vue', () => {
   let limitedAccessEmitSpy: jasmine.Spy;
   let routerSpy: jasmine.Spy;
   let wrapper: Wrapper<DefaultProps & Mission, Element>;
   const VUETIFY = new Vuetify();
-  const DEFAULT_DRONE_STATUS = {
-    drone: {name: 'a', xPos: 0, yPos: 0},
-    status: 'IDLE',
-  } as DroneStatus;
+  const DEFAULT_DRONE_STATUS = {...DEFAULT_DRONE_DATA} as DroneData;
+  DEFAULT_DRONE_STATUS.name = 'a';
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -81,7 +83,7 @@ describe('mission.vue', () => {
   it('should add a drone', () => {
     wrapper.vm.droneList = [DEFAULT_DRONE_STATUS];
     expect(wrapper.vm.droneList.length).toEqual(1);
-    wrapper.vm.addDrone(DEFAULT_DRONE_STATUS.drone);
+    wrapper.vm.addDrone(DEFAULT_DRONE_STATUS as NewDroneData);
     expect(wrapper.vm.droneList.length).toEqual(2);
   });
 
@@ -108,12 +110,12 @@ describe('mission.vue', () => {
     wrapper.vm['chosenOption'] = -1;
     expect(wrapper.vm.getSelectedDrone()).toEqual('');
     const EXPECTED_DRONE = {
-      drone: {name: 'expectedDrone', xPos: 0, yPos: 0, orientation: 0},
-      status: 'stat',
-    };
+      ...DEFAULT_DRONE_DATA,
+    } as DroneData;
+    EXPECTED_DRONE.name = 'expected';
     wrapper.vm.droneList[0] = EXPECTED_DRONE;
     wrapper.vm['chosenOption'] = 0;
-    expect(wrapper.vm.getSelectedDrone()).toEqual(EXPECTED_DRONE.drone.name);
+    expect(wrapper.vm.getSelectedDrone()).toEqual(EXPECTED_DRONE.name);
   });
 
   it('should tell if connected', () => {
@@ -135,7 +137,7 @@ describe('mission.vue', () => {
       stubs: ['NavigationCommands', 'DroneCommands', 'MissionCommands'],
     });
 
-    serverSocket.emit('droneList', [DEFAULT_DRONE_STATUS.drone]);
+    serverSocket.emit('droneList', [DEFAULT_DRONE_STATUS]);
 
     serverSocket.emit(
       'update_status',
