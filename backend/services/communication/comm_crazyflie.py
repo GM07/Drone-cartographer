@@ -1,27 +1,19 @@
 """This module has the CommCrazyflie class that is used to
 communicate with the physical drones """
 
-from logging import shutdown
-from types import TracebackType
-from typing import Dict, List
+from typing import List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
 from cflib.crazyflie.log import LogConfig
 from flask_socketio import SocketIO
-from numpy import uint
 
 from constants import COMMANDS
-from services.communication.database.mongo_interface import Mission, Database
-from time import perf_counter
-from datetime import datetime
-from services.data.drone_data import DroneData, DroneState, log_data_to_drone_data
+from services.data.drone_data import DroneState, log_data_to_drone_data
 from services.communication.abstract_comm import AbstractComm
-from services.data.drone_data import DroneData
 
 from services.data.map import Map, MapData
-
-from services.data.map import Map, MapData
+from services.data.starting_drone_data import StartingDroneData
 
 
 class CommCrazyflie(AbstractComm):
@@ -30,18 +22,19 @@ class CommCrazyflie(AbstractComm):
     An example use is comm=CommCrazyflie([])
     comm.__init_drivers()"""
 
-    def __init__(self, socket_io: SocketIO, drone_list: list):
+    def __init__(self, socket_io: SocketIO,
+                 drone_list: List[StartingDroneData]):
         super().__init__(socket_io, drone_list)
         if drone_list is None:
             print('Error : drone list is empty')
             self.sync_crazyflies = []
-            self.drone_list = []
+            self.set_drone([])
             return
 
         print('Creating Embedded Crazyflie communication with drone list :',
               drone_list)
         Map().set_drone_len(len(drone_list))
-        self.links = list(map(lambda drone: drone['name'], drone_list))
+        self.links = list(map(lambda drone: drone.name, drone_list))
         self.crazyflies: list[Crazyflie] = list(
             map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
         self.crazyflies_by_id = {}
@@ -72,7 +65,7 @@ class CommCrazyflie(AbstractComm):
     def setup_log(self):
         self.log_configs: List[LogConfig] = []
         for index, crazyflie in enumerate(self.crazyflies):
-            log_config = LogConfig(name=str(self.drone_list[index]['name']),
+            log_config = LogConfig(name=str(self.drone_list[index].name),
                                    period_in_ms=AbstractComm.DELAY_RECEIVER_MS)
             log_config.add_variable('range.front', 'uint16_t')
             log_config.add_variable('range.left', 'uint16_t')
@@ -104,10 +97,9 @@ class CommCrazyflie(AbstractComm):
         sending_links = self.links if len(links) == 0 else links
 
         if command == COMMANDS.LAUNCH.value:
-            self.current_mission = Mission(0, len(self.drone_list), False, 0,
-                                           [[]])
+            self.mission_manager.start_current_mission(len(self.drone_list),
+                                                       False)
             self.logs = []
-            self.mission_start_time = perf_counter()
 
         for link in sending_links:
             packet = bytearray(command)  # Command must be an array of numbers
@@ -118,20 +110,16 @@ class CommCrazyflie(AbstractComm):
                 print(f'Error : {e}')
 
         if command == COMMANDS.LAND.value:
-            self.current_mission.flight_duration = self.mission_start_time - perf_counter(
-            )
-            self.current_mission.logs = self.logs
-            database = Database()
-            database.upload_mission_info(self.current_mission)
+            self.mission_manager.end_current_mission(self.logs)
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
-        drone_data = log_data_to_drone_data(data)
+        drone_data = log_data_to_drone_data(logconf.name, data)
         Map().add_data(MapData(logconf.name, drone_data), self.SOCKETIO)
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         # print(f'{timestamp}{logconf.id}:{data}')
-        self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
-        self.send_drone_status([(logconf.name,
-                                 DroneState(drone_data.state).name)])
+        self.send_log(f'{logconf.id}{data} ')
+        self.send_drone_status([drone_data.to_dict()])
+        self.set_drone_data(drone_data)
 
     def validate_name(self, name: str) -> str:
         return name

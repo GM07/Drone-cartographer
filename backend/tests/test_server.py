@@ -7,9 +7,21 @@ from flask_socketio import SocketIO, send, emit, join_room, leave_room, \
     Namespace, disconnect
 
 import server
+from services.data.starting_drone_data import StartingDroneData
 
 
 class TestApplication(unittest.TestCase):
+
+    class StartingDroneDataStub:
+
+        def __init__(self, name):
+            self.name = name
+            return None
+
+    class CrazyflieStub:
+
+        def __init__(self, socket_io, drone_list):
+            return None
 
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.AccessStatus.is_request_valid')
@@ -59,7 +71,7 @@ class TestApplication(unittest.TestCase):
     @mock.patch('server.SimulationConfiguration.add_obstacles')
     @mock.patch('server.SimulationConfiguration.add_drone')
     @mock.patch('server.CommCrazyflie.shutdown')
-    @mock.patch('server.AbstractComm.get_drones')
+    @mock.patch('server.AbstractComm.get_full_drone_data')
     @mock.patch('server.MissionStatus.get_mission_started')
     @mock.patch('server.AccessStatus.is_request_valid')
     def test_launch_unsuccessful(self, is_request_mock: mock.MagicMock,
@@ -103,13 +115,13 @@ class TestApplication(unittest.TestCase):
     @mock.patch('server.AbstractComm.get_drones')
     @mock.patch('server.MissionStatus.get_mission_started')
     @mock.patch('server.AccessStatus.is_request_valid')
-    def test_launch_succesful(self, is_request_mock: mock.MagicMock,
-                              get_mission_started: mock.MagicMock,
-                              get_drones_mock: mock.MagicMock,
-                              shutdown_mock: mock.MagicMock,
-                              add_drone_mock: mock.MagicMock,
-                              add_obstacles: mock.MagicMock,
-                              launch_mock: mock.MagicMock):
+    def test_launch_successful(self, is_request_mock: mock.MagicMock,
+                               get_mission_started: mock.MagicMock,
+                               get_drones_mock: mock.MagicMock,
+                               shutdown_mock: mock.MagicMock,
+                               add_drone_mock: mock.MagicMock,
+                               add_obstacles: mock.MagicMock,
+                               launch_mock: mock.MagicMock):
         get_drones_mock.return_value = [{'name': 'test'}]
         is_request_mock.return_value = True
         get_mission_started.return_value = False
@@ -117,12 +129,14 @@ class TestApplication(unittest.TestCase):
                                              namespace='/limitedAccess')
         self.assertTrue(client.is_connected('/limitedAccess'))
         client.emit('launch', True, namespace='/limitedAccess')
-        self.assertEqual(get_drones_mock.call_count, 2)
+        self.assertEqual(get_drones_mock.call_count, 1)
         self.assertEqual(shutdown_mock.call_count, 2)
         add_drone_mock.assert_called_once()
         add_obstacles.assert_called_once()
         launch_mock.assert_called_once()
 
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value=None))
     @mock.patch('server.SimulationConfiguration.__init__',
                 mock.MagicMock(return_value=None))
     @mock.patch('server.CommSimulation.send_command',
@@ -139,10 +153,10 @@ class TestApplication(unittest.TestCase):
     @mock.patch('server.SimulationConfiguration.add_obstacles')
     @mock.patch('server.SimulationConfiguration.add_drone')
     @mock.patch('server.CommSimulation.shutdown')
-    @mock.patch('server.AbstractComm.get_drones')
+    @mock.patch('server.CommSimulation.get_drones')
     @mock.patch('server.MissionStatus.get_mission_started')
     @mock.patch('server.AccessStatus.is_request_valid')
-    def test_launch_succesful_not_simulated(
+    def test_launch_successful_not_simulated(
             self, is_request_mock: mock.MagicMock,
             get_mission_started: mock.MagicMock,
             get_drones_mock: mock.MagicMock, shutdown_mock: mock.MagicMock,
@@ -160,13 +174,17 @@ class TestApplication(unittest.TestCase):
 
         client.emit('launch', False, namespace='/limitedAccess')
 
-        self.assertEqual(get_drones_mock.call_count, 2)
+        self.assertEqual(get_drones_mock.call_count, 1)
         self.assertEqual(shutdown_mock.call_count, 1)
         add_drone_mock.assert_not_called()
         add_obstacles.assert_not_called()
         launch_mock.assert_not_called()
         launch_mission_mock.assert_called_once()
 
+    @mock.patch('server.CommCrazyflie', CrazyflieStub)
+    @mock.patch('server.StartingDroneData', StartingDroneDataStub)
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
     @mock.patch('server.CommCrazyflie.shutdown',
                 mock.MagicMock(return_value=None))
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
@@ -196,6 +214,9 @@ class TestApplication(unittest.TestCase):
         }])
         comm_mock.shutdown.assert_called_once()
 
+    @mock.patch('server.StartingDroneData', StartingDroneDataStub)
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
     @mock.patch('server.CommCrazyflie.__del__',
                 mock.MagicMock(return_value=None))
     @mock.patch('server.CommCrazyflie.__init__',
@@ -227,6 +248,8 @@ class TestApplication(unittest.TestCase):
         }])
         comm_mock.shutdown.assert_not_called()
 
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value=None))
     @mock.patch('server.CommSimulation.__init__')
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.CommCrazyflie.__init__')
@@ -248,6 +271,9 @@ class TestApplication(unittest.TestCase):
         crazyflie_mock.assert_not_called()
         simulated_mock.assert_called()
 
+    @mock.patch('server.CommCrazyflie', CrazyflieStub)
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value=None))
     @mock.patch('server.CommSimulation.__init__')
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.AccessStatus.set_mission_type')
@@ -258,8 +284,8 @@ class TestApplication(unittest.TestCase):
 
         simulated_mock.return_value = None
 
-        comm_mock.get_drones = mock.MagicMock(return_value=[{'name': 'test'}])
-
+        comm_mock.get_drones = mock.MagicMock(return_value=[{'test'}])
+        comm_mock.shutdown = mock.MagicMock()
         client = server.SOCKETIO.test_client(server.APP,
                                              namespace='/limitedAccess')
         client.emit('set_mission_type', False, namespace='/limitedAccess')
@@ -267,7 +293,8 @@ class TestApplication(unittest.TestCase):
         simulated_mock.assert_not_called()
         client.disconnect('/limitedAccess')
 
-    @mock.patch('server.COMM.get_drones', mock.MagicMock(return_value='test'))
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.MissionStatus.terminate_mission')
     @mock.patch('server.MissionStatus.get_mission_started')
@@ -289,7 +316,8 @@ class TestApplication(unittest.TestCase):
         terminate_mission_mock.assert_called_once()
         server.COMM.send_command.assert_called_once()
 
-    @mock.patch('server.COMM.get_drones', mock.MagicMock(return_value='test'))
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.MissionStatus.terminate_mission')
     @mock.patch('server.MissionStatus.get_mission_started')
@@ -311,7 +339,8 @@ class TestApplication(unittest.TestCase):
         terminate_mission_mock.assert_not_called()
         server.COMM.send_command.assert_not_called()
 
-    @mock.patch('server.COMM.get_drones', mock.MagicMock(return_value='test'))
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.AccessStatus.take_control')
     @mock.patch('server.MissionStatus.update_all_clients')
@@ -326,7 +355,8 @@ class TestApplication(unittest.TestCase):
         take_control_mock.assert_called_once()
         update_mock.assert_called_once_with(server.SOCKETIO)
 
-    @mock.patch('server.COMM.get_drones', mock.MagicMock(return_value='test'))
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.AccessStatus.take_control')
     @mock.patch('server.MissionStatus.update_all_clients')
@@ -366,7 +396,8 @@ class TestApplication(unittest.TestCase):
         get_mission_from_id_mock.assert_called_once_with('1')
         jsonify_mock.assert_called_once_with([])
 
-    @mock.patch('server.COMM.get_drones', mock.MagicMock(return_value='test'))
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.AccessStatus.revoke_controlling_client')
     @mock.patch('server.MissionStatus.update_all_clients')
@@ -382,7 +413,8 @@ class TestApplication(unittest.TestCase):
         update_mock.assert_called_once_with(server.SOCKETIO)
         revoke_mock.assert_called_once_with(server.SOCKETIO, request)
 
-    @mock.patch('server.COMM.get_drones', mock.MagicMock(return_value='test'))
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.AccessStatus.revoke_controlling_client')
     @mock.patch('server.MissionStatus.update_all_clients')
@@ -444,21 +476,22 @@ class TestApplication(unittest.TestCase):
                                                       server.request)
 
     @mock.patch('server.AccessStatus.update_specific_client')
-    @mock.patch('server.COMM.get_drones')
-    def test_connect(self, get_drones_mock: mock.MagicMock,
+    @mock.patch('server.COMM.get_full_drone_data')
+    def test_connect(self, get_full_drone_data_mock: mock.MagicMock,
                      update_mock: mock.MagicMock):
-        get_drones_mock.return_value = ['test']
+        get_full_drone_data_mock.return_value = ['test']
 
         client = server.SOCKETIO.test_client(server.APP,
                                              namespace='/limitedAccess')
         self.assertTrue(client.is_connected('/limitedAccess'))
         update_mock.assert_called_once()
-        get_drones_mock.assert_called_once_with()
-        self.assertEqual(client.get_received('/limitedAccess'), [{
-            'name': 'droneList',
-            'args': [['test']],
-            'namespace': '/limitedAccess'
-        }])
+        get_full_drone_data_mock.assert_called_once_with()
+        self.assertEqual(
+            client.get_received('/limitedAccess')[1], {
+                'name': 'droneList',
+                'args': [['test']],
+                'namespace': '/limitedAccess'
+            })
 
     @mock.patch('server.start_drone_status_task')
     def test_send_drone_status(self, start_drone_mock: mock.MagicMock):

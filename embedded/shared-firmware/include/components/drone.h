@@ -75,9 +75,9 @@ class Drone {
   inline void initDrone() { m_data.m_id = m_controller->getId(); };
 
   static Drone& getEmbeddedDrone();
-
-  DroneData m_data;
   std::unordered_map<size_t, DroneData> m_peerData;
+  DroneData m_data;
+  bool m_p2pColorGradientIsActive{false};
 
  protected:
   Vector3D m_normal;

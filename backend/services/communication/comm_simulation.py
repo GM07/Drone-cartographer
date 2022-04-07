@@ -12,14 +12,11 @@ from constants import COMMANDS
 import queue
 from flask_socketio import SocketIO
 from time import sleep
-from services.communication.interface.drone import Drone
 
 from services.data.drone_data import DroneData
 from services.data.map import Map, MapData
-from services.communication.database.mongo_interface import Mission, Database
-from time import perf_counter, sleep
-from datetime import datetime
 from services.communication.abstract_comm import AbstractComm
+from services.data.starting_drone_data import StartingDroneData
 
 DELAY = 0.1
 
@@ -33,15 +30,17 @@ class CommSimulation(AbstractComm):
     SOCKET_COMMAND_PATH = '/tmp/socket/{}'
     SOCKET_DATA_PATH = '/tmp/socket/data{}'
 
-    def __init__(self, socketIO: SocketIO, drone_list=[]):
+    def __init__(self,
+                 socketIO: SocketIO,
+                 drone_list: List[StartingDroneData] = []):
         super().__init__(socketIO, drone_list)
         print('Drone list: ', drone_list)
         Map().set_drone_len(len(drone_list))
-        self.nb_connections = len(drone_list)
         for drone in drone_list:
-            drone['name'] = self.validate_name(drone['name'])
+            drone.name = self.validate_name(drone.name)
 
-        self.drone_list = drone_list
+        self.set_drone(drone_list)
+
         self.thread_active = True
         self.__COMMANDS_QUEUE = queue.Queue(10)
         self.__COMMANDS_THREAD = threading.Thread(
@@ -59,9 +58,9 @@ class CommSimulation(AbstractComm):
                                 socket.socket] = {}  # (server, connection)
 
         for i in range(self.nb_connections):
-            file_name = self.SOCKET_COMMAND_PATH.format(drone_list[i]['name'])
+            file_name = self.SOCKET_COMMAND_PATH.format(self.drone_list[i].name)
             self.command_servers[self.__init_server_bind(file_name)] = None
-            file_name = self.SOCKET_DATA_PATH.format(drone_list[i]['name'])
+            file_name = self.SOCKET_DATA_PATH.format(self.drone_list[i].name)
             self.data_servers[self.__init_server_bind(file_name)] = None
 
         if self.nb_connections > 0:
@@ -69,7 +68,6 @@ class CommSimulation(AbstractComm):
             self.__RECEIVE_THREAD.start()
         self.mission_start_time = 0
         self.mission_end_time = 0
-        self.current_mission: Mission
 
     def shutdown(self):
         self.thread_active = False
@@ -95,7 +93,7 @@ class CommSimulation(AbstractComm):
         try:
             self.__COMMANDS_QUEUE.put_nowait(command)
         except queue.Full:
-            self.send_log([(datetime.now().isoformat(), "Command queue full")])
+            self.send_log("Command queue full")
             print("Command queue is full")
             pass
 
@@ -197,19 +195,15 @@ class CommSimulation(AbstractComm):
                     if len(received) == 0:
                         is_socket_broken = True
                     else:
-                        data = DroneData(received)
-                        Map().add_data(MapData(str(server.getsockname()), data),
+                        data = DroneData(self.drone_list[count].name, received)
+                        Map().add_data(MapData(str(data.name), data),
                                        self.SOCKETIO)
-                        self.send_log([
-                            (datetime.now().isoformat(),
-                             f'Drone {self.drone_list[count]}' + data.__str__())
-                        ])
-                        self.send_drone_status([(self.drone_list[count]['name'],
-                                                 data.state.name)])
-                        #print(data)
+                        self.send_log(f'Drone {data.name}' + data.__str__())
+                        self.send_drone_status([data.to_dict()])
+                        self.set_drone_data(data)
+
                     if is_socket_broken:
-                        self.send_log([(datetime.now().isoformat(),
-                                        f'Broken Socket no {count}')])
+                        self.send_log(f'Broken Socket no {count}')
                         print("Socket broken")
                         self.data_servers[server] = None
                     count += 1
@@ -230,35 +224,28 @@ class CommSimulation(AbstractComm):
             if command is None:
                 return
             if command == COMMANDS.LAUNCH.value:
-                self.current_mission = Mission(0, self.nb_connections, True, 0,
-                                               [[]])
+                self.mission_manager.start_current_mission(
+                    self.nb_connections, True)
                 self.logs = []
-                self.mission_start_time = perf_counter()
 
             print('Sending command ', command, ' to simulation')
             for server, conn in self.command_servers.items():
                 try:
                     conn.send(bytearray(command))
 
-                    self.send_log([(datetime.now().isoformat(),
-                                    COMMANDS(command).name)])
+                    self.send_log(COMMANDS(command).name)
                 except BrokenPipeError:
                     print('Command could not be sent, BrokenPipeError')
-                    self.send_log([(datetime.now().isoformat(), 'Broken Pipe')])
+                    self.send_log('Broken Pipe')
                     self.command_servers[server] = None
                     missing_connection = True
                 except socket.error:
-                    self.send_log([(datetime.now().isoformat(), 'Socket error')
-                                  ])
+                    self.send_log('Socket error')
+
                     return
 
             if command == COMMANDS.LAND.value:
-                self.current_mission.flight_duration = self.mission_start_time - perf_counter(
-                )
-                self.current_mission.logs = self.logs
-
-                database = Database()
-                database.upload_mission_info(self.current_mission)
+                self.mission_manager.end_current_mission(self.logs)
 
     def validate_name(self, name: str) -> str:
         return re.sub(r'[\/:]', '', name)

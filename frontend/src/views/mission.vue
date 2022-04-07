@@ -17,10 +17,7 @@
             </v-list-item>
           </v-list>
 
-          <NavigationCommands
-            :accessStatus="accessStatus"
-            :droneList="getDrones()"
-          />
+          <NavigationCommands :accessStatus="accessStatus" />
           <v-divider></v-divider>
           <DroneCommands
             v-if="isDroneCommandsEnabled()"
@@ -47,7 +44,6 @@
           <MissionCommands
             v-if="isUserControlling()"
             :accessStatus="accessStatus"
-            :droneList="getDrones()"
           />
 
           <v-list dense nav>
@@ -87,12 +83,13 @@
               </v-item>
             </v-col>
             <v-col
-              v-for="(droneStatus, index) in droneList"
+              v-for="(droneData, index) in droneList"
               :key="index"
               cols="auto"
             >
               <v-item v-slot="{toggle}">
                 <v-card
+                  class="card-container"
                   :color="chosenOption === index ? 'primary' : ''"
                   elevation="2"
                   @click="
@@ -110,8 +107,24 @@
                       <v-icon>mdi-close-circle</v-icon>
                     </v-btn>
                   </v-card-actions>
-                  <v-card-text>{{ droneStatus.drone.name }}</v-card-text>
-                  <v-card-text> État: {{ droneStatus.status }}</v-card-text>
+                  <v-card-text class="pt-1 pb-1">
+                    {{ droneData.name }}
+                  </v-card-text>
+                  <v-card-text class="pt-1 pb-1">
+                    État: {{ droneData.state }}
+                  </v-card-text>
+                  <v-card-text class="pt-1 pb-1">
+                    Batterie:
+                    {{ droneData.batteryLevel.toFixed(2) }}%
+                  </v-card-text>
+                  <v-card-text class="pt-1 pb-1">
+                    Position en x:
+                    {{ droneData.xPos.toFixed(4) }}
+                  </v-card-text>
+                  <v-card-text class="pt-1 pb-1">
+                    Position en y:
+                    {{ droneData.yPos.toFixed(4) }}
+                  </v-card-text>
                 </v-card>
               </v-item>
             </v-col>
@@ -130,26 +143,23 @@
         </v-container>
       </v-item-group>
 
-      <v-select
-        v-bind:items="droneNameList"
-        label="Sélectionner les cartes individuelles voulues"
-        multiple
-        no-data-text="Aucun drone disponible"
-        style="padding: 20px"
-        v-on:input="limitNumMaps"
-      ></v-select>
-      <div style="display: flex; flex-direction: row">
-        <Map v-bind:mapData="mapData1" />
-        <Map v-bind:mapData="mapData2" />
+      <div>
+        <Map
+          :droneList="droneList"
+          :indexDrone="indexDrone"
+          :mapData="mapData"
+          :mapName="mapName"
+          :missionLaunched="missionLaunched"
+        />
       </div>
     </div>
 
-    <drone-menu
-      :droneList="getDrones()"
+    <DroneMenu
+      :droneList="droneList"
       :isDroneMenuOpen="isDroneMenuOpen"
       @addDrone="addDrone"
       @setDroneMenuOpen="setDroneMenuOpen"
-    ></drone-menu>
+    />
 
     <div v-if="isLogsMenuOpen" justify-end style="width: 100%">
       <v-btn @click="isLogsMenuOpen = !isLogsMenuOpen">
@@ -163,6 +173,10 @@
 <style scoped>
 .v-btn--active.no-active:not(:hover)::before {
   opacity: 0 !important;
+}
+
+.card-container {
+  min-width: 205px;
 }
 
 .main-container {
@@ -202,9 +216,14 @@ import {
   SERVER_ADDRESS,
   MAP_DATA_NAMESPACE,
   SOCKETIO_DRONE_STATUS,
+  SOCKETIO_MAP_DATA,
 } from '@/communication/server_constants';
 import {AccessStatus} from '@/communication/access_status';
-import {Drone, DroneStatus} from '@/communication/drone';
+import {
+  DroneData,
+  NewDroneData,
+  DEFAULT_DRONE_DATA,
+} from '@/communication/drone';
 import LogsInterface from '@/components/logs_interface.vue';
 import {ServerCommunication} from '@/communication/server_communication';
 import SocketIO from 'socket.io-client';
@@ -230,17 +249,16 @@ export default class Mission extends Vue {
   public dialog = false;
   public isDroneMenuOpen = false;
   public isLogsMenuOpen = false;
-  public droneList: DroneStatus[] = [];
+  public droneList: DroneData[] = [];
   public accessStatus = {
     isMissionSimulated: false,
     isUserControlling: false,
   } as AccessStatus;
 
-  public mapData1: MapData = EMPTY_MAP;
-  public mapData2: MapData = EMPTY_MAP;
-
-  private droneNameList: string[] = [];
-  private visualizedMaps: string[] = [];
+  private mapData: MapData[][] = [[EMPTY_MAP]];
+  private indexDrone = 0;
+  private mapName = 'générale';
+  private missionLaunched = false;
 
   private chosenOption = -1;
 
@@ -252,20 +270,31 @@ export default class Mission extends Vue {
   }
 
   public changeData(data: MapData): void {
-    const BASE_PATH = this.accessStatus.isMissionSimulated
-      ? '/tmp/socket/data'
-      : '';
+    this.droneList.forEach(() => this.mapData.push([EMPTY_MAP]));
+    const TEMP_MAP_DATA: MapData[][] = this.fillEmptyMap();
 
-    if (data.id === BASE_PATH + this.visualizedMaps[0]) this.mapData1 = data;
-    else if (data.id === BASE_PATH + this.visualizedMaps[1])
-      this.mapData2 = data;
+    for (let j = 0; j < this.mapData.length; j++) {
+      TEMP_MAP_DATA[j].push(...this.mapData[j]);
+    }
+
+    if (TEMP_MAP_DATA[0][0].id === '') TEMP_MAP_DATA[0][0] = data;
+    else TEMP_MAP_DATA[0].push(data);
+
+    for (let i = 0; i < this.droneList.length; i++) {
+      if (this.droneList[i].name === data.id) {
+        if (TEMP_MAP_DATA[++i][0].id === '') TEMP_MAP_DATA[i][0] = data;
+        else TEMP_MAP_DATA[i].push(data);
+      }
+    }
+    this.mapData = TEMP_MAP_DATA;
   }
 
-  public limitNumMaps(input: string[]): void {
-    if (input.length > 2) {
-      input.pop();
+  public fillEmptyMap(): MapData[][] {
+    const MAP_DATA: MapData[][] = [];
+    for (let i = 0; i < this.mapData.length; i++) {
+      MAP_DATA[i] = [EMPTY_MAP];
     }
-    this.visualizedMaps = input;
+    return MAP_DATA;
   }
 
   public deleteDrone(index: number): void {
@@ -275,30 +304,49 @@ export default class Mission extends Vue {
     this.droneList.splice(index, 1);
 
     ServerCommunication.setDrone(
-      this.getDrones(),
+      this.getNewDrones(),
       this.accessStatus.isMissionSimulated
     );
   }
 
   public setSelected(index: number): void {
+    this.mapData[this.indexDrone] = [EMPTY_MAP];
+
     this.chosenOption = index;
+    this.indexDrone = index + 1;
+
+    this.mapName =
+      this.indexDrone !== 0
+        ? this.droneList[this.chosenOption].name
+        : 'générale';
   }
 
   public setDroneMenuOpen(value: boolean): void {
     this.isDroneMenuOpen = value;
   }
 
-  public getDrones(): Drone[] {
-    return this.droneList.map(droneStatus => droneStatus.drone);
+  public getNewDrones(): NewDroneData[] {
+    return this.droneList.map(droneData => {
+      return {
+        name: droneData.name,
+        startingXPos: droneData.startingXPos,
+        startingYPos: droneData.startingYPos,
+        startingOrientation: droneData.startingOrientation,
+      } as NewDroneData;
+    });
   }
 
-  public addDrone(drone: Drone): void {
-    this.droneNameList.push(drone.name);
-    this.droneList.push({drone: {...drone}, status: 'IDLE'});
+  public addDrone(drone: NewDroneData): void {
+    this.droneList.push({...DEFAULT_DRONE_DATA, ...drone} as DroneData);
+    this.droneList[this.droneList.length - 1].xPos = drone.startingXPos;
+    this.droneList[this.droneList.length - 1].yPos = drone.startingYPos;
+    this.setStartingPoint(drone, this.droneList.length - 1);
     ServerCommunication.setDrone(
-      this.getDrones(),
+      this.getNewDrones(),
       this.accessStatus.isMissionSimulated
     );
+
+    this.mapData.push([EMPTY_MAP]);
   }
 
   public isDroneCommandsEnabled(): boolean {
@@ -311,13 +359,20 @@ export default class Mission extends Vue {
 
   public getSelectedDrone(): string {
     if (this.chosenOption !== -1 && this.droneList.length > 0) {
-      return this.droneList[this.chosenOption].drone.name;
+      return this.droneList[this.chosenOption].name;
     }
     return '';
   }
 
   public isConnected(): boolean {
     return SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
+  private setStartingPoint(newDroneData: NewDroneData, index: number) {
+    this.droneList[index].startingXPos = newDroneData.startingXPos;
+    this.droneList[index].startingYPos = newDroneData.startingYPos;
+    this.droneList[index].startingOrientation =
+      newDroneData.startingOrientation;
   }
 
   private beforeCreate(): void {
@@ -335,30 +390,54 @@ export default class Mission extends Vue {
 
     SOCKETIO_DRONE_STATUS.on(
       'update_drone_status',
-      (statusList: Array<[string, string]>) => {
-        statusList.forEach(statusTuple => {
+      (droneDataList: Array<DroneData>) => {
+        droneDataList.forEach(droneData => {
           for (let i = 0; i < this.droneList.length; i++) {
-            console.log(this.droneList[i].drone.name, statusTuple[0]);
-            if (this.droneList[i].drone.name === statusTuple[0])
-              this.droneList[i].status = statusTuple[1];
+            if (this.droneList[i].name === droneData.name) {
+              Vue.set(this.droneList, i, {
+                ...this.droneList[i],
+                ...droneData,
+              } as DroneData);
+            }
           }
         });
       }
     );
 
-    SOCKETIO_LIMITED_ACCESS.on('droneList', (droneList: Drone[]) => {
+    SOCKETIO_LIMITED_ACCESS.on('droneList', (droneList: Array<DroneData>) => {
       this.droneList = droneList.map(droneValue => {
-        return {drone: droneValue, status: 'IDLE'} as DroneStatus;
+        return {...DEFAULT_DRONE_DATA, ...droneValue} as DroneData;
       });
+    });
+
+    SOCKETIO_MAP_DATA.on('getAllMapData', res => {
+      console.log('map');
+      const TEMP_MAP_DATA: MapData[][] = [[EMPTY_MAP]];
+      this.droneList.forEach(() => TEMP_MAP_DATA.push([EMPTY_MAP]));
+      this.mapData = TEMP_MAP_DATA;
+      res.forEach((droneData: MapData) => {
+        this.changeData(droneData);
+      });
+    });
+
+    SOCKETIO_MAP_DATA.on('clear_all_maps', isMissionLaunched => {
+      if (isMissionLaunched) {
+        const TEMP_MAP_DATA: MapData[][] = [[EMPTY_MAP]];
+        this.droneList.forEach(() => TEMP_MAP_DATA.push([EMPTY_MAP]));
+        this.mapData = TEMP_MAP_DATA;
+      }
+      this.missionLaunched = isMissionLaunched;
     });
 
     SOCKETIO_LIMITED_ACCESS.open();
     SOCKETIO_DRONE_STATUS.open();
+    SOCKETIO_MAP_DATA.open();
   }
 
   private destroyed() {
     SOCKETIO_LIMITED_ACCESS.removeAllListeners().close();
     SOCKETIO_DRONE_STATUS.removeAllListeners().close();
+    SOCKETIO_MAP_DATA.removeAllListeners().close();
   }
 }
 </script>

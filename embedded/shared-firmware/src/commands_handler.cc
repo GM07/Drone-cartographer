@@ -17,6 +17,12 @@ bool Drone::handleCommand(Command command) {
     case Command::kLand:
       m_controller->land();
       return true;
+    case Command::kStartP2PGradient:
+      m_p2pColorGradientIsActive = true;
+      return true;
+    case Command::kEndP2PGradient:
+      m_p2pColorGradientIsActive = false;
+      return true;
     default:
       return false;
   }

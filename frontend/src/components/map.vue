@@ -1,6 +1,6 @@
 <template>
   <div style="display: flex; flex-direction: column; align-items: center">
-    <h2 style="color: DimGray">Carte : {{ this.mapData.id.slice(16) }}</h2>
+    <h2 style="color: DimGray">Carte {{ this.mapName }}</h2>
     <canvas
       ref="canvas"
       style="
@@ -17,11 +17,11 @@
 import {Component, Vue, Prop, Watch} from 'vue-property-decorator';
 import {Vec2d} from '../utils/vec2d';
 import {
-  OPTIONS,
   MapData,
   MM_TO_CM,
   M_TO_CM,
   MAP_SIZE,
+  DEGREE_TO_RAD,
 } from '../utils/map_constants';
 import SocketIO from 'socket.io-client';
 
@@ -29,81 +29,144 @@ import {
   SERVER_ADDRESS,
   MAP_DATA_NAMESPACE,
 } from '@/communication/server_constants';
+import {DroneData} from '@/communication/drone';
 
 @Component({})
 export default class Map extends Vue {
-  @Prop() public mapData!: MapData;
+  @Prop() public mapData!: MapData[][];
+  @Prop() public indexDrone!: number;
+  @Prop() public mapName!: string;
+  @Prop() public missionLaunched!: boolean;
+  @Prop() public droneList!: DroneData[];
   readonly SOCKETIO = SocketIO(SERVER_ADDRESS + MAP_DATA_NAMESPACE, {
     transports: ['websocket', 'polling'],
   });
-  private options = OPTIONS;
   private dronePos: Vec2d[] = [new Vec2d(0, 0)];
   private mapSize: Vec2d = new Vec2d(0, 0);
   private canvasSize: Vec2d = new Vec2d(0, 0);
+
+  private savedContexts: string[] = [];
+  private savedMap = new Image();
+
+  private currentIndex = 0;
+  private lastIndex = 0;
+
+  private hasBeenMounted = false;
 
   constructor() {
     super();
   }
 
+  @Watch('indexDrone', {immediate: true})
+  public onIndexChange(): void {
+    if (!this.hasBeenMounted) return;
+
+    const CANVAS = this.$refs.canvas as HTMLCanvasElement;
+    const CANVAS_CTX = CANVAS.getContext('2d') as CanvasRenderingContext2D;
+
+    this.lastIndex = this.currentIndex;
+    this.currentIndex = this.indexDrone;
+    this.savedContexts[this.lastIndex] = CANVAS.toDataURL();
+
+    this.savedMap.onload = this.createLoadedCanvas;
+    this.savedMap.src = this.savedContexts[this.currentIndex];
+
+    CANVAS_CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
+
+    this.onMapChange();
+  }
+
   @Watch('mapData', {immediate: true})
   public onMapChange(): void {
-    console.log(this.mapData);
+    if (!this.hasBeenMounted) return;
+
     // Get the canvas
     const CANVAS = this.$refs.canvas as HTMLCanvasElement;
     const CANVAS_CTX = CANVAS.getContext('2d') as CanvasRenderingContext2D;
 
-    // Get new drone position
-    this.dronePos = [
-      new Vec2d(this.mapData.position[0] * 100, this.mapData.position[1] * 100),
-    ];
-
-    // Show new drone position
-    CANVAS_CTX.fillStyle = 'red';
-    const NEW_POS = this.toCanvasPos(this.dronePos[0]);
-    CANVAS_CTX.fillRect(NEW_POS.x, NEW_POS.y, 1, 1);
-
-    const TEMPARRAYPERIM: Vec2d[] = [];
-    if (this.mapData.sensors.front > 0)
-      TEMPARRAYPERIM.push(
-        new Vec2d(
-          this.mapData.position[0] * M_TO_CM +
-            this.mapData.sensors.front / MM_TO_CM,
-          this.mapData.position[1] * M_TO_CM
-        )
+    for (let i = 0; i < this.mapData[this.indexDrone].length; i++) {
+      const CURRENT_DATA = this.mapData[this.indexDrone][i];
+      const COS_ORIENTATION = Math.cos(
+        this.droneList[this.indexDrone].startingOrientation * DEGREE_TO_RAD
       );
-    if (this.mapData.sensors.right > 0)
-      TEMPARRAYPERIM.push(
-        new Vec2d(
-          this.mapData.position[0] * M_TO_CM,
-          this.mapData.position[1] * M_TO_CM -
-            this.mapData.sensors.right / MM_TO_CM
-        )
-      );
-    if (this.mapData.sensors.back > 0)
-      TEMPARRAYPERIM.push(
-        new Vec2d(
-          this.mapData.position[0] * M_TO_CM -
-            this.mapData.sensors.back / MM_TO_CM,
-          this.mapData.position[1] * M_TO_CM
-        )
-      );
-    if (this.mapData.sensors.left > 0)
-      TEMPARRAYPERIM.push(
-        new Vec2d(
-          this.mapData.position[0] * M_TO_CM,
-          this.mapData.position[1] * M_TO_CM +
-            this.mapData.sensors.left / MM_TO_CM
-        )
+      const SIN_ORIENTATION = Math.sin(
+        this.droneList[this.indexDrone].startingOrientation * DEGREE_TO_RAD
       );
 
-    for (const VEC of TEMPARRAYPERIM) {
-      CANVAS_CTX.fillStyle = 'blue';
-      const WALL_POS = this.toCanvasPos(VEC);
-      CANVAS_CTX.fillRect(WALL_POS.x, WALL_POS.y, 3, 3);
+      // Get new drone position
+      this.dronePos = [
+        new Vec2d(
+          CURRENT_DATA.position[0] * M_TO_CM,
+          CURRENT_DATA.position[1] * M_TO_CM
+        ),
+      ];
+
+      // Show new drone position
+      CANVAS_CTX.fillStyle = 'red';
+      const NEW_POS = this.toCanvasPos(this.dronePos[0]);
+      CANVAS_CTX.fillRect(NEW_POS.x, NEW_POS.y, 1, 1);
+
+      const TEMPARRAYPERIM: Vec2d[] = [];
+
+      if (CURRENT_DATA.sensors.front > 0)
+        TEMPARRAYPERIM.push(
+          new Vec2d(
+            CURRENT_DATA.position[0] * M_TO_CM +
+              (CURRENT_DATA.sensors.front * COS_ORIENTATION) / MM_TO_CM,
+            CURRENT_DATA.position[1] * M_TO_CM +
+              (CURRENT_DATA.sensors.front * SIN_ORIENTATION) / MM_TO_CM
+          )
+        );
+      if (CURRENT_DATA.sensors.right > 0)
+        TEMPARRAYPERIM.push(
+          new Vec2d(
+            CURRENT_DATA.position[0] * M_TO_CM +
+              (CURRENT_DATA.sensors.right * SIN_ORIENTATION) / MM_TO_CM,
+            CURRENT_DATA.position[1] * M_TO_CM -
+              (CURRENT_DATA.sensors.right * COS_ORIENTATION) / MM_TO_CM
+          )
+        );
+      if (CURRENT_DATA.sensors.back > 0)
+        TEMPARRAYPERIM.push(
+          new Vec2d(
+            CURRENT_DATA.position[0] * M_TO_CM -
+              (CURRENT_DATA.sensors.back * COS_ORIENTATION) / MM_TO_CM,
+            CURRENT_DATA.position[1] * M_TO_CM -
+              (CURRENT_DATA.sensors.back * SIN_ORIENTATION) / MM_TO_CM
+          )
+        );
+      if (CURRENT_DATA.sensors.left > 0)
+        TEMPARRAYPERIM.push(
+          new Vec2d(
+            CURRENT_DATA.position[0] * M_TO_CM -
+              (CURRENT_DATA.sensors.left * SIN_ORIENTATION) / MM_TO_CM,
+            CURRENT_DATA.position[1] * M_TO_CM +
+              (CURRENT_DATA.sensors.left * COS_ORIENTATION) / MM_TO_CM
+          )
+        );
+
+      for (const VEC of TEMPARRAYPERIM) {
+        CANVAS_CTX.fillStyle = 'blue';
+        const WALL_POS = this.toCanvasPos(VEC);
+        CANVAS_CTX.fillRect(WALL_POS.x, WALL_POS.y, 3, 3);
+      }
     }
+  }
 
-    this.options.series[0].data = this.dronePos;
-    this.options.series[1].data.push(...TEMPARRAYPERIM);
+  @Watch('missionLaunched', {immediate: true})
+  public launchMission(): void {
+    if (this.missionLaunched) {
+      this.savedContexts = [];
+      const CANVAS = this.$refs.canvas as HTMLCanvasElement;
+      const CANVAS_CTX = CANVAS.getContext('2d') as CanvasRenderingContext2D;
+      CANVAS_CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
+    }
+  }
+
+  public createLoadedCanvas(): void {
+    const CANVAS = this.$refs.canvas as HTMLCanvasElement;
+    const CANVAS_CTX = CANVAS.getContext('2d') as CanvasRenderingContext2D;
+    CANVAS_CTX.drawImage(this.savedMap, 0, 0);
   }
 
   public toCanvasPos(pos: Vec2d): Vec2d {
@@ -129,6 +192,11 @@ export default class Map extends Vue {
       this.mapSize.x = MAP_SIZE; // FOR NOW WE HAVE AN ARENA OF 5m
       this.mapSize.y = (this.canvasSize.y * this.mapSize.x) / this.canvasSize.x;
     }
+
+    const CANVAS_CTX = CANVAS.getContext('2d') as CanvasRenderingContext2D;
+    CANVAS_CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
+
+    this.hasBeenMounted = true;
   }
 }
 </script>
