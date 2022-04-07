@@ -16,11 +16,11 @@ constexpr size_t kMessageMaxSize = 30;
 constexpr size_t kNbStartingDirection = 8;
 
 // Meters and seconds
-constexpr float kDroneSpeed = 2.0F;
+constexpr float kDroneSpeed = 0.25F;
 constexpr float kTakeOffSpeed = 1.0F;
 constexpr float kLandingSpeed = 0.25F;
 constexpr float kHeight = 0.3F;
-constexpr float kMaxHeight = 3.0F;
+constexpr float kMaxHeight = 1.7F;
 
 constexpr float kSimulationCollisionAvoidanceRange = 25.0F;
 constexpr float kRealMinCollisionAvoidanceRange = 42.0F;

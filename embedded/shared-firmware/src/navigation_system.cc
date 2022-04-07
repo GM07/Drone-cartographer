@@ -43,6 +43,8 @@ void Drone::step() {
 }
 
 void Drone::returnToBase() {
+  static bool altitudeReached = false;
+
   // Peer or wall-collision should be prioritized over returning to base
   if (m_peerCollision || !Math::areAlmostEqual(m_normal, Vector3D())) return;
 
@@ -50,9 +52,10 @@ void Drone::returnToBase() {
   m_controller->m_targetPosition = m_controller->getCurrentLocation();
   m_controller->m_targetPosition.m_z = kMaxHeight;
 
-  if (!m_controller->isAltitudeReached()) {
-    m_data.m_direction = Vector3D::z(1.0f);
+  if (!m_controller->isAltitudeReached() && !altitudeReached) {
+    m_data.m_direction = Vector3D::z(1.0F);
   } else {
+    altitudeReached = true;
     m_data.m_direction = Vector3D() - m_controller->getCurrentLocation();
     m_data.m_direction.m_z = 0;
 
@@ -61,6 +64,7 @@ void Drone::returnToBase() {
         Vector3D::z(m_controller->getCurrentLocation().m_z);
     if (m_controller->isTrajectoryFinished()) {
       m_controller->land();
+      altitudeReached = false;
       m_data.m_direction = Vector3D::z(-1.0f);
       m_controller->m_state = State::kLanding;
     }
@@ -145,7 +149,7 @@ void Drone::collisionAvoidance() {
   }
 
   if (!m_peerCollision) {
-    constexpr float maxRange = M_PI * 2;
+    constexpr float maxRange = Math::kPi * 2;
     constexpr float minRange = 0;
     static const uint32_t kSeed =
         std::chrono::system_clock::now().time_since_epoch().count();

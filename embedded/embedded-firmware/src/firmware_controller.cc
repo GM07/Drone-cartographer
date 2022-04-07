@@ -14,6 +14,7 @@ extern "C" {
 #include "estimator_kalman.h"
 #include "led.h"
 #include "ledseq.h"
+#include "log.h"
 #include "param_logic.h"
 #include "radiolink.h"
 #include "supervisor.h"
@@ -70,17 +71,33 @@ void FirmwareController::updateSensorsData() {
 [[nodiscard]] Vector3D FirmwareController::getCurrentLocation() const {
   point_t point;
   estimatorKalmanGetEstimatedPos(&point);
+
+  logVarId_t useFId = logGetVarId("kalman", "useF");
+  if (logGetUint(useFId)) {
+    logVarId_t floorHeightId = logGetVarId("kalman", "stateF");
+    float floorHeight = logGetFloat(floorHeightId);
+    point.z += floorHeight;
+  }
+
   return Vector3D(point.x, point.y, point.z) - m_takeOffPosition;
 }
 
 ////////////////////////////////
 void FirmwareController::takeOff(float height) {
+  // Disable useF for the start
+  paramVarId_t paramIdUseF = paramGetVarId("kalman", "useF");
+  paramSetInt(paramIdUseF, 0);
+
   m_takeOffPosition += getCurrentLocation();
   m_targetPosition = Vector3D::z(height);
 }
 
 ///////////////////////////////
 void FirmwareController::land() {
+  // Disable useF for the start
+  paramVarId_t paramIdUseF = paramGetVarId("kalman", "useF");
+  paramSetInt(paramIdUseF, 0);
+
   m_targetPosition = getCurrentLocation();
   m_targetPosition.m_z = 0;
 }
@@ -113,6 +130,11 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
   setpoint.velocity.x = speedVector.m_x;
   setpoint.velocity.y = speedVector.m_y;
   setpoint.velocity_body = false;
+
+  if (m_state == State::kExploring) {
+    setpoint.mode.z = modeAbs;
+    setpoint.position.z = kHeight;
+  }
 
   commanderSetSetpoint(&setpoint, 3);
 }

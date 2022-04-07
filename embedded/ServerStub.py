@@ -29,14 +29,14 @@ nConnections = 9
 identifier = "s"
 
 # CHANGE TO FALSE TO CONTROL REAL DRONE
-is_simulation = True
+is_simulation = False
 
 servers = []
 clients = []
 
 # For Drones
 # CHANGE TO PROPER DRONE ADDRESS
-URI = ['radio://0/80/2M/E7E7E7E762']
+URI = ['radio://0/80/2M/E7E7E7E761']
 COMM_CRAZYFLIE = CommCrazyflie()
 
 if is_simulation:

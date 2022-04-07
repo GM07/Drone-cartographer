@@ -7,6 +7,8 @@ constexpr float kThreshold = 10.0e-3;
 
 namespace Math {
 
+constexpr float kPi = 3.14159265358979323846F;
+
 ///////////////////////////////////////////////
 template <class T>
 [[nodiscard]] constexpr inline bool areAlmostEqual(

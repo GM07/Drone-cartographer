@@ -38,7 +38,7 @@ class AbstractController {
 
   [[nodiscard]] virtual Vector3D getCurrentLocation() const = 0;
   [[nodiscard]] virtual bool isTrajectoryFinished() const = 0;
-  [[nodiscard]] inline bool isAltitudeReached() const {
+  [[nodiscard]] virtual bool isAltitudeReached() const {
     return Math::areAlmostEqual(getCurrentLocation().m_z, m_targetPosition.m_z,
                                 kRealTrajectoryFinishedTreshold);
   }
