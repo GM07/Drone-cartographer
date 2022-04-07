@@ -3,7 +3,7 @@ import VueRouter, {RouteConfig} from 'vue-router';
 import Home from '@/views/home.vue';
 import Mission from '@/views/mission.vue';
 import CompletedMissions from '@/views/completed_missions.vue';
-import Editor from '@/views/editor.vue';
+import Editor from '@/components/editor.vue';
 
 Vue.use(VueRouter);
 
@@ -27,11 +27,6 @@ const ROUTES: Array<RouteConfig> = [
     path: COMPLETED_ROUTE,
     name: 'CompletedMissions',
     component: CompletedMissions,
-  },
-  {
-    path: EDITOR_ROUTE,
-    name: 'Editor',
-    component: Editor,
   },
   {
     path: '*',

@@ -20,11 +20,11 @@ export class ServerCommunication {
   }
 
   public static recompile(): boolean {
-    // if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
-    SERVER_CONSTANTS.SOCKETIO_SERVER_STATUS.emit(
-      SERVER_CONSTANTS.RECOMPILE_ADDRESS
-    );
-    // }
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.RECOMPILE_ADDRESS
+      );
+    }
 
     return true;
   }
@@ -54,11 +54,11 @@ export class ServerCommunication {
   }
 
   public static flash(): boolean {
-    // if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
-    SERVER_CONSTANTS.SOCKETIO_SERVER_STATUS.emit(
-      SERVER_CONSTANTS.FLASH_ADDRESS
-    );
-    // }
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.FLASH_ADDRESS
+      );
+    }
 
     return true;
   }

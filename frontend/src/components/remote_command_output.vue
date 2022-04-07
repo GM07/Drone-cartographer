@@ -13,12 +13,12 @@
         "
       >
         <p
-          v-for="item in this.output"
-          :key="item[1]"
+          v-for="(item, index) in this.output"
+          :key="item[1] + index"
           :style="
             item[0] === 'stdout'
-              ? 'color: white; margin: 0px; font-family: Consolas, Monaco, monospace;'
-              : 'color: red; margin: 0px; font-family: Consolas, Monaco, monospace;'
+              ? 'color: white; margin: 0px; font-family: Consolas, Monaco, monospace; z-index: 10;'
+              : 'color: red; margin: 0px; font-family: Consolas, Monaco, monospace; z-index: 10;'
           "
         >
           {{ item[1] }}
@@ -81,6 +81,12 @@ export default class RemoteCommandOutput extends Vue {
   constructor() {
     super();
 
+    this.socket = SocketIO(SERVER_ADDRESS + this.namespace, {
+      transports: ['websocket'],
+    }).close();
+  }
+
+  public created(): void {
     this.socket = SocketIO(SERVER_ADDRESS + this.namespace, {
       transports: ['websocket'],
     }).close();

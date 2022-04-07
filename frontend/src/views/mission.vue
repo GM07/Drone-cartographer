@@ -1,5 +1,12 @@
 <template>
-  <v-layout class="main-container" column fill-height justify-space-between>
+  <Editor v-if="editorMode" @goBack="switchEditorStatus"></Editor>
+  <v-layout
+    v-else
+    class="main-container"
+    column
+    fill-height
+    justify-space-between
+  >
     <v-navigation-drawer
       app
       :mini-variant="this.$vuetify.breakpoint.smAndDown && miniVariant"
@@ -40,11 +47,14 @@
                 >Fermer logs</v-list-item-title
               >
             </v-list-item>
-            <v-list-item :disabled="!isUserControlling()" @click="recompile()">
+            <v-list-item
+              :disabled="!isUserControlling()"
+              @click="switchEditorStatus"
+            >
               <v-list-item-icon>
                 <v-icon color="blue">mdi-cog-refresh-outline</v-icon>
               </v-list-item-icon>
-              <v-list-item-title>Recompiler</v-list-item-title>
+              <v-list-item-title>Editer</v-list-item-title>
             </v-list-item>
             <v-list-item
               :disabled="
@@ -167,18 +177,16 @@
       @addDrone="addDrone"
       @setDroneMenuOpen="setDroneMenuOpen"
     ></drone-menu>
-
-    <!-- <remote-command-output namespace="/flashDrones"></remote-command-output> -->
-    <remote-command-output
-      namespace="/recompileSimulation"
-    ></remote-command-output>
-    <!-- <remote-command-output namespace="/recompileEmbedded"></remote-command-output> -->
   </v-layout>
 </template>
 
 <style scoped>
 .v-btn--active.no-active:not(:hover)::before {
   opacity: 0 !important;
+}
+
+#content {
+  display: flex;
 }
 
 .main-container {
@@ -224,6 +232,7 @@ import {Drone, DroneStatus} from '@/communication/drone';
 import RemoteCommandOutput from '@/components/remote_command_output.vue';
 import LogsInterface from '@/components/logs_interface.vue';
 import {ServerCommunication} from '@/communication/server_communication';
+import Editor from '@/components/editor.vue';
 import SocketIO from 'socket.io-client';
 import {MapData, EMPTY_MAP} from '@/utils/map_constants';
 
@@ -236,6 +245,7 @@ import {MapData, EMPTY_MAP} from '@/utils/map_constants';
     Map,
     LogsInterface,
     RemoteCommandOutput,
+    Editor,
   },
 })
 export default class Mission extends Vue {
@@ -243,6 +253,7 @@ export default class Mission extends Vue {
     transports: ['websocket', 'polling'],
   });
 
+  public editorMode = false;
   public miniVariant = true;
   public attemptedLimitedConnexion = false;
   public dialog = false;
@@ -344,6 +355,10 @@ export default class Mission extends Vue {
 
   public isConnected(): boolean {
     return SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
+  public switchEditorStatus(): void {
+    this.editorMode = !this.editorMode;
   }
 
   private beforeCreate(): void {

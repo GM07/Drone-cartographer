@@ -1,13 +1,26 @@
 <template>
   <div id="content">
-    <vue-resizable
-      id="resizableDiv"
-      :active="['r']"
-      :width="400"
-      @resize:move="resizeMove"
-    >
-      <div id="files">
-        <vue-custom-scrollbar class="scroll-area" :settings="settings">
+    <div id="leftPanel">
+      <div>
+        <v-row id="goBack">
+          <v-btn
+            id="goBackButton"
+            color="transparent"
+            elevation="0"
+            @click="goBack"
+          >
+            <v-icon left> mdi-arrow-left </v-icon>
+            Retour
+          </v-btn>
+        </v-row>
+      </div>
+      <vue-resizable
+        id="resizableDiv"
+        :active="['r']"
+        :width="400"
+        @resize:move="resizeMove"
+      >
+        <div id="files">
           <treeselect
             id="tree"
             :always-open="true"
@@ -22,9 +35,9 @@
             :searchable="false"
             @select="onFileSelected"
           />
-        </vue-custom-scrollbar>
-      </div>
-    </vue-resizable>
+        </div>
+      </vue-resizable>
+    </div>
     <!-- @keydown.ctrl.83.prevent.stop="save" -->
     <div id="file" ref="fileDiv">
       <div id="editor" class="scroll-area">
@@ -56,15 +69,22 @@
             :eager="true"
             :transition="false"
           >
-            <remote-command-output namespace="/recompileSimulation">
+            <remote-command-output
+              id="recompileSimulation"
+              ref="recompileSimulation"
+              namespace="/recompileSimulation"
+            >
             </remote-command-output>
           </v-tab-item>
           <v-tab-item key="recompileEmbedded" :eager="true" :transition="false">
-            <remote-command-output namespace="/recompileEmbedded">
+            <remote-command-output
+              id="recompileEmbedded"
+              namespace="/recompileEmbedded"
+            >
             </remote-command-output>
           </v-tab-item>
           <v-tab-item key="flash" :eager="true" :transition="false">
-            <remote-command-output namespace="/flashDrones">
+            <remote-command-output id="flashDrones" namespace="/flashDrones">
             </remote-command-output>
           </v-tab-item>
         </v-tabs-items>
@@ -73,7 +93,7 @@
             <v-icon dark>mdi-cog-play</v-icon>
           </v-btn>
           <v-btn class="action" color="green" icon @click="flash">
-            <v-icon dark>mdi-play</v-icon>
+            <v-icon dark>mdi-upload-outline</v-icon>
           </v-btn>
         </div>
       </div>
@@ -85,9 +105,12 @@
 /* Tabs */
 .v-tabs-items.full-height-tab .v-window-item {
   height: calc(
-    20vh - 52px
+    25vh - 52px
   ); /* 48 px is default height of tabs + Default padding */
-  overflow-y: auto;
+}
+
+.theme--light.v-tabs > .v-tabs-bar {
+  background-color: #1e1e1e !important;
 }
 
 .theme--light.v-tabs > .v-tabs-bar .v-tab:not(.v-tab--active) {
@@ -129,11 +152,11 @@
   display: none;
 }
 
-/* Scrollbar */
-
-.scroll-area {
-  width: 100%;
-  height: 100vh;
+.theme--light.v-tabs > .v-tabs-bar .v-tab:not(.v-tab--active),
+.theme--light.v-tabs > .v-tabs-bar .v-tab:not(.v-tab--active) > .v-icon,
+.theme--light.v-tabs > .v-tabs-bar .v-tab:not(.v-tab--active) > .v-btn,
+.theme--light.v-tabs > .v-tabs-bar .v-tab--disabled {
+  color: #d4d4d49a !important;
 }
 
 /* Custom */
@@ -142,8 +165,18 @@
   padding: auto;
 }
 
+#goBack {
+  padding: 15px 5px;
+  display: flex;
+  z-index: 10;
+}
+
+#goBackButton {
+  color: white;
+}
+
 #actions {
-  bottom: calc(20vh - 48px); /* Size of tabs */
+  bottom: calc(25vh - 48px); /* Size of tabs */
   right: 0%;
   position: absolute;
   padding: 4px;
@@ -158,16 +191,18 @@
 
 #files {
   width: 100%;
+  height: calc(100vh - 52px);
+  overflow-y: scroll;
 }
 
 #editor {
   width: 100%;
-  height: 80%;
+  height: 75%;
 }
 
 #terminal {
   width: 100%;
-  height: 20%;
+  height: 25%;
   background-color: #1e1e1e;
   border-top: 1px solid #d7ebff7a;
 }
@@ -177,6 +212,10 @@
   display: flex;
   flex-direction: column;
   width: calc(100% - 400px);
+}
+
+body {
+  overflow-y: hidden;
 }
 </style>
 <script lang="ts">
@@ -243,6 +282,7 @@ export default class Editor extends Vue {
     this.fileContent = '// Select a file ! ';
     const RESPONSE = await ServerCommunication.getFiles();
     this.computeHierarchy(RESPONSE);
+    this.$forceUpdate();
   }
 
   public computeHierarchy(response: Response): void {
@@ -284,7 +324,7 @@ export default class Editor extends Vue {
       }
     }
 
-    this.options = [FIRST_NODE]; // Start at /INF3995 instead of /workspaces
+    this.options = [FIRST_NODE];
     this.treeOpen = true;
   }
 
@@ -320,11 +360,14 @@ export default class Editor extends Vue {
     ServerCommunication.flash();
   }
 
+  public goBack(): void {
+    this.$emit('goBack');
+  }
+
   private changeFileContent(value: string): void {
     this.fileContent = value;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.$refs.codeEditor as any).$forceUpdate();
-    // this.$forceUpdate();
   }
 }
 </script>
