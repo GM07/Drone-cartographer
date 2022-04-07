@@ -11,6 +11,7 @@ import services.status.access_status as AccessStatus
 
 NAMESPACE = '/getMissionStatus'
 is_mission_started = False
+is_p2p_gradient_running = False
 
 # TODO : Discuter si c'est vraiment necessaire d'avoir ces fonctions
 #        puisque les variables sont globales
@@ -37,7 +38,9 @@ def launch_mission(socket_io: SocketIO):
 
 def terminate_mission(socket_io: SocketIO):
     global is_mission_started
+    global is_p2p_gradient_running
     is_mission_started = False
+    is_p2p_gradient_running = False
     update_all_clients(socket_io)
 
 
@@ -45,13 +48,19 @@ def update_all_clients(socket_io: SocketIO, exception=None):
     exception_list = []
     if exception is not None:
         exception_list.append(exception)
-
     socket_io.emit('update_status',
                    get_mission_status(),
                    namespace=NAMESPACE,
                    broadcast=True,
                    include_self=False,
                    skip_sid=exception_list)
+
+
+def update_p2p_gradient_value(socket_io: SocketIO,):
+    socket_io.emit('updateP2PGradient',
+                   is_p2p_gradient_running,
+                   namespace='/limitedAccess',
+                   broadcast=True)
 
 
 def update_specific_client(socket_io: SocketIO, request_session_id):
@@ -64,5 +73,5 @@ def update_specific_client(socket_io: SocketIO, request_session_id):
 def get_mission_status():
     return {
         'isMissionStarted': is_mission_started,
-        'isSomeoneControlling': AccessStatus.is_someone_controlling(),
+        'isSomeoneControlling': AccessStatus.is_someone_controlling()
     }
