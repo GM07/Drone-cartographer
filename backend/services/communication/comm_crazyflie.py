@@ -1,25 +1,16 @@
 """This module has the CommCrazyflie class that is used to
 communicate with the physical drones """
 
-from logging import shutdown
-from types import TracebackType
-from typing import Dict, List
+from typing import List
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
 from cflib.crazyflie.log import LogConfig
 from flask_socketio import SocketIO
-from numpy import uint
 
 from constants import COMMANDS
-from services.communication.database.mongo_interface import Mission, Database
-from time import perf_counter
-from datetime import datetime
-from services.data.drone_data import DroneData, DroneState, log_data_to_drone_data
+from services.data.drone_data import DroneState, log_data_to_drone_data
 from services.communication.abstract_comm import AbstractComm
-from services.data.drone_data import DroneData
-
-from services.data.map import Map, MapData
 
 from services.data.map import Map, MapData
 
@@ -104,10 +95,9 @@ class CommCrazyflie(AbstractComm):
         sending_links = self.links if len(links) == 0 else links
 
         if command == COMMANDS.LAUNCH.value:
-            self.current_mission = Mission(0, len(self.drone_list), False, 0,
-                                           [[]])
+            self.mission_manager.start_current_mission(len(self.drone_list),
+                                                       False)
             self.logs = []
-            self.mission_start_time = perf_counter()
 
         for link in sending_links:
             packet = bytearray(command)  # Command must be an array of numbers
@@ -118,11 +108,7 @@ class CommCrazyflie(AbstractComm):
                 print(f'Error : {e}')
 
         if command == COMMANDS.LAND.value:
-            self.current_mission.flight_duration = self.mission_start_time - perf_counter(
-            )
-            self.current_mission.logs = self.logs
-            database = Database()
-            database.upload_mission_info(self.current_mission)
+            self.mission_manager.end_current_mission(self.logs)
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         drone_data = log_data_to_drone_data(data)

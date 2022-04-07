@@ -9,14 +9,14 @@ from flask_socketio import SocketIO
 from services.communication.comm_tasks import DRONE_STATUS_QUEUE, LOGS_QUEUE
 from typing import List, Tuple
 from constants import COMMANDS
-from services.communication.database.mongo_interface import Mission
+from services.communication.database.mongo_interface import MissionManager
 from datetime import datetime
 
 
 class AbstractComm(metaclass=ABCMeta):
     DELAY_RECEIVER_MS = 50
     logs: List[Tuple[str, str]] = []
-    current_mission: Mission
+    mission_manager: MissionManager = MissionManager()
 
     def __init__(self, socket_io: SocketIO, drone_list: list):
         self.SOCKETIO = socket_io

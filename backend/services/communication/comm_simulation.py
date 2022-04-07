@@ -7,18 +7,14 @@ import re
 import os
 import os.path
 import threading
-from typing import Dict, List
+from typing import Dict
 from constants import COMMANDS
 import queue
 from flask_socketio import SocketIO
 from time import sleep
-from services.communication.interface.drone import Drone
 
 from services.data.drone_data import DroneData
 from services.data.map import Map, MapData
-from services.communication.database.mongo_interface import Mission, Database
-from time import perf_counter, sleep
-from datetime import datetime
 from services.communication.abstract_comm import AbstractComm
 
 DELAY = 0.1
@@ -69,7 +65,6 @@ class CommSimulation(AbstractComm):
             self.__RECEIVE_THREAD.start()
         self.mission_start_time = 0
         self.mission_end_time = 0
-        self.current_mission: Mission
 
     def shutdown(self):
         self.thread_active = False
@@ -226,10 +221,9 @@ class CommSimulation(AbstractComm):
             if command is None:
                 return
             if command == COMMANDS.LAUNCH.value:
-                self.current_mission = Mission(0, self.nb_connections, True, 0,
-                                               [[]])
+                self.mission_manager.start_current_mission(
+                    self.nb_connections, True)
                 self.logs = []
-                self.mission_start_time = perf_counter()
 
             print('Sending command ', command, ' to simulation')
             for server, conn in self.command_servers.items():
@@ -248,12 +242,7 @@ class CommSimulation(AbstractComm):
                     return
 
             if command == COMMANDS.LAND.value:
-                self.current_mission.flight_duration = self.mission_start_time - perf_counter(
-                )
-                self.current_mission.logs = self.logs
-
-                database = Database()
-                database.upload_mission_info(self.current_mission)
+                self.mission_manager.end_current_mission(self.logs)
 
     def validate_name(self, name: str) -> str:
         return re.sub(r'[\/:]', '', name)
