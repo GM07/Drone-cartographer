@@ -17,6 +17,10 @@
 
 constexpr float kRealTrajectoryFinishedTreshold = 0.05;
 
+// Meters and seconds
+constexpr float kSpeed = 0.25F;
+constexpr float kHeight = 0.3F;
+
 class AbstractController {
  public:
   virtual ~AbstractController() = default;
@@ -31,17 +35,31 @@ class AbstractController {
       : m_abstractSensors(std::move(abstractSensors)){};
 
   virtual void setVelocity(const Vector3D& direction, float speed) = 0;
-  virtual void takeOff(float height) = 0;
-  virtual void land() = 0;
-  virtual void returnToBase() = 0;
+
+  inline void takeOff(float height) {
+    m_takeOffPosition += getCurrentLocation();
+    m_targetPosition = Vector3D::z(height);
+    m_state = State::kTakingOff;
+    setVelocity(Vector3D::z(1.0F), kSpeed);
+  };
+
+  inline void land() {
+    m_targetPosition = getCurrentLocation();
+    m_targetPosition.m_z = 0;
+    m_state = State::kLanding;
+    setVelocity(Vector3D::z(-1.0F), kSpeed);
+  };
+
   virtual void stopMotors() = 0;
 
   [[nodiscard]] virtual Vector3D getCurrentLocation() const = 0;
   [[nodiscard]] virtual bool isTrajectoryFinished() const = 0;
-  [[nodiscard]] virtual bool isAltitudeReached() const {
+
+  [[nodiscard]] inline bool isAltitudeReached() const {
     return Math::areAlmostEqual(getCurrentLocation().m_z, m_targetPosition.m_z,
                                 kRealTrajectoryFinishedTreshold);
-  }
+  };
+
   [[nodiscard]] virtual bool isDroneCrashed() const = 0;
 
   virtual void initCommunicationManager() = 0;

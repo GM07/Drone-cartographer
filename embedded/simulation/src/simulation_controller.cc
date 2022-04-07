@@ -133,24 +133,6 @@ void SimulationController::log(const std::string& message) {
   logBuffer << message << std::endl;
 }
 
-///////////////////////////////////////////////////
-void SimulationController::takeOff(float height) {
-  // Since getCurrentLocation() is relative to the old m_takeOffPosition
-  // We need to add the old m_takeOffPosition to get the new one.
-  m_takeOffPosition += getCurrentLocation();
-
-  m_targetPosition = getCurrentLocation() + Vector3D::z(height);
-
-  setVelocity(Vector3D::z(height), kTakeOffSpeed);
-}
-
-///////////////////////////////////////////////////
-void SimulationController::land() {
-  Vector3D pos = getCurrentLocation();
-  m_targetPosition = Vector3D(pos.m_x, pos.m_y, 0.0);
-  setVelocity(Vector3D::z(-pos.m_z), kLandingSpeed);
-}
-
 // All positions are relative to takeOff position
 ///////////////////////////////////////////////////
 [[nodiscard]] Vector3D SimulationController::getCurrentLocation() const {

@@ -39,9 +39,6 @@ class SimulationController : public AbstractController {
   SimulationController& operator=(const SimulationController& other) = delete;
 
   void setVelocity(const Vector3D& direction, float speed) override;
-  void takeOff(float height) override;
-  inline void returnToBase() override{/**/};
-  void land() override;
   inline void stopMotors() override{/**/};
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;

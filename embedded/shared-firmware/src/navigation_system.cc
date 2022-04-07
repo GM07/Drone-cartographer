@@ -12,12 +12,14 @@ void Drone::step() {
 
   switch (m_controller->m_state) {
     case State::kTakingOff:
+      m_data.m_direction = Vector3D::z(1.0F);
       if (m_controller->isAltitudeReached()) {
         m_controller->m_state = State::kExploring;
         m_data.m_direction = m_initialDirection;
       }
       break;
     case State::kLanding:
+      m_data.m_direction = Vector3D::z(-1.0F);
       if (m_controller->isAltitudeReached()) {
         m_controller->m_state = State::kIdle;
         m_controller->stopMotors();
@@ -28,47 +30,12 @@ void Drone::step() {
       collisionAvoidance();
       changeDirection();
       break;
-    case State::kReturnToBase:
-      wallAvoidance();
-      collisionAvoidance();
-      changeDirection();
-      returnToBase();
-      break;
     case State::kIdle:  // Fallthrough
     default:
       return;
   }
 
-  m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
-}
-
-void Drone::returnToBase() {
-  static bool altitudeReached = false;
-
-  // Peer or wall-collision should be prioritized over returning to base
-  if (m_peerCollision || !Math::areAlmostEqual(m_normal, Vector3D())) return;
-
-  // Set the height
-  m_controller->m_targetPosition = m_controller->getCurrentLocation();
-  m_controller->m_targetPosition.m_z = kMaxHeight;
-
-  if (!m_controller->isAltitudeReached() && !altitudeReached) {
-    m_data.m_direction = Vector3D::z(1.0F);
-  } else {
-    altitudeReached = true;
-    m_data.m_direction = Vector3D() - m_controller->getCurrentLocation();
-    m_data.m_direction.m_z = 0;
-
-    // If there are no walls and we are above our origin land
-    m_controller->m_targetPosition =
-        Vector3D::z(m_controller->getCurrentLocation().m_z);
-    if (m_controller->isTrajectoryFinished()) {
-      m_controller->land();
-      altitudeReached = false;
-      m_data.m_direction = Vector3D::z(-1.0f);
-      m_controller->m_state = State::kLanding;
-    }
-  }
+  m_controller->setVelocity(m_data.m_direction, kSpeed);
 }
 
 /////////////////////////////////////////////////////////////////////

@@ -29,7 +29,7 @@ nConnections = 9
 identifier = "s"
 
 # CHANGE TO FALSE TO CONTROL REAL DRONE
-is_simulation = False
+is_simulation = True
 
 servers = []
 clients = []

@@ -15,13 +15,6 @@
 constexpr size_t kMessageMaxSize = 30;
 constexpr size_t kNbStartingDirection = 8;
 
-// Meters and seconds
-constexpr float kDroneSpeed = 0.25F;
-constexpr float kTakeOffSpeed = 1.0F;
-constexpr float kLandingSpeed = 0.25F;
-constexpr float kHeight = 0.3F;
-constexpr float kMaxHeight = 1.7F;
-
 constexpr float kSimulationCollisionAvoidanceRange = 25.0F;
 constexpr float kRealMinCollisionAvoidanceRange = 42.0F;
 constexpr float kRealMaxCollisionAvoidanceRange = 45.0F;
@@ -75,7 +68,6 @@ class Drone {
   void wallAvoidance();
   void collisionAvoidance();
   void changeDirection();
-  void returnToBase();
 
   void updateCrashStatus();
 

@@ -23,13 +23,6 @@ class FirmwareController : public AbstractController {
   FirmwareController operator=(const FirmwareController& other) = delete;
 
   void setVelocity(const Vector3D& direction, float speed) override;
-  void takeOff(float height) override;
-  void land() override;
-  inline void returnToBase() override {
-    // Enable variable zRanger
-    paramVarId_t paramIdUseF = paramGetVarId("kalman", "useF");
-    paramSetInt(paramIdUseF, 1);
-  };
   void stopMotors() override;
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
