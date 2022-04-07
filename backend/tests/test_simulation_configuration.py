@@ -3,6 +3,7 @@ import random
 import unittest
 from unittest import mock
 import services.communication.simulation_configuration as Config
+from services.data.starting_drone_data import StartingDroneData
 
 
 class TestApplication(unittest.TestCase):
@@ -49,12 +50,13 @@ class TestApplication(unittest.TestCase):
         et_mock.parse = mock.MagicMock()
         et_mock.SubElement = mock.MagicMock()
 
-        config.add_drone({
-            'name': 'test',
-            'xPos': 1,
-            'yPos': 2,
-            'orientation': 127
-        })
+        config.add_drone(
+            StartingDroneData({
+                'name': 'test',
+                'startingXPos': 1,
+                'startingYPos': 2,
+                'startingOrientation': 127
+            }))
         path_mock.assert_called()
         et_mock.parse.assert_called()
         et_mock.SubElement.assert_called()
@@ -76,12 +78,14 @@ class TestApplication(unittest.TestCase):
         config = Config.SimulationConfiguration()
         et_mock.parse = mock.MagicMock()
         et_mock.SubElement = mock.MagicMock()
-        config.add_obstacles([{
-            'name': 'test',
-            'xPos': 1,
-            'yPos': 2,
-            'orientation': 0
-        }])
+        config.add_obstacles([
+            StartingDroneData({
+                'name': 'test',
+                'startingXPos': 1,
+                'startingYPos': 2,
+                'startingOrientation': 0
+            })
+        ])
 
         self.assertEqual(path_mock.call_count, 2)
         self.assertEqual(et_mock.parse.call_count, 1)

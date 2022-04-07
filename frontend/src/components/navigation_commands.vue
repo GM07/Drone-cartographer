@@ -33,12 +33,10 @@ import {ServerCommunication} from '@/communication/server_communication';
 import {ROUTER} from '@/router';
 import {ACCESSOR} from '@/store';
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import {Drone} from '@/communication/drone';
 
 @Component({})
 export default class NavigationCommands extends Vue {
   @Prop() private accessStatus!: AccessStatus;
-  @Prop() private droneList!: Drone[];
   public attemptedLimitedConnection = false;
 
   constructor() {

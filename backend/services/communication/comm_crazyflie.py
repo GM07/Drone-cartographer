@@ -13,6 +13,7 @@ from services.data.drone_data import DroneState, log_data_to_drone_data
 from services.communication.abstract_comm import AbstractComm
 
 from services.data.map import Map, MapData
+from services.data.starting_drone_data import StartingDroneData
 
 
 class CommCrazyflie(AbstractComm):
@@ -21,18 +22,19 @@ class CommCrazyflie(AbstractComm):
     An example use is comm=CommCrazyflie([])
     comm.__init_drivers()"""
 
-    def __init__(self, socket_io: SocketIO, drone_list: list):
+    def __init__(self, socket_io: SocketIO,
+                 drone_list: List[StartingDroneData]):
         super().__init__(socket_io, drone_list)
         if drone_list is None:
             print('Error : drone list is empty')
             self.sync_crazyflies = []
-            self.drone_list = []
+            self.set_drone([])
             return
 
         print('Creating Embedded Crazyflie communication with drone list :',
               drone_list)
         Map().set_drone_len(len(drone_list))
-        self.links = list(map(lambda drone: drone['name'], drone_list))
+        self.links = list(map(lambda drone: drone.name, drone_list))
         self.crazyflies: list[Crazyflie] = list(
             map(lambda link: Crazyflie(rw_cache='./cache'), self.links))
         self.crazyflies_by_id = {}
@@ -63,7 +65,7 @@ class CommCrazyflie(AbstractComm):
     def setup_log(self):
         self.log_configs: List[LogConfig] = []
         for index, crazyflie in enumerate(self.crazyflies):
-            log_config = LogConfig(name=str(self.drone_list[index]['name']),
+            log_config = LogConfig(name=str(self.drone_list[index].name),
                                    period_in_ms=AbstractComm.DELAY_RECEIVER_MS)
             log_config.add_variable('range.front', 'uint16_t')
             log_config.add_variable('range.left', 'uint16_t')
@@ -111,13 +113,13 @@ class CommCrazyflie(AbstractComm):
             self.mission_manager.end_current_mission(self.logs)
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
-        drone_data = log_data_to_drone_data(data)
+        drone_data = log_data_to_drone_data(logconf.name, data)
         Map().add_data(MapData(logconf.name, drone_data), self.SOCKETIO)
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         # print(f'{timestamp}{logconf.id}:{data}')
         self.send_log(f'{logconf.id}{data} ')
-        self.send_drone_status([(logconf.name,
-                                 DroneState(drone_data.state).name)])
+        self.send_drone_status([drone_data.to_dict()])
+        self.set_drone_data(drone_data)
 
     def validate_name(self, name: str) -> str:
         return name

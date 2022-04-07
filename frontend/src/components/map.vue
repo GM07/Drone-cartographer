@@ -29,7 +29,7 @@ import {
   SERVER_ADDRESS,
   MAP_DATA_NAMESPACE,
 } from '@/communication/server_constants';
-import {DroneStatus} from '@/communication/drone';
+import {DroneData} from '@/communication/drone';
 
 @Component({})
 export default class Map extends Vue {
@@ -37,7 +37,7 @@ export default class Map extends Vue {
   @Prop() public indexDrone!: number;
   @Prop() public mapName!: string;
   @Prop() public missionLaunched!: boolean;
-  @Prop() public droneList!: DroneStatus[];
+  @Prop() public droneList!: DroneData[];
   readonly SOCKETIO = SocketIO(SERVER_ADDRESS + MAP_DATA_NAMESPACE, {
     transports: ['websocket', 'polling'],
   });
@@ -87,10 +87,10 @@ export default class Map extends Vue {
     for (let i = 0; i < this.mapData[this.indexDrone].length; i++) {
       const CURRENT_DATA = this.mapData[this.indexDrone][i];
       const COS_ORIENTATION = Math.cos(
-        this.droneList[this.indexDrone].drone.orientation * DEGREE_TO_RAD
+        this.droneList[this.indexDrone].startingOrientation * DEGREE_TO_RAD
       );
       const SIN_ORIENTATION = Math.sin(
-        this.droneList[this.indexDrone].drone.orientation * DEGREE_TO_RAD
+        this.droneList[this.indexDrone].startingOrientation * DEGREE_TO_RAD
       );
 
       // Get new drone position
