@@ -75,10 +75,17 @@ void addCustomLoggingVariables() {
 }
 
 /////////////////////////////////////////////////////////////////////////
+void disableVariableHeightZRanger() {
+  // Disable useF for the start
+  paramVarId_t paramIdUseF = paramGetVarId("kalman", "useF");
+  paramSetInt(paramIdUseF, 0);
+}
+
+/////////////////////////////////////////////////////////////////////////
 extern "C" void appMain() {
   ledClearAll();
   addCustomLoggingVariables();
-  enableCrtpHighLevelCommander();
+  disableVariableHeightZRanger();
   Drone::getEmbeddedDrone().initDrone();
 
   while (true) {

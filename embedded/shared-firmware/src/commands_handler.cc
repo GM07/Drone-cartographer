@@ -13,11 +13,17 @@ bool Drone::handleCommand(Command command) {
       return true;
     case Command::kTakeOff:
       m_controller->takeOff(kHeight);
+      m_data.m_direction = Vector3D::z(1.0F);
       m_controller->m_state = State::kTakingOff;
       return true;
     case Command::kLand:
       m_controller->land();
+      m_data.m_direction = Vector3D::z(-1.0F);
       m_controller->m_state = State::kLanding;
+      return true;
+    case Command::kReturnToBase:
+      m_controller->returnToBase();
+      m_controller->m_state = State::kReturnToBase;
       return true;
     default:
       return false;

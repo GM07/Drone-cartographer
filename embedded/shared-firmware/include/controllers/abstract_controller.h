@@ -11,8 +11,11 @@
 #include "utils/directions.h"
 #include "utils/drone_data.h"
 #include "utils/led.h"
+#include "utils/math.h"
 #include "utils/state.h"
 #include "utils/vector3d.h"
+
+constexpr float kRealTrajectoryFinishedTreshold = 0.05;
 
 class AbstractController {
  public:
@@ -30,9 +33,15 @@ class AbstractController {
   virtual void setVelocity(const Vector3D& direction, float speed) = 0;
   virtual void takeOff(float height) = 0;
   virtual void land() = 0;
+  virtual void returnToBase() = 0;
+  virtual void stopMotors() = 0;
 
   [[nodiscard]] virtual Vector3D getCurrentLocation() const = 0;
   [[nodiscard]] virtual bool isTrajectoryFinished() const = 0;
+  [[nodiscard]] inline bool isAltitudeReached() const {
+    return Math::areAlmostEqual(getCurrentLocation().m_z, m_targetPosition.m_z,
+                                kRealTrajectoryFinishedTreshold);
+  }
   [[nodiscard]] virtual bool isDroneCrashed() const = 0;
 
   virtual void initCommunicationManager() = 0;
@@ -54,10 +63,10 @@ class AbstractController {
   State m_state{State::kIdle};
   std::unique_ptr<AbstractSensors> m_abstractSensors;
   ControllerData m_data{};
+  Vector3D m_targetPosition;
 
  protected:
   Vector3D m_takeOffPosition;
-  Vector3D m_targetPosition;
 };
 
 #endif

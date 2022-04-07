@@ -8,6 +8,7 @@
 extern "C" {
 #include "FreeRTOS.h"
 #include "ledseq.h"
+#include "param_logic.h"
 #include "radiolink.h"
 }
 
@@ -24,6 +25,12 @@ class FirmwareController : public AbstractController {
   void setVelocity(const Vector3D& direction, float speed) override;
   void takeOff(float height) override;
   void land() override;
+  inline void returnToBase() override {
+    // Enable variable zRanger
+    paramVarId_t paramIdUseF = paramGetVarId("kalman", "useF");
+    paramSetInt(paramIdUseF, 1);
+  };
+  void stopMotors() override;
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
   [[nodiscard]] bool isTrajectoryFinished() const override;
@@ -47,6 +54,7 @@ class FirmwareController : public AbstractController {
   void log(const std::string& message) override{/**/};
 
  private:
+  float m_height;
   ledseqContext_t m_seqLED{};
 };
 #endif

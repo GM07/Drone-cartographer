@@ -16,19 +16,20 @@ constexpr size_t kMessageMaxSize = 30;
 constexpr size_t kNbStartingDirection = 8;
 
 // Meters and seconds
-constexpr float kDroneSpeed = 0.25F;
+constexpr float kDroneSpeed = 2.0F;
 constexpr float kTakeOffSpeed = 1.0F;
 constexpr float kLandingSpeed = 0.25F;
 constexpr float kHeight = 0.3F;
+constexpr float kMaxHeight = 3.0F;
 
-constexpr float kSimulationCollisionAvoidanceRange = 20.0F;
+constexpr float kSimulationCollisionAvoidanceRange = 25.0F;
 constexpr float kRealMinCollisionAvoidanceRange = 42.0F;
 constexpr float kRealMaxCollisionAvoidanceRange = 45.0F;
 
 class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
-      : m_messageRX(), m_controller(controller) {
+      : m_messageRX(), m_controller(controller), m_peerCollision(false) {
     constexpr float kTrigoHalf = Math::sin(Math::pi<float> / 6.0F);
     constexpr float kTrigoSqrt3On2 = Math::cos(Math::pi<float> / 6.0F);
     const uint32_t kSeed =
@@ -48,7 +49,7 @@ class Drone {
     std::uniform_int_distribution<int> distribution(
         0, startingDirection.size() - 1);
 
-    m_data.m_direction = startingDirection.at(distribution(generator));
+    m_initialDirection = startingDirection.at(distribution(generator));
   }
 
   Drone(const Drone& other) = delete;
@@ -74,6 +75,7 @@ class Drone {
   void wallAvoidance();
   void collisionAvoidance();
   void changeDirection();
+  void returnToBase();
 
   void updateCrashStatus();
 
@@ -87,8 +89,10 @@ class Drone {
 
  protected:
   Vector3D m_normal;
+  Vector3D m_initialDirection;
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
   std::unordered_map<size_t, DroneData> m_usedPeerData;
+  bool m_peerCollision;
 };
 #endif

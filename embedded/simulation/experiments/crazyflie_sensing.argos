@@ -60,18 +60,9 @@
     <box id="wall_west" size="0.001,5,2" movable="false">
       <body position="-2.5,0,0" orientation="0,0,0" />
     </box>
-    <!-- <box id="wall_front" size="0.001,5,2" movable="false">
-      <body position="0.2,0,0" orientation="0,0,0" />
+    <box id="wall" size="0.001,2.5,2" movable="false">
+      <body position="0,0,0" orientation="0,0,0" />
     </box>
-    <box id="wall_back" size="0.001,5,2" movable="false">
-      <body position="-0.2,0,0" orientation="0,0,0" />
-    </box>
-    <box id="wall_left" size="5,0.001,2" movable="false">
-      <body position="0,0.2,0" orientation="0,0,0" />
-    </box>
-    <box id="wall_right" size="5,0.001,2" movable="false">
-      <body position="0,-0.2,0" orientation="0,0,0" />
-    </box> -->
       
     <crazyflie id="s0">
       <controller config="ssc" />
