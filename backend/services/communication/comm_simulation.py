@@ -62,8 +62,7 @@ class CommSimulation(AbstractComm):
             file_name = self.SOCKET_COMMAND_PATH.format(drone_list[i]['name'])
             self.command_servers[drone_list[i]['name']] = DroneSimulationSocket(
                 None, self.__init_server_bind(file_name))
-            # self.command_servers.server[self.__init_server_bind(
-            #    file_name)] = None
+
             file_name = self.SOCKET_DATA_PATH.format(drone_list[i]['name'])
             self.data_servers[self.__init_server_bind(file_name)] = None
 
@@ -95,11 +94,9 @@ class CommSimulation(AbstractComm):
         return super().shutdown()
 
     def send_command(self, command: COMMANDS, links=[], args: bytes = None):
-        if args is not None:
-            command = command + tuple(args)
         try:
             for link in links:
-                command_to_send = CommandWrapper(link, command)
+                command_to_send = CommandWrapper(link, command, args)
                 self.__COMMANDS_QUEUE.put_nowait(command_to_send)
         except queue.Full:
             self.send_log([(datetime.now().isoformat(), "Command queue full")])
@@ -237,19 +234,22 @@ class CommSimulation(AbstractComm):
             if command_wrapper is None:
                 return
 
-            if command_wrapper.command[0] == COMMANDS.LAUNCH.value:
+            full_command = command_wrapper.command + tuple(command_wrapper.args)
+
+            if command_wrapper.command == COMMANDS.LAUNCH.value:
                 self.current_mission = Mission(0, self.nb_connections, True, 0,
                                                [[]])
                 self.logs = []
                 self.mission_start_time = perf_counter()
 
-            print('Sending command ', command_wrapper.command, ' to simulation')
+            print('Sending command ', full_command, ' to simulation')
+
             try:
                 self.command_servers[command_wrapper.link].conn.send(
-                    bytearray(command_wrapper.command))
+                    bytearray(full_command))
 
-                # self.send_log([(datetime.now().isoformat(),
-                #                COMMANDS(command['command'][0]))])
+                self.send_log([(datetime.now().isoformat(),
+                                COMMANDS(command_wrapper.command).name)])
             except BrokenPipeError:
                 print('Command could not be sent, BrokenPipeError')
                 self.send_log([(datetime.now().isoformat(), 'Broken Pipe')])
@@ -259,7 +259,7 @@ class CommSimulation(AbstractComm):
                 self.send_log([(datetime.now().isoformat(), 'Socket error')])
                 return
 
-            if command_wrapper.command[0] == COMMANDS.LAND.value:
+            if command_wrapper.command == COMMANDS.LAND.value:
                 self.current_mission.flight_duration = self.mission_start_time - perf_counter(
                 )
                 self.current_mission.logs = self.logs

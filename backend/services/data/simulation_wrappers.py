@@ -2,6 +2,8 @@ from dataclasses import dataclass
 import socket
 from typing import Any
 
+from constants import COMMANDS
+
 
 @dataclass
 class DroneSimulationSocket:
@@ -12,4 +14,5 @@ class DroneSimulationSocket:
 @dataclass
 class CommandWrapper:
     link: str
-    command: Any
+    command: COMMANDS
+    args: Any
