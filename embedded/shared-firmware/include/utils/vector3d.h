@@ -1,6 +1,7 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
 
+#include <cmath>
 #include <string>
 #include <utility>
 
@@ -40,6 +41,13 @@ class Vector3D {
   }
 
   static bool areSameDirection(const Vector3D& vec1, const Vector3D& vec2);
+
+  inline void rotate(float angle) {
+    const float xValue = m_x;
+    const float yValue = m_y;
+    m_x = xValue * std::cos(angle) - yValue * std::sin(angle);
+    m_y = yValue * std::cos(angle) + xValue * std::sin(angle);
+  }
 
   static Vector3D x(float value);
   static Vector3D y(float value);

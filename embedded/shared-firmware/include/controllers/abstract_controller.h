@@ -15,6 +15,8 @@
 #include "utils/vector3d.h"
 
 class AbstractController {
+  friend class Drone;
+
  public:
   virtual ~AbstractController() = default;
   AbstractController() = default;
@@ -58,6 +60,7 @@ class AbstractController {
  protected:
   Vector3D m_takeOffPosition;
   Vector3D m_targetPosition;
+  float m_orientation;
 };
 
 #endif

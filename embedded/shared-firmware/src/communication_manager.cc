@@ -11,7 +11,8 @@ void Drone::communicationManagerTask() {
 
   while (m_controller->m_state != State::kDead) {
     if (m_controller->receiveMessage(&m_messageRX, sizeof(m_messageRX)) != 0U) {
-      handleCommand(static_cast<Command>(m_messageRX[0]));
+      handleCommand(static_cast<Command>(m_messageRX[0]),
+                    reinterpret_cast<void*>(&m_messageRX[1]));
     }
 
     Time::delayMs(kCommunicationDelay);

@@ -64,7 +64,7 @@ class Drone {
   };
 
   // Command Manager
-  bool handleCommand(Command command);
+  bool handleCommand(Command command, void* extraArgs);
 
   // Communication Manager
   void communicationManagerTask();

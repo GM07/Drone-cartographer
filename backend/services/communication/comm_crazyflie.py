@@ -100,7 +100,10 @@ class CommCrazyflie(AbstractComm):
             except Exception as e:
                 print('Exception: {}'.format(e))
 
-    def send_command(self, command: COMMANDS, links=[]) -> None:
+    def send_command(self,
+                     command: COMMANDS,
+                     links=[],
+                     args: bytes = None) -> None:
         sending_links = self.links if len(links) == 0 else links
 
         if command == COMMANDS.LAUNCH.value:
@@ -111,6 +114,8 @@ class CommCrazyflie(AbstractComm):
 
         for link in sending_links:
             packet = bytearray(command)  # Command must be an array of numbers
+            for arg in args:
+                packet.append(arg)
             print('Sending packet : ', packet)
             try:
                 self.crazyflies_by_id[link].appchannel.send_packet(packet)

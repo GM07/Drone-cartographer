@@ -13,6 +13,7 @@ import queue
 from flask_socketio import SocketIO
 from time import sleep
 from services.communication.interface.drone import Drone
+from services.data.simulation_wrappers import DroneSimulationSocket, CommandWrapper
 
 from services.data.drone_data import DroneData
 from services.data.map import Map, MapData
@@ -43,7 +44,7 @@ class CommSimulation(AbstractComm):
 
         self.drone_list = drone_list
         self.thread_active = True
-        self.__COMMANDS_QUEUE = queue.Queue(10)
+        self.__COMMANDS_QUEUE = queue.Queue(20)
         self.__COMMANDS_THREAD = threading.Thread(
             target=self.__send_command_tasks_wrapper,
             daemon=True,
@@ -53,14 +54,16 @@ class CommSimulation(AbstractComm):
             daemon=True,
             name='[Simulation] Receiving thread')
 
-        self.command_servers: Dict[socket.socket,
-                                   socket.socket] = {}  # (server, connection)
+        self.command_servers: Dict[str, DroneSimulationSocket] = {}
         self.data_servers: Dict[socket.socket,
                                 socket.socket] = {}  # (server, connection)
 
         for i in range(self.nb_connections):
             file_name = self.SOCKET_COMMAND_PATH.format(drone_list[i]['name'])
-            self.command_servers[self.__init_server_bind(file_name)] = None
+            self.command_servers[drone_list[i]['name']] = DroneSimulationSocket(
+                None, self.__init_server_bind(file_name))
+            # self.command_servers.server[self.__init_server_bind(
+            #    file_name)] = None
             file_name = self.SOCKET_DATA_PATH.format(drone_list[i]['name'])
             self.data_servers[self.__init_server_bind(file_name)] = None
 
@@ -79,10 +82,10 @@ class CommSimulation(AbstractComm):
             pass
         self.__COMMANDS_QUEUE.put_nowait(None)
 
-        for server, connection in self.command_servers.items():
-            server.shutdown(socket.SHUT_RDWR)
-            if connection is not None:
-                connection.shutdown(socket.SHUT_RDWR)
+        for _, drone_simulation_socket in self.command_servers.items():
+            drone_simulation_socket.server.shutdown(socket.SHUT_RDWR)
+            if drone_simulation_socket.conn is not None:
+                drone_simulation_socket.conn.shutdown(socket.SHUT_RDWR)
 
         for server, connection in self.data_servers.items():
             server.shutdown(socket.SHUT_RDWR)
@@ -91,9 +94,13 @@ class CommSimulation(AbstractComm):
 
         return super().shutdown()
 
-    def send_command(self, command: COMMANDS):
+    def send_command(self, command: COMMANDS, links=[], args: bytes = None):
+        if args is not None:
+            command = command + tuple(args)
         try:
-            self.__COMMANDS_QUEUE.put_nowait(command)
+            for link in links:
+                command_to_send = CommandWrapper(link, command)
+                self.__COMMANDS_QUEUE.put_nowait(command_to_send)
         except queue.Full:
             self.send_log([(datetime.now().isoformat(), "Command queue full")])
             print("Command queue is full")
@@ -128,15 +135,15 @@ class CommSimulation(AbstractComm):
                 self.__thread_send_command()
 
     @staticmethod
-    def __thread_attempt_socket_connection(server_dict: Dict[socket.socket,
-                                                             socket.socket]):
-        for server, connection in server_dict.items():
-            if connection is None:
+    def __thread_attempt_socket_connection(
+            sockets: Dict[str, DroneSimulationSocket]):
+        for _, drone_simulation_socket in sockets.items():
+            if drone_simulation_socket.conn is None:
                 try:
-                    server.setblocking(True)
-                    server.settimeout(None)
-                    conn, _ = server.accept()
-                    server_dict[server] = conn
+                    drone_simulation_socket.server.setblocking(True)
+                    drone_simulation_socket.server.settimeout(None)
+                    conn, _ = drone_simulation_socket.server.accept()
+                    drone_simulation_socket.conn = conn
                 except socket.error as socket_error:
                     if socket_error.errno == EINVAL or socket_error.errno == EBADF:
                         return
@@ -225,33 +232,34 @@ class CommSimulation(AbstractComm):
     def __thread_send_command(self):
         missing_connection = False
         while not missing_connection and self.thread_active:
-            command = self.__COMMANDS_QUEUE.get()
-            if command is None:
+            command_wrapper: CommandWrapper = self.__COMMANDS_QUEUE.get()
+
+            if command_wrapper is None:
                 return
-            if command == COMMANDS.LAUNCH.value:
+
+            if command_wrapper.command[0] == COMMANDS.LAUNCH.value:
                 self.current_mission = Mission(0, self.nb_connections, True, 0,
                                                [[]])
                 self.logs = []
                 self.mission_start_time = perf_counter()
 
-            print('Sending command ', command, ' to simulation')
-            for server, conn in self.command_servers.items():
-                try:
-                    conn.send(bytearray(command))
+            print('Sending command ', command_wrapper.command, ' to simulation')
+            try:
+                self.command_servers[command_wrapper.link].conn.send(
+                    bytearray(command_wrapper.command))
 
-                    self.send_log([(datetime.now().isoformat(),
-                                    COMMANDS(command).name)])
-                except BrokenPipeError:
-                    print('Command could not be sent, BrokenPipeError')
-                    self.send_log([(datetime.now().isoformat(), 'Broken Pipe')])
-                    self.command_servers[server] = None
-                    missing_connection = True
-                except socket.error:
-                    self.send_log([(datetime.now().isoformat(), 'Socket error')
-                                  ])
-                    return
+                # self.send_log([(datetime.now().isoformat(),
+                #                COMMANDS(command['command'][0]))])
+            except BrokenPipeError:
+                print('Command could not be sent, BrokenPipeError')
+                self.send_log([(datetime.now().isoformat(), 'Broken Pipe')])
+                self.command_servers[command_wrapper.link].conn = None
+                missing_connection = True
+            except socket.error:
+                self.send_log([(datetime.now().isoformat(), 'Socket error')])
+                return
 
-            if command == COMMANDS.LAND.value:
+            if command_wrapper.command[0] == COMMANDS.LAND.value:
                 self.current_mission.flight_duration = self.mission_start_time - perf_counter(
                 )
                 self.current_mission.logs = self.logs

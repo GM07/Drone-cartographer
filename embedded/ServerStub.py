@@ -24,11 +24,11 @@ class Commands:
   kTakeOff = 0x02
   kLand = 0x03
 
-nConnections = 9
+nConnections = 1
 identifier = "s"
 
 # CHANGE TO FALSE TO CONTROL REAL DRONE
-is_simulation = False
+is_simulation = True
 
 servers = []
 clients = []
@@ -54,7 +54,10 @@ if is_simulation:
 
 
 def takeOff():
+  orientation = 0
   data = [Commands.kTakeOff]
+  for byte in orientation.to_bytes(4, byteorder = 'little'):
+    data.append(byte)
   send_command(data)
 
 def land():

@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "components/drone.h"
 #include "utils/math.h"
 

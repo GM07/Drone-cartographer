@@ -42,7 +42,10 @@ class AbstractComm(metaclass=ABCMeta):
         return self.drone_list
 
     @abstractmethod
-    def send_command(self, command: COMMANDS, links=[]) -> None:
+    def send_command(self,
+                     command: COMMANDS,
+                     links=[],
+                     args: bytes = None) -> None:
         pass
 
     @abstractmethod

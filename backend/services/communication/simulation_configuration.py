@@ -81,7 +81,7 @@ class SimulationConfiguration:
                 Box(
                     float(drone['xPos']) - DRONE_SIZE / 2,
                     float(drone['yPos']) - DRONE_SIZE / 2, DRONE_SIZE,
-                    DRONE_SIZE, drone['orientation']))
+                    DRONE_SIZE, float(drone['orientation'])))
 
         while (len(box_list) < len(drone_list) + NB_WALLS):
             # Generate random point

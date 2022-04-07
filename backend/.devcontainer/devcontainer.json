@@ -1,23 +1,23 @@
 {
-  "name": "INF3995 - Backend",
-  "dockerFile": "./Dockerfile",
-  "settings": {
-    "terminal.integrated.defaultProfile.linux": "zsh",
-    "python.defaultInterpreterPath": "/usr/local/bin/python"
-  },
-  "workspaceFolder": "/workspaces/INF3995-106/backend",
-  "extensions": [
-    "ms-python.python",
-    "himanoa.Python-autopep8",
-  ],
-  "runArgs": [
-    "--network=host",
-    "--privileged",
-    "--device=/dev/ttyUSB0"
-  ],
-  "mounts": [
-    "source=/tmp/socket/,target=/tmp/socket/,type=bind",
-    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-  ],
-  "initializeCommand": "mkdir /tmp/socket/ &> /dev/null"
+	"name": "INF3995 - Backend",
+	"dockerFile": "./Dockerfile",
+	"settings": {
+		"terminal.integrated.defaultProfile.linux": "zsh",
+		"python.defaultInterpreterPath": "/usr/local/bin/python"
+	},
+	"workspaceFolder": "/workspaces/INF3995-106/backend",
+	"extensions": [
+		"ms-python.python",
+		"himanoa.Python-autopep8",
+	],
+	"runArgs": [
+		"--network=host",
+		"--privileged",
+		"--device=/dev/ttyUSB0"
+	],
+	"mounts": [
+		"source=/tmp/socket/,target=/tmp/socket/,type=bind",
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+	],
+	"initializeCommand": "mkdir /tmp/socket/ &> /dev/null"
 }
