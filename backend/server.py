@@ -36,7 +36,7 @@ SOCKETIO = SocketIO(
     APP,
     async_mode='gevent',
     cors_allowed_origins='*',
-    logger=True,
+    logger=False,
 )
 
 # Bash executor instance to execute commands and transmit stderr and stdout over websocket
@@ -93,7 +93,7 @@ def get_files():
 
 
 # Recompile firmware
-@SOCKETIO.on('recompile', namespace='/getMissionStatus')
+@SOCKETIO.on('recompile', namespace='/limitedAccess')
 def recompile():
     RECOMPILE_SIMULATION.start()
     RECOMPILE_EMBEDDED.start()
@@ -101,25 +101,28 @@ def recompile():
 
 
 # Reflash firmware
-@SOCKETIO.on('flash', namespace='/getMissionStatus')
+@SOCKETIO.on('flash', namespace='/limitedAccess')
 def flash():
-    # if not AccessStatus.is_request_valid(request):
-    #     return ''
+    if not AccessStatus.is_request_valid(request):
+        return ''
 
-    # if AccessStatus.get_mission_simulated():
-    #     return ''
+    if AccessStatus.get_mission_simulated():
+        return ''
 
-    drone_list = URI  #COMM.get_drones()
+    drone_list = COMM.get_drones()
+
+    COMM.stop_logs()
 
     # Create the command to flash all drones
     flashDrone = []
     for drone in drone_list:
-        flashDrone.append("make cload radio=" + drone)
+        flashDrone.append("make cload radio=" + drone['name'])
 
     bashCommand = f"docker exec embedded sh -c 'cd workspaces/INF3995-106/embedded/embedded-firmware" + " && " + " && ".join(
         flashDrone) + "'"
     FLASH_ALL_DRONES.changeCommand(bashCommand)
-    FLASH_ALL_DRONES.start()
+    FLASH_ALL_DRONES.start(COMM.start_logs)
+
     return 'Flashing'
 
 

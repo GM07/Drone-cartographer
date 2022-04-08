@@ -13,6 +13,7 @@ class BashExecutor:
         self.transmitStdoutTask = None
         self.transmitStderrTask = None
         self.nbOutputFinished = 0
+        self.on_end = None
 
     def stop(self):
         self.SOCKETIO.emit('stop',
@@ -24,12 +25,18 @@ class BashExecutor:
         if (self.process != None):
             self.process.kill()
 
+        if self.on_end != None:
+            print('stopping command')
+            self.on_end()
+
     def changeCommand(self, bashCommand: str):
         self.bashCommand = bashCommand
 
-    def start(self):
+    def start(self, on_end=None):
+        print('starting command')
         # Make sure we are not running the same process twice
         self.stop()
+        self.on_end = on_end
         self.nbOutputFinished = 0
 
         self.process = subprocess.Popen(shlex.split(self.bashCommand),

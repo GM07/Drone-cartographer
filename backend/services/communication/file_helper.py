@@ -44,6 +44,8 @@ class FileHelper:
     @staticmethod
     def update_files(paths: List, contents: List) -> None:
         for index, path in enumerate(paths):
+            if len(path) == 0:
+                continue
             content: str = contents[index]
             os.system(f'rm ../{path}')
             os.system(f'touch ../{path}')

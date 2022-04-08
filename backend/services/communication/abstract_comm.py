@@ -49,3 +49,11 @@ class AbstractComm(metaclass=ABCMeta):
     @abstractmethod
     def shutdown(self):
         pass
+
+    @abstractmethod
+    def stop_logs(self):
+        pass
+
+    @abstractmethod
+    def start_logs(self):
+        pass

@@ -38,6 +38,13 @@ class CommCrazyflie(AbstractComm):
             self.drone_list = []
             return
 
+        self.init_comm(drone_list)
+
+    def __del__(self):
+        print('destructor called')
+        self.shutdown()
+
+    def init_comm(self, drone_list: list):
         print('Creating Embedded Crazyflie communication with drone list :',
               drone_list)
         Map().set_drone_len(len(drone_list))
@@ -55,10 +62,6 @@ class CommCrazyflie(AbstractComm):
         except Exception as e:
             print(f'Exception: {e}')
 
-    def __del__(self):
-        print('destructor called')
-        self.shutdown()
-
     def __init_drivers(self):
         cflib.crtp.init_drivers()
 
@@ -66,8 +69,15 @@ class CommCrazyflie(AbstractComm):
         print(f'shutdown called : {self.sync_crazyflies}')
         for sync in self.sync_crazyflies:
             print(f'closing link : {sync}')
-            sync.close_link()
+            if sync.is_link_open():
+                sync.close_link()
         return super().shutdown()
+
+    def start_logs(self):
+        self.init_comm(self.drone_list)
+
+    def stop_logs(self):
+        self.shutdown()
 
     def setup_log(self):
         self.log_configs: List[LogConfig] = []
@@ -124,11 +134,10 @@ class CommCrazyflie(AbstractComm):
             database = Database()
             database.upload_mission_info(self.current_mission)
 
-    def __retrieve_log(self, timestamp, data, logconf: LogConfig):
-        drone_data = log_data_to_drone_data(data)
+    def __retrieve_log(self, _, data, logconf: LogConfig):
+        print('retrieve_log called')
+        drone_data: DroneData = log_data_to_drone_data(data)
         Map().add_data(MapData(logconf.name, drone_data), self.SOCKETIO)
-        # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
-        # print(f'{timestamp}{logconf.id}:{data}')
         self.send_log([(datetime.now().isoformat(), f'{logconf.id}{data} ')])
         self.send_drone_status([(logconf.name,
                                  DroneState(drone_data.state).name)])

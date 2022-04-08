@@ -54,17 +54,6 @@
               <v-list-item-icon>
                 <v-icon color="blue">mdi-cog-refresh-outline</v-icon>
               </v-list-item-icon>
-              <v-list-item-title>Editer</v-list-item-title>
-            </v-list-item>
-            <v-list-item
-              :disabled="
-                !isUserControlling() && !this.accessStatus.isMissionSimulated
-              "
-              @click="flash()"
-            >
-              <v-list-item-icon>
-                <v-icon color="blue">mdi-upload-outline</v-icon>
-              </v-list-item-icon>
               <v-list-item-title>Programmer</v-list-item-title>
             </v-list-item>
           </v-list>
@@ -177,6 +166,13 @@
       @addDrone="addDrone"
       @setDroneMenuOpen="setDroneMenuOpen"
     ></drone-menu>
+
+    <div v-if="isLogsMenuOpen" justify-end style="width: 100%">
+      <v-btn @click="isLogsMenuOpen = !isLogsMenuOpen">
+        <v-icon color="black"> mdi-close </v-icon>Logs
+      </v-btn>
+      <LogsInterface />
+    </div>
   </v-layout>
 </template>
 

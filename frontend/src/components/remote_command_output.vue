@@ -7,7 +7,7 @@
           inset: 0px;
           padding-left: 20px;
           background-color: #1e1e1e;
-          overflow: scroll;
+          overflow-y: scroll;
           display: flex;
           flex-direction: column-reverse;
         "
@@ -17,8 +17,8 @@
           :key="item[1] + index"
           :style="
             item[0] === 'stdout'
-              ? 'color: white; margin: 0px; font-family: Consolas, Monaco, monospace; z-index: 10;'
-              : 'color: red; margin: 0px; font-family: Consolas, Monaco, monospace; z-index: 10;'
+              ? 'color: white; margin: 0px; font-family: Consolas, Monaco, monospace; z-index: 10; word-wrap: break-word;'
+              : 'color: red; margin: 0px; font-family: Consolas, Monaco, monospace; z-index: 10; word-wrap: break-word;'
           "
         >
           {{ item[1] }}
