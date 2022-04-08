@@ -262,3 +262,9 @@ class CommSimulation(AbstractComm):
 
     def validate_name(self, name: str) -> str:
         return re.sub(r'[\/:]', '', name)
+
+    def start_logs(self):
+        pass  # No need for this function in simulation, because link is strong enough
+
+    def stop_logs(self):
+        pass
