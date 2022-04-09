@@ -14,7 +14,6 @@
         <v-btn class="ma-4" large primary to="/History"
           >Historique de mission
         </v-btn>
-        <v-btn class="ma-4" large primary to="/Editor">Editor </v-btn>
       </v-col>
     </v-row>
   </v-container>

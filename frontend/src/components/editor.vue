@@ -330,6 +330,7 @@ export default class Editor extends Vue {
 
   public onFileSelected(node: TreeNode): void {
     if (this.files.has(node.id)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.changeFileContent(this.files.get(node.id)!); // We already verify that the id is in the map... Compiler is dumb
       this.currentFileSelected = node.id;
       this.$forceUpdate();

@@ -27,6 +27,7 @@
 </template>
 
 <script>
+/* Code basé sur : https://github.com/justcaliturner/simple-code-editor */
 /* eslint-disable */
 export default {
   name: 'CopyCode',

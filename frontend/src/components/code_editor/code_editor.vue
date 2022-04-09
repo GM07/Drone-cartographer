@@ -95,6 +95,7 @@
 </template>
 
 <script>
+/* Code basé sur : https://github.com/justcaliturner/simple-code-editor */
 /* eslint-disable */
 import hljs from 'highlight.js';
 import Dropdown from './dropdown.vue';

@@ -52,7 +52,7 @@
               @click="switchEditorStatus"
             >
               <v-list-item-icon>
-                <v-icon color="blue">mdi-cog-refresh-outline</v-icon>
+                <v-icon color="blue">mdi-laptop</v-icon>
               </v-list-item-icon>
               <v-list-item-title>Programmer</v-list-item-title>
             </v-list-item>

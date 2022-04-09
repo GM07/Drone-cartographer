@@ -3,7 +3,6 @@ import VueRouter, {RouteConfig} from 'vue-router';
 import Home from '@/views/home.vue';
 import Mission from '@/views/mission.vue';
 import CompletedMissions from '@/views/completed_missions.vue';
-import Editor from '@/components/editor.vue';
 
 Vue.use(VueRouter);
 
