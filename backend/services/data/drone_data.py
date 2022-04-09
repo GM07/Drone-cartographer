@@ -58,7 +58,7 @@ class DroneData:
         self.name = name
         self.position = Point2D(0, 0)
         self.sensors = DroneSensors(0, 0, 0, 0)
-        self.battery_level = 100
+        self.battery_level = 1.0
         self.state = DroneState(0)
         if not empty:
             self.__from_bytes(data)
