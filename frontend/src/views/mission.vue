@@ -115,7 +115,7 @@
                   </v-card-text>
                   <v-card-text class="pt-1 pb-1">
                     Batterie:
-                    {{ droneData.batteryLevel.toFixed(2) }}%
+                    {{ (droneData.batteryLevel * 100).toFixed(2) }}%
                   </v-card-text>
                   <v-card-text class="pt-1 pb-1">
                     Position en x:
