@@ -7,7 +7,10 @@ import subprocess
 import math
 from dataclasses import dataclass
 import random
+from typing import List
 import xml.etree.ElementTree as ET
+
+from services.data.starting_drone_data import StartingDroneData
 
 WALL_SPACING: float = 0.05
 
@@ -46,31 +49,32 @@ class SimulationConfiguration:
         shutil.copyfile(current_path + '/template.argos',
                         current_path + '/crazyflie_sensing.argos')
 
-    def add_drone(self, drone):
+    def add_drone(self, drone: StartingDroneData):
         current_path = str(pathlib.Path(__file__).parent.resolve())
         tree = ET.parse(current_path + '/crazyflie_sensing.argos')
         arena = tree.find('arena')
 
         crazyflie = ET.SubElement(arena, 'crazyflie')
-        crazyflie.set('id', drone['name'])
+        crazyflie.set('id', drone.name)
 
         controller = ET.SubElement(crazyflie, 'controller')
         controller.set('config', 'ssc')
 
         battery = ET.SubElement(crazyflie, 'battery')
         battery.set('model', 'time_motion')
-        battery.set('delta', '1e-3')
-        battery.set('pos_delta', '1e-3')
-        battery.set('orient_delta', '1e-3')
+        battery.set('delta', '1e-4')
+        battery.set('pos_delta', '1e-4')
+        battery.set('orient_delta', '1e-4')
 
         body = ET.SubElement(crazyflie, 'body')
-        body.set('position',
-                 str(drone['xPos']) + ',' + str(drone['yPos']) + ',0')
-        body.set('orientation', str(drone['orientation']) + ',0,0')
+        body.set(
+            'position',
+            str(drone.starting_x_pos) + ',' + str(drone.starting_y_pos) + ',0')
+        body.set('orientation', str(drone.starting_orientation) + ',0,0')
 
         tree.write(current_path + '/crazyflie_sensing.argos')
 
-    def add_obstacles(self, drone_list):
+    def add_obstacles(self, drone_list: List[StartingDroneData]):
         box_list = list()
         WALL_LENGTH = 2
         NB_WALLS = 5
@@ -79,9 +83,9 @@ class SimulationConfiguration:
         for drone in drone_list:
             box_list.append(
                 Box(
-                    float(drone['xPos']) - DRONE_SIZE / 2,
-                    float(drone['yPos']) - DRONE_SIZE / 2, DRONE_SIZE,
-                    DRONE_SIZE, drone['orientation']))
+                    float(drone.starting_x_pos) - DRONE_SIZE / 2,
+                    float(drone.starting_y_pos) - DRONE_SIZE / 2, DRONE_SIZE,
+                    DRONE_SIZE, float(drone.starting_orientation)))
 
         while (len(box_list) < len(drone_list) + NB_WALLS):
             # Generate random point

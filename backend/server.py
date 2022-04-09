@@ -2,6 +2,10 @@ import os
 from gevent import monkey
 
 from services.communication.bash_executor import BashExecutor
+from typing import Any, Dict, List
+from gevent import monkey
+
+from services.data.starting_drone_data import StartingDroneData
 
 if __name__ == '__main__':
     monkey.patch_all()
@@ -23,6 +27,7 @@ from services.communication.simulation_configuration import SimulationConfigurat
 from constants import COMMANDS, RECOMPILE_EMBEDDED_COMMAND, RECOMPILE_SIMULATION_COMMAND, URI
 from services.communication.database.mongo_interface import Database
 from services.communication.file_helper import FileHelper
+from services.data.map import Map
 
 # Flask application
 APP = Flask(__name__)
@@ -32,12 +37,10 @@ APP.config['SECRET_KEY'] = 'dev'
 
 # Socketio instance to communicate with frontend
 
-SOCKETIO = SocketIO(
-    APP,
-    async_mode='gevent',
-    cors_allowed_origins='*',
-    logger=False,
-)
+SOCKETIO = SocketIO(APP,
+                    async_mode='gevent',
+                    cors_allowed_origins='*',
+                    logger=False)
 
 # Bash executor instance to execute commands and transmit stderr and stdout over websocket
 RECOMPILE_SIMULATION = BashExecutor(RECOMPILE_SIMULATION_COMMAND, SOCKETIO,
@@ -151,16 +154,24 @@ def launch(is_simulated: bool):
     COMM.send_command(COMMANDS.LAUNCH.value)
     AccessStatus.set_mission_type(SOCKETIO, is_simulated)
     MissionStatus.launch_mission(SOCKETIO)
+    SOCKETIO.emit('clear_all_maps',
+                  True,
+                  namespace='/getAllMapData',
+                  broadcast=True)
     return 'Launched'
 
 
 @SOCKETIO.on('set_drone', namespace='/limitedAccess')
-def set_drone(drone_list, is_simulated):
+def set_drone(drone_list: List[Dict[str, Any]], is_simulated):
+    starting_drone_data_list: List[StartingDroneData] = []
+    for drone in drone_list:
+        starting_drone_data_list.append(StartingDroneData(drone))
+
     global COMM
-    COMM.set_drone(drone_list)
+    COMM.set_drone(starting_drone_data_list)
 
     SOCKETIO.emit('droneList',
-                  COMM.get_drones(),
+                  COMM.get_full_drone_data(),
                   namespace='/limitedAccess',
                   broadcast=True,
                   include_self=False,
@@ -169,7 +180,8 @@ def set_drone(drone_list, is_simulated):
     if not is_simulated:
         COMM.shutdown()
         COMM = CommCrazyflie(
-            SOCKETIO, drone_list)  # Recreate object to reconnect to drones
+            SOCKETIO,
+            starting_drone_data_list)  # Recreate object to reconnect to drones
     return ''
 
 
@@ -197,6 +209,13 @@ def terminate():
     COMM.send_command(COMMANDS.LAND.value)
 
     MissionStatus.terminate_mission(SOCKETIO)
+    Map.raw_data.clear()
+    Map.filtered_data.clear()
+
+    SOCKETIO.emit('clear_all_maps',
+                  False,
+                  namespace='/getAllMapData',
+                  broadcast=True)
     return 'Terminated'
 
 
@@ -246,8 +265,9 @@ def mission_connect():
 @SOCKETIO.on('connect', namespace='/limitedAccess')
 def connect():
     AccessStatus.update_specific_client(SOCKETIO, request.sid)
+    MissionStatus.update_p2p_gradient_value(SOCKETIO)
     SOCKETIO.emit('droneList',
-                  COMM.get_drones(),
+                  COMM.get_full_drone_data(),
                   namespace='/limitedAccess',
                   room=request.sid)
     return ''
@@ -256,6 +276,15 @@ def connect():
 @SOCKETIO.on('connect', namespace='/getDroneStatus')
 def send_drone_status():
     start_drone_status_task(SOCKETIO)
+    return ''
+
+
+@SOCKETIO.on('connect', namespace='/getAllMapData')
+def send_all_map_data():
+    SOCKETIO.emit('getAllMapData',
+                  Map.get_all_filtered_data(),
+                  namespace='/getAllMapData',
+                  broadcast=True)
     return ''
 
 
@@ -273,6 +302,22 @@ def send_logs():
     return ''
 
 
+@SOCKETIO.on('setP2PGradient', namespace='/limitedAccess')
+def set_p2p(run_color_gradient: bool):
+    if not MissionStatus.get_mission_started(
+    ) or not AccessStatus.is_request_valid(request):
+        return ''
+
+    MissionStatus.is_p2p_gradient_running = run_color_gradient
+
+    if run_color_gradient:
+        COMM.send_command(COMMANDS.START_P2P.value)
+    else:
+        COMM.send_command(COMMANDS.END_P2P.value)
+
+    MissionStatus.update_p2p_gradient_value(SOCKETIO)
+
+
 if __name__ == '__main__':
     print('The backend is running on port 5000')
-    SOCKETIO.run(APP, debug=False, host='0.0.0.0', port=5000)
+    SOCKETIO.run(APP, debug=False, host='0.0.0.0', port=5000, log_output=True)

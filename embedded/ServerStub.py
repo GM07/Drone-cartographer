@@ -5,6 +5,7 @@ import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from tkinter import *
 
+
 class CommCrazyflie: 
 
     def __init__(self):
@@ -23,19 +24,21 @@ class Commands:
   kIdentify = 0x01
   kTakeOff = 0x02
   kLand = 0x03
+  kStartGradient=0x04
+  kEndGradient= 0x05
 
 nConnections = 9
 identifier = "s"
 
 # CHANGE TO FALSE TO CONTROL REAL DRONE
-is_simulation = False
+is_simulation = True
 
 servers = []
 clients = []
 
 # For Drones
 # CHANGE TO PROPER DRONE ADDRESS
-URI = ['radio://0/80/2M/E7E7E7E762', 'radio://0/80/2M/E7E7E7E761']
+URI = ['radio://0/80/2M/E7E7E7E762','radio://0/80/2M/E7E7E7E761']
 COMM_CRAZYFLIE = CommCrazyflie()
 
 if is_simulation:
@@ -46,11 +49,15 @@ if is_simulation:
     server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     server.bind(file_name)
     servers.append(server)
+    
 
   for server in servers:
+    
     server.listen(1)
     client, addr = server.accept()
     clients.append(client)
+
+    
 
 
 def takeOff():
@@ -65,6 +72,14 @@ def identify():
   data = [Commands.kIdentify]
   send_command(data)
 
+def startGradient():
+  data = [Commands.kStartGradient]
+  send_command(data)
+
+def endGradient():
+  data = [Commands.kEndGradient]
+  send_command(data)
+
 def send_command(data):
   if is_simulation:
     for client in clients:
@@ -73,14 +88,19 @@ def send_command(data):
     for uri in URI:
       COMM_CRAZYFLIE.send_command(data, uri)
 
+
 window = Tk()
 
 window.title('Server stub - Dream team')
-window.geometry('300x50')
+window.geometry('500x50')
 takeOffButton = Button(window, text='Take off', command=takeOff)
 takeOffButton.grid(column=0, row=0)
 landButton = Button(window, text='Land', command=land)
 landButton.grid(column=1, row=0)
 identifyButton = Button(window, text='Identify', command=identify)
 identifyButton.grid(column=2, row=0)
+identifyButton = Button(window, text='Start Gradient', command=startGradient)
+identifyButton.grid(column=3, row=0)
+identifyButton = Button(window, text='End Gradient', command=endGradient)
+identifyButton.grid(column=4, row=0)
 window.mainloop()

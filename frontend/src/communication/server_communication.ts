@@ -1,5 +1,5 @@
 import * as SERVER_CONSTANTS from '@/communication/server_constants';
-import {Drone} from '@/communication/drone';
+import {NewDroneData} from '@/communication/drone';
 
 export class ServerCommunication {
   public static getConnectedDrones(): Promise<Response> {
@@ -119,6 +119,17 @@ export class ServerCommunication {
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
+  public static setP2PGradient(newValue: boolean): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.SET_P2P_ADDRESS,
+        newValue
+      );
+    }
+
+    return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
   public static returnToBase(callback: () => void): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
@@ -141,7 +152,10 @@ export class ServerCommunication {
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
-  public static setDrone(drone: Drone[], isMissionSimulated: boolean): void {
+  public static setDrone(
+    drone: NewDroneData[],
+    isMissionSimulated: boolean
+  ): void {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
         SERVER_CONSTANTS.SET_DRONE_ADDRESS,

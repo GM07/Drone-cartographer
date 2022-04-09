@@ -9,6 +9,33 @@
       >
       </v-switch>
     </div>
+    <v-list-item
+      v-if="!isP2PGradientRunning"
+      :disabled="
+        !this.$store.state.missionStatus.isMissionStarted ||
+        accessStatus.isMissionSimulated
+      "
+      v-on:click="setP2PGradient(true)"
+    >
+      <v-list-item-icon>
+        <v-icon color="blue">mdi-led-on</v-icon>
+      </v-list-item-icon>
+      <v-list-item-title>Pair à pair</v-list-item-title>
+    </v-list-item>
+
+    <v-list-item
+      v-if="
+        isP2PGradientRunning &&
+        this.$store.state.missionStatus.isMissionStarted &&
+        !accessStatus.isMissionSimulated
+      "
+      v-on:click="setP2PGradient(false)"
+    >
+      <v-list-item-icon>
+        <v-icon color="blue">mdi-led-off</v-icon>
+      </v-list-item-icon>
+      <v-list-item-title>Arrêter pair à pair</v-list-item-title>
+    </v-list-item>
 
     <v-list-item
       :disabled="
@@ -54,15 +81,18 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import {ACCESSOR} from '@/store';
 import {ServerCommunication} from '@/communication/server_communication';
 import {AccessStatus} from '@/communication/access_status';
-import {Drone} from '@/communication/drone';
+import {
+  SOCKETIO_LIMITED_ACCESS,
+  UPDATE_P2P_GRADIENT,
+} from '@/communication/server_constants';
 
 @Component({})
 export default class MissionCommands extends Vue {
-  @Prop() private droneList!: Drone[];
   @Prop() private accessStatus!: AccessStatus;
   public isLaunchMissionSelected = false;
   public isTerminateMissionSelected = false;
   public isReturnToBaseSelected = false;
+  public isP2PGradientRunning = false;
 
   set simulatedMission(isSimulated: boolean) {
     if (!ACCESSOR.missionStatus.isMissionStarted) {
@@ -101,6 +131,11 @@ export default class MissionCommands extends Vue {
       this.isReturnToBaseSelected = false;
     }
   }
+  public setP2PGradient(value: boolean): void {
+    if (!ACCESSOR.missionStatus.isMissionStarted) return;
+
+    ServerCommunication.setP2PGradient(value);
+  }
 
   public terminateMission(): void {
     if (!ACCESSOR.missionStatus.isMissionStarted) return;
@@ -113,6 +148,16 @@ export default class MissionCommands extends Vue {
     if (!COMMAND_SENT) {
       this.isTerminateMissionSelected = false;
     }
+  }
+  private beforeCreate() {
+    SOCKETIO_LIMITED_ACCESS.on(UPDATE_P2P_GRADIENT, (newValue: boolean) => {
+      this.isP2PGradientRunning = newValue;
+    });
+
+    SOCKETIO_LIMITED_ACCESS.open();
+  }
+  private destroyed() {
+    SOCKETIO_LIMITED_ACCESS.removeListener(UPDATE_P2P_GRADIENT);
   }
 }
 </script>

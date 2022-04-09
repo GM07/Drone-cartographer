@@ -13,6 +13,7 @@ from pymongo import MongoClient
 from datetime import datetime
 from services.data.drone_data import DroneData
 from constants import COMMANDS
+from time import perf_counter
 
 
 @dataclass
@@ -96,3 +97,20 @@ def serialize_objectid_from_result(result: list):
     for test in result:
         test['_id'] = str(test['_id'])
     return result
+
+
+class MissionManager:
+    current_mission: Mission
+    current_mission_start_time: float
+
+    def start_current_mission(self, drone_count: int, is_simulated: bool):
+        self.current_mission = Mission(0, drone_count, is_simulated, 0, [[]])
+        self.mission_start_time = perf_counter()
+
+    def end_current_mission(self, logs: List[Tuple[str, str]]):
+        self.current_mission.flight_duration = self.mission_start_time - perf_counter(
+        )
+        self.current_mission.logs = logs
+
+        database = Database()
+        database.upload_mission_info(self.current_mission)

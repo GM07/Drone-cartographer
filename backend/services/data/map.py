@@ -63,7 +63,7 @@ class Map:
                 cls._instance = super(Map, cls).__new__(cls)
             return cls._instance
 
-    # @lock(_lock)
+    @lock(_lock)
     def add_data(self, map_data: MapData, socket: SocketIO):
 
         drone_id = map_data.drone_id
@@ -88,7 +88,7 @@ class Map:
                 Map.filter_sensor_value(back), Map.filter_sensor_value(right))
             sending_data.drone_data.update_sensors(mean_sensors)
             self.emit_data(sending_data, socket)
-            # print(sending_data.drone_id, sending_data.drone_data)
+            self.filtered_data.append(sending_data)
             self.buffer_data[drone_id].clear()
 
     @staticmethod
@@ -104,6 +104,13 @@ class Map:
             namespace='/getMapData',
             broadcast=True,
         )
+
+    @lock(_lock)
+    def get_all_filtered_data():
+        socket_filtered_data = []
+        for data in Map.filtered_data:
+            socket_filtered_data.append(data.to_socket_data())
+        return socket_filtered_data
 
     def mean_data_per_sensor(self, drone_list: List[DroneData]):
 

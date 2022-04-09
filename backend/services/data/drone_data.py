@@ -2,6 +2,7 @@
 DroneState and DroneData to be able to regroup the information
 taken from the drones"""
 from enum import Enum
+from typing import Any, Dict
 from services.communication.byte_decoder import ByteDecoder
 
 
@@ -33,8 +34,8 @@ class DroneState(Enum):
     CRASHED = 5
 
 
-def log_data_to_drone_data(log_data):
-    drone_data: DroneData = DroneData(bytes(), True)
+def log_data_to_drone_data(name: str, log_data):
+    drone_data: DroneData = DroneData(name, bytes(), True)
     drone_data.position.x = log_data['kalman.stateX']
     drone_data.position.y = log_data['kalman.stateY']
     drone_data.position.z = log_data['kalman.stateZ']
@@ -43,7 +44,7 @@ def log_data_to_drone_data(log_data):
     drone_data.sensors.left = log_data['range.left']
     drone_data.sensors.right = log_data['range.right']
     drone_data.battery_level = log_data['pm.batteryLevel']
-    drone_data.state = log_data['custom.droneCustomState']
+    drone_data.state = DroneState(log_data['custom.droneCustomState'])
 
     return drone_data
 
@@ -53,16 +54,31 @@ class DroneData:
 
     DATA_SIZE: int = 29
 
-    def __init__(self, data: bytes, empty=False):
+    def __init__(self, name: str, data: bytes, empty=False):
+        self.name = name
         self.position = Point2D(0, 0)
         self.sensors = DroneSensors(0, 0, 0, 0)
-        self.battery_level = 0
+        self.battery_level = 1.0
         self.state = DroneState(0)
         if not empty:
             self.__from_bytes(data)
 
     def update_sensors(self, sensors: DroneSensors):
         self.sensors = sensors
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'name': self.name,
+            'sensorFront': self.sensors.front,
+            'sensorLeft': self.sensors.left,
+            'sensorBack': self.sensors.back,
+            'sensorRight': self.sensors.right,
+            'xPos': self.position.x,
+            'yPos': self.position.y,
+            'zPos': self.position.z,
+            'batteryLevel': self.battery_level,
+            'state': self.state.name
+        }
 
     def __from_bytes(self, data: bytes):
         decoder: ByteDecoder = ByteDecoder(

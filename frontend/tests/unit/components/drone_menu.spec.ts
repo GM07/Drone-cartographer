@@ -1,7 +1,7 @@
 import {shallowMount, Wrapper} from '@vue/test-utils';
 import {DefaultProps} from 'vue/types/options';
 import DroneMenu from '@/components/drone_menu.vue';
-import {Drone} from '@/communication/drone';
+import {NewDroneData} from '@/communication/drone';
 
 describe('drone_menu.vue', () => {
   let wrapper: Wrapper<DefaultProps & DroneMenu, Element>;
@@ -17,7 +17,12 @@ describe('drone_menu.vue', () => {
   });
 
   it('should submit', () => {
-    const NEW_DRONE = {name: 'a', xPos: 1, yPos: 1} as Drone;
+    const NEW_DRONE = {
+      name: 'a',
+      startingXPos: 1,
+      startingYPos: 1,
+      startingOrientation: 0,
+    } as NewDroneData;
     wrapper.vm['newDrone'] = NEW_DRONE;
     const RESET_SPY = spyOn(wrapper.vm, 'resetValidation');
     const CLOSE_MENU_SPY = spyOn(wrapper.vm, 'closeMenu');
@@ -69,7 +74,12 @@ describe('drone_menu.vue', () => {
   });
 
   it('should validate if the drone does not exist twice', async () => {
-    const NEW_DRONE = {name: 'a', xPos: 1, yPos: 1} as Drone;
+    const NEW_DRONE = {
+      name: 'a',
+      startingXPos: 1,
+      startingYPos: 1,
+      startingOrientation: 0,
+    } as NewDroneData;
     wrapper.vm['newDrone'] = NEW_DRONE;
     expect(wrapper.vm.validateDroneExistTwice() as boolean).toBe(true);
     await wrapper.setProps({droneList: [NEW_DRONE]});
@@ -86,7 +96,12 @@ describe('drone_menu.vue', () => {
   });
 
   it('should validate the drone distance', async () => {
-    const NEW_DRONE = {name: 'a', xPos: 1, yPos: 1} as Drone;
+    const NEW_DRONE = {
+      name: 'a',
+      startingXPos: 1,
+      startingYPos: 1,
+      startingOrientation: 0,
+    } as NewDroneData;
     wrapper.vm['newDrone'] = NEW_DRONE;
     expect(wrapper.vm.validateDistance()).toBe(true);
     await wrapper.setProps({droneList: [NEW_DRONE]});

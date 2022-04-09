@@ -5,7 +5,7 @@
 
 #include "utils/vector3d.h"
 
-constexpr uint8_t HEADER_SIZE = 5;
+constexpr size_t kHeaderSize = 5;
 
 struct DroneData {
   DroneData() = default;
@@ -18,7 +18,7 @@ struct DroneData {
   Vector3D m_direction;
   float m_distanceFromTakeoff{0};
   float m_range{0};
-  std::array<char, HEADER_SIZE> m_magicHeader{{'D', 'R', 'E', 'A', 'M'}};
+  std::array<char, kHeaderSize> m_magicHeader{{'D', 'R', 'E', 'A', 'M'}};
   size_t m_id{0};
 } __attribute__((packed));
 
