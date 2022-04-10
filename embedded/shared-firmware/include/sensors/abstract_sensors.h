@@ -22,15 +22,3 @@ class AbstractSensors {
 };
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-

@@ -4,15 +4,3 @@
 enum LED {kLedBlueLeft, kLedGreenLeft, kLedRedLeft, kLedGreenRight, kLedRedRight, kLedBlueRight};
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-

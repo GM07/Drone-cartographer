@@ -17,15 +17,3 @@ void Drone::communicationManagerTask() {
     Time::delayMs(kCommunicationDelay);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -92,15 +92,3 @@ class Drone {
   std::unordered_map<size_t, DroneData> m_usedPeerData;
 };
 #endif
-
-
-
-
-
-
-
-
-
-
-
-

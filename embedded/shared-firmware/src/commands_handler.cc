@@ -29,14 +29,3 @@ bool Drone::handleCommand(Command command) {
       return false;
   }
 }
-
-
-
-
-
-
-
-
-
-
-

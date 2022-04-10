@@ -141,15 +141,3 @@ template <typename T>
 }  // namespace Math
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-

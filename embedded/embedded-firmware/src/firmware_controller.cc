@@ -148,15 +148,3 @@ void FirmwareController::sendP2PMessage(void* message, size_t size) {
 
   return (configblockGetRadioAddress() & kRadioAddressMask);
 }
-
-
-
-
-
-
-
-
-
-
-
-

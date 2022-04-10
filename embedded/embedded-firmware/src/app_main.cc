@@ -88,15 +88,3 @@ extern "C" void appMain() {
     Drone::getEmbeddedDrone().step();
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

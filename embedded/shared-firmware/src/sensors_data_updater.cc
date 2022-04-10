@@ -7,15 +7,3 @@ void Drone::updateCrashStatus() {
     m_controller->m_state = State::kCrash;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

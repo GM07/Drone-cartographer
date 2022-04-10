@@ -24,15 +24,3 @@ struct __attribute__((__packed__)) ControllerData {
 };
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-

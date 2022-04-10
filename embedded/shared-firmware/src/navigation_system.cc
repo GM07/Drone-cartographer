@@ -106,15 +106,3 @@ void Drone::changeDirection() {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -50,15 +50,3 @@ class FirmwareController : public AbstractController {
   ledseqContext_t m_seqLED{};
 };
 #endif
-
-
-
-
-
-
-
-
-
-
-
-

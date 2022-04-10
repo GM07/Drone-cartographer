@@ -49,15 +49,3 @@ class Vector3D {
 } __attribute__((packed));
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-

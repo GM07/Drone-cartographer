@@ -53,15 +53,3 @@ SimulationSensors::SimulationSensors(CCrazyflieSensing* ccrazyflieSensing)
              m_ccrazyflieSensing->m_pcBattery->GetReading().AvailableCharge) *
          kToPercentage;
 }
-
-
-
-
-
-
-
-
-
-
-
-

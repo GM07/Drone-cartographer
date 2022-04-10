@@ -64,15 +64,3 @@ void p2pTaskInit() {
 
   p2pIsInit = true;
 }
-
-
-
-
-
-
-
-
-
-
-
-

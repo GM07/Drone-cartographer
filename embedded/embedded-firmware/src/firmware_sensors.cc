@@ -52,15 +52,3 @@ extern "C" {
   logVarId_t vbatid = logGetVarId("pm", "batteryLevel");
   return logGetUint(vbatid) / kToPercentage;
 }
-
-
-
-
-
-
-
-
-
-
-
-
