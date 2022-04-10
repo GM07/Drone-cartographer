@@ -20,10 +20,11 @@ TEST(ValidateCommandsHandler, handleCommandIdentify) {
 TEST(ValidateCommandsHandler, handleCommandTakeOff) {
   std::shared_ptr<StubController> controller =
       std::make_shared<StubController>();
+  int orientation = 0;
   Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
   drone.getController()->m_state = State::kTakingOff;
   EXPECT_CALL(*controller, takeOff(_)).Times(1);
-  EXPECT_TRUE(drone.handleCommand(Command::kTakeOff));
+  EXPECT_TRUE(drone.handleCommand(Command::kTakeOff, &orientation));
   EXPECT_EQ(drone.getController()->m_state, State::kTakingOff);
 }
 

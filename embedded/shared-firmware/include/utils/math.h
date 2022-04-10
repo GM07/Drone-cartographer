@@ -24,7 +24,7 @@ constexpr std::size_t kMaxDepth = 10;
 template <typename T, typename std::enable_if<
                           std::is_floating_point<T>::value>::type* = nullptr>
 [[nodiscard]] inline constexpr T toRad(int degrees) {
-  T kHalfCircle = 180.0;
+  constexpr T kHalfCircle = 180.0;
   return degrees * pi<T> / kHalfCircle;
 }
 

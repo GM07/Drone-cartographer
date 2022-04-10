@@ -60,7 +60,7 @@ class AbstractController {
  protected:
   Vector3D m_takeOffPosition;
   Vector3D m_targetPosition;
-  float m_orientation;
+  float m_orientation{0};
 };
 
 #endif
