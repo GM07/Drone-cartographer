@@ -100,8 +100,8 @@ class Map:
     def emit_data(self, map_data: MapData, socket: SocketIO):
         socket.emit(
             'getMapData',
-            map_data.to_socket_data(),
-            namespace='/getMapData',
+            [map_data.to_socket_data()],
+            namespace='/getAllMapData',
             broadcast=True,
         )
 
