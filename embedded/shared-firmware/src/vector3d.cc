@@ -37,6 +37,10 @@ float Vector3D::distanceTo(const Vector3D& other) const {
                    powf(m_z - other.m_z, 2));
 }
 
+float Vector3D::distanceToXY(const Vector3D& other) const {
+  return std::sqrt(powf(m_x - other.m_x, 2) + powf(m_y - other.m_y, 2));
+}
+
 Vector3D Vector3D::reflect(const Vector3D& normal) const {
   return (*this) - normal.toUnitVector() * (*this * normal.toUnitVector()) * 2;
 }

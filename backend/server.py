@@ -145,6 +145,16 @@ def terminate():
     return 'Terminated'
 
 
+@SOCKETIO.on('return_to_base', namespace='/limitedAccess')
+def return_to_base():
+    if (not MissionStatus.get_mission_started() or
+            not AccessStatus.is_request_valid(request)):
+        return ''
+
+    COMM.send_command(COMMANDS.RETURN_TO_BASE.value)
+    return ''
+
+
 @SOCKETIO.on('take_control', namespace='/limitedAccess')
 def request_control():
     change = AccessStatus.take_control(SOCKETIO, request)

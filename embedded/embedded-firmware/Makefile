@@ -1,7 +1,7 @@
 
 # enable app support
 APP=1
-APP_STACKSIZE=300
+APP_STACKSIZE=1000
 
 VPATH += src/
 VPATH += ../shared-firmware/src/
@@ -14,8 +14,9 @@ PROJ_OBJ += commands_handler.o \
 	vector3d.o \
 	firmware_sensors.o \
 	sensors_data_updater.o \
-	color_gradient.o \
-	p2p_task.o
+	p2p_task.o \
+	math.o \
+	color_gradient.o
 
 CRAZYFLIE_BASE=../crazyflie-firmware
 

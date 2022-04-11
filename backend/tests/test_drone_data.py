@@ -37,7 +37,9 @@ class TestApplication(unittest.TestCase):
         self.assertEqual(Drone.DroneState(2), Drone.DroneState.LANDING)
         self.assertEqual(Drone.DroneState(3), Drone.DroneState.DEAD)
         self.assertEqual(Drone.DroneState(4), Drone.DroneState.EXPLORING)
-        self.assertEqual(Drone.DroneState(5), Drone.DroneState.CRASHED)
+        self.assertEqual(Drone.DroneState(5),
+                         Drone.DroneState.RETURNING_TO_BASE)
+        self.assertEqual(Drone.DroneState(6), Drone.DroneState.CRASHED)
 
     @mock.patch('services.data.drone_data.DroneData._DroneData__from_bytes')
     def test_drone_data(self, byte: mock.MagicMock):
