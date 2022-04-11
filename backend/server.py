@@ -217,7 +217,7 @@ def send_drone_status():
 
 @SOCKETIO.on('connect', namespace='/getAllMapData')
 def send_all_map_data():
-    SOCKETIO.emit('getAllMapData',
+    SOCKETIO.emit('getMapData',
                   Map.get_all_filtered_data(),
                   namespace='/getAllMapData',
                   broadcast=True)
