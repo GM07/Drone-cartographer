@@ -2,7 +2,7 @@
 #include "utils/commands.h"
 
 /////////////////////////////////////////////////////////////////////////
-bool Drone::handleCommand(Command command) {
+bool Drone::handleCommand(Command command, void* extraArgs) {
   if (m_controller->m_state == State::kCrash) {
     return false;
   }
@@ -13,6 +13,8 @@ bool Drone::handleCommand(Command command) {
       return true;
     case Command::kTakeOff:
       if (!m_controller->hasLowBattery()) {
+        m_controller->m_orientation =
+          Math::toRad<float>(*reinterpret_cast<int*>(extraArgs));
         m_controller->takeOff(kHeight);
         m_controller->m_state = State::kTakingOff;
       }

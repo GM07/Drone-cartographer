@@ -77,7 +77,11 @@ def launch(is_simulated: bool):
     else:
         COMM = CommCrazyflie(SOCKETIO, drone_list)
 
-    COMM.send_command(COMMANDS.LAUNCH.value)
+    for drone in drone_list:
+        COMM.send_command(
+            COMMANDS.LAUNCH.value, [drone.name],
+            int(drone.starting_orientation).to_bytes(4, byteorder='little'))
+
     AccessStatus.set_mission_type(SOCKETIO, is_simulated)
     MissionStatus.launch_mission(SOCKETIO)
     SOCKETIO.emit('clear_all_maps',

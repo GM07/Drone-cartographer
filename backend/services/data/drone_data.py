@@ -143,10 +143,7 @@ Drone GetData (0x04)
 26
 27
 28  State - Crash, Take Off, Exploration, Landing, Idle
-29  
-30  
-31  
-32  
+ 
 
 Drone GetHeight (0x05)
 

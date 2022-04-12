@@ -22,6 +22,8 @@ constexpr float kRealAdditionnalCollisionRange = 15.0F;
 constexpr float kSimulationAdditionnalCollisionRange = 20.0F;
 
 class AbstractController {
+  friend class Drone;
+
  public:
   virtual ~AbstractController() = default;
   AbstractController() = default;
@@ -85,6 +87,7 @@ class AbstractController {
 
  protected:
   Vector3D m_takeOffPosition;
+  float m_orientation{0};
 };
 
 #endif
