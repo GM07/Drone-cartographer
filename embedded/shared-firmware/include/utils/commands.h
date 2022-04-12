@@ -7,6 +7,7 @@ enum class Command : uint8_t {
   kLand,
   kStartP2PGradient,
   kEndP2PGradient,
+  kReturnToBase,
 };
 
 #endif

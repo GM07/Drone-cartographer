@@ -31,7 +31,8 @@ class DroneState(Enum):
     LANDING = 2
     DEAD = 3
     EXPLORING = 4
-    CRASHED = 5
+    RETURNING_TO_BASE = 5
+    CRASHED = 6
 
 
 def log_data_to_drone_data(name: str, log_data):

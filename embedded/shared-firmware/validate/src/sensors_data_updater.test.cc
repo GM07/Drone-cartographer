@@ -21,7 +21,7 @@ TEST(ValidateSensorsDataUpdater, UpdateSensorsDataShouldForward) {
 TEST(ValidateSensorsDataUpdater, updateCrashStatusIfNotCrashed) {
   std::shared_ptr<StubController> controller =
       std::make_shared<StubController>();
-  EXPECT_CALL(*controller, isDroneCrashed()).Times(1).WillOnce(Return(false));
+  EXPECT_CALL(*controller, isDroneCrashed()).Times(2).WillOnce(Return(false));
 
   Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
   drone.getController()->m_state = State::kIdle;
