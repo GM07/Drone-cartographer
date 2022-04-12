@@ -14,7 +14,6 @@ extern "C" {
 #include "estimator_kalman.h"
 #include "led.h"
 #include "ledseq.h"
-#include "log.h"
 #include "param_logic.h"
 #include "radiolink.h"
 #include "supervisor.h"
@@ -62,19 +61,13 @@ void FirmwareController::updateSensorsData() {
 }
 
 ////////////////////////////////////////////////
-[[nodiscard]] bool FirmwareController::isTrajectoryFinished() const {
-  return Math::areAlmostEqual(getCurrentLocation(), m_targetPosition,
-                              kRealTrajectoryFinishedTreshold);
-}
-
-////////////////////////////////////////////////
 [[nodiscard]] Vector3D FirmwareController::getCurrentLocation() const {
   point_t point;
   estimatorKalmanGetEstimatedPos(&point);
   return Vector3D(point.x, point.y, point.z) - m_takeOffPosition;
 }
 
-void FirmwareController::stopMotors() { commanderNotifySetpointsStop(0); }
+void FirmwareController::stopMotors() const { commanderNotifySetpointsStop(0); }
 
 ///////////////////////////////////////
 [[nodiscard]] size_t FirmwareController::receiveMessage(void* message,

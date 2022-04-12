@@ -22,7 +22,7 @@ constexpr float kRealMaxCollisionAvoidanceRange = 45.0F;
 class Drone {
  public:
   explicit Drone(std::shared_ptr<AbstractController>&& controller)
-      : m_messageRX(), m_controller(controller), m_peerCollision(false) {
+      : m_messageRX(), m_controller(controller) {
     constexpr float kTrigoHalf = Math::sin(Math::pi<float> / 6.0F);
     constexpr float kTrigoSqrt3On2 = Math::cos(Math::pi<float> / 6.0F);
     const uint32_t kSeed =
@@ -85,6 +85,6 @@ class Drone {
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
   std::unordered_map<size_t, DroneData> m_usedPeerData;
-  bool m_peerCollision;
+  bool m_peerCollision{false};
 };
 #endif

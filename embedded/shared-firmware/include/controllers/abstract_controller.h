@@ -50,7 +50,7 @@ class AbstractController {
     setVelocity(Vector3D::z(-1.0F), kSpeed);
   };
 
-  virtual void stopMotors() = 0;
+  virtual void stopMotors() const = 0;
 
   [[nodiscard]] virtual Vector3D getCurrentLocation() const = 0;
   [[nodiscard]] virtual bool isTrajectoryFinished() const = 0;

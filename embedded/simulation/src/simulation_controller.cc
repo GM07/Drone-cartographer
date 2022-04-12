@@ -142,11 +142,6 @@ void SimulationController::log(const std::string& message) {
 }
 
 ///////////////////////////////////////////////////
-[[nodiscard]] bool SimulationController::isTrajectoryFinished() const {
-  return Math::areAlmostEqual(getCurrentLocation(), m_targetPosition);
-}
-
-///////////////////////////////////////////////////
 void SimulationController::setVelocity(const Vector3D& direction, float speed) {
   Vector3D speedVector = direction.toUnitVector() * speed;
   m_ccrazyflieSensing->m_pcPropellers->SetLinearVelocity(

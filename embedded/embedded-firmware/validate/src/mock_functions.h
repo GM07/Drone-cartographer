@@ -17,8 +17,6 @@ extern "C" {
 
 #include <gmock/gmock.h>
 
-#include "components/drone.h"
-
 struct Functions {
   virtual ~Functions() = default;
   virtual BaseType_t xTaskCrate(TaskFunction_t pxTaskCode,

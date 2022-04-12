@@ -98,8 +98,9 @@ void Drone::collisionAvoidance() {
         m_usedPeerData.insert_or_assign(peerData.m_id, peerData);
 
         // Makes sure both drone use the same random angle
-        float angle = peerData.m_id <= m_data.m_id ? m_data.m_randomAngleRad
-                                                   : peerData.m_randomAngleRad;
+        const float angle = peerData.m_id <= m_data.m_id
+                                ? m_data.m_randomAngleRad
+                                : peerData.m_randomAngleRad;
 
         // Rotate normals by the random angle
         Vector3D peerNormal = peerData.m_direction - m_data.m_direction;
@@ -117,8 +118,8 @@ void Drone::collisionAvoidance() {
   }
 
   if (!m_peerCollision) {
-    constexpr float maxRange = Math::kPi * 2;
-    constexpr float minRange = 0;
+    constexpr float maxRange = Math::pi<double> * 2;
+    constexpr float minRange = 0.0F;
     static const uint32_t kSeed =
         std::chrono::system_clock::now().time_since_epoch().count();
 

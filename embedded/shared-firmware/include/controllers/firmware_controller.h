@@ -8,7 +8,6 @@
 extern "C" {
 #include "FreeRTOS.h"
 #include "ledseq.h"
-#include "param_logic.h"
 #include "radiolink.h"
 }
 
@@ -23,11 +22,14 @@ class FirmwareController : public AbstractController {
   FirmwareController operator=(const FirmwareController& other) = delete;
 
   void setVelocity(const Vector3D& direction, float speed) override;
-  void stopMotors() override;
+  void stopMotors() const override;
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
-  [[nodiscard]] bool isTrajectoryFinished() const override;
-  [[nodiscard]] bool isAltitudeReached() const override {
+  [[nodiscard]] bool isTrajectoryFinished() const override {
+    return Math::areAlmostEqual(getCurrentLocation(), m_targetPosition,
+                                kRealTrajectoryFinishedTreshold);
+  }
+  [[nodiscard]] inline bool isAltitudeReached() const override {
     return Math::areAlmostEqual(getCurrentLocation().m_z, m_targetPosition.m_z,
                                 kRealTrajectoryFinishedTreshold);
   };
