@@ -110,10 +110,7 @@ void Drone::collisionAvoidance() {
 
         // Rotate normals by the random angle
         Vector3D peerNormal = peerData.m_direction - m_data.m_direction;
-        peerNormal.m_x =
-            cosf(angle) * peerNormal.m_x - sinf(angle) * peerNormal.m_y;
-        peerNormal.m_y =
-            sinf(angle) * peerNormal.m_x + cosf(angle) * peerNormal.m_y;
+        peerNormal = peerNormal.rotate(angle);
 
         // Add the normal so the drone can dodge
         m_normal += peerNormal;
