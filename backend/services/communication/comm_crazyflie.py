@@ -34,7 +34,6 @@ class CommCrazyflie(AbstractComm):
         self.init_comm(drone_list)
 
     def __del__(self):
-        print('destructor called')
         self.shutdown()
 
     def init_comm(self, drone_list: list):

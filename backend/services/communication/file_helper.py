@@ -51,4 +51,5 @@ class FileHelper:
             os.system(f'touch ../{path}')
             file = open('../' + path, 'w')
             file.write(content)
+            file.write('\n')
             file.close()

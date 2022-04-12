@@ -6,7 +6,6 @@ import gevent.queue
 from flask_socketio import SocketIO
 from services.communication.comm_tasks import LOGS_QUEUE, DRONE_STATUS_QUEUE
 from typing import List, Tuple
-from services.communication.comm_tasks import LOGS_QUEUE
 from flask_socketio import SocketIO
 
 from services.communication.comm_tasks import DRONE_STATUS_QUEUE, LOGS_QUEUE

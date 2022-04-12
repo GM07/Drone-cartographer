@@ -12,7 +12,7 @@ class BashExecutor:
         self.process = None
         self.transmitStdoutTask = None
         self.transmitStderrTask = None
-        self.nbOutputFinished = 0
+        self.nb_output_finished = 0
         self.on_end = None
 
     def stop(self):
@@ -26,18 +26,16 @@ class BashExecutor:
             self.process.kill()
 
         if self.on_end != None:
-            print('stopping command')
             self.on_end()
 
     def changeCommand(self, bashCommand: str):
         self.bashCommand = bashCommand
 
     def start(self, on_end=None):
-        print('starting command')
         # Make sure we are not running the same process twice
         self.stop()
         self.on_end = on_end
-        self.nbOutputFinished = 0
+        self.nb_output_finished = 0
 
         self.process = subprocess.Popen(shlex.split(self.bashCommand),
                                         stdout=subprocess.PIPE,
@@ -77,8 +75,8 @@ class BashExecutor:
                                broadcast=True,
                                include_self=False,
                                skip_sid=True)
-        self.nbOutputFinished += 1
-        if (self.nbOutputFinished == 2):
+        self.nb_output_finished += 1
+        if (self.nb_output_finished == 2):
             self.stop()
 
     def __transmit_stderr(self):
@@ -101,8 +99,8 @@ class BashExecutor:
                                broadcast=True,
                                include_self=False,
                                skip_sid=True)
-        self.nbOutputFinished += 1
-        if self.nbOutputFinished == 2:
+        self.nb_output_finished += 1
+        if self.nb_output_finished == 2:
             self.stop()
 
     def __del__(self):
