@@ -94,8 +94,10 @@ class CommSimulation(AbstractComm):
         return super().shutdown()
 
     def send_command(self, command: COMMANDS, links=[], args: bytes = None):
+        drone_list_name = [drone.name for drone in self.drone_list]
+        sending_links = drone_list_name if len(links) == 0 else links
         try:
-            for link in links:
+            for link in sending_links:
                 command_to_send = CommandWrapper(link, command, args)
                 self.__COMMANDS_QUEUE.put_nowait(command_to_send)
         except queue.Full:
@@ -231,7 +233,11 @@ class CommSimulation(AbstractComm):
             if command_wrapper is None:
                 return
 
-            full_command = command_wrapper.command + tuple(command_wrapper.args)
+            if command_wrapper.args is not None:
+                full_command = command_wrapper.command + tuple(
+                    command_wrapper.args)
+            else:
+                full_command = command_wrapper.command
 
             if command_wrapper.command == COMMANDS.LAUNCH.value:
                 self.mission_manager.start_current_mission(
