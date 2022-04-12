@@ -27,6 +27,7 @@ class Vector3D {
   [[nodiscard]] bool operator!=(const Vector3D& other) const;
 
   [[nodiscard]] float distanceTo(const Vector3D& other) const;
+  [[nodiscard]] float distanceToXY(const Vector3D& other) const;
   [[nodiscard]] Vector3D reflect(const Vector3D& normal) const;
   [[nodiscard]] Vector3D toUnitVector() const;
   [[nodiscard]] float length() const;

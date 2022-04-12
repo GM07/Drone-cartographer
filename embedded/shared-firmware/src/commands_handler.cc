@@ -12,10 +12,12 @@ bool Drone::handleCommand(Command command, void* extraArgs) {
       m_controller->identify();
       return true;
     case Command::kTakeOff:
-      m_controller->m_orientation =
+      if (!m_controller->hasLowBattery()) {
+        m_controller->m_orientation =
           Math::toRad<float>(*reinterpret_cast<int*>(extraArgs));
-      m_controller->takeOff(kHeight);
-      m_controller->m_state = State::kTakingOff;
+        m_controller->takeOff(kHeight);
+        m_controller->m_state = State::kTakingOff;
+      }
       return true;
     case Command::kLand:
       m_controller->land();
@@ -26,6 +28,9 @@ bool Drone::handleCommand(Command command, void* extraArgs) {
       return true;
     case Command::kEndP2PGradient:
       m_p2pColorGradientIsActive = false;
+      return true;
+    case Command::kReturnToBase:
+      m_controller->m_state = State::kReturningToBase;
       return true;
     default:
       return false;

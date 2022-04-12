@@ -12,6 +12,7 @@ class COMMANDS(Enum):
     LAND = 0x3,
     START_P2P = 0x4,
     END_P2P = 0x5,
+    RETURN_TO_BASE = 0x6,
 
 
 # Objects to communicate with Crazyflie
