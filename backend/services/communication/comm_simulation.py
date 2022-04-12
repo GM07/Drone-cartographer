@@ -81,7 +81,7 @@ class CommSimulation(AbstractComm):
             pass
         self.__COMMANDS_QUEUE.put_nowait(None)
 
-        for _, drone_simulation_socket in self.command_servers.items():
+        for drone_simulation_socket in self.command_servers.values():
             drone_simulation_socket.server.shutdown(socket.SHUT_RDWR)
             if drone_simulation_socket.conn is not None:
                 drone_simulation_socket.conn.shutdown(socket.SHUT_RDWR)
@@ -134,7 +134,7 @@ class CommSimulation(AbstractComm):
     @staticmethod
     def __thread_attempt_socket_connection(
             sockets: Dict[str, DroneSimulationSocket]):
-        for _, drone_simulation_socket in sockets.items():
+        for drone_simulation_socket in sockets.values():
             if drone_simulation_socket.conn is None:
                 try:
                     drone_simulation_socket.server.setblocking(True)
