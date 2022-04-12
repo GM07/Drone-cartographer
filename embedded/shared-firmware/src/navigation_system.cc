@@ -14,13 +14,9 @@ void Drone::step() {
 
   switch (m_controller->m_state) {
     case State::kTakingOff:
-<<<<<<< HEAD
       m_data.m_direction = Vector3D::z(1.0F);
       if (m_controller->isAltitudeReached()) {
-=======
-      if (m_controller->isTrajectoryFinished()) {
         resetCollisionHistory();
->>>>>>> 52bf33095b7a1f1c505eb0b10722c3dcf7d5ccda
         m_controller->m_state = State::kExploring;
         m_data.m_direction = m_initialDirection;
       }
@@ -37,13 +33,9 @@ void Drone::step() {
       collisionAvoidance();
       analyzeShortcuts();
       changeDirection();
-<<<<<<< HEAD
-=======
-      m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
       break;
     case State::kReturningToBase:
       returnToBaseStateSteps();
->>>>>>> 52bf33095b7a1f1c505eb0b10722c3dcf7d5ccda
       break;
     case State::kIdle:  // Fallthrough
     default:
@@ -203,7 +195,7 @@ void Drone::returnToBaseDirection() {
 
   m_controller->m_targetPosition = m_collisionHistory.back();
 
-  if (!m_hadDroneCollision && areAlmostEqual(m_normal, Vector3D())) {
+  if (!m_peerCollision && Math::areAlmostEqual(m_normal, Vector3D())) {
     m_data.m_direction =
         m_controller->m_targetPosition - m_controller->getCurrentLocation();
     m_data.m_direction.m_z = 0;
@@ -221,9 +213,9 @@ void Drone::returnToBaseStateSteps() {
     m_controller->m_state = State::kLanding;
     return;
   }
-  m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
+  m_controller->setVelocity(m_data.m_direction, kSpeed);
 
-  if (!m_hadDroneCollision && !m_collisionHistory.empty() &&
+  if (!m_peerCollision && !m_collisionHistory.empty() &&
       m_controller->hasReachedCheckpoint()) {
     m_collisionHistory.pop_back();
   }
@@ -286,18 +278,18 @@ void Drone::analyzeBaseShortcuts(const Vector3D& frontPoint,
   constexpr float kHalfBaseCross = 0.3F;
   const Vector3D& kLocation = m_controller->getCurrentLocation();
 
-  std::pair<bool, Vector3D> frontIntersect =
-      intersectsSegment(kLocation, frontPoint, Vector3D::y(-kHalfBaseCross),
-                        Vector3D::y(kHalfBaseCross));
-  std::pair<bool, Vector3D> backIntersect =
-      intersectsSegment(kLocation, backPoint, Vector3D::y(-kHalfBaseCross),
-                        Vector3D::y(kHalfBaseCross));
-  std::pair<bool, Vector3D> leftIntersect =
-      intersectsSegment(kLocation, leftPoint, Vector3D::x(-kHalfBaseCross),
-                        Vector3D::x(kHalfBaseCross));
-  std::pair<bool, Vector3D> rightIntersect =
-      intersectsSegment(kLocation, rightPoint, Vector3D::x(-kHalfBaseCross),
-                        Vector3D::x(kHalfBaseCross));
+  std::pair<bool, Vector3D> frontIntersect = Math::intersectsSegment(
+      kLocation, frontPoint, Vector3D::y(-kHalfBaseCross),
+      Vector3D::y(kHalfBaseCross));
+  std::pair<bool, Vector3D> backIntersect = Math::intersectsSegment(
+      kLocation, backPoint, Vector3D::y(-kHalfBaseCross),
+      Vector3D::y(kHalfBaseCross));
+  std::pair<bool, Vector3D> leftIntersect = Math::intersectsSegment(
+      kLocation, leftPoint, Vector3D::x(-kHalfBaseCross),
+      Vector3D::x(kHalfBaseCross));
+  std::pair<bool, Vector3D> rightIntersect = Math::intersectsSegment(
+      kLocation, rightPoint, Vector3D::x(-kHalfBaseCross),
+      Vector3D::x(kHalfBaseCross));
 
   std::array<std::pair<bool, Vector3D>, kNbLateralSensors> intersectionList{
       {frontIntersect, backIntersect, leftIntersect, rightIntersect}};
@@ -347,13 +339,13 @@ void Drone::analyzePathShortcuts(const Vector3D& frontPoint,
   const Vector3D& endPoint2 = m_collisionHistory.back();
 
   std::pair<bool, Vector3D> frontIntersect =
-      intersectsSegment(kLocation, frontPoint, endPoint1, endPoint2);
+      Math::intersectsSegment(kLocation, frontPoint, endPoint1, endPoint2);
   std::pair<bool, Vector3D> backIntersect =
-      intersectsSegment(kLocation, backPoint, endPoint1, endPoint2);
+      Math::intersectsSegment(kLocation, backPoint, endPoint1, endPoint2);
   std::pair<bool, Vector3D> leftIntersect =
-      intersectsSegment(kLocation, leftPoint, endPoint1, endPoint2);
+      Math::intersectsSegment(kLocation, leftPoint, endPoint1, endPoint2);
   std::pair<bool, Vector3D> rightIntersect =
-      intersectsSegment(kLocation, rightPoint, endPoint1, endPoint2);
+      Math::intersectsSegment(kLocation, rightPoint, endPoint1, endPoint2);
 
   std::array<std::pair<bool, Vector3D>, kNbLateralSensors> pathIntersectionList{
       {frontIntersect, backIntersect, leftIntersect, rightIntersect}};

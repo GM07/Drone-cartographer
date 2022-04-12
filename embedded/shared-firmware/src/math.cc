@@ -6,6 +6,7 @@
  * https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
  * ax + by = c
  */
+namespace Math {
 std::pair<bool, Vector3D> intersectsSegment(const Vector3D& start1,
                                             const Vector3D& end1,
                                             const Vector3D& start2,
@@ -22,15 +23,17 @@ std::pair<bool, Vector3D> intersectsSegment(const Vector3D& start1,
 
   const float determinant = a1 * b2 - a2 * b1;
 
-  if (areAlmostEqual(determinant, 0.0F)) {
+  if (Math::areAlmostEqual(determinant, 0.0F)) {
     return std::make_pair(false, Vector3D());
   }
   const float kX = (b2 * c1 - b1 * c2) / determinant;
   const float kY = (a1 * c2 - a2 * c1) / determinant;
   const Vector3D returnedVector(kX, kY, 0);
-  if (isOnSegment(start1, end1, returnedVector) &&
-      isOnSegment(start2, end2, returnedVector)) {
+  if (Math::isOnSegment(start1, end1, returnedVector) &&
+      Math::isOnSegment(start2, end2, returnedVector)) {
     return std::make_pair(true, returnedVector);
   }
   return std::make_pair(false, Vector3D());
 }
+
+}  // namespace Math

@@ -92,7 +92,6 @@ class AbstractController {
   virtual void updateSensorsData() = 0;
   [[nodiscard]] virtual float getMinCollisionAvoidanceDistance() const = 0;
   [[nodiscard]] virtual float getMaxCollisionAvoidanceDistance() const = 0;
-  [[nodiscard]] virtual float getAdditionnalCollisionRange() const = 0;
 
   State m_state{State::kIdle};
   std::unique_ptr<AbstractSensors> m_abstractSensors;
@@ -103,14 +102,9 @@ class AbstractController {
     return m_takeOffPosition;
   }
 
-  Vector3D m_targetPosition;
-
  protected:
   Vector3D m_takeOffPosition;
-<<<<<<< HEAD
-=======
   float m_orientation{0};
->>>>>>> 52bf33095b7a1f1c505eb0b10722c3dcf7d5ccda
 };
 
 #endif

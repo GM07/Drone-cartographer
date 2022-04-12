@@ -19,7 +19,6 @@ class FirmwareController : public AbstractController {
   FirmwareController(FirmwareController&& other) = delete;
   FirmwareController operator=(FirmwareController&& other) = delete;
   FirmwareController(const FirmwareController& other) = delete;
-  FirmwareController operator=(const FirmwareController& other) = delete;
 
   void setVelocity(const Vector3D& direction, float speed) override;
   void stopMotors() const override;
@@ -47,9 +46,6 @@ class FirmwareController : public AbstractController {
   void updateSensorsData() override;
   [[nodiscard]] float getMinCollisionAvoidanceDistance() const override;
   [[nodiscard]] float getMaxCollisionAvoidanceDistance() const override;
-  [[nodiscard]] inline float getAdditionnalCollisionRange() const override {
-    return kRealAdditionnalCollisionRange;
-  };
   [[nodiscard]] bool isDroneCrashed() const override;
 
   void initCommunicationManager() override{/**/};
