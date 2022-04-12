@@ -122,7 +122,14 @@ class TestApplication(unittest.TestCase):
                                add_drone_mock: mock.MagicMock,
                                add_obstacles: mock.MagicMock,
                                launch_mock: mock.MagicMock):
-        get_drones_mock.return_value = [{'name': 'test'}]
+        get_drones_mock.return_value = [
+            StartingDroneData({
+                'name': 'test',
+                'startingOrientation': 0,
+                'startingXPos': 0,
+                'startingYPos': 0
+            })
+        ]
         is_request_mock.return_value = True
         get_mission_started.return_value = False
         client = server.SOCKETIO.test_client(server.APP,
@@ -163,7 +170,14 @@ class TestApplication(unittest.TestCase):
             add_drone_mock: mock.MagicMock, add_obstacles: mock.MagicMock,
             launch_mock: mock.MagicMock, launch_mission_mock: mock.MagicMock):
 
-        get_drones_mock.return_value = [{'name': 'test'}]
+        get_drones_mock.return_value = [
+            StartingDroneData({
+                'name': 'test',
+                'startingOrientation': 0,
+                'startingXPos': 0,
+                'startingYPos': 0
+            })
+        ]
         is_request_mock.return_value = True
         get_mission_started.return_value = False
         client = server.SOCKETIO.test_client(server.APP,

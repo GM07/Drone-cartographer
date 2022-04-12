@@ -58,5 +58,5 @@ class TestCommCrazyflie(unittest.TestCase):
         comm_cf.crazyflies_by_id[URI[0]] = Crazyflie(rw_cache='./cache')
         comm_cf.links = ["radio://0/80/2M/E7E7E7E761"]
         print("Crazyflies by id: ", comm_cf.crazyflies_by_id)
-        comm_cf.send_command(COMMANDS.IDENTIFY.value, [])
+        comm_cf.send_command(COMMANDS.IDENTIFY.value)
         cflib.crazyflie.appchannel.Appchannel.send_packet.assert_called()

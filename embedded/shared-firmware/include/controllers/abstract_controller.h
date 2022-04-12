@@ -20,8 +20,13 @@ constexpr float kRealTrajectoryFinishedTreshold = 0.05;
 // Meters and seconds
 constexpr float kSpeed = 0.25F;
 constexpr float kHeight = 0.3F;
+constexpr float kLowBattery = 0.3F;
+constexpr float kMaxDistanceToBase = 0.05F;
+constexpr float kMaxDistanceToCheckpoint = 0.05F;
 
 class AbstractController {
+  friend class Drone;
+
  public:
   virtual ~AbstractController() = default;
   AbstractController() = default;
@@ -56,6 +61,20 @@ class AbstractController {
   [[nodiscard]] virtual bool isTrajectoryFinished() const = 0;
   [[nodiscard]] virtual bool isAltitudeReached() const = 0;
 
+  [[nodiscard]] inline bool hasReachedCheckpoint() const {
+    return getCurrentLocation().distanceToXY(m_targetPosition) <
+           kMaxDistanceToCheckpoint;
+  }
+  [[nodiscard]] inline bool isNearBase() const {
+    return getCurrentLocation().distanceToXY(Vector3D()) < kMaxDistanceToBase;
+  }
+
+  [[nodiscard]] inline bool hasLowBattery() const {
+    if (m_abstractSensors == nullptr) {
+      return false;
+    }
+    return m_abstractSensors->getBatteryLevel() < kLowBattery;
+  }
   [[nodiscard]] virtual bool isDroneCrashed() const = 0;
 
   virtual void initCommunicationManager() = 0;
@@ -73,14 +92,25 @@ class AbstractController {
   virtual void updateSensorsData() = 0;
   [[nodiscard]] virtual float getMinCollisionAvoidanceDistance() const = 0;
   [[nodiscard]] virtual float getMaxCollisionAvoidanceDistance() const = 0;
+  [[nodiscard]] virtual float getAdditionnalCollisionRange() const = 0;
 
   State m_state{State::kIdle};
   std::unique_ptr<AbstractSensors> m_abstractSensors;
   ControllerData m_data{};
   Vector3D m_targetPosition;
 
+  [[nodiscard]] inline const Vector3D& getTakeOffPosition() const {
+    return m_takeOffPosition;
+  }
+
+  Vector3D m_targetPosition;
+
  protected:
   Vector3D m_takeOffPosition;
+<<<<<<< HEAD
+=======
+  float m_orientation{0};
+>>>>>>> 52bf33095b7a1f1c505eb0b10722c3dcf7d5ccda
 };
 
 #endif

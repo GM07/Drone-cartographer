@@ -6,14 +6,18 @@
 #include <array>
 #include <chrono>
 #include <cmath>
+#include <deque>
 #include <random>
 
 #include "controllers/abstract_controller.h"
 #include "utils/commands.h"
 #include "utils/drone_data.h"
+#include "utils/shortcut_verifier.h"
 
 constexpr size_t kMessageMaxSize = 30;
 constexpr size_t kNbStartingDirection = 8;
+constexpr size_t kMaxCheckpoints = 400;
+constexpr size_t kNbLateralSensors = 4;
 
 constexpr float kSimulationCollisionAvoidanceRange = 25.0F;
 constexpr float kRealMinCollisionAvoidanceRange = 42.0F;
@@ -43,6 +47,9 @@ class Drone {
         0, startingDirection.size() - 1);
 
     m_initialDirection = startingDirection.at(distribution(generator));
+
+    m_lastPathShortcutPosition.resize(kNbLateralSensors);
+    m_lastBaseShortcutPosition.resize(kNbLateralSensors);
   }
 
   Drone(const Drone& other) = delete;
@@ -58,7 +65,7 @@ class Drone {
   };
 
   // Command Manager
-  bool handleCommand(Command command);
+  bool handleCommand(Command command, void* extraArgs = nullptr);
 
   // Communication Manager
   void communicationManagerTask();
@@ -67,9 +74,17 @@ class Drone {
   void step();
   void wallAvoidance();
   void collisionAvoidance();
+  void analyzeShortcuts();
   void changeDirection();
 
+  void returnToBaseDirection();
+  void returnToBaseStateSteps();
+  void resetCollisionHistory();
+  void pushValidPath(size_t index);
+
+  // Sensor Manager
   void updateCrashStatus();
+  void updateStatusFromBattery();
 
   // Initialisation
   inline void initDrone() { m_data.m_id = m_controller->getId(); };
@@ -80,11 +95,35 @@ class Drone {
   bool m_p2pColorGradientIsActive{false};
 
  protected:
+  void addToCollisionHistory();
+  void analyzeBaseShortcuts(const Vector3D& frontPoint,
+                            const Vector3D& backPoint,
+                            const Vector3D& leftPoint,
+                            const Vector3D& rightPoint);
+  void analyzePathShortcuts(const Vector3D& frontPoint,
+                            const Vector3D& backPoint,
+                            const Vector3D& leftPoint,
+                            const Vector3D& rightPoint);
+  [[nodiscard]] float getAddedCollisionRange() const;
+  [[nodiscard]] static float getRealSensorDistance(float sensor);
+  [[nodiscard]] static std::array<float, kNbLateralSensors>
+  getPathDifferenceList(const std::vector<ShortcutVerifier>& shortcuts,
+                        const Vector3D& location);
+
+  std::deque<Vector3D> m_collisionHistory;
+  std::vector<ShortcutVerifier> m_lastPathShortcutPosition;
+  std::vector<ShortcutVerifier> m_lastBaseShortcutPosition;
+  float m_additionnalCollisionRange{0.0};
+
   Vector3D m_normal;
   Vector3D m_initialDirection;
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
   std::unordered_map<size_t, DroneData> m_usedPeerData;
   bool m_peerCollision{false};
+
+ private:
+  static constexpr float kMinPathDistanceInterval = 0.1F;
+  static constexpr float kMaxPathDistanceInterval = 0.2F;
 };
 #endif

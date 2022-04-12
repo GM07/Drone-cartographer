@@ -1,6 +1,8 @@
 #ifndef MATH_H
 #define MATH_H
 
+#include <utils/vector3d.h>
+
 #include <functional>
 
 constexpr float kThreshold = 10.0e-3;
@@ -15,10 +17,32 @@ template <class T>
   return diff < threshold && diff > -threshold;
 }
 
+[[nodiscard]] inline bool isOnSegment(const Vector3D& segmentBegin,
+                                      const Vector3D& segmentEnd,
+                                      const Vector3D& point,
+                                      float threshold = kThreshold) {
+  return point.m_x >= std::min(segmentBegin.m_x, segmentEnd.m_x) - threshold &&
+         point.m_x <= std::max(segmentBegin.m_x, segmentEnd.m_x) + threshold &&
+         point.m_y >= std::min(segmentBegin.m_y, segmentEnd.m_y) - threshold &&
+         point.m_y <= std::max(segmentBegin.m_y, segmentEnd.m_y) + threshold;
+}
+
+[[nodiscard]] std::pair<bool, Vector3D> intersectsSegment(
+    const Vector3D& start1, const Vector3D& end1, const Vector3D& start2,
+    const Vector3D& end2);
+
 template <typename T>
 constexpr T pi = static_cast<T>(3.14159265358979323846L);  // NOLINT
 
 constexpr std::size_t kMaxDepth = 10;
+
+///////////////////////////////////////////////
+template <typename T, typename std::enable_if<
+                          std::is_floating_point<T>::value>::type* = nullptr>
+[[nodiscard]] inline constexpr T toRad(int degrees) {
+  constexpr T kHalfCircle = 180.0;
+  return degrees * pi<T> / kHalfCircle;
+}
 
 ///////////////////////////////////////////////
 // n!

@@ -1,6 +1,7 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
 
+#include <cmath>
 #include <string>
 #include <utility>
 
@@ -26,6 +27,7 @@ class Vector3D {
   [[nodiscard]] bool operator!=(const Vector3D& other) const;
 
   [[nodiscard]] float distanceTo(const Vector3D& other) const;
+  [[nodiscard]] float distanceToXY(const Vector3D& other) const;
   [[nodiscard]] Vector3D reflect(const Vector3D& normal) const;
   [[nodiscard]] Vector3D toUnitVector() const;
   [[nodiscard]] float length() const;
@@ -40,6 +42,12 @@ class Vector3D {
   }
 
   static bool areSameDirection(const Vector3D& vec1, const Vector3D& vec2);
+
+  [[nodiscard]] inline Vector3D rotate(float angle) const {
+    const float xRotated = m_x * std::cos(angle) - m_y * std::sin(angle);
+    const float yRotated = m_y * std::cos(angle) + m_x * std::sin(angle);
+    return Vector3D(xRotated, yRotated, m_z);
+  }
 
   static Vector3D x(float value);
   static Vector3D y(float value);

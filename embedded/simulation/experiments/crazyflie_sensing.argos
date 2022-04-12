@@ -137,6 +137,9 @@
         <placement index="0" position="2,0,4"
                    look_at="0,0,0" up="-1,0,0" 
                    lens_focal_length="20" />
+        <placement index="1" position="0,0,6"
+                   look_at="0,0,0" up="-1,0,0" 
+                   lens_focal_length="20" />
         </placements>
       </camera>
     </qt-opengl>

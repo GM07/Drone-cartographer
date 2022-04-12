@@ -143,7 +143,8 @@ void SimulationController::log(const std::string& message) {
 
 ///////////////////////////////////////////////////
 void SimulationController::setVelocity(const Vector3D& direction, float speed) {
-  Vector3D speedVector = direction.toUnitVector() * speed;
+  Vector3D speedVector =
+      (direction.toUnitVector() * speed).rotate(m_orientation);
   m_ccrazyflieSensing->m_pcPropellers->SetLinearVelocity(
       CVector3(speedVector.m_x, speedVector.m_y, speedVector.m_z));
 }

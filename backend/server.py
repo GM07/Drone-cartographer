@@ -77,7 +77,11 @@ def launch(is_simulated: bool):
     else:
         COMM = CommCrazyflie(SOCKETIO, drone_list)
 
-    COMM.send_command(COMMANDS.LAUNCH.value)
+    for drone in drone_list:
+        COMM.send_command(
+            COMMANDS.LAUNCH.value, [drone.name],
+            int(drone.starting_orientation).to_bytes(4, byteorder='little'))
+
     AccessStatus.set_mission_type(SOCKETIO, is_simulated)
     MissionStatus.launch_mission(SOCKETIO)
     SOCKETIO.emit('clear_all_maps',
@@ -145,6 +149,16 @@ def terminate():
     return 'Terminated'
 
 
+@SOCKETIO.on('return_to_base', namespace='/limitedAccess')
+def return_to_base():
+    if (not MissionStatus.get_mission_started() or
+            not AccessStatus.is_request_valid(request)):
+        return ''
+
+    COMM.send_command(COMMANDS.RETURN_TO_BASE.value)
+    return ''
+
+
 @SOCKETIO.on('take_control', namespace='/limitedAccess')
 def request_control():
     change = AccessStatus.take_control(SOCKETIO, request)
@@ -207,7 +221,7 @@ def send_drone_status():
 
 @SOCKETIO.on('connect', namespace='/getAllMapData')
 def send_all_map_data():
-    SOCKETIO.emit('getAllMapData',
+    SOCKETIO.emit('getMapData',
                   Map.get_all_filtered_data(),
                   namespace='/getAllMapData',
                   broadcast=True)

@@ -31,7 +31,8 @@ class DroneState(Enum):
     LANDING = 2
     DEAD = 3
     EXPLORING = 4
-    CRASHED = 5
+    RETURNING_TO_BASE = 5
+    CRASHED = 6
 
 
 def log_data_to_drone_data(name: str, log_data):
@@ -58,7 +59,7 @@ class DroneData:
         self.name = name
         self.position = Point2D(0, 0)
         self.sensors = DroneSensors(0, 0, 0, 0)
-        self.battery_level = 100
+        self.battery_level = 1.0
         self.state = DroneState(0)
         if not empty:
             self.__from_bytes(data)
@@ -142,10 +143,7 @@ Drone GetData (0x04)
 26
 27
 28  State - Crash, Take Off, Exploration, Landing, Idle
-29  
-30  
-31  
-32  
+ 
 
 Drone GetHeight (0x05)
 

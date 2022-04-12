@@ -24,6 +24,9 @@ bool commIsInit = false;
 
 }  // namespace
 
+static_assert(kDroneSpeed == 0.25,  // NOLINT
+              "You changed the drone speed! Was that really intended ? ");
+
 /////////////////////////////////////////////////////////////////////////
 Drone& Drone::getEmbeddedDrone() {
   static Drone drone(std::make_shared<FirmwareController>());
