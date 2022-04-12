@@ -97,7 +97,8 @@ class CommCrazyflie(AbstractComm):
                      command: COMMANDS,
                      links=[],
                      args: bytes = None) -> None:
-        sending_links = self.links if len(links) == 0 else links
+        drone_list_name = [drone.name for drone in self.drone_list]
+        sending_links = drone_list_name if len(links) == 0 else links
 
         if command == COMMANDS.LAUNCH.value:
             self.mission_manager.start_current_mission(len(self.drone_list),
