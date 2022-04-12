@@ -43,7 +43,7 @@ class Vector3D {
 
   static bool areSameDirection(const Vector3D& vec1, const Vector3D& vec2);
 
-  inline Vector3D rotate(float angle) {
+  inline Vector3D rotate(float angle) const {
     const float xRotated = m_x * std::cos(angle) - m_y * std::sin(angle);
     const float yRotated = m_y * std::cos(angle) + m_x * std::sin(angle);
     return Vector3D(xRotated, yRotated, m_z);
