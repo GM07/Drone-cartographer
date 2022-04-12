@@ -62,7 +62,7 @@ if is_simulation:
 
 
 def takeOff():
-  orientation = 0
+  orientation = 180
   data = [Commands.kTakeOff]
   for byte in orientation.to_bytes(4, byteorder = 'little'):
     data.append(byte)

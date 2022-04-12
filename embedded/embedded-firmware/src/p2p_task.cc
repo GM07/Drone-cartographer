@@ -32,6 +32,8 @@ void p2pcallbackHandler(P2PPacket* p) {
     }
 
     data.m_range = p->rssi;
+    data.m_direction.rotate(
+        Drone::getEmbeddedDrone().getController()->getOrientation());
     Drone::getEmbeddedDrone().m_peerData.insert_or_assign(data.m_id, data);
   }
 }
@@ -45,7 +47,10 @@ void p2pTaskWrapper(void* /*parameter*/) {
   Drone& drone = Drone::getEmbeddedDrone();
 
   while (true) {
-    drone.getController()->sendP2PMessage(static_cast<void*>(&drone.m_data),
+    DroneData dataToSend = drone.m_data;
+    dataToSend.m_direction.rotate(
+        Drone::getEmbeddedDrone().getController()->getOrientation());
+    drone.getController()->sendP2PMessage(static_cast<void*>(&dataToSend),
                                           sizeof(drone.m_data));
 
     Time::delayMs(kP2pTaskDelay);

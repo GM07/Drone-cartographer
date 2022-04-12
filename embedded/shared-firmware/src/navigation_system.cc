@@ -200,23 +200,27 @@ void Drone::returnToBaseStateSteps() {
 void Drone::analyzeShortcuts() {
   constexpr float kMeterToMillimiter = 1000.0F;
 
-  const Vector3D& kLocation = m_controller->getCurrentLocation();
+  const Vector3D kLocation = m_controller->getCurrentLocation();
 
   float frontData = getRealSensorDistance(m_controller->m_data.front);
   float backData = getRealSensorDistance(m_controller->m_data.back);
   float leftData = getRealSensorDistance(m_controller->m_data.left);
   float rightData = getRealSensorDistance(m_controller->m_data.right);
 
-  const Vector3D& frontPoint =
-      kLocation + Vector3D::x(frontData / kMeterToMillimiter);
-  const Vector3D& backPoint =
-      kLocation - Vector3D::x(backData / kMeterToMillimiter);
-  const Vector3D& leftPoint =
-      kLocation + Vector3D::y(leftData / kMeterToMillimiter);
-  const Vector3D& rightPoint =
-      kLocation - Vector3D::y(rightData / kMeterToMillimiter);
+  const Vector3D frontPoint =
+      kLocation + Vector3D::x(frontData / kMeterToMillimiter)
+                      .rotate(m_controller->getOrientation());
+  const Vector3D backPoint =
+      kLocation - Vector3D::x(backData / kMeterToMillimiter)
+                      .rotate(m_controller->getOrientation());
+  const Vector3D leftPoint =
+      kLocation + Vector3D::y(leftData / kMeterToMillimiter)
+                      .rotate(m_controller->getOrientation());
+  const Vector3D rightPoint =
+      kLocation - Vector3D::y(rightData / kMeterToMillimiter)
+                      .rotate(m_controller->getOrientation());
 
-  analyzeBaseShortcuts(frontPoint, backPoint, leftPoint, rightPoint);
+  // analyzeBaseShortcuts(frontPoint, backPoint, leftPoint, rightPoint);
   analyzePathShortcuts(frontPoint, backPoint, leftPoint, rightPoint);
 }
 
@@ -254,18 +258,22 @@ void Drone::analyzeBaseShortcuts(const Vector3D& frontPoint,
   constexpr float kHalfBaseCross = 0.3F;
   const Vector3D& kLocation = m_controller->getCurrentLocation();
 
-  std::pair<bool, Vector3D> frontIntersect =
-      intersectsSegment(kLocation, frontPoint, Vector3D::y(-kHalfBaseCross),
-                        Vector3D::y(kHalfBaseCross));
-  std::pair<bool, Vector3D> backIntersect =
-      intersectsSegment(kLocation, backPoint, Vector3D::y(-kHalfBaseCross),
-                        Vector3D::y(kHalfBaseCross));
-  std::pair<bool, Vector3D> leftIntersect =
-      intersectsSegment(kLocation, leftPoint, Vector3D::x(-kHalfBaseCross),
-                        Vector3D::x(kHalfBaseCross));
-  std::pair<bool, Vector3D> rightIntersect =
-      intersectsSegment(kLocation, rightPoint, Vector3D::x(-kHalfBaseCross),
-                        Vector3D::x(kHalfBaseCross));
+  std::pair<bool, Vector3D> frontIntersect = intersectsSegment(
+      kLocation, frontPoint,
+      Vector3D::y(-kHalfBaseCross).rotate(m_controller->getOrientation()),
+      Vector3D::y(kHalfBaseCross).rotate(m_controller->getOrientation()));
+  std::pair<bool, Vector3D> backIntersect = intersectsSegment(
+      kLocation, backPoint,
+      Vector3D::y(-kHalfBaseCross).rotate(m_controller->getOrientation()),
+      Vector3D::y(kHalfBaseCross).rotate(m_controller->getOrientation()));
+  std::pair<bool, Vector3D> leftIntersect = intersectsSegment(
+      kLocation, leftPoint,
+      Vector3D::x(-kHalfBaseCross).rotate(m_controller->getOrientation()),
+      Vector3D::x(kHalfBaseCross).rotate(m_controller->getOrientation()));
+  std::pair<bool, Vector3D> rightIntersect = intersectsSegment(
+      kLocation, rightPoint,
+      Vector3D::x(-kHalfBaseCross).rotate(m_controller->getOrientation()),
+      Vector3D::x(kHalfBaseCross).rotate(m_controller->getOrientation()));
 
   std::array<std::pair<bool, Vector3D>, kNbLateralSensors> intersectionList{
       {frontIntersect, backIntersect, leftIntersect, rightIntersect}};
