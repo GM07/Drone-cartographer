@@ -119,7 +119,7 @@ def flash():
     # Create the command to flash all drones
     flashDrone = []
     for drone in drone_list:
-        flashDrone.append("make cload radio=" + drone['name'])
+        flashDrone.append("make cload radio=" + drone.name)
 
     bashCommand = f"docker exec embedded sh -c 'cd workspaces/INF3995-106/embedded/embedded-firmware" + " && " + " && ".join(
         flashDrone) + "'"
