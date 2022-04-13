@@ -165,9 +165,10 @@ void SimulationController::land() {
 }
 
 ///////////////////////////////////////////////////
-void SimulationController::setVelocity(const Vector3D& direction, float speed) {
+void SimulationController::setVelocity(const Vector3D& direction, float speed,
+                                       bool bodyReference) {
   Vector3D speedVector = direction.toUnitVector() * speed;
-  if (!areAlmostEqual(m_targetPosition - getCurrentLocation(), direction)) {
+  if (bodyReference) {
     speedVector = speedVector.rotate(m_orientation);
   }
   m_ccrazyflieSensing->m_pcPropellers->SetLinearVelocity(

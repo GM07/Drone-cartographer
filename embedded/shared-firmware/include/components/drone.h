@@ -83,7 +83,7 @@ class Drone {
   void analyzeShortcuts();
   void changeDirection();
 
-  void returnToBaseDirection();
+  bool returnToBaseDirection();
   void returnToBaseStateSteps();
   void resetCollisionHistory();
   void pushValidPath(size_t index);
@@ -112,9 +112,8 @@ class Drone {
                             const Vector3D& rightPoint);
   [[nodiscard]] float getAddedCollisionRange() const;
   [[nodiscard]] static float getRealSensorDistance(float sensor);
-  [[nodiscard]] static std::array<float, kNbLateralSensors>
-  getPathDifferenceList(const std::vector<ShortcutVerifier>& shortcuts,
-                        const Vector3D& location);
+  [[nodiscard]] std::array<float, kNbLateralSensors> getPathDifferenceList(
+      const std::vector<ShortcutVerifier>& shortcuts, const Vector3D& location);
 
   std::deque<Vector3D> m_collisionHistory;
   std::vector<ShortcutVerifier> m_lastPathShortcutPosition;

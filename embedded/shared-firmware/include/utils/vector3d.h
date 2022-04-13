@@ -33,12 +33,21 @@ class Vector3D {
   [[nodiscard]] float length() const;
   [[nodiscard]] std::string toString() const;
 
+  [[nodiscard]] inline Vector3D to2D() const {
+    return Vector3D(m_x, m_y, 0.0F);
+  }
+
   [[nodiscard]] inline bool operator<(float value) const {
     return this->length() < value;
   }
 
   [[nodiscard]] inline bool operator>(float value) const {
     return this->length() > value;
+  }
+
+  // Project current vector to other vector
+  [[nodiscard]] Vector3D projectTo(const Vector3D& other) const {
+    return other * (this->operator*(other) / other.length());
   }
 
   static bool areSameDirection(const Vector3D& vec1, const Vector3D& vec2);

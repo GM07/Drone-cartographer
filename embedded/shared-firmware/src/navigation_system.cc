@@ -112,6 +112,7 @@ void Drone::collisionAvoidance() {
   }
 }
 
+/////////////////////////////////////////////////////////////////////
 void Drone::changeDirection() {
   if (!areAlmostEqual(m_normal, Vector3D())) {
     Vector3D newDirection = m_data.m_direction.reflect(m_normal);
@@ -123,6 +124,7 @@ void Drone::changeDirection() {
   }
 }
 
+/////////////////////////////////////////////////////////////////////
 void Drone::resetCollisionHistory() {
   m_collisionHistory.clear();
   m_collisionHistory.emplace_back();
@@ -134,6 +136,7 @@ void Drone::resetCollisionHistory() {
   m_additionnalCollisionRange = 0.0F;
 }
 
+/////////////////////////////////////////////////////////////////////
 void Drone::addToCollisionHistory() {
   if (m_controller->m_state == State::kExploring) {
     for (size_t i = 0; i < m_lastBaseShortcutPosition.size(); ++i) {
@@ -152,6 +155,7 @@ void Drone::addToCollisionHistory() {
   }
 }
 
+/////////////////////////////////////////////////////////////////////
 void Drone::pushValidPath(size_t index) {
   if (index < m_lastPathShortcutPosition.size() &&
       m_lastPathShortcutPosition[index].isPathIntersectionValid) {
@@ -162,7 +166,8 @@ void Drone::pushValidPath(size_t index) {
   }
 }
 
-void Drone::returnToBaseDirection() {
+/////////////////////////////////////////////////////////////////////
+bool Drone::returnToBaseDirection() {
   changeDirection();
 
   if (m_collisionHistory.empty()) {
@@ -175,13 +180,16 @@ void Drone::returnToBaseDirection() {
     m_data.m_direction =
         m_controller->m_targetPosition - m_controller->getCurrentLocation();
     m_data.m_direction.m_z = 0;
+    return true;
   }
+  return false;
 }
 
+/////////////////////////////////////////////////////////////////////
 void Drone::returnToBaseStateSteps() {
   wallAvoidance();
   collisionAvoidance();
-  returnToBaseDirection();
+  const bool directionBodyRef = returnToBaseDirection();
   if (m_controller->isNearBase()) {
     m_collisionHistory.clear();
     m_collisionHistory.emplace_back();
@@ -189,7 +197,7 @@ void Drone::returnToBaseStateSteps() {
     m_controller->m_state = State::kLanding;
     return;
   }
-  m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
+  m_controller->setVelocity(m_data.m_direction, kDroneSpeed, !directionBodyRef);
 
   if (!m_hadDroneCollision && !m_collisionHistory.empty() &&
       m_controller->hasReachedCheckpoint()) {
@@ -197,6 +205,7 @@ void Drone::returnToBaseStateSteps() {
   }
 }
 
+/////////////////////////////////////////////////////////////////////
 void Drone::analyzeShortcuts() {
   constexpr float kMeterToMillimiter = 1000.0F;
 
@@ -220,10 +229,11 @@ void Drone::analyzeShortcuts() {
       kLocation - Vector3D::y(rightData / kMeterToMillimiter)
                       .rotate(m_controller->getOrientation());
 
-  // analyzeBaseShortcuts(frontPoint, backPoint, leftPoint, rightPoint);
+  analyzeBaseShortcuts(frontPoint, backPoint, leftPoint, rightPoint);
   analyzePathShortcuts(frontPoint, backPoint, leftPoint, rightPoint);
 }
 
+/////////////////////////////////////////////////////////////////////
 float Drone::getRealSensorDistance(float sensor) {
   constexpr float kMaxDist = 1500.0F;
   constexpr float kTooFar = -19.0F;
@@ -234,9 +244,11 @@ float Drone::getRealSensorDistance(float sensor) {
   if (sensor <= kTooFar) {
     return kMaxDist;
   }
+
   return 0.0F;
 }
 
+/////////////////////////////////////////////////////////////////////
 [[nodiscard]] std::array<float, kNbLateralSensors> Drone::getPathDifferenceList(
     const std::vector<ShortcutVerifier>& shortcuts, const Vector3D& location) {
   float pathDifferenceFront = std::fabs(std::fabs(location.m_x) -
@@ -251,6 +263,7 @@ float Drone::getRealSensorDistance(float sensor) {
            pathDifferenceRight}};
 }
 
+/////////////////////////////////////////////////////////////////////
 void Drone::analyzeBaseShortcuts(const Vector3D& frontPoint,
                                  const Vector3D& backPoint,
                                  const Vector3D& leftPoint,
@@ -310,6 +323,7 @@ void Drone::analyzeBaseShortcuts(const Vector3D& frontPoint,
   }
 }
 
+/////////////////////////////////////////////////////////////////////
 void Drone::analyzePathShortcuts(const Vector3D& frontPoint,
                                  const Vector3D& backPoint,
                                  const Vector3D& leftPoint,
