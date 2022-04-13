@@ -18,8 +18,7 @@ struct DroneData {
   Vector3D m_direction;
   float m_distanceFromTakeoff{0};
   float m_range{0};
-  std::array<char, kHeaderSize
-  > m_magicHeader{{'D', 'R', 'E', 'A', 'M'}};
+  std::array<char, kHeaderSize> m_magicHeader{{'D', 'R', 'E', 'A', 'M'}};
   size_t m_id{0};
 } __attribute__((packed));
 

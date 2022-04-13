@@ -207,3 +207,4 @@ void SimulationController::receiveP2PMessage(
 [[nodiscard]] size_t SimulationController::getId() const {
   return std::hash<std::string>{}(m_ccrazyflieSensing->GetId());
 }
+

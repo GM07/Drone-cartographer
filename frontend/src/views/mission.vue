@@ -1,5 +1,12 @@
 <template>
-  <v-layout class="main-container" column fill-height justify-space-between>
+  <Editor v-if="editorMode" @goBack="switchEditorStatus"></Editor>
+  <v-layout
+    v-else
+    class="main-container"
+    column
+    fill-height
+    justify-space-between
+  >
     <v-navigation-drawer
       app
       :mini-variant="this.$vuetify.breakpoint.smAndDown && miniVariant"
@@ -36,6 +43,15 @@
               <v-list-item-title v-if="isLogsMenuOpen"
                 >Fermer logs</v-list-item-title
               >
+            </v-list-item>
+            <v-list-item
+              :disabled="!isUserControlling()"
+              @click="switchEditorStatus"
+            >
+              <v-list-item-icon>
+                <v-icon color="blue">mdi-laptop</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>Programmer</v-list-item-title>
             </v-list-item>
           </v-list>
         </div>
@@ -169,6 +185,9 @@
   opacity: 0 !important;
 }
 
+#content {
+  display: flex;
+}
 .card-container {
   min-width: 205px;
 }
@@ -215,8 +234,12 @@ import {
   NewDroneData,
   DEFAULT_DRONE_DATA,
 } from '@/communication/drone';
+import RemoteCommandOutput from '@/components/remote_command_output.vue';
 import LogsInterface from '@/components/logs_interface.vue';
 import {ServerCommunication} from '@/communication/server_communication';
+import Editor from '@/components/editor.vue';
+import SocketIO from 'socket.io-client';
+import {MapData, EMPTY_MAP} from '@/utils/map_constants';
 
 @Component({
   components: {
@@ -226,9 +249,12 @@ import {ServerCommunication} from '@/communication/server_communication';
     DroneMenu,
     Map,
     LogsInterface,
+    RemoteCommandOutput,
+    Editor,
   },
 })
 export default class Mission extends Vue {
+  public editorMode = false;
   public miniVariant = true;
   public attemptedLimitedConnexion = false;
   public dialog = false;
@@ -245,6 +271,14 @@ export default class Mission extends Vue {
 
   constructor() {
     super();
+  }
+
+  public recompile(): void {
+    if (this.accessStatus.isUserControlling) ServerCommunication.recompile();
+  }
+
+  public flash(): void {
+    if (this.accessStatus.isUserControlling) ServerCommunication.flash();
   }
 
   public deleteDrone(index: number): void {
@@ -307,6 +341,10 @@ export default class Mission extends Vue {
 
   public isConnected(): boolean {
     return SOCKETIO_LIMITED_ACCESS.connected;
+  }
+
+  public switchEditorStatus(): void {
+    this.editorMode = !this.editorMode;
   }
 
   private setStartingPoint(newDroneData: NewDroneData, index: number) {

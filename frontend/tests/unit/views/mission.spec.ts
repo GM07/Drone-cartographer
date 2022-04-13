@@ -59,7 +59,14 @@ describe('mission.vue', () => {
     wrapper = shallowMount<Mission>(Mission, {
       store: STORE_STUB,
       vuetify: VUETIFY,
-      stubs: ['NavigationCommands', 'DroneCommands', 'MissionCommands', 'Map'],
+      stubs: [
+        'NavigationCommands',
+        'DroneCommands',
+        'MissionCommands',
+        'Editor',
+        'Map',
+        'Editor',
+      ],
     });
   });
 
@@ -134,7 +141,12 @@ describe('mission.vue', () => {
     const TEST_WRAPPER = shallowMount<Mission>(Mission, {
       store: STORE_STUB,
       vuetify: VUETIFY,
-      stubs: ['NavigationCommands', 'DroneCommands', 'MissionCommands'],
+      stubs: [
+        'NavigationCommands',
+        'DroneCommands',
+        'MissionCommands',
+        'Editor',
+      ],
     });
 
     serverSocket.emit('droneList', [DEFAULT_DRONE_STATUS]);
@@ -162,7 +174,12 @@ describe('mission.vue', () => {
     const TEST_WRAPPER = shallowMount<Mission>(Mission, {
       store: STORE_STUB,
       vuetify: VUETIFY,
-      stubs: ['NavigationCommands', 'DroneCommands', 'MissionCommands'],
+      stubs: [
+        'NavigationCommands',
+        'DroneCommands',
+        'MissionCommands',
+        'Editor',
+      ],
     });
 
     serverSocket.disconnect();

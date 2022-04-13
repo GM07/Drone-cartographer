@@ -31,6 +31,12 @@ class CommCrazyflie(AbstractComm):
             self.set_drone([])
             return
 
+        self.init_comm(drone_list)
+
+    def __del__(self):
+        self.shutdown()
+
+    def init_comm(self, drone_list: list):
         print('Creating Embedded Crazyflie communication with drone list :',
               drone_list)
         Map().set_drone_len(len(drone_list))
@@ -48,10 +54,6 @@ class CommCrazyflie(AbstractComm):
         except Exception as e:
             print(f'Exception: {e}')
 
-    def __del__(self):
-        print('destructor called')
-        self.shutdown()
-
     def __init_drivers(self):
         cflib.crtp.init_drivers()
 
@@ -59,8 +61,15 @@ class CommCrazyflie(AbstractComm):
         print(f'shutdown called : {self.sync_crazyflies}')
         for sync in self.sync_crazyflies:
             print(f'closing link : {sync}')
-            sync.close_link()
+            if sync.is_link_open():
+                sync.close_link()
         return super().shutdown()
+
+    def start_logs(self):
+        self.init_comm(self.drone_list)
+
+    def stop_logs(self):
+        self.shutdown()
 
     def setup_log(self):
         self.log_configs: List[LogConfig] = []
