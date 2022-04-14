@@ -18,7 +18,7 @@
         </p>
       </div>
       <v-btn
-        v-if="userControlling"
+        v-if="userControlling && !getMissionStatus()"
         :color="selected ? 'white' : '#2196f3'"
         icon
         x-small
@@ -147,12 +147,13 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import {Prop, Watch} from 'vue-property-decorator';
 import {DroneData} from '@/communication/drone';
+import {ACCESSOR} from '@/store/index';
 
 @Component({})
 export default class DroneDataCard extends Vue {
   @Prop() droneData!: DroneData;
-  @Prop() selected = false;
-  @Prop() userControlling = false;
+  @Prop() selected;
+  @Prop() userControlling;
 
   constructor() {
     super();
@@ -178,6 +179,10 @@ export default class DroneDataCard extends Vue {
       ICON + '-' + +Math.floor(BATTERY / STEP).toFixed(0) * STEP;
     console.log(UPDATED_ICON);
     return UPDATED_ICON;
+  }
+
+  public getMissionStatus(): boolean {
+    return ACCESSOR.missionStatus.isMissionStarted;
   }
 }
 </script>
