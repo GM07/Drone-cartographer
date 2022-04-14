@@ -125,7 +125,7 @@
               </v-item>
             </v-col>
             <v-col class="d-flex" cols="auto">
-              <v-item v-if="isUserControlling()">
+              <v-item v-if="isUserControlling() && !getMissionStatus()">
                 <v-card
                   id="add-drone"
                   class="centered-card unselected"
@@ -236,6 +236,7 @@ import RemoteCommandOutput from '@/components/remote_command_output.vue';
 import LogsInterface from '@/components/logs_interface.vue';
 import {ServerCommunication} from '@/communication/server_communication';
 import Editor from '@/components/editor.vue';
+import {ACCESSOR} from '@/store/index';
 
 @Component({
   components: {
@@ -268,6 +269,10 @@ export default class Mission extends Vue {
 
   constructor() {
     super();
+  }
+
+  public getMissionStatus(): boolean {
+    return ACCESSOR.missionStatus.isMissionStarted;
   }
 
   public recompile(): void {
