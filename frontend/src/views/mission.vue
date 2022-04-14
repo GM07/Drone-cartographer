@@ -31,8 +31,7 @@
             :accessStatus="accessStatus"
             :droneid="getSelectedDrone()"
           />
-
-          <v-list>
+          <v-list nav>
             <v-list-item @click="isLogsMenuOpen = !isLogsMenuOpen">
               <v-list-item-icon>
                 <v-icon color="blue">mdi-note-text</v-icon>
@@ -87,14 +86,23 @@
             <v-col class="d-flex" cols="auto">
               <v-item v-slot="{toggle}">
                 <v-card
-                  :color="chosenOption === -1 ? 'primary' : ''"
-                  elevation="2"
+                  :class="chosenOption === -1 ? 'selected' : 'unselected'"
+                  :elevation="0"
+                  :style="'display: flex; '"
                   @click="
                     toggle();
                     setSelected(-1);
                   "
                 >
-                  <v-card-text>General</v-card-text>
+                  <v-card-text
+                    id="general"
+                    :class="
+                      chosenOption === -1
+                        ? 'selected centered-card'
+                        : 'unselected centered-card'
+                    "
+                    >General</v-card-text
+                  >
                 </v-card>
               </v-item>
             </v-col>
@@ -104,51 +112,24 @@
               cols="auto"
             >
               <v-item v-slot="{toggle}">
-                <v-card
-                  class="card-container"
-                  :color="chosenOption === index ? 'primary' : ''"
-                  elevation="2"
+                <drone-data-card
+                  :droneData="droneData"
+                  :selected="chosenOption === index ? true : false"
+                  :userControlling="isUserControlling()"
                   @click="
                     toggle();
                     setSelected(index);
                   "
-                >
-                  <v-card-actions v-if="isUserControlling()">
-                    <v-btn
-                      outlined
-                      rounded
-                      text
-                      @click.stop="deleteDrone(index)"
-                    >
-                      <v-icon>mdi-close-circle</v-icon>
-                    </v-btn>
-                  </v-card-actions>
-                  <v-card-text class="pt-1 pb-1">
-                    {{ droneData.name }}
-                  </v-card-text>
-                  <v-card-text class="pt-1 pb-1">
-                    État: {{ droneData.state }}
-                  </v-card-text>
-                  <v-card-text class="pt-1 pb-1">
-                    Batterie:
-                    {{ (droneData.batteryLevel * 100).toFixed(2) }}%
-                  </v-card-text>
-                  <v-card-text class="pt-1 pb-1">
-                    Position en x:
-                    {{ droneData.xPos.toFixed(4) }}
-                  </v-card-text>
-                  <v-card-text class="pt-1 pb-1">
-                    Position en y:
-                    {{ droneData.yPos.toFixed(4) }}
-                  </v-card-text>
-                </v-card>
+                  @deleteDrone="deleteDrone(index)"
+                ></drone-data-card>
               </v-item>
             </v-col>
             <v-col class="d-flex" cols="auto">
               <v-item v-if="isUserControlling()">
                 <v-card
-                  active-class="no-active"
-                  elevation="2"
+                  id="add-drone"
+                  class="centered-card unselected"
+                  elevation="0"
                   @click.stop="isDroneMenuOpen = true"
                 >
                   <v-card-text>+</v-card-text>
@@ -185,9 +166,6 @@
   opacity: 0 !important;
 }
 
-#content {
-  display: flex;
-}
 .card-container {
   min-width: 205px;
 }
@@ -201,6 +179,25 @@
   bottom: 0;
   max-width: 100vw;
   width: 100%;
+}
+
+.centered-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0 !important;
+}
+
+#general {
+  border-top-left-radius: 4px !important;
+  border-bottom-left-radius: 4px !important;
+  font-size: 16px;
+  border: 1px solid #1976d211;
+}
+
+#add-drone {
+  border-top-right-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
 }
 
 #LogTitle {
@@ -223,6 +220,7 @@ import DroneCommands from '@/components/drone_commands.vue';
 import MissionCommands from '@/components/mission_commands.vue';
 import NavigationCommands from '@/components/navigation_commands.vue';
 import Map from '@/components/map.vue';
+import DroneDataCard from '@/components/drone_data_card.vue';
 import DroneMenu from '@/components/drone_menu.vue';
 import {
   SOCKETIO_LIMITED_ACCESS,
@@ -238,8 +236,6 @@ import RemoteCommandOutput from '@/components/remote_command_output.vue';
 import LogsInterface from '@/components/logs_interface.vue';
 import {ServerCommunication} from '@/communication/server_communication';
 import Editor from '@/components/editor.vue';
-import SocketIO from 'socket.io-client';
-import {MapData, EMPTY_MAP} from '@/utils/map_constants';
 
 @Component({
   components: {
@@ -249,6 +245,7 @@ import {MapData, EMPTY_MAP} from '@/utils/map_constants';
     DroneMenu,
     Map,
     LogsInterface,
+    DroneDataCard,
     RemoteCommandOutput,
     Editor,
   },

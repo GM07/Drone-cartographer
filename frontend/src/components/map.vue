@@ -1,6 +1,6 @@
 <template>
   <div style="display: flex; flex-direction: column; align-items: center">
-    <h2 style="color: DimGray">Carte {{ this.mapName }}</h2>
+    <h2 style="padding-top: 20px">Carte {{ this.mapName }}</h2>
     <canvas
       ref="canvas"
       style="
