@@ -2,9 +2,10 @@ from flask_socketio import SocketIO
 import threading
 from functools import wraps
 from typing import Dict, List
-from itertools import groupby
 
-from services.data.drone_data import DroneData, DroneSensors, DroneState
+import numpy
+
+from services.data.drone_data import DroneData, DroneSensors
 
 
 def lock(lock: threading.Lock):
@@ -93,7 +94,7 @@ class Map:
 
     @staticmethod
     def filter_sensor_value(value):
-        if value > 500:
+        if value > 2000:
             return -1
         return value
 
@@ -112,21 +113,42 @@ class Map:
             socket_filtered_data.append(data.to_socket_data())
         return socket_filtered_data
 
+    def filter_outliers(self, initial_data, counter_initial_data):
+        sending_data = -1
+        if (len(initial_data) > 0 and
+                counter_initial_data / len(initial_data) < 0.5):
+            diff = numpy.abs(initial_data - numpy.median(initial_data))
+            mdev = numpy.median(diff)
+            s = diff / mdev if mdev else 0.
+            data = numpy.array(initial_data)[s < 5]
+
+            sending_data = numpy.mean(data)
+
+        return sending_data
+
     def mean_data_per_sensor(self, drone_list: List[DroneData]):
+        fronts, lefts, rights, backs = [], [], [], []
+        counter_fronts, counter_lefts, counter_backs, counter_rights = 4, 4, 4, 4
+        for drone in drone_list:
+            if (drone.sensors.front > 0):
+                fronts.append(drone.sensors.front)
+                counter_fronts -= 1
+            if (drone.sensors.left > 0):
+                lefts.append(drone.sensors.left)
+                counter_lefts -= 1
+            if (drone.sensors.right > 0):
+                rights.append(drone.sensors.right)
+                counter_rights -= 1
+            if (drone.sensors.back > 0):
+                backs.append(drone.sensors.back)
+                counter_backs -= 1
 
-        m_front, m_left, m_back, m_right = 0, 0, 0, 0
-        for elem in drone_list:
-            m_front += elem.sensors.front
-            m_left += elem.sensors.left
-            m_back += elem.sensors.back
-            m_right += elem.sensors.right
+        sending_front_data = self.filter_outliers(fronts, counter_fronts)
+        sending_back_data = self.filter_outliers(backs, counter_backs)
+        sending_left_data = self.filter_outliers(lefts, counter_lefts)
+        sending_right_data = self.filter_outliers(rights, counter_rights)
 
-        m_front /= len(drone_list)
-        m_left /= len(drone_list)
-        m_back /= len(drone_list)
-        m_right /= len(drone_list)
-
-        return m_front, m_left, m_back, m_right
+        return sending_front_data, sending_left_data, sending_back_data, sending_right_data
 
     def set_drone_len(self, drone_len):
         self.drone_len = drone_len
