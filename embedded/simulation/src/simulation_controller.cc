@@ -185,7 +185,9 @@ void SimulationController::receiveP2PMessage(
       m_ccrazyflieSensing->m_pcRABS->GetReadings();
 
   for (auto reading : readings) {
-    DroneData data(*reinterpret_cast<DroneData*>(reading.Data.ToCArray()));
+    DroneData data((*reinterpret_cast<DroneData*>(reading.Data.ToCArray()))
+                       .transformReference(m_orientation));
+
     data.m_range = reading.Range;
     p2pData->insert_or_assign(data.m_id, data);
   }

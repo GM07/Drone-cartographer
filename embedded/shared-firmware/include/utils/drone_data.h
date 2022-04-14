@@ -20,6 +20,14 @@ struct DroneData {
   float m_range{0};
   std::array<char, kHeaderSize> m_magicHeader{{'D', 'R', 'E', 'A', 'M'}};
   size_t m_id{0};
+
+ public:
+  DroneData transformReference(const float orientation) {
+    DroneData copy(*this);
+    copy.m_direction = copy.m_direction.rotate(orientation);
+    return copy;
+  }
+
 } __attribute__((packed));
 
 #endif
