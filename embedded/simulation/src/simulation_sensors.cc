@@ -48,8 +48,5 @@ SimulationSensors::SimulationSensors(CCrazyflieSensing* ccrazyflieSensing)
 }
 
 [[nodiscard]] float SimulationSensors::getBatteryLevel() const {
-  constexpr float kToPercentage = 100.0F;
-  return static_cast<float>(
-             m_ccrazyflieSensing->m_pcBattery->GetReading().AvailableCharge) *
-         kToPercentage;
+  return m_ccrazyflieSensing->m_pcBattery->GetReading().AvailableCharge;
 }

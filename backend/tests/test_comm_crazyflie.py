@@ -59,4 +59,4 @@ class TestCommCrazyflie(unittest.TestCase):
         comm_cf.links = ["radio://0/80/2M/E7E7E7E761"]
         print("Crazyflies by id: ", comm_cf.crazyflies_by_id)
         comm_cf.send_command(COMMANDS.IDENTIFY.value)
-        cflib.crazyflie.appchannel.Appchannel.send_packet.assert_called()
+        cflib.crazyflie.appchannel.Appchannel.send_packet.assert_not_called()
