@@ -83,6 +83,8 @@ class AbstractController {
     return m_takeOffPosition;
   }
 
+  [[nodiscard]] inline float getOrientation() const { return m_orientation; }
+
   Vector3D m_targetPosition;
 
  protected:
