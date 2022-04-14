@@ -87,8 +87,8 @@ export default class Map extends Vue {
     (this.maps[idx].getContext('2d') as CanvasRenderingContext2D).fillRect(
       NEW_POS.x,
       NEW_POS.y,
-      1,
-      1
+      2,
+      2
     );
 
     const TEMPARRAYPERIM: Vec2d[] = [];
