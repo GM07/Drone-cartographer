@@ -22,6 +22,7 @@ module.exports = {
   },
   roots: ['<rootDir/src/', '<rootDir>/tests/'],
   moduleFileExtensions: ['js', 'ts', 'vue'],
+  transformIgnorePatterns: ['/node_modules/(?!@riophae/vue-treeselect)/'], // Fix for https://githubhot.com/repo/vuejs/vue-jest/issues/257
   transform: {
     '^.+\\.js$': 'babel-jest',
     '^.+\\.vue$': 'vue-jest',

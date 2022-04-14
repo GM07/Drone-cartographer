@@ -1,3 +1,7 @@
+import os
+from gevent import monkey
+
+from services.communication.bash_executor import BashExecutor
 from typing import Any, Dict, List
 from gevent import monkey
 
@@ -20,8 +24,9 @@ import services.status.mission_status as MissionStatus
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.comm_simulation import CommSimulation
 from services.communication.simulation_configuration import SimulationConfiguration
-from constants import MAX_TIMEOUT, COMMANDS, URI
+from constants import COMMANDS, RECOMPILE_EMBEDDED_COMMAND, RECOMPILE_SIMULATION_COMMAND, URI
 from services.communication.database.mongo_interface import Database
+from services.communication.file_helper import FileHelper
 from services.data.map import Map
 
 # Flask application
@@ -37,6 +42,13 @@ SOCKETIO = SocketIO(APP,
                     cors_allowed_origins='*',
                     logger=False)
 
+# Bash executor instance to execute commands and transmit stderr and stdout over websocket
+RECOMPILE_SIMULATION = BashExecutor(RECOMPILE_SIMULATION_COMMAND, SOCKETIO,
+                                    "/recompileSimulation")
+RECOMPILE_EMBEDDED = BashExecutor(RECOMPILE_EMBEDDED_COMMAND, SOCKETIO,
+                                  "/recompileEmbedded")
+FLASH_ALL_DRONES = BashExecutor("", SOCKETIO, "/flashDrones")
+
 # PyMongo instance to communicate with DB -> Add when DB created
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/db'
 # mongo = PyMongo(app)
@@ -50,9 +62,71 @@ def identify_drone(drone_addr):
     if not AccessStatus.is_request_valid(request):
         return ''
 
-    global COMM
     COMM.send_command(COMMANDS.IDENTIFY.value, [drone_addr])
     return 'Identified drone'
+
+
+@APP.route('/setFiles', methods=['POST'])
+def set_files():
+    files = request.get_json()['keys']
+    contents = request.get_json()['values']
+    FileHelper.update_files(files, contents)
+    return {'output': 'File updated'}
+
+
+@APP.route('/getFiles')
+def get_files():
+    abs_path = os.path.abspath(__file__ + '/../../embedded')
+    directories = [
+        abs_path + '/simulation/src', abs_path + '/shared-firmware/src',
+        abs_path + '/shared-firmware/include',
+        abs_path + '/embedded-firmware/src'
+    ]
+    files = FileHelper.get_files(directories)
+
+    files_content = FileHelper.get_files_content(files)
+
+    keys = []
+    values = []
+    for (key, value) in files_content.items():
+        keys.append(key.replace('/workspaces/INF3995-106/', ''))
+        values.append(value)
+
+    return jsonify({'keys': keys, 'values': values})
+
+
+# Recompile firmware
+@SOCKETIO.on('recompile', namespace='/limitedAccess')
+def recompile():
+    RECOMPILE_SIMULATION.start()
+    RECOMPILE_EMBEDDED.start()
+    return 'Recompiling'
+
+
+# Reflash firmware
+@SOCKETIO.on('flash', namespace='/limitedAccess')
+def flash():
+    if not AccessStatus.is_request_valid(request):
+        return ''
+
+    if AccessStatus.get_mission_simulated():
+        return ''
+
+    drone_list = COMM.get_drones()
+
+    COMM.stop_logs()
+
+    # Create the command to flash all drones
+    flashDrone = []
+    for drone in drone_list:
+        flashDrone.append("make cload radio=" + drone.name)
+
+    bashCommand = f"docker exec embedded sh -c 'cd workspaces/INF3995-106/embedded/embedded-firmware" + " && " + " && ".join(
+        flashDrone) + "'"
+    FLASH_ALL_DRONES.changeCommand(bashCommand)
+    FLASH_ALL_DRONES.start(COMM.start_logs)
+
+    return 'Flashing'
 
 
 # Launch mission

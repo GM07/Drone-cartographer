@@ -23,6 +23,8 @@ class TestCommCrazyflie(unittest.TestCase):
         comm_cf = CommCrazyflie(MagicMock(), [])
         self.assertIsInstance(comm_cf, CommCrazyflie)
 
+    @patch('cflib.crazyflie.syncCrazyflie.SyncCrazyflie.is_link_open',
+           MagicMock({'cflib.crtp.init_drivers': True}))
     @patch('cflib.crazyflie.syncCrazyflie.SyncCrazyflie.close_link',
            MagicMock())
     def test_del(self):
