@@ -14,7 +14,7 @@
         </v-icon>
 
         <p id="batterie-text" class="stateInfo">
-          {{ (droneData.batteryLevel * 100).toFixed(0) }}%
+          {{ droneData.batteryLevel.toFixed(0) }}%
         </p>
       </div>
       <v-btn
@@ -163,7 +163,7 @@ export default class DroneDataCard extends Vue {
     const ICON = 'mdi-battery';
     const MAX_VALUE = 100;
     const STEP = 10;
-    const BATTERY = this.droneData.batteryLevel * MAX_VALUE;
+    const BATTERY = this.droneData.batteryLevel;
 
     if (BATTERY > MAX_VALUE - STEP) {
       return ICON;
