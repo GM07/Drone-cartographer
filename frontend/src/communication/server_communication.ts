@@ -141,10 +141,11 @@ export class ServerCommunication {
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
-  public static terminateMission(callback: () => void): boolean {
+  public static terminateMission(maps: string, callback: () => void): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
         SERVER_CONSTANTS.TERMINATE_MISSION_ADDRESS,
+        maps,
         callback
       );
     }
@@ -169,7 +170,11 @@ export class ServerCommunication {
     return fetch(SERVER_CONSTANTS.GET_COMPLETED_MISSIONS);
   }
 
-  public static getSpecificMission(id: string): Promise<Response> {
-    return fetch(SERVER_CONSTANTS.GET_SPECIFIC_MISSION + '/' + id);
+  public static getSpecificMissionLogs(id: string): Promise<Response> {
+    return fetch(SERVER_CONSTANTS.GET_SPECIFIC_MISSION_LOGS + '/' + id);
+  }
+
+  public static getSpecificMissionMaps(id: string): Promise<Response> {
+    return fetch(SERVER_CONSTANTS.GET_SPECIFIC_MISSION_MAPS + '/' + id);
   }
 }

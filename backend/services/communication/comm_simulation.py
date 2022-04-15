@@ -12,7 +12,6 @@ from constants import COMMANDS
 import queue
 from flask_socketio import SocketIO
 from time import sleep
-from services.communication.interface.drone import Drone
 from services.data.simulation_wrappers import DroneSimulationSocket, CommandWrapper
 
 from services.data.drone_data import DroneData
@@ -171,6 +170,7 @@ class CommSimulation(AbstractComm):
         ack = 0x01
 
         at_least_one_connected = True
+
         while at_least_one_connected and self.thread_active:
             at_least_one_connected = False
 
@@ -209,6 +209,8 @@ class CommSimulation(AbstractComm):
                         self.send_log(f'Drone {data.name}' + data.__str__())
                         self.send_drone_status([data.to_dict()])
                         self.set_drone_data(data)
+
+                        self.mission_manager.update_position(data, count)
 
                     if is_socket_broken:
                         self.send_log(f'Broken Socket no {count}')
@@ -259,9 +261,6 @@ class CommSimulation(AbstractComm):
             except socket.error:
                 self.send_log('Socket error')
                 return
-
-            if command_wrapper.command == COMMANDS.LAND.value:
-                self.mission_manager.end_current_mission(self.logs)
 
     def validate_name(self, name: str) -> str:
         return re.sub(r'[\/:]', '', name)

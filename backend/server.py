@@ -204,17 +204,16 @@ def set_mission_type(is_simulated: bool):
 
 # Terminate mission
 @SOCKETIO.on('terminate', namespace='/limitedAccess')
-def terminate():
+def terminate(map: str):
     if (not MissionStatus.get_mission_started() or
             not AccessStatus.is_request_valid(request)):
         return ''
 
-    global COMM
     COMM.send_command(COMMANDS.LAND.value)
 
     MissionStatus.terminate_mission(SOCKETIO)
-    Map.raw_data.clear()
-    Map.filtered_data.clear()
+    COMM.mission_manager.current_mission.map = map
+    COMM.mission_manager.end_current_mission(COMM.logs)
 
     SOCKETIO.emit('clear_all_maps',
                   False,
@@ -248,10 +247,16 @@ def retrieve_missions():
     return jsonify(database_connection.get_all_missions_time_stamps())
 
 
-@APP.route('/getSpecificMission/<id>')
-def retrieve_specific_mission(id: str):
+@APP.route('/getSpecificMissionLogs/<id>')
+def retrieve_specific_mission_logs(id: str):
     database_connection = Database()
-    return jsonify(database_connection.get_mission_from_id(id))
+    return jsonify(database_connection.get_mission_logs_from_id(id))
+
+
+@APP.route('/getSpecificMissionMaps/<id>')
+def retrieve_specific_mission_map(id: str):
+    database_connection = Database()
+    return jsonify(database_connection.get_mission_maps_from_id(id))
 
 
 @SOCKETIO.on('revoke_control', namespace='/limitedAccess')
