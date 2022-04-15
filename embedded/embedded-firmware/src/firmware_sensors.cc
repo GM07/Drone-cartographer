@@ -48,7 +48,6 @@ extern "C" {
 
 ///////////////////////////////////////
 [[nodiscard]] float FirmwareSensors::getBatteryLevel() const {
-  constexpr float kToPercentage = 10.0F;
   logVarId_t vbatid = logGetVarId("pm", "batteryLevel");
-  return static_cast<float>(logGetUint(vbatid)) / kToPercentage;
+  return static_cast<float>(logGetUint(vbatid));
 }

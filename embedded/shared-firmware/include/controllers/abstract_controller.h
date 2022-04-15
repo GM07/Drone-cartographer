@@ -14,7 +14,7 @@
 #include "utils/state.h"
 #include "utils/vector3d.h"
 
-constexpr float kLowBattery = 0.3F;
+constexpr float kLowBattery = 30.0F;
 constexpr float kMaxDistanceToBase = 0.05F;
 constexpr float kMaxDistanceToCheckpoint = 0.05F;
 
