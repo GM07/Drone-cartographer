@@ -11,10 +11,12 @@ export interface DroneSensors {
 }
 
 export enum DroneState {
+  IDLE = 0,
   TAKING_OFF = 1,
   LANDING = 2,
   DEAD = 3,
   EXPLORING = 4,
+  RETURNING_TO_BASE = 5,
   CRASHED = 5,
 }
 
@@ -32,6 +34,6 @@ export interface Mission {
   number_of_drones: number;
   is_simulated: boolean;
   total_distance: number;
-  maps: [[Point2d]];
+  map: string;
   logs: Array<[string, string]>;
 }

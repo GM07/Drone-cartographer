@@ -31,13 +31,13 @@ import {DroneData} from '@/communication/drone';
 export default class Map extends Vue {
   @Prop() public indexDrone!: number;
   @Prop() public droneList!: DroneData[];
+  @Prop() public maps!: HTMLCanvasElement[];
 
   private dronePos: Vec2d[] = [new Vec2d(0, 0)];
   private mapSize: Vec2d = new Vec2d(0, 0);
   private canvasSize: Vec2d = new Vec2d(0, 0);
 
   private hasBeenMounted = false;
-  private maps: HTMLCanvasElement[] = [];
   private mapName = 'générale';
 
   constructor() {

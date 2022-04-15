@@ -59,6 +59,7 @@
           <MissionCommands
             v-if="isUserControlling()"
             :accessStatus="accessStatus"
+            :maps="maps"
           />
 
           <v-list dense nav>
@@ -141,7 +142,7 @@
       </v-item-group>
 
       <div>
-        <Map :droneList="droneList" :indexDrone="indexDrone" />
+        <Map :droneList="droneList" :indexDrone="indexDrone" :maps="maps" />
       </div>
     </div>
 
@@ -259,6 +260,8 @@ export default class Mission extends Vue {
   public isDroneMenuOpen = false;
   public isLogsMenuOpen = false;
   public droneList: DroneData[] = [];
+  public maps: HTMLCanvasElement[] = [];
+  public isMissionEnding = false;
   public accessStatus = {
     isMissionSimulated: false,
     isUserControlling: false,

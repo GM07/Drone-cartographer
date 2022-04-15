@@ -101,7 +101,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 /* Tabs */
 .v-tabs-items.full-height-tab .v-window-item {
   height: calc(

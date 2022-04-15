@@ -56,7 +56,7 @@ class AbstractComm(metaclass=ABCMeta):
         except gevent.queue.Full:
             pass
 
-        self.logs += log
+        self.logs += dated_log
 
     def send_drone_status(self, status: List[Dict[str, Any]]):
         try:

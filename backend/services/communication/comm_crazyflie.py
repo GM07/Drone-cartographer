@@ -9,7 +9,7 @@ from cflib.crazyflie.log import LogConfig
 from flask_socketio import SocketIO
 
 from constants import COMMANDS
-from services.data.drone_data import DroneState, log_data_to_drone_data
+from services.data.drone_data import log_data_to_drone_data
 from services.communication.abstract_comm import AbstractComm
 
 from services.data.map import Map, MapData
@@ -125,14 +125,12 @@ class CommCrazyflie(AbstractComm):
             except Exception as e:
                 print(f'Error : {e}')
 
-        if command == COMMANDS.LAND.value:
-            self.mission_manager.end_current_mission(self.logs)
-
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         drone_data = log_data_to_drone_data(logconf.name, data)
         Map().add_data(MapData(logconf.name, drone_data), self.SOCKETIO)
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         # print(f'{timestamp}{logconf.id}:{data}')
+        self.mission_manager.update_position(drone_data, logconf.id)
         self.send_log(f'{logconf.id}{data} ')
         self.send_drone_status([drone_data.to_dict()])
         self.set_drone_data(drone_data)
