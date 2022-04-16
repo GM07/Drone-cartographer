@@ -116,7 +116,7 @@ class CommCrazyflie(AbstractComm):
 
         for link in sending_links:
             packet = bytearray(command)  # Command must be an array of numbers
-            command.append(b'\x00\x00\x00')
+            packet += b'\x00\x00\x00'
             if args is not None:
                 for arg in args:
                     packet.append(arg)
