@@ -174,10 +174,8 @@ export default class DroneDataCard extends Vue {
       return 'mdi-battery-outline';
     }
 
-    console.log('fixed : ', +Math.floor(BATTERY / STEP).toFixed(0) * STEP);
     const UPDATED_ICON =
       ICON + '-' + +Math.floor(BATTERY / STEP).toFixed(0) * STEP;
-    console.log(UPDATED_ICON);
     return UPDATED_ICON;
   }
 

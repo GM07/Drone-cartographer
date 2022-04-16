@@ -25,7 +25,7 @@
             </v-row>
             <v-form ref="pos">
               <v-row>
-                <v-col cols="12">
+                <v-col :key="1">
                   <v-text-field
                     v-model.number="newDrone.startingXPos"
                     label="Position X"
@@ -39,9 +39,7 @@
                     @change="validatePositionForm('x')"
                   ></v-text-field>
                 </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12">
+                <v-col :key="2">
                   <v-text-field
                     v-model.number="newDrone.startingYPos"
                     label="Position Y"
@@ -166,10 +164,10 @@ import {round} from 'lodash';
 @Component({components: {VueResizable}})
 export default class DroneMenu extends Vue {
   private static readonly MAX_RANGE = 2;
-  private static readonly DRONE_WIDTH = 30;
-  private static readonly DRONE_HEIGHT = 30;
-  private static readonly WIDTH = 300 - DroneMenu.DRONE_WIDTH / 2;
-  private static readonly HEIGHT = 300 - DroneMenu.DRONE_HEIGHT / 2;
+  private static readonly DRONE_WIDTH = 30 + 2; // border size
+  private static readonly DRONE_HEIGHT = 30 + 2; // border size
+  private static readonly WIDTH = 300;
+  private static readonly HEIGHT = 300;
   private static droneCount = 0;
   @Prop() private droneList!: DroneData[];
   @Prop() private isDroneMenuOpen!: boolean;
@@ -196,25 +194,26 @@ export default class DroneMenu extends Vue {
   @Watch('isDroneMenuOpen')
   public setDefaultNewDroneData(): void {
     if (!this.isDroneMenuOpen) {
-      // this.x = this.xPosToPixel(this.newDrone.startingXPos);
-      // this.y = this.yPosToPixel(this.newDrone.startingYPos);
-      // this.$forceUpdate();
       return;
     }
+
+    this.newDrone = {...DEFAULT_NEW_DRONE_DATA};
 
     if (this.isMissionSimulated) {
       DroneMenu.droneCount = this.currentDroneList.length;
       this.newDrone.name = 'drone_' + DroneMenu.droneCount++;
-      this.newDrone.startingXPos = this.pixelToXPos(this.x);
-      this.newDrone.startingYPos = this.pixelToYPos(this.y);
-      this.newDrone.startingOrientation = 0;
     }
+    this.newDrone.startingOrientation = 0;
+    this.newDrone.startingYPos = this.pixelToYPos(this.y);
+    this.newDrone.startingXPos = this.pixelToXPos(this.x);
 
     this.$forceUpdate();
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public dragMove(data): void {
+    this.x = data.left;
+    this.y = data.top;
     this.newDrone.startingXPos = this.pixelToXPos(data.left);
     this.newDrone.startingYPos = this.pixelToYPos(data.top);
   }
@@ -222,7 +221,8 @@ export default class DroneMenu extends Vue {
   public pixelToXPos(pixel: number): number {
     return (
       round(
-        (pixel * 2 + DroneMenu.DRONE_WIDTH - DroneMenu.WIDTH) / DroneMenu.WIDTH,
+        (pixel * 2 + DroneMenu.DRONE_WIDTH - DroneMenu.WIDTH) /
+          (DroneMenu.WIDTH - DroneMenu.DRONE_WIDTH),
         2
       ) * DroneMenu.MAX_RANGE
     );
@@ -232,7 +232,7 @@ export default class DroneMenu extends Vue {
     return (
       -round(
         (pixel * 2 + DroneMenu.DRONE_HEIGHT - DroneMenu.HEIGHT) /
-          DroneMenu.HEIGHT,
+          (DroneMenu.HEIGHT - DroneMenu.DRONE_HEIGHT),
         2
       ) * DroneMenu.MAX_RANGE
     );
@@ -264,9 +264,9 @@ export default class DroneMenu extends Vue {
       this.$emit('addDrone', {...this.newDrone} as NewDroneData);
       this.closeMenu();
       this.resetValidation();
-      // this.setDefaultNewDroneData();
       this.newDrone.startingXPos = this.pixelToXPos(this.x);
       this.newDrone.startingYPos = this.pixelToYPos(this.y);
+      this.$forceUpdate();
     }
   }
 
