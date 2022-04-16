@@ -94,7 +94,7 @@ class Map:
 
     @staticmethod
     def filter_sensor_value(value):
-        if value > 2000:
+        if value > 1000:
             return -1
         return value
 

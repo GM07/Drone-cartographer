@@ -18,9 +18,6 @@ constexpr float kLowBattery = 30.0F;
 constexpr float kMaxDistanceToBase = 0.05F;
 constexpr float kMaxDistanceToCheckpoint = 0.05F;
 
-constexpr float kRealAdditionnalCollisionRange = 15.0F;
-constexpr float kSimulationAdditionnalCollisionRange = 20.0F;
-
 class AbstractController {
   friend class Drone;
 
@@ -36,7 +33,8 @@ class AbstractController {
       std::unique_ptr<AbstractSensors>&& abstractSensors)
       : m_abstractSensors(std::move(abstractSensors)){};
 
-  virtual void setVelocity(const Vector3D& direction, float speed) = 0;
+  virtual void setVelocity(const Vector3D& direction, float speed,
+                           bool bodyReference = true) = 0;
   virtual void takeOff(float height) = 0;
   virtual void land() = 0;
 
@@ -73,7 +71,6 @@ class AbstractController {
   virtual void updateSensorsData() = 0;
   [[nodiscard]] virtual float getMinCollisionAvoidanceDistance() const = 0;
   [[nodiscard]] virtual float getMaxCollisionAvoidanceDistance() const = 0;
-  [[nodiscard]] virtual float getAdditionnalCollisionRange() const = 0;
 
   State m_state{State::kIdle};
   std::unique_ptr<AbstractSensors> m_abstractSensors;
@@ -84,6 +81,7 @@ class AbstractController {
   }
 
   [[nodiscard]] inline float getOrientation() const { return m_orientation; }
+  [[nodiscard]] virtual float getSegmentOrientation() const = 0;
 
   Vector3D m_targetPosition;
 

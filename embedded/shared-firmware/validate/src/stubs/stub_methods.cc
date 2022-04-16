@@ -19,7 +19,8 @@ void FirmwareController::takeOff(float height) {}
 void FirmwareController::land() {}
 void FirmwareController::updateSensorsData() {}
 bool FirmwareController::isDroneCrashed() const { return false; }
-void FirmwareController::setVelocity(const Vector3D& direction, float speed) {}
+void FirmwareController::setVelocity(const Vector3D& direction, float speed,
+                                     bool bodyReference) {}
 
 void FirmwareController::sendP2PMessage(void* message, size_t size){/**/};
 [[nodiscard]] size_t FirmwareController::getId() const { return 0; };
