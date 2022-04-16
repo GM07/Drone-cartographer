@@ -116,6 +116,7 @@ class CommCrazyflie(AbstractComm):
 
         for link in sending_links:
             packet = bytearray(command)  # Command must be an array of numbers
+            command.append(b'\x00\x00\x00')
             if args is not None:
                 for arg in args:
                     packet.append(arg)
@@ -130,7 +131,7 @@ class CommCrazyflie(AbstractComm):
         Map().add_data(MapData(logconf.name, drone_data), self.SOCKETIO)
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         # print(f'{timestamp}{logconf.id}:{data}')
-        self.mission_manager.update_position(drone_data, logconf.id)
+        #        self.mission_manager.update_position(drone_data, logconf.id)
         self.send_log(f'{logconf.id}{data} ')
         self.send_drone_status([drone_data.to_dict()])
         self.set_drone_data(drone_data)
