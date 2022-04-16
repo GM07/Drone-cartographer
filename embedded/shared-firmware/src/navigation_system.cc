@@ -1,5 +1,6 @@
 #include "components/drone.h"
 #include "utils/math.h"
+#include "utils/segment.h"
 
 /////////////////////////////////////////////////////////////////////
 void Drone::step() {
@@ -10,10 +11,17 @@ void Drone::step() {
 
   m_controller->receiveP2PMessage(&m_peerData);
 
+  bool bodyReference = true;
+
   switch (m_controller->m_state) {
     case State::kTakingOff:
       if (m_controller->isTrajectoryFinished()) {
-        resetCollisionHistory();
+        // Reset the return to base algo
+        m_potentialShortCuts.clear();
+        m_returnPath.clear();
+        m_returnPath.push_back(m_controller->getCurrentLocation());
+
+        // Go into exploring
         m_controller->m_state = State::kExploring;
         m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
       }
@@ -27,14 +35,20 @@ void Drone::step() {
       m_normal = Vector3D();
       wallAvoidance();
       collisionAvoidance();
-      analyzeShortcuts();
       changeDirection();
+      analyzeShortcuts();
       m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
       break;
     case State::kReturningToBase:
-      returnToBaseStateSteps();
+      m_normal = Vector3D();
+      wallAvoidance();
+      collisionAvoidance();
+      changeDirection();
+      bodyReference = !returnToBase();
+      analyzeShortcuts();
+      m_controller->setVelocity(m_data.m_direction, kDroneSpeed, bodyReference);
       break;
-    case State::kIdle:  // Fallthrough
+    case State::kIdle:
     default:
       break;
   }
@@ -92,23 +106,16 @@ void Drone::wallAvoidance() {
 void Drone::collisionAvoidance() {
   m_hadDroneCollision = false;
   for (const auto& [id, peerData] : m_peerData) {
-    if (peerData.m_range <= m_controller->getMinCollisionAvoidanceDistance() +
-                                getAddedCollisionRange()) {
+    if (peerData.m_range <= m_controller->getMinCollisionAvoidanceDistance()) {
+      m_controller->identify();
       if (m_usedPeerData.find(peerData.m_id) == m_usedPeerData.end()) {
         m_usedPeerData.insert_or_assign(peerData.m_id, peerData);
         m_normal += peerData.m_direction - m_data.m_direction;
-        m_additionnalCollisionRange =
-            m_data.m_id > peerData.m_id
-                ? 0.0F
-                : m_controller->getAdditionnalCollisionRange();
       }
       m_hadDroneCollision = true;
     } else {
       m_usedPeerData.erase(peerData.m_id);
     }
-  }
-  if (!m_hadDroneCollision) {
-    m_additionnalCollisionRange = 0.0F;
   }
 }
 
@@ -117,107 +124,190 @@ void Drone::changeDirection() {
     Vector3D newDirection = m_data.m_direction.reflect(m_normal);
 
     if (!areAlmostEqual<Vector3D>(m_data.m_direction, newDirection)) {
-      addToCollisionHistory();
+      // Add point to the return path
+      // Only add the point if we are not in returnToBase or if we had a
+      // collision This is because we disable wallCollision when returning to
+      // base Otherwise the drone gets stuck and we have -nan values as speed
+      if (m_controller->m_state != State::kReturningToBase ||
+          m_hadDroneCollision) {
+        m_returnPath.push_back(m_controller->getCurrentLocation());
+      }
+
+      // Invalidate pending shortcuts since we had a chage of direction
+      m_potentialShortCuts.clear();
+
       m_data.m_direction = newDirection;
     }
   }
 }
 
-void Drone::resetCollisionHistory() {
-  m_collisionHistory.clear();
-  m_collisionHistory.emplace_back();
-
-  for (size_t i = 0; i < m_lastPathShortcutPosition.size(); ++i) {
-    m_lastBaseShortcutPosition[i].reset();
-    m_lastPathShortcutPosition[i].reset();
-  }
-  m_additionnalCollisionRange = 0.0F;
-}
-
-void Drone::addToCollisionHistory() {
-  if (m_controller->m_state == State::kExploring) {
-    for (size_t i = 0; i < m_lastBaseShortcutPosition.size(); ++i) {
-      pushValidPath(i);
-      m_lastBaseShortcutPosition[i].reset();
-      m_lastPathShortcutPosition[i].reset();
-    }
-  }
-
-  const bool kCanPushCheckpoint =
-      (m_controller->m_state == State::kExploring || m_hadDroneCollision) &&
-      m_collisionHistory.size() < kMaxCheckpoints;
-
-  if (kCanPushCheckpoint) {
-    m_collisionHistory.push_back(m_controller->getCurrentLocation());
-  }
-}
-
-void Drone::pushValidPath(size_t index) {
-  if (index < m_lastPathShortcutPosition.size() &&
-      m_lastPathShortcutPosition[index].isPathIntersectionValid) {
-    m_collisionHistory.pop_back();
-    m_collisionHistory.emplace_back(
-        m_lastPathShortcutPosition[index].intersectionPosition);
-    m_collisionHistory.emplace_back(m_lastPathShortcutPosition[index].source);
-  }
-}
-
-void Drone::returnToBaseDirection() {
-  changeDirection();
-
-  if (m_collisionHistory.empty()) {
-    m_collisionHistory.emplace_back();
-  }
-
-  m_controller->m_targetPosition = m_collisionHistory.back();
-
-  if (!m_hadDroneCollision && areAlmostEqual(m_normal, Vector3D())) {
-    m_data.m_direction =
-        m_controller->m_targetPosition - m_controller->getCurrentLocation();
-    m_data.m_direction.m_z = 0;
-  }
-}
-
-void Drone::returnToBaseStateSteps() {
-  wallAvoidance();
-  collisionAvoidance();
-  returnToBaseDirection();
+bool Drone::returnToBase() {
   if (m_controller->isNearBase()) {
-    m_collisionHistory.clear();
-    m_collisionHistory.emplace_back();
     m_controller->land();
     m_controller->m_state = State::kLanding;
-    return;
+    m_data.m_direction = Vector3D::z(-1.0F);
+    m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
+    return false;
   }
-  m_controller->setVelocity(m_data.m_direction, kDroneSpeed);
 
-  if (!m_hadDroneCollision && !m_collisionHistory.empty() &&
-      m_controller->hasReachedCheckpoint()) {
-    m_collisionHistory.pop_back();
+  // If we are in collision avoidance or if we are in a drone collision
+  if (m_hadDroneCollision) {
+    return false;
   }
+
+  m_controller->m_targetPosition = m_returnPath[m_returnPath.size() - 1];
+
+  if (m_controller->hasReachedCheckpoint()) {
+    if (!m_returnPath.empty()) {
+      m_returnPath.pop_back();
+    }
+
+    // Invalidate pending shortcuts since we had a chage of direction
+    m_potentialShortCuts.clear();
+  }
+
+  m_data.m_direction =
+      m_controller->m_targetPosition - m_controller->getCurrentLocation();
+  m_data.m_direction.m_z = 0;
+
+  return true;
 }
 
-void Drone::analyzeShortcuts() {
+std::array<Segment, kNbLateralSensors> Drone::createSensorSegments(
+    const Vector3D& currentLocation) {
+  // Create the segments from the sensors
   constexpr float kMeterToMillimiter = 1000.0F;
-
-  const Vector3D& kLocation = m_controller->getCurrentLocation();
 
   float frontData = getRealSensorDistance(m_controller->m_data.front);
   float backData = getRealSensorDistance(m_controller->m_data.back);
   float leftData = getRealSensorDistance(m_controller->m_data.left);
   float rightData = getRealSensorDistance(m_controller->m_data.right);
 
+  // We must rotate segments
+  // TODO - This might differ in simulation v.s. in embedded
+  // There might not be a need to rotate this in embedded depending on how X and
+  // Y are incremented
   const Vector3D& frontPoint =
-      kLocation + Vector3D::x(frontData / kMeterToMillimiter);
+      currentLocation + Vector3D::x(frontData / kMeterToMillimiter)
+                            .rotate(m_controller->getSegmentOrientation());
   const Vector3D& backPoint =
-      kLocation - Vector3D::x(backData / kMeterToMillimiter);
+      currentLocation - Vector3D::x(backData / kMeterToMillimiter)
+                            .rotate(m_controller->getSegmentOrientation());
   const Vector3D& leftPoint =
-      kLocation + Vector3D::y(leftData / kMeterToMillimiter);
+      currentLocation + Vector3D::y(leftData / kMeterToMillimiter)
+                            .rotate(m_controller->getSegmentOrientation());
   const Vector3D& rightPoint =
-      kLocation - Vector3D::y(rightData / kMeterToMillimiter);
+      currentLocation - Vector3D::y(rightData / kMeterToMillimiter)
+                            .rotate(m_controller->getSegmentOrientation());
 
-  analyzeBaseShortcuts(frontPoint, backPoint, leftPoint, rightPoint);
-  analyzePathShortcuts(frontPoint, backPoint, leftPoint, rightPoint);
+  return {{Segment(currentLocation, frontPoint),
+           Segment(currentLocation, backPoint),
+           Segment(currentLocation, leftPoint),
+           Segment(currentLocation, rightPoint)}};
+}
+
+void Drone::findPotentialShortCut(
+    const Vector3D& currentLocation,
+    const std::array<Segment, kNbLateralSensors>& sensorSegments) {
+  // Check for segment intersection with start from closest to base to last
+  for (size_t i = 1; i < m_returnPath.size(); ++i) {
+    Segment segment(m_returnPath[i - 1], m_returnPath[i]);
+
+    for (const auto& sensorSegment : sensorSegments) {
+      std::optional<Vector3D> intersection = segment.intersects(sensorSegment);
+      if (intersection.has_value()) {
+        // No need to add segment we will be going to
+        if (areAlmostEqual(intersection.value(),
+                           m_returnPath[m_returnPath.size() - 1],
+                           kMaxDistanceToCheckpoint)) {
+          break;
+        }
+        // Return the potentialShortcut
+        // TODO - 0.1 might be to little of a distance to travel for real drones
+        PotentialShortcut shortcut = {
+            .detectionPosition = currentLocation,
+            .intersectionPosition = intersection.value(),
+            .sensorDirection =
+                (sensorSegment.m_end - sensorSegment.m_start).toUnitVector(),
+            .intersectionSegment = segment,
+            .indexToAddAt = i,
+            .distanceToTravel = kDistanceForSafeShortcut};
+
+        if (m_potentialShortCuts.find(shortcut) == m_potentialShortCuts.end()) {
+          m_potentialShortCuts.insert(shortcut);
+        }
+        return;
+      }
+    }
+  }
+}
+
+void Drone::validatePotentialShortCuts(
+    const Vector3D& currentLocation,
+    const std::array<Segment, kNbLateralSensors>& sensorSegments) {
+  // We use an iterator to be able to delete while iterating
+  auto potentialShortcutIterator = m_potentialShortCuts.begin();
+  while (potentialShortcutIterator != m_potentialShortCuts.end()) {
+    if (potentialShortcutIterator->hasTraveledEnoughDistance(currentLocation)) {
+      // Find the same sensorSegment that was used for the first detection
+      Segment shortcutSensorSegment;
+      for (const auto& sensorSegment : sensorSegments) {
+        if (areAlmostEqual(
+                potentialShortcutIterator->sensorDirection,
+                (sensorSegment.m_end - sensorSegment.m_start).toUnitVector())) {
+          shortcutSensorSegment = sensorSegment;
+          break;
+        }
+      }
+
+      std::optional<Vector3D> intersection =
+          potentialShortcutIterator->intersectionSegment.intersects(
+              shortcutSensorSegment);
+      if (intersection.has_value()) {
+        // Erase all segments after the shortcut
+        m_returnPath.erase(std::next(m_returnPath.begin(),
+                                     potentialShortcutIterator->indexToAddAt),
+                           m_returnPath.end());
+
+        m_returnPath.push_back(
+            potentialShortcutIterator->intersectionPosition +
+            (intersection.value() -
+             potentialShortcutIterator->intersectionPosition) /
+                2);
+        m_returnPath.push_back(
+            potentialShortcutIterator->detectionPosition +
+            (currentLocation - potentialShortcutIterator->detectionPosition) /
+                2);
+
+        // Once a shortcut is found remove all other potential shortcuts
+        // This is becease a shortcut changes the segments we analyse
+        m_potentialShortCuts.clear();
+
+        // Once a shortcut is found leave the loop
+        potentialShortcutIterator = m_potentialShortCuts.end();
+      } else {
+        // If we can't use the shortcut anymore delete it
+        potentialShortcutIterator =
+            m_potentialShortCuts.erase(potentialShortcutIterator);
+      }
+    } else {
+      ++potentialShortcutIterator;
+    }
+  }
+}
+
+void Drone::analyzeShortcuts() {
+  Vector3D currentLocation = m_controller->getCurrentLocation();
+  currentLocation.m_z = 0;
+
+  std::array<Segment, kNbLateralSensors> sensorSegments =
+      createSensorSegments(currentLocation);
+
+  findPotentialShortCut(currentLocation, sensorSegments);
+
+  // If segment is found make sure we can travel to it (check for distance
+  // traveled and segment still intersecting)
+  validatePotentialShortCuts(currentLocation, sensorSegments);
 }
 
 float Drone::getRealSensorDistance(float sensor) {
@@ -231,137 +321,4 @@ float Drone::getRealSensorDistance(float sensor) {
     return kMaxDist;
   }
   return 0.0F;
-}
-
-[[nodiscard]] std::array<float, kNbLateralSensors> Drone::getPathDifferenceList(
-    const std::vector<ShortcutVerifier>& shortcuts, const Vector3D& location) {
-  float pathDifferenceFront = std::fabs(std::fabs(location.m_x) -
-                                        std::fabs(shortcuts.at(0).source.m_x));
-  float pathDifferenceBack = std::fabs(std::fabs(location.m_x) -
-                                       std::fabs(shortcuts.at(1).source.m_x));
-  float pathDifferenceLeft = std::fabs(std::fabs(location.m_y) -
-                                       std::fabs(shortcuts.at(2).source.m_y));
-  float pathDifferenceRight = std::fabs(std::fabs(location.m_y) -
-                                        std::fabs(shortcuts.at(3).source.m_y));
-  return {{pathDifferenceFront, pathDifferenceBack, pathDifferenceLeft,
-           pathDifferenceRight}};
-}
-
-void Drone::analyzeBaseShortcuts(const Vector3D& frontPoint,
-                                 const Vector3D& backPoint,
-                                 const Vector3D& leftPoint,
-                                 const Vector3D& rightPoint) {
-  constexpr float kHalfBaseCross = 0.3F;
-  const Vector3D& kLocation = m_controller->getCurrentLocation();
-
-  std::pair<bool, Vector3D> frontIntersect =
-      intersectsSegment(kLocation, frontPoint, Vector3D::y(-kHalfBaseCross),
-                        Vector3D::y(kHalfBaseCross));
-  std::pair<bool, Vector3D> backIntersect =
-      intersectsSegment(kLocation, backPoint, Vector3D::y(-kHalfBaseCross),
-                        Vector3D::y(kHalfBaseCross));
-  std::pair<bool, Vector3D> leftIntersect =
-      intersectsSegment(kLocation, leftPoint, Vector3D::x(-kHalfBaseCross),
-                        Vector3D::x(kHalfBaseCross));
-  std::pair<bool, Vector3D> rightIntersect =
-      intersectsSegment(kLocation, rightPoint, Vector3D::x(-kHalfBaseCross),
-                        Vector3D::x(kHalfBaseCross));
-
-  std::array<std::pair<bool, Vector3D>, kNbLateralSensors> intersectionList{
-      {frontIntersect, backIntersect, leftIntersect, rightIntersect}};
-
-  std::array<float, kNbLateralSensors> differenceList =
-      getPathDifferenceList(m_lastBaseShortcutPosition, kLocation);
-
-  for (size_t i = 0; i < kNbLateralSensors; ++i) {
-    if (intersectionList.at(i).first &&
-        !m_lastBaseShortcutPosition[i].hasFirstIntersection) {
-      m_lastBaseShortcutPosition[i].hasFirstIntersection = true;
-      m_lastBaseShortcutPosition[i].source = kLocation;
-    } else if (intersectionList.at(i).first &&
-               m_lastBaseShortcutPosition.at(i).hasFirstIntersection &&
-               differenceList.at(i) > kMinPathDistanceInterval &&
-               differenceList.at(i) < kMaxPathDistanceInterval) {
-      if (m_lastBaseShortcutPosition.at(i).hasSecondIntersection) {
-        // remove old path
-        m_collisionHistory.clear();
-        m_collisionHistory.emplace_back();
-        m_collisionHistory.emplace_back(
-            m_lastBaseShortcutPosition[i].intersectionPosition);
-        m_collisionHistory.emplace_back(m_lastBaseShortcutPosition[i].source);
-      }
-      m_lastBaseShortcutPosition[i].hasSecondIntersection = true;
-      m_lastBaseShortcutPosition[i].source = kLocation;
-      m_lastBaseShortcutPosition[i].intersectionPosition =
-          intersectionList.at(i).second;
-    } else if (!intersectionList.at(i).first ||
-               (m_lastBaseShortcutPosition.at(i).hasFirstIntersection &&
-                differenceList.at(i) >= kMaxPathDistanceInterval)) {
-      m_lastBaseShortcutPosition[i].reset();
-    }
-  }
-}
-
-void Drone::analyzePathShortcuts(const Vector3D& frontPoint,
-                                 const Vector3D& backPoint,
-                                 const Vector3D& leftPoint,
-                                 const Vector3D& rightPoint) {
-  if (m_collisionHistory.size() < 2) {
-    return;
-  }
-
-  const Vector3D& kLocation = m_controller->getCurrentLocation();
-  const Vector3D& endPoint1 = m_collisionHistory[m_collisionHistory.size() - 2];
-  const Vector3D& endPoint2 = m_collisionHistory.back();
-
-  std::pair<bool, Vector3D> frontIntersect =
-      intersectsSegment(kLocation, frontPoint, endPoint1, endPoint2);
-  std::pair<bool, Vector3D> backIntersect =
-      intersectsSegment(kLocation, backPoint, endPoint1, endPoint2);
-  std::pair<bool, Vector3D> leftIntersect =
-      intersectsSegment(kLocation, leftPoint, endPoint1, endPoint2);
-  std::pair<bool, Vector3D> rightIntersect =
-      intersectsSegment(kLocation, rightPoint, endPoint1, endPoint2);
-
-  std::array<std::pair<bool, Vector3D>, kNbLateralSensors> pathIntersectionList{
-      {frontIntersect, backIntersect, leftIntersect, rightIntersect}};
-
-  std::array<float, kNbLateralSensors> pathDifferenceList =
-      getPathDifferenceList(m_lastPathShortcutPosition, kLocation);
-
-  for (size_t i = 0; i < kNbLateralSensors; ++i) {
-    if (pathIntersectionList.at(i).first &&
-        !m_lastPathShortcutPosition.at(i).hasFirstIntersection) {
-      m_lastPathShortcutPosition[i].hasFirstIntersection = true;
-      m_lastPathShortcutPosition[i].source = kLocation;
-
-    } else if (pathIntersectionList.at(i).first &&
-               m_lastPathShortcutPosition.at(i).hasFirstIntersection &&
-               pathDifferenceList.at(i) > kMinPathDistanceInterval &&
-               pathDifferenceList.at(i) < kMaxPathDistanceInterval) {
-      if (m_lastPathShortcutPosition.at(i).hasSecondIntersection) {
-        m_lastPathShortcutPosition[i].isPathIntersectionValid = true;
-      }
-
-      m_lastPathShortcutPosition[i].hasSecondIntersection = true;
-      m_lastPathShortcutPosition[i].source = kLocation;
-      m_lastPathShortcutPosition[i].intersectionPosition =
-          pathIntersectionList.at(i).second;
-
-    } else if (!pathIntersectionList.at(i).first ||
-               (m_lastPathShortcutPosition.at(i).hasFirstIntersection &&
-                pathDifferenceList.at(i) >= kMaxPathDistanceInterval)) {
-      pushValidPath(i);
-      m_lastPathShortcutPosition[i].reset();
-    }
-  }
-}
-
-/////////////////////////////////////////////////////////////////////
-[[nodiscard]] float Drone::getAddedCollisionRange() const {
-  if (m_controller->m_state != State::kReturningToBase) {
-    return 0.0F;
-  }
-
-  return m_additionnalCollisionRange;
 }

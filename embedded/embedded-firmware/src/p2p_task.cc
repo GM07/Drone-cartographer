@@ -25,17 +25,18 @@ void p2pcallbackHandler(P2PPacket* p) {
   {
     P2PPacket packet;
     memcpy(&packet, p, sizeof(packet));
-    DroneData data(
-        (*reinterpret_cast<DroneData*>(&packet.data))  // NOLINT
-            .transformReference(
-                Drone::getEmbeddedDrone().getController()->getOrientation()));
+    DroneData data((*reinterpret_cast<DroneData*>(&packet.data)));  // NOLINT
 
     if (!isValidP2PPacket(data)) {
       return;
     }
 
-    data.m_range = p->rssi;
-    Drone::getEmbeddedDrone().m_peerData.insert_or_assign(data.m_id, data);
+    DroneData validData(data.transformReference(
+        -Drone::getEmbeddedDrone().getController()->getOrientation()));
+
+    validData.m_range = p->rssi;
+    Drone::getEmbeddedDrone().m_peerData.insert_or_assign(validData.m_id,
+                                                          validData);
   }
 }
 
@@ -49,7 +50,7 @@ void p2pTaskWrapper(void* /*parameter*/) {
 
   while (true) {
     DroneData dataToSend = drone.m_data.transformReference(
-        -drone.getController()->getOrientation());
+        drone.getController()->getOrientation());
     drone.getController()->sendP2PMessage(static_cast<void*>(&dataToSend),
                                           sizeof(dataToSend));
 
@@ -62,7 +63,7 @@ bool p2pTaskTest() { return p2pIsInit; }
 
 /////////////////////////////////////////////////////////////////////////
 void p2pTaskInit() {
-  xTaskCreate(p2pTaskWrapper, "P2P_TASK_NAME", configMINIMAL_STACK_SIZE,
+  xTaskCreate(p2pTaskWrapper, "P2P_TASK_NAME", configMINIMAL_STACK_SIZE * 2,
               nullptr, 0, nullptr);
 
   p2pRegisterCB(p2pcallbackHandler);

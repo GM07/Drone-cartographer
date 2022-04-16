@@ -21,7 +21,8 @@ class FirmwareController : public AbstractController {
   FirmwareController(const FirmwareController& other) = delete;
   FirmwareController operator=(const FirmwareController& other) = delete;
 
-  void setVelocity(const Vector3D& direction, float speed) override;
+  void setVelocity(const Vector3D& direction, float speed,
+                   bool /*bodyReference*/) override;
   void takeOff(float height) override;
   void land() override;
 
@@ -41,10 +42,11 @@ class FirmwareController : public AbstractController {
   void updateSensorsData() override;
   [[nodiscard]] float getMinCollisionAvoidanceDistance() const override;
   [[nodiscard]] float getMaxCollisionAvoidanceDistance() const override;
-  [[nodiscard]] inline float getAdditionnalCollisionRange() const override {
-    return kRealAdditionnalCollisionRange;
-  };
   [[nodiscard]] bool isDroneCrashed() const override;
+
+  [[nodiscard]] inline float getSegmentOrientation() const override {
+    return 0.0F;
+  };
 
   void initCommunicationManager() override{/**/};
   void log(const std::string& message) override{/**/};
