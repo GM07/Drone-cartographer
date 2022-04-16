@@ -86,12 +86,14 @@ class Database:
                     }])))
         except:
             print('Database error')
+            return []
 
     def get_mission_from_id(self, identifier: str):
         try:
             mission = self.db.missions.find_one({'_id': ObjectId(identifier)})
         except:
             print('Database error')
+            return {}
         if mission is not None:
             mission['_id'] = str(mission['_id'])
         return mission
@@ -102,6 +104,7 @@ class Database:
                                                 {"logs": 1})
         except:
             print('Database error')
+            return {}
         if mission is not None:
             mission['_id'] = str(mission['_id'])
         return mission
@@ -112,6 +115,7 @@ class Database:
                                                 {"map": 1})
         except:
             print('Database error')
+            return {}
         if mission is not None:
             mission['_id'] = str(mission['_id'])
         return mission
@@ -176,7 +180,8 @@ class MissionManager:
     def update_position(self, data: DroneData, index):
 
         self.lock.acquire()
-        if not self.mission_start_time:
+        if not self.is_mission_started:
+            self.lock.release()
             return
         self.current_mission.total_distance += math.hypot(
             data.position.x - self.last_known_positions[index].x,
