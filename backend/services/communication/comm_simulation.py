@@ -237,9 +237,9 @@ class CommSimulation(AbstractComm):
 
             if command_wrapper.args is not None:
                 full_command = command_wrapper.command + tuple(
-                    command_wrapper.args)
+                    b'\x00\x00\x00') + tuple(command_wrapper.args)
             else:
-                full_command = command_wrapper.command
+                full_command = command_wrapper.command + tuple(b'\x00\x00\x00')
 
             if command_wrapper.command == COMMANDS.LAUNCH.value:
                 self.mission_manager.start_current_mission(

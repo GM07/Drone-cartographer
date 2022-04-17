@@ -44,11 +44,11 @@ class AbstractController {
     return getCurrentLocation().distanceToXY(m_targetPosition) <
            kMaxDistanceToCheckpoint;
   }
-  [[nodiscard]] inline bool isNearBase() const {
+  [[nodiscard]] virtual inline bool isNearBase() const {
     return getCurrentLocation().distanceToXY(Vector3D()) < kMaxDistanceToBase;
   }
 
-  [[nodiscard]] inline bool hasLowBattery() const {
+  [[nodiscard]] virtual inline bool hasLowBattery() const {
     if (m_abstractSensors == nullptr) {
       return false;
     }
