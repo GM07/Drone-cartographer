@@ -19,7 +19,7 @@ class StubSimulationSensors : public AbstractSensors {
   MOCK_CONST_METHOD0(getPosX, float());
   MOCK_CONST_METHOD0(getPosY, float());
   MOCK_CONST_METHOD0(getPosZ, float());
-  MOCK_CONST_METHOD0(getBatteryLevel, float(bool));
+  MOCK_CONST_METHOD1(getBatteryLevel, float(bool));
 };
 
 #endif
