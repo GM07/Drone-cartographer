@@ -18,7 +18,7 @@ class AbstractSensors {
   [[nodiscard]] virtual float getPosX() const = 0;
   [[nodiscard]] virtual float getPosY() const = 0;
   [[nodiscard]] virtual float getPosZ() const = 0;
-  [[nodiscard]] virtual float getBatteryLevel() const = 0;
+  [[nodiscard]] virtual float getBatteryLevel(bool isInMission) const = 0;
 };
 
 #endif

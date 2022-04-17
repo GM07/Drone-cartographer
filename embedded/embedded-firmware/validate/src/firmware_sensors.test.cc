@@ -40,7 +40,7 @@ TEST(ValidateFirmwareSensors, getFrontDistance) {
   EXPECT_EQ(sensors.getPosX(), kPosX);
   EXPECT_EQ(sensors.getPosY(), kPosY);
   EXPECT_EQ(sensors.getPosZ(), kPosZ);
-  EXPECT_EQ(sensors.getBatteryLevel(), kBatteryLevel);
+  EXPECT_EQ(sensors.getBatteryLevel(_), kBatteryLevel);
 
   delete mock;
 }

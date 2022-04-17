@@ -19,7 +19,7 @@ class StubFirmwareSensors : public AbstractSensors {
   MOCK_CONST_METHOD0(getPosX, float());
   MOCK_CONST_METHOD0(getPosY, float());
   MOCK_CONST_METHOD0(getPosZ, float());
-  MOCK_CONST_METHOD0(getBatteryLevel, float());
+  MOCK_CONST_METHOD0(getBatteryLevel, float(bool));
 };
 
 #endif
