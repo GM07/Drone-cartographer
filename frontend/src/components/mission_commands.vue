@@ -89,6 +89,7 @@ import {
 @Component({})
 export default class MissionCommands extends Vue {
   @Prop() private accessStatus!: AccessStatus;
+  @Prop() private maps!: [HTMLCanvasElement];
   public isLaunchMissionSelected = false;
   public isTerminateMissionSelected = false;
   public isReturnToBaseSelected = false;
@@ -130,6 +131,7 @@ export default class MissionCommands extends Vue {
     if (!COMMAND_SENT) {
       this.isReturnToBaseSelected = false;
     }
+    this.$emit('terminateMission', true);
   }
   public setP2PGradient(value: boolean): void {
     if (!ACCESSOR.missionStatus.isMissionStarted) return;
@@ -140,10 +142,14 @@ export default class MissionCommands extends Vue {
   public terminateMission(): void {
     if (!ACCESSOR.missionStatus.isMissionStarted) return;
     this.isTerminateMissionSelected = true;
+    this.$emit('terminateMission', true);
 
-    const COMMAND_SENT = ServerCommunication.terminateMission(() => {
-      this.isTerminateMissionSelected = false;
-    });
+    const COMMAND_SENT = ServerCommunication.terminateMission(
+      this.maps[0].toDataURL(),
+      () => {
+        this.isTerminateMissionSelected = false;
+      }
+    );
 
     if (!COMMAND_SENT) {
       this.isTerminateMissionSelected = false;

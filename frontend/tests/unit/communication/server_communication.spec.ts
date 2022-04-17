@@ -104,11 +104,11 @@ describe('Communication.ts', () => {
   });
 
   it('should terminates a mission', () => {
-    let response = ServerCommunication.terminateMission(() => {});
+    let response = ServerCommunication.terminateMission('', () => {});
     expect(response).toBe(false);
     expect(limitedAccessEmitSpy).not.toHaveBeenCalled();
     SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected = true;
-    response = ServerCommunication.terminateMission(() => {});
+    response = ServerCommunication.terminateMission('', () => {});
     expect(response).toBe(true);
     expect(limitedAccessEmitSpy).toHaveBeenCalled();
   });
@@ -135,9 +135,9 @@ describe('Communication.ts', () => {
     fetchMock.mockResponse(JSON.stringify(''), {
       status: SERVER_CONSTANTS.HTTP_OK,
     });
-    await ServerCommunication.getSpecificMission('id');
+    await ServerCommunication.getSpecificMissionLogs('id');
     expect(fetchMock).toHaveBeenCalledWith(
-      SERVER_CONSTANTS.GET_SPECIFIC_MISSION + '/' + 'id'
+      SERVER_CONSTANTS.GET_SPECIFIC_MISSION_LOGS + '/' + 'id'
     );
   });
 });

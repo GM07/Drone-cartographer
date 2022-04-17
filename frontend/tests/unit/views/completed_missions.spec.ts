@@ -3,7 +3,7 @@ import {shallowMount, Wrapper} from '@vue/test-utils';
 import {DefaultProps} from 'vue/types/options';
 import * as SERVER_CONSTANTS from '@/communication/server_constants';
 import {ServerCommunication} from '@/communication/server_communication';
-import {Mission, Point2d} from '@/utils/mission';
+import {Mission} from '@/utils/mission';
 import Vuetify from 'vuetify';
 
 describe('completed_missions.vue', () => {
@@ -16,7 +16,7 @@ describe('completed_missions.vue', () => {
       number_of_drones: 0,
       is_simulated: true,
       total_distance: 0,
-      maps: [[{x: 1, y: 1} as Point2d]],
+      map: '',
     } as Mission,
   ];
   const DIFFERENT_FAKE_MISSION_LIST = [
@@ -26,7 +26,7 @@ describe('completed_missions.vue', () => {
       number_of_drones: 1,
       is_simulated: false,
       total_distance: 1,
-      maps: [[{x: 2, y: 2} as Point2d]],
+      map: '',
     } as Mission,
   ];
   const VUETIFY = new Vuetify();
@@ -146,7 +146,7 @@ describe('completed_missions.vue', () => {
       status: SERVER_CONSTANTS.HTTP_OK,
     });
 
-    const SPY = spyOn(wrapper.vm, 'getMissionInfo').and.callThrough();
+    const SPY = spyOn(wrapper.vm, 'getMissionLogs').and.callThrough();
     const DEFAULT_ID = 'id';
     const DEFAULT_MISSION = {_id: 'id'} as Mission;
     wrapper.vm['openLogId'] = DEFAULT_ID;
@@ -164,7 +164,7 @@ describe('completed_missions.vue', () => {
       status: SERVER_CONSTANTS.HTTP_OK,
     });
 
-    const RES = await wrapper.vm['getMissionInfo'](FAKE_MISSION_ID);
+    const RES = await wrapper.vm['getMissionLogs'](FAKE_MISSION_ID);
     expect(RES).toEqual(FAKE_MISSION_RESULT);
   });
 });

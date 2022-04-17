@@ -39,8 +39,8 @@ void SimulationController::updateSensorsData() {
       m_abstractSensors->getLeftDistance() * kCmToMmFactor,
       m_abstractSensors->getBackDistance() * kCmToMmFactor,
       m_abstractSensors->getRightDistance() * kCmToMmFactor,
-      m_abstractSensors->getPosX(),
-      m_abstractSensors->getPosY(),
+      getCurrentLocation().rotate(-m_orientation).m_x,
+      getCurrentLocation().rotate(-m_orientation).m_y,
       m_abstractSensors->getBatteryLevel(),
       m_state,
   };
@@ -142,9 +142,15 @@ void SimulationController::log(const std::string& message) {
 }
 
 ///////////////////////////////////////////////////
-void SimulationController::setVelocity(const Vector3D& direction, float speed) {
-  Vector3D speedVector =
-      (direction.toUnitVector() * speed).rotate(m_orientation);
+void SimulationController::setVelocity(const Vector3D& direction,  // NOLINT
+                                       float speed,                // NOLINT
+                                       bool bodyReference) {       // NOLINT
+  Vector3D speedVector = (direction.toUnitVector() * speed);
+
+  if (bodyReference) {
+    speedVector = speedVector.rotate(m_orientation);
+  }
+
   m_ccrazyflieSensing->m_pcPropellers->SetLinearVelocity(
       CVector3(speedVector.m_x, speedVector.m_y, speedVector.m_z));
 }
@@ -162,7 +168,9 @@ void SimulationController::receiveP2PMessage(
       m_ccrazyflieSensing->m_pcRABS->GetReadings();
 
   for (auto reading : readings) {
-    DroneData data(*reinterpret_cast<DroneData*>(reading.Data.ToCArray()));
+    DroneData data((*reinterpret_cast<DroneData*>(reading.Data.ToCArray()))
+                       .transformReference(-m_orientation));
+
     data.m_range = reading.Range;
     p2pData->insert_or_assign(data.m_id, data);
   }

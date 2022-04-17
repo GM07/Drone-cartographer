@@ -1,5 +1,5 @@
 <template>
-  <v-list dense nav>
+  <v-list nav>
     <v-list-item
       v-if="!this.accessStatus.isMissionSimulated"
       v-on:click="identify()"
@@ -7,7 +7,7 @@
       <v-list-item-icon>
         <v-icon color="blue">mdi-lightbulb</v-icon>
       </v-list-item-icon>
-      <v-list-item-title class="title">Identifier</v-list-item-title>
+      <v-list-item-title>Identifier</v-list-item-title>
     </v-list-item>
   </v-list>
 </template>

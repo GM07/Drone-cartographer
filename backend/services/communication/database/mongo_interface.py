@@ -7,13 +7,16 @@ database = Database()
 database.upload_mission_info(mission_info)
 """
 from dataclasses import dataclass
+import threading
+
 from typing import List, Tuple
 from mongomock import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
-from services.data.drone_data import DroneData
-from constants import COMMANDS
+from services.data.drone_data import DroneData, Point2D
+from services.data.map import Map
 from time import perf_counter
+import math
 
 
 @dataclass
@@ -31,7 +34,7 @@ class Mission:
     number_of_drones: int
     is_simulated: bool
     total_distance: float
-    maps: List[List[Point]]
+    map: str
     logs: List[Tuple[str, str]]
 
     def __init__(self,
@@ -39,13 +42,13 @@ class Mission:
                  number_of_drones: int,
                  is_simulated: bool,
                  total_distance: float,
-                 maps: List[List[Point]] = [[]]):
+                 map: str = ''):
 
         self.flight_duration = flight_duration
         self.number_of_drones = number_of_drones
         self.is_simulated = is_simulated
         self.total_distance = total_distance
-        self.maps = maps
+        self.map = map
         self.time_stamp = datetime.now().isoformat()
         self.logs = []
 
@@ -56,41 +59,85 @@ class Database:
     It lets you add and get objects from the database"""
 
     def __init__(self) -> None:
-        self.client = MongoClient('mongodb://127.0.0.1:27017/')
-        self.db = self.client['admin']
+        try:
+            self.client = MongoClient('mongodb://127.0.0.1:27017/')
+            self.db = self.client['admin']
+        except:
+            print("Couldn't connect to database please relaunch")
 
     def upload_mission_info(self, mission: Mission):
-        return self.db.missions.insert_one(mission.__dict__).inserted_id
+        try:
+            return self.db.missions.insert_one(mission.__dict__).inserted_id
+        except:
+            print('Database error')
 
     def get_all_missions_time_stamps(self) -> list:
-        return serialize_objectid_from_result(
-            list(
-                self.db.missions.aggregate([{
-                    '$project': {
-                        'time_stamp': 1,
-                        'is_simulated': 1,
-                        'total_distance': 1,
-                        'number_of_drones': 1,
-                        'flight_duration': 1
-                    }
-                }])))
+        try:
+            return serialize_objectid_from_result(
+                list(
+                    self.db.missions.aggregate([{
+                        '$project': {
+                            'time_stamp': 1,
+                            'is_simulated': 1,
+                            'total_distance': 1,
+                            'number_of_drones': 1,
+                            'flight_duration': 1
+                        }
+                    }])))
+        except:
+            print('Database error')
+            return []
 
     def get_mission_from_id(self, identifier: str):
-        mission = self.db.missions.find_one({'_id': ObjectId(identifier)})
+        try:
+            mission = self.db.missions.find_one({'_id': ObjectId(identifier)})
+        except:
+            print('Database error')
+            return {}
+        if mission is not None:
+            mission['_id'] = str(mission['_id'])
+        return mission
+
+    def get_mission_logs_from_id(self, identifier: str):
+        try:
+            mission = self.db.missions.find_one({'_id': ObjectId(identifier)},
+                                                {"logs": 1})
+        except:
+            print('Database error')
+            return {}
+        if mission is not None:
+            mission['_id'] = str(mission['_id'])
+        return mission
+
+    def get_mission_maps_from_id(self, identifier: str):
+        try:
+            mission = self.db.missions.find_one({'_id': ObjectId(identifier)},
+                                                {"map": 1})
+        except:
+            print('Database error')
+            return {}
         if mission is not None:
             mission['_id'] = str(mission['_id'])
         return mission
 
     def remove_mission_from_id(self, identifier: str) -> bool:
-        return self.db.missions.delete_one({
-            '_id': ObjectId(identifier)
-        }).deleted_count != 0
+        try:
+            return self.db.missions.delete_one({
+                '_id': ObjectId(identifier)
+            }).deleted_count != 0
+        except:
+            print('Database error')
+            return False
 
     def update_mission_info_from_id(self, mission: Mission,
                                     identifier: str) -> bool:
-        return self.db.missions.replace_one({
-            '_id': ObjectId(identifier)
-        }, mission.__dict__).matched_count != 0
+        try:
+            return self.db.missions.replace_one({
+                '_id': ObjectId(identifier)
+            }, mission.__dict__).matched_count != 0
+        except:
+            print('Database error')
+            return False
 
 
 def serialize_objectid_from_result(result: list):
@@ -100,17 +147,45 @@ def serialize_objectid_from_result(result: list):
 
 
 class MissionManager:
-    current_mission: Mission
+    current_mission: Mission = {}
     current_mission_start_time: float
+    last_known_positions: List[Point2D] = []
+    lock = threading.Lock()
+    is_mission_started = False
 
     def start_current_mission(self, drone_count: int, is_simulated: bool):
+        self.lock.acquire()
         self.current_mission = Mission(0, drone_count, is_simulated, 0, [[]])
         self.mission_start_time = perf_counter()
+        self.last_known_positions = [Point2D(0, 0)] * drone_count
+        self.is_mission_started = True
+        self.lock.release()
 
     def end_current_mission(self, logs: List[Tuple[str, str]]):
-        self.current_mission.flight_duration = self.mission_start_time - perf_counter(
-        )
+        self.lock.acquire()
+
+        self.current_mission.flight_duration = perf_counter(
+        ) - self.mission_start_time
         self.current_mission.logs = logs
 
+        self.last_known_positions = [Point2D(0, 0)
+                                    ] * self.current_mission.number_of_drones
+        self.is_mission_started = False
+        Map.raw_data.clear()
+        Map.filtered_data.clear()
         database = Database()
         database.upload_mission_info(self.current_mission)
+        self.lock.release()
+
+    def update_position(self, data: DroneData, index):
+
+        self.lock.acquire()
+        if not self.is_mission_started:
+            self.lock.release()
+            return
+        self.current_mission.total_distance += math.hypot(
+            data.position.x - self.last_known_positions[index].x,
+            data.position.y - self.last_known_positions[index].y)
+
+        self.last_known_positions[index] = data.position
+        self.lock.release()

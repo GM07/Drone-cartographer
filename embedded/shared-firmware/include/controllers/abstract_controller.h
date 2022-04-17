@@ -20,7 +20,7 @@ constexpr float kRealTrajectoryFinishedTreshold = 0.05;
 // Meters and seconds
 constexpr float kSpeed = 0.25F;
 constexpr float kHeight = 0.3F;
-constexpr float kLowBattery = 0.3F;
+constexpr float kLowBattery = 30.0F;
 constexpr float kMaxDistanceToBase = 0.05F;
 constexpr float kMaxDistanceToCheckpoint = 0.05F;
 
@@ -39,7 +39,8 @@ class AbstractController {
       std::unique_ptr<AbstractSensors>&& abstractSensors)
       : m_abstractSensors(std::move(abstractSensors)){};
 
-  virtual void setVelocity(const Vector3D& direction, float speed) = 0;
+  virtual void setVelocity(const Vector3D& direction, float speed,  // NOLINT
+                           bool bodyReference = true) = 0;          // NOLINT
 
   inline virtual void takeOff(float height) {
     m_takeOffPosition += getCurrentLocation();
@@ -93,14 +94,17 @@ class AbstractController {
   [[nodiscard]] virtual float getMinCollisionAvoidanceDistance() const = 0;
   [[nodiscard]] virtual float getMaxCollisionAvoidanceDistance() const = 0;
 
+  [[nodiscard]] inline const Vector3D& getTakeOffPosition() const {
+    return m_takeOffPosition;
+  }
+
+  [[nodiscard]] inline float getOrientation() const { return m_orientation; }
+  [[nodiscard]] virtual float getSegmentOrientation() const = 0;
+
   State m_state{State::kIdle};
   std::unique_ptr<AbstractSensors> m_abstractSensors;
   ControllerData m_data{};
   Vector3D m_targetPosition;
-
-  [[nodiscard]] inline const Vector3D& getTakeOffPosition() const {
-    return m_takeOffPosition;
-  }
 
  protected:
   Vector3D m_takeOffPosition;

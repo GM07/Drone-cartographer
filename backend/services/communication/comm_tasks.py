@@ -1,3 +1,4 @@
+from asyncio.subprocess import PIPE, STDOUT
 import gevent.queue
 import threading
 from flask_socketio import SocketIO
@@ -6,6 +7,7 @@ LOGS_TASK_QUEUE_LOCK = threading.Lock()
 DRONE_STATUS_QUEUE_LOCK = threading.Lock()
 LOGS_QUEUE = gevent.queue.Queue(-1)
 logs_task_should_run = True
+should_log = True
 DRONE_STATUS_QUEUE = gevent.queue.Queue(-1)
 
 
@@ -25,13 +27,14 @@ def start_drone_status_task(SOCKETIO: SocketIO):
 
 def __logs_task(SOCKETIO: SocketIO):
     while logs_task_should_run:
-        logs = LOGS_QUEUE.get()
-        SOCKETIO.emit('get_logs',
-                      logs,
-                      namespace='/getLogs',
-                      broadcast=True,
-                      include_self=False,
-                      skip_sid=True)
+        if should_log:
+            logs = LOGS_QUEUE.get()
+            SOCKETIO.emit('get_logs',
+                          logs,
+                          namespace='/getLogs',
+                          broadcast=True,
+                          include_self=False,
+                          skip_sid=True)
 
 
 def __drone_status_task(SOCKETIO: SocketIO):

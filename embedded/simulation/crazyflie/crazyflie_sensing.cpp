@@ -126,8 +126,11 @@ void CCrazyflieSensing::p2pTaskWrapper() {
   constexpr int32_t kDelayBetweenP2PMessage = 50;
   while (m_drone.getController()->m_state != State::kDead) {
     Time::delayMs(kDelayBetweenP2PMessage);
-    m_drone.getController()->sendP2PMessage(static_cast<void*>(&m_drone.m_data),
-                                            sizeof(m_drone.m_data));
+    DroneData dataToSend = m_drone.m_data.transformReference(
+        m_drone.getController()->getOrientation());
+
+    m_drone.getController()->sendP2PMessage(static_cast<void*>(&dataToSend),
+                                            sizeof(dataToSend));
   }
 }
 

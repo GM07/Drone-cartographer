@@ -4,7 +4,8 @@ from abc import ABCMeta, abstractmethod
 import threading
 import gevent.queue
 from flask_socketio import SocketIO
-from services.communication.comm_tasks import LOGS_QUEUE
+from services.communication.comm_tasks import LOGS_QUEUE, DRONE_STATUS_QUEUE
+from typing import List, Tuple
 from flask_socketio import SocketIO
 
 from services.communication.comm_tasks import DRONE_STATUS_QUEUE, LOGS_QUEUE
@@ -55,7 +56,7 @@ class AbstractComm(metaclass=ABCMeta):
         except gevent.queue.Full:
             pass
 
-        self.logs += log
+        self.logs += dated_log
 
     def send_drone_status(self, status: List[Dict[str, Any]]):
         try:
@@ -94,4 +95,12 @@ class AbstractComm(metaclass=ABCMeta):
 
     @abstractmethod
     def shutdown(self):
+        pass
+
+    @abstractmethod
+    def stop_logs(self):
+        pass
+
+    @abstractmethod
+    def start_logs(self):
         pass

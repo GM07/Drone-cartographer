@@ -15,13 +15,14 @@ class FirmwareController : public AbstractController {
  public:
   FirmwareController();
   ~FirmwareController() override = default;
-
   FirmwareController(FirmwareController&& other) = delete;
-  FirmwareController operator=(FirmwareController&& other) = delete;
+  FirmwareController& operator=(FirmwareController&& other) = delete;
   FirmwareController(const FirmwareController& other) = delete;
+  FirmwareController& operator=(const FirmwareController& other) = delete;
 
-  void setVelocity(const Vector3D& direction, float speed) override;
   void stopMotors() const override;
+  void setVelocity(const Vector3D& direction, float speed,
+                   bool /*bodyReference*/) override;
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
   [[nodiscard]] bool isTrajectoryFinished() const override {
@@ -47,6 +48,10 @@ class FirmwareController : public AbstractController {
   [[nodiscard]] float getMinCollisionAvoidanceDistance() const override;
   [[nodiscard]] float getMaxCollisionAvoidanceDistance() const override;
   [[nodiscard]] bool isDroneCrashed() const override;
+
+  [[nodiscard]] inline float getSegmentOrientation() const override {
+    return 0.0F;
+  };
 
   void initCommunicationManager() override{/**/};
   void log(const std::string& message) override{/**/};

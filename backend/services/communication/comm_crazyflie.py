@@ -9,7 +9,7 @@ from cflib.crazyflie.log import LogConfig
 from flask_socketio import SocketIO
 
 from constants import COMMANDS
-from services.data.drone_data import DroneState, log_data_to_drone_data
+from services.data.drone_data import log_data_to_drone_data
 from services.communication.abstract_comm import AbstractComm
 
 from services.data.map import Map, MapData
@@ -31,6 +31,12 @@ class CommCrazyflie(AbstractComm):
             self.set_drone([])
             return
 
+        self.init_comm(drone_list)
+
+    def __del__(self):
+        self.shutdown()
+
+    def init_comm(self, drone_list: list):
         print('Creating Embedded Crazyflie communication with drone list :',
               drone_list)
         Map().set_drone_len(len(drone_list))
@@ -48,10 +54,6 @@ class CommCrazyflie(AbstractComm):
         except Exception as e:
             print(f'Exception: {e}')
 
-    def __del__(self):
-        print('destructor called')
-        self.shutdown()
-
     def __init_drivers(self):
         cflib.crtp.init_drivers()
 
@@ -59,8 +61,15 @@ class CommCrazyflie(AbstractComm):
         print(f'shutdown called : {self.sync_crazyflies}')
         for sync in self.sync_crazyflies:
             print(f'closing link : {sync}')
-            sync.close_link()
+            if sync.is_link_open():
+                sync.close_link()
         return super().shutdown()
+
+    def start_logs(self):
+        self.init_comm(self.drone_list)
+
+    def stop_logs(self):
+        self.shutdown()
 
     def setup_log(self):
         self.log_configs: List[LogConfig] = []
@@ -97,7 +106,8 @@ class CommCrazyflie(AbstractComm):
                      command: COMMANDS,
                      links=[],
                      args: bytes = None) -> None:
-        sending_links = self.links if len(links) == 0 else links
+        drone_list_name = [drone.name for drone in self.drone_list]
+        sending_links = drone_list_name if len(links) == 0 else links
 
         if command == COMMANDS.LAUNCH.value:
             self.mission_manager.start_current_mission(len(self.drone_list),
@@ -106,6 +116,7 @@ class CommCrazyflie(AbstractComm):
 
         for link in sending_links:
             packet = bytearray(command)  # Command must be an array of numbers
+            packet += b'\x00\x00\x00'
             if args is not None:
                 for arg in args:
                     packet.append(arg)
@@ -115,14 +126,12 @@ class CommCrazyflie(AbstractComm):
             except Exception as e:
                 print(f'Error : {e}')
 
-        if command == COMMANDS.LAND.value:
-            self.mission_manager.end_current_mission(self.logs)
-
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         drone_data = log_data_to_drone_data(logconf.name, data)
         Map().add_data(MapData(logconf.name, drone_data), self.SOCKETIO)
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         # print(f'{timestamp}{logconf.id}:{data}')
+        self.mission_manager.update_position(drone_data, logconf.id)
         self.send_log(f'{logconf.id}{data} ')
         self.send_drone_status([drone_data.to_dict()])
         self.set_drone_data(drone_data)

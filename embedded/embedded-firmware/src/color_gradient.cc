@@ -106,3 +106,4 @@ void colorGradientTaskInit() {
 }
 
 bool colorGradientTest() { return isInit; };
+

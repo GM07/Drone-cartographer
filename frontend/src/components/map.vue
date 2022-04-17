@@ -1,6 +1,6 @@
 <template>
   <div style="display: flex; flex-direction: column; align-items: center">
-    <h2 style="color: DimGray">Carte {{ this.mapName }}</h2>
+    <h2 style="padding-top: 20px">Carte {{ this.mapName }}</h2>
     <canvas
       ref="canvas"
       style="
@@ -31,13 +31,13 @@ import {DroneData} from '@/communication/drone';
 export default class Map extends Vue {
   @Prop() public indexDrone!: number;
   @Prop() public droneList!: DroneData[];
+  @Prop() public maps!: HTMLCanvasElement[];
 
   private dronePos: Vec2d[] = [new Vec2d(0, 0)];
   private mapSize: Vec2d = new Vec2d(0, 0);
   private canvasSize: Vec2d = new Vec2d(0, 0);
 
   private hasBeenMounted = false;
-  private maps: HTMLCanvasElement[] = [];
   private mapName = 'générale';
 
   constructor() {
@@ -76,9 +76,16 @@ export default class Map extends Vue {
     );
 
     // Get new drone position
-    this.dronePos = [
-      new Vec2d(data.position[0] * M_TO_CM, data.position[1] * M_TO_CM),
-    ];
+    const ROTATED_POS = new Vec2d(
+      data.position[0] * M_TO_CM * COS_ORIENTATION -
+        data.position[1] * M_TO_CM * SIN_ORIENTATION +
+        this.droneList[DATA_INDEX].startingXPos * M_TO_CM,
+      data.position[0] * M_TO_CM * SIN_ORIENTATION +
+        data.position[1] * M_TO_CM * COS_ORIENTATION +
+        this.droneList[DATA_INDEX].startingYPos * M_TO_CM
+    );
+
+    this.dronePos = [ROTATED_POS];
 
     // Show new drone position
     (this.maps[idx].getContext('2d') as CanvasRenderingContext2D).fillStyle =
@@ -87,46 +94,66 @@ export default class Map extends Vue {
     (this.maps[idx].getContext('2d') as CanvasRenderingContext2D).fillRect(
       NEW_POS.x,
       NEW_POS.y,
-      1,
-      1
+      2,
+      2
     );
 
     const TEMPARRAYPERIM: Vec2d[] = [];
 
+    const POS_X = this.dronePos[0].x;
+    const POS_Y = this.dronePos[0].y;
+
+    const FRONT = data.sensors.front / MM_TO_CM;
+    const FRONT_VEC = new Vec2d(1, 0);
+    const LEFT = data.sensors.left / MM_TO_CM;
+    const LEFT_VEC = new Vec2d(0, 1);
+    const BACK = data.sensors.back / MM_TO_CM;
+    const BACK_VEC = new Vec2d(-1, 0);
+    const RIGHT = data.sensors.right / MM_TO_CM;
+    const RIGHT_VEC = new Vec2d(0, -1);
+    const CANVAS = this.$refs.canvas as HTMLCanvasElement;
+    const CANVAS_CTX = CANVAS.getContext('2d') as CanvasRenderingContext2D;
+
     if (data.sensors.front > 0)
       TEMPARRAYPERIM.push(
         new Vec2d(
-          data.position[0] * M_TO_CM +
-            (data.sensors.front * COS_ORIENTATION) / MM_TO_CM,
-          data.position[1] * M_TO_CM +
-            (data.sensors.front * SIN_ORIENTATION) / MM_TO_CM
+          POS_X +
+            (FRONT_VEC.x * COS_ORIENTATION - FRONT_VEC.y * SIN_ORIENTATION) *
+              FRONT,
+          POS_Y +
+            (FRONT_VEC.x * SIN_ORIENTATION + FRONT_VEC.y * COS_ORIENTATION) *
+              FRONT
         )
       );
     if (data.sensors.right > 0)
       TEMPARRAYPERIM.push(
         new Vec2d(
-          data.position[0] * M_TO_CM +
-            (data.sensors.right * SIN_ORIENTATION) / MM_TO_CM,
-          data.position[1] * M_TO_CM -
-            (data.sensors.right * COS_ORIENTATION) / MM_TO_CM
+          POS_X +
+            (RIGHT_VEC.x * COS_ORIENTATION - RIGHT_VEC.y * SIN_ORIENTATION) *
+              RIGHT,
+          POS_Y +
+            (RIGHT_VEC.x * SIN_ORIENTATION + RIGHT_VEC.y * COS_ORIENTATION) *
+              RIGHT
         )
       );
     if (data.sensors.back > 0)
       TEMPARRAYPERIM.push(
         new Vec2d(
-          data.position[0] * M_TO_CM -
-            (data.sensors.back * COS_ORIENTATION) / MM_TO_CM,
-          data.position[1] * M_TO_CM -
-            (data.sensors.back * SIN_ORIENTATION) / MM_TO_CM
+          POS_X +
+            (BACK_VEC.x * COS_ORIENTATION - BACK_VEC.y * SIN_ORIENTATION) *
+              BACK,
+          POS_Y +
+            (BACK_VEC.x * SIN_ORIENTATION + BACK_VEC.y * COS_ORIENTATION) * BACK
         )
       );
     if (data.sensors.left > 0)
       TEMPARRAYPERIM.push(
         new Vec2d(
-          data.position[0] * M_TO_CM -
-            (data.sensors.left * SIN_ORIENTATION) / MM_TO_CM,
-          data.position[1] * M_TO_CM +
-            (data.sensors.left * COS_ORIENTATION) / MM_TO_CM
+          POS_X +
+            (LEFT_VEC.x * COS_ORIENTATION - LEFT_VEC.y * SIN_ORIENTATION) *
+              LEFT,
+          POS_Y +
+            (LEFT_VEC.x * SIN_ORIENTATION + LEFT_VEC.y * COS_ORIENTATION) * LEFT
         )
       );
 
@@ -141,9 +168,6 @@ export default class Map extends Vue {
         3
       );
     }
-
-    const CANVAS = this.$refs.canvas as HTMLCanvasElement;
-    const CANVAS_CTX = CANVAS.getContext('2d') as CanvasRenderingContext2D;
 
     CANVAS_CTX.drawImage(this.maps[this.indexDrone], 0, 0);
   }

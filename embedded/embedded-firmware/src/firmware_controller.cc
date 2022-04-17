@@ -84,7 +84,8 @@ void FirmwareController::sendMessage(void* message, size_t size) const {
 void FirmwareController::identify() { ledseqRun(&m_seqLED); }
 
 ///////////////////////////////////////
-void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
+void FirmwareController::setVelocity(const Vector3D& direction, float speed,
+                                     bool /*bodyReference*/) {
   Vector3D speedVector = direction.toUnitVector() * speed;
 
   static setpoint_t setpoint;
@@ -96,7 +97,8 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed) {
   setpoint.velocity.y = speedVector.m_y;
   setpoint.velocity_body = false;
 
-  if (m_state == State::kExploring) {
+  // We need a constant height while exploring and returning to base
+  if (m_state == State::kExploring || m_state == State::kReturningToBase) {
     setpoint.mode.z = modeAbs;
     setpoint.position.z = kHeight;
   }

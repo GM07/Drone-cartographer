@@ -125,6 +125,19 @@
             <v-list-item-title class="text-h6 mb-3">
               Date de complétion: {{ item.time_stamp }}
             </v-list-item-title>
+            <p class="mb-3">
+              <strong> Temps de vol:</strong>
+              {{ parseFloat(item.flight_duration).toFixed(3) }} s
+            </p>
+            <p class="mb-3">
+              <strong> Nombre de drones:</strong> {{ item.number_of_drones }}
+            </p>
+
+            <p class="mb-3">
+              <strong> Distance parcourue totale:</strong>
+              {{ parseFloat(item.total_distance).toFixed(3) }} m
+            </p>
+
             <div
               style="
                 display: flex;
@@ -134,9 +147,47 @@
                 justify-content: space-between;
               "
             >
-              <v-btn class="ma-2" color="indigo" outlined>
-                Plus d'informations
+              <v-btn
+                v-if="openMapId != item._id"
+                class="ma-2"
+                color="indigo"
+                outlined
+                @click="setMissionMaps(true, item)"
+              >
+                Afficher carte
               </v-btn>
+              <v-btn
+                v-if="openMapId == item._id"
+                class="ma-2"
+                color="indigo"
+                outlined
+                @click="setMissionMaps(false, item)"
+              >
+                Fermer carte
+              </v-btn>
+              <div v-if="openMapId == item._id">
+                <v-btn
+                  v-for="(map, index) in item.maps"
+                  :key="map"
+                  @click="indexDrone = index"
+                >
+                  <p v-if="index == 0">Carte générale</p>
+                  <p v-else>Carte du drone no {{ index }}</p>
+                </v-btn>
+                <div
+                  class="ma-10"
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                  "
+                >
+                  <h2 style="color: DimGray">Carte Générale</h2>
+
+                  <img class="Map" :src="item.map" />
+                </div>
+              </div>
+
               <v-btn
                 v-if="openLogId != item._id"
                 class="ma-2"
@@ -223,6 +274,9 @@
 .animated {
   animation-fill-mode: none;
 }
+.Map {
+  border: 1px solid black;
+}
 </style>
 
 <script lang="ts">
@@ -230,7 +284,8 @@ import {Component, Vue} from 'vue-property-decorator';
 import {ServerCommunication} from '@/communication/server_communication';
 import {Mission} from '@/utils/mission';
 import {TIME_MULTIPLIER} from '@/communication/server_constants';
-
+import Map from '@/components/map.vue';
+import {MapData} from '@/utils/map_constants';
 enum Filters {
   all,
   simulated,
@@ -238,18 +293,23 @@ enum Filters {
   date,
 }
 
-@Component({})
+@Component({components: {Map}})
 export default class CompletedMissions extends Vue {
   private missions: Mission[] = [];
   private showedMissions: Mission[] = [];
+  private currentMap = '';
+  private indexDrone = 0;
+  private openMapId = ' ';
   private miniVariant = true;
   private mode: Filters = Filters.all;
   private isSearchMenuOpen = false;
   private currentTab = 0;
   private openLogId = ' ';
+  private droneIndex = 0;
   private filter = Filters;
   private currentFilter = 'Aucun';
   private isAscending = true;
+  private baseMap: MapData[] = [];
   private sorts = [
     'Aucun',
     'Nombre de drones',
@@ -267,6 +327,7 @@ export default class CompletedMissions extends Vue {
   private changeFilterMode(mode: Filters): void {
     this.mode = mode;
     this.openLogId = '';
+    this.openMapId = '';
     this.getCompletedMissions().then(() => {
       this.updateFilteredMissions();
       this.sortMissions();
@@ -380,15 +441,46 @@ export default class CompletedMissions extends Vue {
         this.openLogId = item._id;
         return;
       }
-      this.getMissionInfo(item).then((mission: Mission) => {
+      this.getMissionLogs(item).then((mission: Mission) => {
         item.logs = mission.logs;
         this.openLogId = mission._id;
       });
     } else this.openLogId = ' ';
   }
 
-  private getMissionInfo(item: Mission): Promise<Mission> {
-    return ServerCommunication.getSpecificMission(item._id)
+  private getMissionLogs(item: Mission): Promise<Mission> {
+    return ServerCommunication.getSpecificMissionLogs(item._id)
+      .then(res => res.json())
+      .then((data: Mission) => {
+        return data;
+      });
+  }
+  private setMissionMaps(setMenu: boolean, item: Mission) {
+    if (setMenu) {
+      if (item.map !== undefined) {
+        this.openMapId = item._id;
+
+        this.$nextTick(() => {
+          this.currentMap = item.map;
+        });
+        return;
+      }
+      this.getMissionMaps(item).then((mission: Mission) => {
+        this.openMapId = mission._id;
+        item.map = mission.map;
+
+        this.$nextTick(() => {
+          this.currentMap = mission.map;
+        });
+      });
+    } else {
+      this.openMapId = ' ';
+      this.currentMap = ' ';
+    }
+  }
+
+  private getMissionMaps(item: Mission): Promise<Mission> {
+    return ServerCommunication.getSpecificMissionMaps(item._id)
       .then(res => res.json())
       .then((data: Mission) => {
         return data;

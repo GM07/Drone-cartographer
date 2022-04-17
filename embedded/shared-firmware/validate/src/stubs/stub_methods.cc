@@ -14,11 +14,11 @@ size_t FirmwareController::receiveMessage(void* message, size_t size) const {
 void FirmwareController::sendMessage(void* message, size_t size) const {}
 void Time::delayMs(uint32_t delayMS) {}
 Vector3D FirmwareController::getCurrentLocation() const {}
-bool FirmwareController::isTrajectoryFinished() const {}
 void FirmwareController::updateSensorsData() {}
-void FirmwareController::stopMotors() {}
+void FirmwareController::stopMotors() const {}
 bool FirmwareController::isDroneCrashed() const { return false; }
-void FirmwareController::setVelocity(const Vector3D& direction, float speed) {}
+void FirmwareController::setVelocity(const Vector3D& direction, float speed,
+                                     bool bodyReference) {}
 
 void FirmwareController::sendP2PMessage(void* message, size_t size){/**/};
 [[nodiscard]] size_t FirmwareController::getId() const { return 0; };

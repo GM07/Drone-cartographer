@@ -18,3 +18,6 @@ class COMMANDS(Enum):
 # Objects to communicate with Crazyflie
 
 URI = ['radio://0/80/2M/E7E7E7E761', 'radio://0/80/2M/E7E7E7E762']
+
+RECOMPILE_SIMULATION_COMMAND = "docker exec embedded sh -c 'cd /workspaces/INF3995-106/embedded/simulation && if test -d build; then rm -rf build; fi && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../../ && make -j`nproc`'"
+RECOMPILE_EMBEDDED_COMMAND = "docker exec embedded sh -c 'cd /workspaces/INF3995-106/embedded/embedded-firmware && make clean && make -j`nproc`'"

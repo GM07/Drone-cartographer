@@ -38,11 +38,12 @@ class SimulationController : public AbstractController {
   SimulationController(const SimulationController& other) = delete;
   SimulationController& operator=(const SimulationController& other) = delete;
 
-  void setVelocity(const Vector3D& direction, float speed) override;
   inline void stopMotors() const override{/**/};
+  void setVelocity(const Vector3D& direction, float speed,  // NOLINT
+                   bool bodyReference = true) override;     // NOLINT
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
-  [[nodiscard]] inline bool isTrajectoryFinished() const {
+  [[nodiscard]] inline bool isTrajectoryFinished() const override {
     return Math::areAlmostEqual(getCurrentLocation(), m_targetPosition);
   }
   [[nodiscard]] inline bool isAltitudeReached() const override {
@@ -67,6 +68,10 @@ class SimulationController : public AbstractController {
   [[nodiscard]] float getMinCollisionAvoidanceDistance() const override;
   [[nodiscard]] float getMaxCollisionAvoidanceDistance() const override;
   [[nodiscard]] inline bool isDroneCrashed() const override { return false; };
+
+  [[nodiscard]] inline float getSegmentOrientation() const override {
+    return m_orientation;
+  };
 
 #ifndef GTEST
  private:

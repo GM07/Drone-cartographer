@@ -19,6 +19,50 @@ export class ServerCommunication {
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
+  public static recompile(): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.RECOMPILE_ADDRESS
+      );
+    }
+
+    return true;
+  }
+
+  public static async sendFiles(files: Map<string, string>): Promise<Response> {
+    const KEYS: string[] = [];
+    const VALUES: string[] = [];
+    files.forEach((value: string, key: string) => {
+      KEYS.push(key);
+      VALUES.push(value);
+    });
+
+    const BODY = JSON.stringify({keys: KEYS, values: VALUES});
+    return (
+      await fetch(SERVER_CONSTANTS.SET_FILES_ADDRESS, {
+        method: 'POST',
+        body: BODY,
+        headers: {'Content-type': 'application/json'},
+      })
+    ).json();
+  }
+
+  public static async getFiles(): Promise<Response> {
+    return (
+      await fetch(SERVER_CONSTANTS.GET_FILES_ADDRESS, {method: 'GET'})
+    ).json();
+  }
+
+  public static flash(): boolean {
+    if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
+        SERVER_CONSTANTS.FLASH_ADDRESS
+      );
+    }
+
+    return true;
+  }
+
   public static takeMissionControl(): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
@@ -97,10 +141,11 @@ export class ServerCommunication {
     return SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected;
   }
 
-  public static terminateMission(callback: () => void): boolean {
+  public static terminateMission(maps: string, callback: () => void): boolean {
     if (SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected) {
       SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.emit(
         SERVER_CONSTANTS.TERMINATE_MISSION_ADDRESS,
+        maps,
         callback
       );
     }
@@ -125,7 +170,11 @@ export class ServerCommunication {
     return fetch(SERVER_CONSTANTS.GET_COMPLETED_MISSIONS);
   }
 
-  public static getSpecificMission(id: string): Promise<Response> {
-    return fetch(SERVER_CONSTANTS.GET_SPECIFIC_MISSION + '/' + id);
+  public static getSpecificMissionLogs(id: string): Promise<Response> {
+    return fetch(SERVER_CONSTANTS.GET_SPECIFIC_MISSION_LOGS + '/' + id);
+  }
+
+  public static getSpecificMissionMaps(id: string): Promise<Response> {
+    return fetch(SERVER_CONSTANTS.GET_SPECIFIC_MISSION_MAPS + '/' + id);
   }
 }

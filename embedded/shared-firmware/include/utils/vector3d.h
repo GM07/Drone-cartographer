@@ -45,7 +45,7 @@ class Vector3D {
 
   [[nodiscard]] inline Vector3D rotate(float angle) const {
     const float xRotated = m_x * std::cos(angle) - m_y * std::sin(angle);
-    const float yRotated = m_y * std::cos(angle) + m_x * std::sin(angle);
+    const float yRotated = m_x * std::sin(angle) + m_y * std::cos(angle);
     return Vector3D(xRotated, yRotated, m_z);
   }
 
@@ -55,5 +55,25 @@ class Vector3D {
 
   float m_x{0}, m_y{0}, m_z{0};
 } __attribute__((packed));
+
+namespace std {
+
+///////////////////////////////////////////////
+template <class T>
+inline size_t hash_combine(const std::size_t& seed, const T& v) {
+  std::hash<T> hasher;
+  return seed ^ (hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2));  // NOLINT
+}
+
+template <>
+struct hash<Vector3D> {
+  size_t operator()(const Vector3D& vec) const {
+    size_t seed = hash<uint64_t>()(std::lround(vec.m_x * 100.0F));
+    seed = std::hash_combine<uint64_t>(seed, std::lround(vec.m_y * 100.0F));
+    seed = std::hash_combine<uint64_t>(seed, std::lround(vec.m_z * 100.0F));
+    return seed;
+  }
+};
+}  // namespace std
 
 #endif

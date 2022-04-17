@@ -6,9 +6,16 @@ export const SERVER_ADDRESS =
     : window.location.protocol + '//' + window.location.hostname + ':5000';
 export const GET_DRONES_ADDRESS = SERVER_ADDRESS + '/getDrones';
 export const GET_COMPLETED_MISSIONS = SERVER_ADDRESS + '/getCompletedMissions';
-export const GET_SPECIFIC_MISSION = SERVER_ADDRESS + '/getSpecificMission';
+export const GET_SPECIFIC_MISSION_LOGS =
+  SERVER_ADDRESS + '/getSpecificMissionLogs';
+export const GET_SPECIFIC_MISSION_MAPS =
+  SERVER_ADDRESS + '/getSpecificMissionMaps';
+export const GET_FILES_ADDRESS = SERVER_ADDRESS + '/getFiles';
+export const SET_FILES_ADDRESS = SERVER_ADDRESS + '/setFiles';
 export const GET_CURRENT_MISSION = SERVER_ADDRESS + '/getCurrentMission';
 export const IDENTIFY_DRONE_ADDRESS = 'identify_drone';
+export const RECOMPILE_ADDRESS = 'recompile';
+export const FLASH_ADDRESS = 'flash';
 export const TAKE_CONTROL_ADDRESS = 'take_control';
 export const REVOKE_CONTROL_ADDRESS = 'revoke_control';
 export const LAUNCH_MISSION_ADDRESS = 'launch';

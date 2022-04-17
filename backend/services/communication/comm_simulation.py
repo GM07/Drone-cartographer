@@ -12,7 +12,6 @@ from constants import COMMANDS
 import queue
 from flask_socketio import SocketIO
 from time import sleep
-from services.communication.interface.drone import Drone
 from services.data.simulation_wrappers import DroneSimulationSocket, CommandWrapper
 
 from services.data.drone_data import DroneData
@@ -94,8 +93,10 @@ class CommSimulation(AbstractComm):
         return super().shutdown()
 
     def send_command(self, command: COMMANDS, links=[], args: bytes = None):
+        drone_list_name = [drone.name for drone in self.drone_list]
+        sending_links = drone_list_name if len(links) == 0 else links
         try:
-            for link in links:
+            for link in sending_links:
                 command_to_send = CommandWrapper(link, command, args)
                 self.__COMMANDS_QUEUE.put_nowait(command_to_send)
         except queue.Full:
@@ -169,6 +170,7 @@ class CommSimulation(AbstractComm):
         ack = 0x01
 
         at_least_one_connected = True
+
         while at_least_one_connected and self.thread_active:
             at_least_one_connected = False
 
@@ -208,6 +210,8 @@ class CommSimulation(AbstractComm):
                         self.send_drone_status([data.to_dict()])
                         self.set_drone_data(data)
 
+                        self.mission_manager.update_position(data, count)
+
                     if is_socket_broken:
                         self.send_log(f'Broken Socket no {count}')
                         print("Socket broken")
@@ -231,7 +235,11 @@ class CommSimulation(AbstractComm):
             if command_wrapper is None:
                 return
 
-            full_command = command_wrapper.command + tuple(command_wrapper.args)
+            if command_wrapper.args is not None:
+                full_command = command_wrapper.command + tuple(
+                    b'\x00\x00\x00') + tuple(command_wrapper.args)
+            else:
+                full_command = command_wrapper.command + tuple(b'\x00\x00\x00')
 
             if command_wrapper.command == COMMANDS.LAUNCH.value:
                 self.mission_manager.start_current_mission(
@@ -254,8 +262,11 @@ class CommSimulation(AbstractComm):
                 self.send_log('Socket error')
                 return
 
-            if command_wrapper.command == COMMANDS.LAND.value:
-                self.mission_manager.end_current_mission(self.logs)
-
     def validate_name(self, name: str) -> str:
         return re.sub(r'[\/:]', '', name)
+
+    def start_logs(self):
+        pass  # No need for this function in simulation, because link is strong enough
+
+    def stop_logs(self):
+        pass

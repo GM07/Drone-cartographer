@@ -309,6 +309,7 @@ class TestApplication(unittest.TestCase):
 
     @mock.patch('server.COMM.get_full_drone_data',
                 mock.MagicMock(return_value='test'))
+    @mock.patch('server.COMM.mission_manager')
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.MissionStatus.terminate_mission')
     @mock.patch('server.MissionStatus.get_mission_started')
@@ -316,7 +317,11 @@ class TestApplication(unittest.TestCase):
     def test_on_terminate_limited_access_successful(
             self, is_request_valid_mock: mock.MagicMock,
             get_mission_started_mock: mock.MagicMock,
-            terminate_mission_mock: mock.MagicMock):
+            terminate_mission_mock: mock.MagicMock,
+            mission_manager_mock: mock.Mock):
+
+        mission_manager_mock.current_mission.map = mock.Mock()
+        mission_manager_mock.end_current_mission = mock.MagicMock()
 
         server.COMM.send_command = mock.MagicMock()
         is_request_valid_mock.return_value = True
@@ -326,9 +331,11 @@ class TestApplication(unittest.TestCase):
 
         self.assertTrue(client.is_connected('/limitedAccess'))
 
-        client.emit('terminate', namespace='/limitedAccess')
+        client.emit('terminate', '', namespace='/limitedAccess')
         terminate_mission_mock.assert_called_once()
         server.COMM.send_command.assert_called_once()
+        self.assertEqual(mission_manager_mock.current_mission.map, '')
+        mission_manager_mock.end_current_mission.assert_called_once()
 
     @mock.patch('server.COMM.get_full_drone_data',
                 mock.MagicMock(return_value='test'))
@@ -349,7 +356,7 @@ class TestApplication(unittest.TestCase):
 
         self.assertTrue(client.is_connected('/limitedAccess'))
 
-        client.emit('terminate', namespace='/limitedAccess')
+        client.emit('terminate', '', namespace='/limitedAccess')
         terminate_mission_mock.assert_not_called()
         server.COMM.send_command.assert_not_called()
 
@@ -399,13 +406,13 @@ class TestApplication(unittest.TestCase):
 
     @mock.patch('server.Database.__init__', mock.MagicMock(return_value=None))
     @mock.patch('server.jsonify')
-    @mock.patch('server.Database.get_mission_from_id')
+    @mock.patch('server.Database.get_mission_logs_from_id')
     def test_retrieve_specific_mission(self,
                                        get_mission_from_id_mock: mock.MagicMock,
                                        jsonify_mock: mock.MagicMock):
         get_mission_from_id_mock.return_value = []
         jsonify_mock.return_value = 'test'
-        response = server.APP.test_client().get('/getSpecificMission/1')
+        response = server.APP.test_client().get('/getSpecificMissionLogs/1')
         self.assertEqual(response.get_data(as_text=True), 'test')
         get_mission_from_id_mock.assert_called_once_with('1')
         jsonify_mock.assert_called_once_with([])
