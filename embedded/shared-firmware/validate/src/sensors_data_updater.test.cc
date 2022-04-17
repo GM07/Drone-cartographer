@@ -21,9 +21,9 @@ TEST(ValidateSensorsDataUpdater, UpdateSensorsDataShouldForward) {
 TEST(ValidateSensorsDataUpdater, updateCrashStatusIfNotCrashed) {
   std::shared_ptr<StubController> controller =
       std::make_shared<StubController>();
-  EXPECT_CALL(*controller, isDroneCrashed()).Times(2).WillOnce(Return(false));
+  EXPECT_CALL(*controller, isDroneCrashed()).Times(1).WillOnce(Return(false));
 
-  Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
+  Drone drone(controller);
   drone.getController()->m_state = State::kIdle;
 
   drone.updateCrashStatus();
@@ -36,8 +36,42 @@ TEST(ValidateSensorsDataUpdater, updateCrashStatusIfCrashed) {
       std::make_shared<StubController>();
   EXPECT_CALL(*controller, isDroneCrashed()).Times(1).WillOnce(Return(true));
 
-  Drone drone(std::dynamic_pointer_cast<AbstractController>(controller));
+  Drone drone(controller);
   drone.updateCrashStatus();
 
   EXPECT_EQ(drone.getController()->m_state, State::kCrash);
+}
+
+TEST(ValidateSensorsDataUpdater, updateCrashStatusIfNotCrashedButWasCrashed) {
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  EXPECT_CALL(*controller, isDroneCrashed()).Times(1).WillOnce(Return(false));
+
+  Drone drone(controller);
+  drone.getController()->m_state = State::kCrash;
+  drone.updateCrashStatus();
+
+  EXPECT_EQ(drone.getController()->m_state, State::kIdle);
+}
+
+TEST(ValidateSensorsDataUpdater, updateStatusFromBatteryFalse) {
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  EXPECT_CALL(*controller, hasLowBattery()).Times(1).WillOnce(Return(false));
+  Drone drone(controller);
+  controller->m_state = State::kExploring;
+
+  drone.updateStatusFromBattery();
+  EXPECT_EQ(controller->m_state, State::kExploring);
+}
+
+TEST(ValidateSensorsDataUpdater, updateStatusFromBatteryTrue) {
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  EXPECT_CALL(*controller, hasLowBattery()).Times(1).WillOnce(Return(true));
+  Drone drone(controller);
+  controller->m_state = State::kExploring;
+
+  drone.updateStatusFromBattery();
+  EXPECT_EQ(controller->m_state, State::kReturningToBase);
 }

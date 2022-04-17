@@ -5,8 +5,7 @@
 void Drone::updateCrashStatus() {
   if (m_controller->isDroneCrashed()) {
     m_controller->m_state = State::kCrash;
-  } else if (!m_controller->isDroneCrashed() &&
-             m_controller->m_state == State::kCrash) {
+  } else if (m_controller->m_state == State::kCrash) {
     m_controller->m_state = State::kIdle;
   }
 }
