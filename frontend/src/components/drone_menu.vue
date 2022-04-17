@@ -163,7 +163,7 @@ import {round} from 'lodash';
 
 @Component({components: {VueResizable}})
 export default class DroneMenu extends Vue {
-  private static readonly MAX_RANGE = 2;
+  public static readonly MAX_RANGE = 2;
   private static readonly DRONE_WIDTH = 30 + 2; // border size
   private static readonly DRONE_HEIGHT = 30 + 2; // border size
   private static readonly WIDTH = 300;

@@ -19,8 +19,8 @@ describe('drone_menu.vue', () => {
   it('should submit', () => {
     const NEW_DRONE = {
       name: 'a',
-      startingXPos: 1,
-      startingYPos: 1,
+      startingXPos: -2,
+      startingYPos: 2,
       startingOrientation: 0,
     } as NewDroneData;
     wrapper.vm['newDrone'] = NEW_DRONE;
