@@ -60,7 +60,11 @@ class Database:
 
     def __init__(self) -> None:
         try:
-            self.client = MongoClient('mongodb://127.0.0.1:27017/')
+
+            self.client = MongoClient('mongodb://127.0.0.1:27017/',
+                                      connectTimeoutMS=2000,
+                                      socketTimeoutMS=2000,
+                                      serverSelectionTimeoutMS=2000)
             self.db = self.client['admin']
         except:
             print("Couldn't connect to database please relaunch")
