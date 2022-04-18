@@ -41,7 +41,7 @@ void communicationManagerTaskWrapper(void* /*parameter*/) {
 /////////////////////////////////////////////////////////////////////////
 void communicationManagerInit() {
   xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
-              configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
+              configMINIMAL_STACK_SIZE * 2, nullptr, 0, nullptr);
   commIsInit = true;
 }
 

@@ -7,7 +7,7 @@ void Drone::step() {
   updateCrashStatus();
   m_data.m_distanceFromTakeoff = m_controller->getCurrentLocation().length();
   m_controller->updateSensorsData();
-  // updateStatusFromBattery();
+  updateStatusFromBattery();
 
   m_controller->receiveP2PMessage(&m_peerData);
 
