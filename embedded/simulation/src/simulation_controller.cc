@@ -162,7 +162,7 @@ void SimulationController::sendP2PMessage(void* message, size_t size) {
 }
 
 /////////////////////////////////////////////////////////////////////////
-[[nodiscard]] bool isValidP2PPacket(DroneData& data) {
+[[nodiscard]] bool isValidP2PPacket(const DroneData& data) {
   std::array<char, kHeaderSize> m_magicHeader{{'D', 'R', 'E', 'A', 'M'}};
   return std::equal(data.m_magicHeader.begin(), data.m_magicHeader.end(),
                     m_magicHeader.begin());
