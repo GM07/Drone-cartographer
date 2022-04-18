@@ -20,6 +20,7 @@ services:
     network_mode: host
     devices:
       - /dev/dri:/dev/dri
+      - /dev/bus/usb/:/dev/bus/usb/
     deploy:
       resources:
         reservations:
