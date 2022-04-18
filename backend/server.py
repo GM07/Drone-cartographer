@@ -213,7 +213,8 @@ def terminate(map: str):
     COMM.send_command(COMMANDS.LAND.value)
 
     MissionStatus.terminate_mission(SOCKETIO)
-    COMM.mission_manager.current_mission.map = map
+    if (hasattr(COMM.mission_manager.current_mission, 'map')):
+        COMM.mission_manager.current_mission.map = map
     COMM.mission_manager.end_current_mission(COMM.logs)
 
     SOCKETIO.emit('clear_all_maps',

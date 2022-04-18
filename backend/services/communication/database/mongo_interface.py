@@ -171,6 +171,9 @@ class MissionManager:
     def end_current_mission(self, logs: List[Tuple[str, str]]):
         self.lock.acquire()
 
+        if not self.is_mission_started:
+            self.lock.release()
+            return
         self.current_mission.flight_duration = perf_counter(
         ) - self.mission_start_time
         self.current_mission.logs = logs
