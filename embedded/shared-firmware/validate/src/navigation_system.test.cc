@@ -140,45 +140,6 @@ TEST(ValidateNavigationSystem, landingFinished) {
   EXPECT_EQ(drone.getController()->m_state, State::kIdle);
 }
 
-TEST(ValidateNavigationSystem, wallAvoidanceWithSensorsEverywhere) {
-  std::shared_ptr<StubController> controller =
-      std::make_shared<StubController>();
-
-  controller->m_data.front = 25;
-  controller->m_data.back = 25;
-  controller->m_data.left = 25;
-  controller->m_data.right = 25;
-
-  Drone drone(controller);
-
-  drone.m_normal = Vector3D(0, 0, 0);
-  drone.wallAvoidance();
-
-  EXPECT_FLOAT_EQ(drone.m_normal.m_x, 0);
-  EXPECT_FLOAT_EQ(drone.m_normal.m_y, 0);
-  EXPECT_FLOAT_EQ(drone.m_normal.m_z, 0);
-}
-
-TEST(ValidateNavigationSystem, wallAvoidanceWithSensors) {
-  std::shared_ptr<StubController> controller =
-      std::make_shared<StubController>();
-
-  controller->m_data.front = 25;
-  controller->m_data.back = 0;
-  controller->m_data.left = 25;
-  controller->m_data.right = 0;
-
-  Drone drone(controller);
-
-  drone.m_normal = Vector3D(-1, -1, 0);
-
-  drone.wallAvoidance();
-
-  EXPECT_FLOAT_EQ(drone.m_normal.m_x, 0);
-  EXPECT_FLOAT_EQ(drone.m_normal.m_y, 0);
-  EXPECT_FLOAT_EQ(drone.m_normal.m_z, 0);
-}
-
 TEST(ValidateNavigationSystem, getRealSensorsDistance) {
   float sensor1 = 10;
   float sensor2 = -2;

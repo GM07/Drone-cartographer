@@ -83,7 +83,7 @@ class CommCrazyflie(AbstractComm):
             log_config.add_variable('kalman.stateX', 'float')
             log_config.add_variable('kalman.stateY', 'float')
             log_config.add_variable('kalman.stateZ', 'float')
-            log_config.add_variable('pm.batteryLevel', 'uint8_t')
+            log_config.add_variable('custom.batteryLevel', 'uint8_t')
             log_config.add_variable('custom.droneCustomState', 'uint8_t')
             self.log_configs.append(log_config)
 

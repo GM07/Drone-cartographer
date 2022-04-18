@@ -52,7 +52,8 @@ class AbstractController {
     if (m_abstractSensors == nullptr) {
       return false;
     }
-    return m_abstractSensors->getBatteryLevel() < kLowBattery;
+    return m_abstractSensors->getBatteryLevel(m_state != State::kIdle) <
+           kLowBattery;
   }
   [[nodiscard]] virtual bool isDroneCrashed() const = 0;
 

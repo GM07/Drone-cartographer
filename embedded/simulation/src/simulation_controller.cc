@@ -41,7 +41,7 @@ void SimulationController::updateSensorsData() {
       m_abstractSensors->getRightDistance() * kCmToMmFactor,
       getCurrentLocation().rotate(-m_orientation).m_x,
       getCurrentLocation().rotate(-m_orientation).m_y,
-      m_abstractSensors->getBatteryLevel(),
+      m_abstractSensors->getBatteryLevel(m_state != State::kIdle),
       m_state,
   };
 

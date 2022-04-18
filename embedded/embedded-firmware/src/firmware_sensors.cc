@@ -1,8 +1,28 @@
 #include "sensors/firmware_sensors.h"
 
+#include <algorithm>
+#include <array>
+#include <iterator>
+
 extern "C" {
 #include "log.h"
 }
+
+namespace {
+constexpr std::size_t kNbLevel = 10;
+std::array<float, kNbLevel> kBatLevels{{
+    4.10,  // 90%
+    4.04,  // 80%
+    4.00,  // 70%
+    3.96,  // 60%
+    3.92,  // 50%
+    3.89,  // 40%
+    3.87,  // 30%
+    3.83,  // 20%
+    3.78,  // 10%
+    3.00   // 00%
+}};
+}  // namespace
 
 ///////////////////////////////////////
 [[nodiscard]] float FirmwareSensors::getFrontDistance() const {
@@ -47,7 +67,12 @@ extern "C" {
 }
 
 ///////////////////////////////////////
-[[nodiscard]] float FirmwareSensors::getBatteryLevel() const {
-  logVarId_t vbatid = logGetVarId("pm", "batteryLevel");
-  return static_cast<float>(logGetUint(vbatid));
+[[nodiscard]] float FirmwareSensors::getBatteryLevel(bool isInMission) const {
+  const float modifier = isInMission ? 0.6F : 0.0F;
+  logVarId_t id = logGetVarId("pm", "vbat");
+  float voltage = logGetFloat(id);
+  return (
+      std::count_if(kBatLevels.begin(), kBatLevels.end(),
+                    [=](float level) { return voltage > level - modifier; }) *
+      10);
 }
