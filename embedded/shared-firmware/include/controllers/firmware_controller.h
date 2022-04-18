@@ -15,19 +15,24 @@ class FirmwareController : public AbstractController {
  public:
   FirmwareController();
   ~FirmwareController() override = default;
-
   FirmwareController(FirmwareController&& other) = delete;
-  FirmwareController operator=(FirmwareController&& other) = delete;
+  FirmwareController& operator=(FirmwareController&& other) = delete;
   FirmwareController(const FirmwareController& other) = delete;
-  FirmwareController operator=(const FirmwareController& other) = delete;
+  FirmwareController& operator=(const FirmwareController& other) = delete;
 
+  void stopMotors() const override;
   void setVelocity(const Vector3D& direction, float speed,
                    bool /*bodyReference*/) override;
-  void takeOff(float height) override;
-  void land() override;
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
-  [[nodiscard]] bool isTrajectoryFinished() const override;
+  [[nodiscard]] bool isTrajectoryFinished() const override {
+    return Math::areAlmostEqual(getCurrentLocation(), m_targetPosition,
+                                kRealTrajectoryFinishedTreshold);
+  }
+  [[nodiscard]] inline bool isAltitudeReached() const override {
+    return Math::areAlmostEqual(getCurrentLocation().m_z, m_targetPosition.m_z,
+                                kRealTrajectoryFinishedTreshold);
+  };
 
   size_t receiveMessage(void* message, size_t size) const override;
   void sendMessage(void* message, size_t size) const override;
@@ -52,6 +57,7 @@ class FirmwareController : public AbstractController {
   void log(const std::string& message) override{/**/};
 
  private:
+  float m_height;
   ledseqContext_t m_seqLED{};
 };
 #endif

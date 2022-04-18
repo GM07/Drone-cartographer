@@ -42,16 +42,3 @@ TEST(ValidateAppMain, updateCrashStatusFun) {
   EXPECT_EQ(Drone::getEmbeddedDrone().getController()->m_state, State::kCrash);
   delete mock;
 }
-
-TEST(ValidateAppMain, enableCrtpHighLevelCommand) {
-  mock = new FunctionsMock;
-  paramVarId_t mockParam;
-  EXPECT_CALL(*mock, paramGetVarId(_, _)).WillOnce([&]() { return mockParam; });
-  EXPECT_CALL(
-      *mock,
-      paramSetInt(_, 1));  // Wanted to expect mockParam as first argument but
-                           // == operator is not overloaded :(
-
-  enableCrtpHighLevelCommander();
-  delete mock;
-}

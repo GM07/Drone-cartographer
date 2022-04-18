@@ -33,7 +33,7 @@ template <>
 struct hash<PotentialShortcut> {
   size_t operator()(const PotentialShortcut& potentialShortcut) const {
     size_t seed = hash<Vector3D>()(potentialShortcut.sensorDirection);
-    std::hash_combine<Segment>(seed, potentialShortcut.intersectionSegment);
+    seed = std::hash_combine<Segment>(seed, potentialShortcut.intersectionSegment);
     return seed;
   }
 };

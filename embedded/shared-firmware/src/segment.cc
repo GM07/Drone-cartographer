@@ -17,7 +17,7 @@ Segment::Segment(const Vector3D& start, const Vector3D& end)
 
   const float determinant = a1 * b2 - a2 * b1;
 
-  if (areAlmostEqual(determinant, 0.0F)) {
+  if (Math::areAlmostEqual(determinant, 0.0F)) {
     return std::nullopt;
   }
 

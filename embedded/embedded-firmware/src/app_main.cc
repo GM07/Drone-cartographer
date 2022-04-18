@@ -24,7 +24,7 @@ bool commIsInit = false;
 
 }  // namespace
 
-static_assert(kDroneSpeed == 0.25,  // NOLINT
+static_assert(kSpeed == 0.25,  // NOLINT
               "You changed the drone speed! Was that really intended ? ");
 
 /////////////////////////////////////////////////////////////////////////
@@ -56,13 +56,6 @@ void updateCrashStatus() {
 }
 
 /////////////////////////////////////////////////////////////////////////
-void enableCrtpHighLevelCommander() {
-  paramVarId_t paramIdCommanderEnHighLevel =
-      paramGetVarId("commander", "enHighLevel");
-  paramSetInt(paramIdCommanderEnHighLevel, 1);
-}
-
-/////////////////////////////////////////////////////////////////////////
 uint8_t logDroneState(uint32_t /*timestamp*/, void* /*data*/) {
   return static_cast<uint8_t>(
       Drone::getEmbeddedDrone().getController()->m_state);
@@ -90,7 +83,6 @@ void addCustomLoggingVariables() {
 extern "C" void appMain() {
   ledClearAll();
   addCustomLoggingVariables();
-  enableCrtpHighLevelCommander();
   Drone::getEmbeddedDrone().initDrone();
 
   while (true) {

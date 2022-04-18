@@ -18,8 +18,9 @@ struct DroneData {
   Vector3D m_direction;
   float m_distanceFromTakeoff{0};
   float m_range{0};
-  std::array<char, kHeaderSize> m_magicHeader{{'D', 'R', 'E', 'A', 'M'}};
+  float m_randomAngleRad{0.0F};
   size_t m_id{0};
+  std::array<char, kHeaderSize> m_magicHeader{{'D', 'R', 'E', 'A', 'M'}};
 
  public:
   DroneData transformReference(const float orientation) {
