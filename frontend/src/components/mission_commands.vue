@@ -144,12 +144,13 @@ export default class MissionCommands extends Vue {
     this.isTerminateMissionSelected = true;
     this.$emit('terminateMission', true);
 
-    const COMMAND_SENT = ServerCommunication.terminateMission(
-      this.maps[0].toDataURL(),
-      () => {
-        this.isTerminateMissionSelected = false;
-      }
-    );
+    const IMAGE =
+      this.maps[0] !== undefined
+        ? this.maps[0].toDataURL()
+        : 'data:image/png;base64';
+    const COMMAND_SENT = ServerCommunication.terminateMission(IMAGE, () => {
+      this.isTerminateMissionSelected = false;
+    });
 
     if (!COMMAND_SENT) {
       this.isTerminateMissionSelected = false;
