@@ -201,8 +201,8 @@ describe('mission.vue', () => {
       setTimeout(() => {
         expect(TEST_WRAPPER.vm.droneList[0].xPos).toEqual(1);
         done();
-      }, 100);
-    }, 100);
+      }, 500);
+    }, 500);
   });
 
   it('should disconnect', () => {

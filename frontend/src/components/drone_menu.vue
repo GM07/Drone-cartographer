@@ -172,7 +172,7 @@ export default class DroneMenu extends Vue {
   @Prop() private droneList!: DroneData[];
   @Prop() private isDroneMenuOpen!: boolean;
   @Prop() private isMissionSimulated!: boolean;
-  @Prop() private currentDroneList: DroneData[] = [];
+  @Prop() private currentDroneList!: DroneData[];
   private newDrone: NewDroneData = {...DEFAULT_NEW_DRONE_DATA};
   private dragSelector = '.drag-container';
   private x = 0;

@@ -68,15 +68,17 @@
         </div>
 
         <template v-slot:extension>
-          <v-tabs v-model="currentTab">
-            <v-tab @click="changeFilterMode(filter.all)">Tous</v-tab>
-            <v-tab @click="changeFilterMode(filter.simulated)"
-              >Simulation</v-tab
-            >
-            <v-tab @click="changeFilterMode(filter.physical)">Embarqué</v-tab>
-            <v-tab @click="changeFilterMode(filter.date)">Date</v-tab>
-            <v-spacer></v-spacer>
-          </v-tabs>
+          <div id="tabs">
+            <v-tabs v-model="currentTab">
+              <v-tab @click="changeFilterMode(filter.all)">Tous</v-tab>
+              <v-tab @click="changeFilterMode(filter.simulated)"
+                >Simulation</v-tab
+              >
+              <v-tab @click="changeFilterMode(filter.physical)">Embarqué</v-tab>
+              <v-tab @click="changeFilterMode(filter.date)">Date</v-tab>
+              <v-spacer></v-spacer>
+            </v-tabs>
+          </div>
         </template>
       </v-app-bar>
 
@@ -276,6 +278,11 @@
 }
 .Map {
   border: 1px solid black;
+}
+
+#tabs {
+  filter: invert(100%) sepia(85%) saturate(78%) hue-rotate(203deg)
+    brightness(112%) contrast(92%);
 }
 </style>
 
