@@ -6,9 +6,9 @@
         "name": "Argos",
         "type": "cppdbg",
         "request": "launch",
-        "program": "LD_PRELOAD=/lib/x86_64-linux-gnu/libasan.so.5",
+        "program": "/usr/local/bin/argos3",
         "args": [
-          "/usr/local/bin/argos3", "-c", "experiments/${input:argos_experiment}",
+          "-c", "experiments/${input:argos_experiment}",
         ],
         "cwd": "${workspaceFolder}/simulation",
         "MIMode": "gdb",
