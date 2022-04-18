@@ -13,8 +13,8 @@ class StartingDroneData:
         return 'name: ' \
             + self.name \
             + ' starting_x_pos: ' \
-            + self.starting_x_pos \
+            + str(self.starting_x_pos) \
             + ' starting_y_pos: ' \
-            + self.starting_y_pos \
+            + str(self.starting_y_pos) \
             + ' starting_orientation: ' \
-            + self.starting_orientation
+            + str(self.starting_orientation)
