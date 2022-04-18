@@ -106,7 +106,8 @@ def recompile():
 # Reflash firmware
 @SOCKETIO.on('flash', namespace='/limitedAccess')
 def flash():
-    if not AccessStatus.is_request_valid(request):
+    if not AccessStatus.is_request_valid(
+            request) or MissionStatus.get_mission_started():
         return ''
 
     if AccessStatus.get_mission_simulated():
