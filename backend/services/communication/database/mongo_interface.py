@@ -9,7 +9,7 @@ database.upload_mission_info(mission_info)
 from dataclasses import dataclass
 import threading
 
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from mongomock import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
@@ -153,15 +153,18 @@ def serialize_objectid_from_result(result: list):
 class MissionManager:
     current_mission: Mission = {}
     current_mission_start_time: float
-    last_known_positions: List[Point2D] = []
+    last_known_positions: Dict[str, Point2D] = {}
     lock = threading.Lock()
     is_mission_started = False
 
-    def start_current_mission(self, drone_count: int, is_simulated: bool):
+    def start_current_mission(self, drone_list: List[DroneData],
+                              is_simulated: bool):
         self.lock.acquire()
-        self.current_mission = Mission(0, drone_count, is_simulated, 0, [[]])
+        self.current_mission = Mission(0, len(drone_list), is_simulated, 0,
+                                       [[]])
         self.mission_start_time = perf_counter()
-        self.last_known_positions = [Point2D(0, 0)] * drone_count
+        for drone in drone_list:
+            self.last_known_positions[drone.name] = Point2D(0, 0)
         self.is_mission_started = True
         self.lock.release()
 
@@ -172,8 +175,6 @@ class MissionManager:
         ) - self.mission_start_time
         self.current_mission.logs = logs
 
-        self.last_known_positions = [Point2D(0, 0)
-                                    ] * self.current_mission.number_of_drones
         self.is_mission_started = False
         Map.raw_data.clear()
         Map.filtered_data.clear()
@@ -181,15 +182,16 @@ class MissionManager:
         database.upload_mission_info(self.current_mission)
         self.lock.release()
 
-    def update_position(self, data: DroneData, index):
+    def update_position(self, data: DroneData):
 
         self.lock.acquire()
         if not self.is_mission_started:
             self.lock.release()
             return
-        self.current_mission.total_distance += math.hypot(
-            data.position.x - self.last_known_positions[index].x,
-            data.position.y - self.last_known_positions[index].y)
 
-        self.last_known_positions[index] = data.position
+        self.current_mission.total_distance += math.hypot(
+            data.position.x - self.last_known_positions[data.name].x,
+            data.position.y - self.last_known_positions[data.name].y)
+
+        self.last_known_positions[data.name] = data.position
         self.lock.release()
