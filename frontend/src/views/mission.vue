@@ -287,14 +287,6 @@ export default class Mission extends Vue {
     return ACCESSOR.missionStatus.isMissionStarted;
   }
 
-  public recompile(): void {
-    if (this.accessStatus.isUserControlling) ServerCommunication.recompile();
-  }
-
-  public flash(): void {
-    if (this.accessStatus.isUserControlling) ServerCommunication.flash();
-  }
-
   public deleteDrone(index: number): void {
     if (this.chosenOption >= index) {
       this.chosenOption = -1;

@@ -9,31 +9,34 @@ import Vuetify from 'vuetify';
 describe('completed_missions.vue', () => {
   let wrapper: Wrapper<DefaultProps & CompletedMissions, Element>;
   let getCompletedMissionsSpy: jasmine.Spy;
-  const DEFAULT_FAKE_MISSION_LIST = [
-    {
-      time_stamp: '1',
-      flight_duration: 2,
-      number_of_drones: 0,
-      is_simulated: true,
-      total_distance: 0,
-      map: '',
-    } as Mission,
-  ];
-  const DIFFERENT_FAKE_MISSION_LIST = [
-    {
-      time_stamp: '2',
-      flight_duration: 3,
-      number_of_drones: 1,
-      is_simulated: false,
-      total_distance: 1,
-      map: '',
-    } as Mission,
-  ];
+  let defaultFakeMissionList: Mission[];
+  let differentFakeMissionList: Mission[];
   const VUETIFY = new Vuetify();
 
   beforeEach(() => {
+    defaultFakeMissionList = [
+      {
+        time_stamp: '1',
+        flight_duration: 2,
+        number_of_drones: 0,
+        is_simulated: true,
+        total_distance: 0,
+        map: '',
+      } as Mission,
+    ];
+    differentFakeMissionList = [
+      {
+        time_stamp: '2',
+        flight_duration: 3,
+        number_of_drones: 1,
+        is_simulated: false,
+        total_distance: 1,
+        map: '',
+      } as Mission,
+    ];
+
     fetchMock.resetMocks();
-    fetchMock.mockResponse(JSON.stringify(DEFAULT_FAKE_MISSION_LIST), {
+    fetchMock.mockResponse(JSON.stringify(defaultFakeMissionList), {
       status: SERVER_CONSTANTS.HTTP_OK,
     });
     getCompletedMissionsSpy = spyOn(
@@ -47,8 +50,8 @@ describe('completed_missions.vue', () => {
 
   it('should create', () => {
     expect(wrapper).toBeTruthy();
-    expect(wrapper.vm['missions']).toEqual(DEFAULT_FAKE_MISSION_LIST);
-    expect(wrapper.vm['showedMissions']).toEqual(DEFAULT_FAKE_MISSION_LIST);
+    expect(wrapper.vm['missions']).toEqual(defaultFakeMissionList);
+    expect(wrapper.vm['showedMissions']).toEqual(defaultFakeMissionList);
   });
 
   it('should change filter mode', done => {
@@ -83,12 +86,12 @@ describe('completed_missions.vue', () => {
 
   it('should get completed missions', async () => {
     fetchMock.resetMocks();
-    fetchMock.mockResponse(JSON.stringify(DIFFERENT_FAKE_MISSION_LIST), {
+    fetchMock.mockResponse(JSON.stringify(differentFakeMissionList), {
       status: SERVER_CONSTANTS.HTTP_OK,
     });
     await wrapper.vm['getCompletedMissions']();
     expect(getCompletedMissionsSpy).toHaveBeenCalled();
-    expect(wrapper.vm['missions']).toEqual(DIFFERENT_FAKE_MISSION_LIST);
+    expect(wrapper.vm['missions']).toEqual(differentFakeMissionList);
   });
 
   it('should filter by date', () => {
@@ -152,6 +155,11 @@ describe('completed_missions.vue', () => {
     wrapper.vm['openLogId'] = DEFAULT_ID;
     wrapper.vm['setLogsMenu'](false, DEFAULT_MISSION);
     expect(wrapper.vm['openLogId']).not.toEqual(DEFAULT_ID);
+
+    const VALID_MISSION = {_id: 'id2', logs: [['1', '2']]} as Mission;
+    wrapper.vm['setLogsMenu'](true, VALID_MISSION);
+    expect(wrapper.vm['openLogId']).toEqual('id2');
+
     wrapper.vm['setLogsMenu'](true, DEFAULT_MISSION);
     expect(SPY).toHaveBeenCalled();
   });
@@ -166,5 +174,36 @@ describe('completed_missions.vue', () => {
 
     const RES = await wrapper.vm['getMissionLogs'](FAKE_MISSION_ID);
     expect(RES).toEqual(FAKE_MISSION_RESULT);
+  });
+
+  it('should set mission map', () => {
+    const GET_MISSION_SPY = spyOn(wrapper.vm, 'getMissionMaps').and.returnValue(
+      new Promise(resolve => {
+        resolve(defaultFakeMissionList[0]);
+      })
+    );
+    wrapper.vm['setMissionMaps'](false, defaultFakeMissionList[0]);
+    expect(GET_MISSION_SPY).not.toHaveBeenCalled();
+
+    wrapper.vm['setMissionMaps'](true, defaultFakeMissionList[0]);
+    expect(GET_MISSION_SPY).not.toHaveBeenCalled();
+
+    wrapper.vm['setMissionMaps'](true, {
+      ...defaultFakeMissionList[0],
+      map: undefined as unknown as string,
+    });
+    expect(GET_MISSION_SPY).toHaveBeenCalled();
+  });
+
+  it('should get mission maps', async () => {
+    const DATA = 'data';
+    fetchMock.resetMocks();
+    fetchMock.mockResponse(JSON.stringify(DATA), {
+      status: SERVER_CONSTANTS.HTTP_OK,
+    });
+    const RESULT = await wrapper.vm['getMissionMaps'](
+      defaultFakeMissionList[0]
+    );
+    expect(RESULT).toEqual(DATA);
   });
 });

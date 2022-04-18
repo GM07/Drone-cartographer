@@ -6,6 +6,7 @@ module.exports = {
     'src/**/*.{vue,ts,tsx}',
     '!src/main.ts',
     '!src/app.vue',
+    '!src/components/code_editor/**',
     '!**/node_modules/**',
     '!**/vendor/**',
   ],
