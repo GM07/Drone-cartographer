@@ -28,7 +28,7 @@
                 <v-col :key="1">
                   <v-text-field
                     v-model.number="newDrone.startingXPos"
-                    label="Position X"
+                    label="Position initiale X"
                     :rules="[
                       validateDistance,
                       validatePosition,
@@ -42,7 +42,7 @@
                 <v-col :key="2">
                   <v-text-field
                     v-model.number="newDrone.startingYPos"
-                    label="Position Y"
+                    label="Position initiale Y"
                     :rules="[
                       validateDistance,
                       validatePosition,
@@ -79,7 +79,7 @@
                   :id="drone.name"
                   :key="drone.name"
                   :style="
-                    'position: absolute; width: 30px; height: 30px; left: ' +
+                    'position: absolute; width: 32px; height: 32px; left: ' +
                     xPosToPixel(drone.startingXPos) +
                     'px; top:' +
                     yPosToPixel(drone.startingYPos) +
@@ -240,7 +240,7 @@ export default class DroneMenu extends Vue {
 
   public xPosToPixel(pos: number): number {
     return (
-      ((pos / DroneMenu.MAX_RANGE) * DroneMenu.WIDTH +
+      ((pos / DroneMenu.MAX_RANGE) * (DroneMenu.WIDTH - DroneMenu.DRONE_WIDTH) +
         DroneMenu.WIDTH -
         DroneMenu.DRONE_WIDTH) /
       2
@@ -249,7 +249,8 @@ export default class DroneMenu extends Vue {
 
   public yPosToPixel(pos: number): number {
     return (
-      ((-pos / DroneMenu.MAX_RANGE) * DroneMenu.HEIGHT +
+      ((-pos / DroneMenu.MAX_RANGE) *
+        (DroneMenu.HEIGHT - DroneMenu.DRONE_HEIGHT) +
         DroneMenu.HEIGHT -
         DroneMenu.DRONE_HEIGHT) /
       2

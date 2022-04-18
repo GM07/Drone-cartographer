@@ -90,10 +90,10 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed,
   Vector3D speedVector = direction.toUnitVector() * speed;
 
   static setpoint_t setpoint;
-  setpoint.mode.z = modeVelocity;
+
   setpoint.mode.x = modeVelocity;
   setpoint.mode.y = modeVelocity;
-  setpoint.velocity.z = speedVector.m_z;
+
   setpoint.velocity.x = speedVector.m_x;
   setpoint.velocity.y = speedVector.m_y;
   setpoint.velocity_body = false;
@@ -102,6 +102,9 @@ void FirmwareController::setVelocity(const Vector3D& direction, float speed,
   if (m_state == State::kExploring || m_state == State::kReturningToBase) {
     setpoint.mode.z = modeAbs;
     setpoint.position.z = kHeight;
+  } else {
+    setpoint.mode.z = modeVelocity;
+    setpoint.velocity.z = speedVector.m_z;
   }
 
   commanderSetSetpoint(&setpoint, 3);

@@ -11,16 +11,16 @@ extern "C" {
 namespace {
 constexpr std::size_t kNbLevel = 10;
 std::array<float, kNbLevel> kBatLevels{{
-    4.10,  // 90%
-    4.04,  // 80%
-    4.00,  // 70%
-    3.96,  // 60%
-    3.92,  // 50%
-    3.89,  // 40%
-    3.87,  // 30%
-    3.83,  // 20%
-    3.78,  // 10%
-    3.00   // 00%
+    4.10,  // 90% // NOLINT
+    4.04,  // 80% // NOLINT
+    4.00,  // 70% // NOLINT
+    3.96,  // 60% // NOLINT
+    3.92,  // 50% // NOLINT
+    3.89,  // 40% // NOLINT
+    3.87,  // 30% // NOLINT
+    3.83,  // 20% // NOLINT
+    3.78,  // 10% // NOLINT
+    3.00   // 00% // NOLINT
 }};
 }  // namespace
 
@@ -68,11 +68,12 @@ std::array<float, kNbLevel> kBatLevels{{
 
 ///////////////////////////////////////
 [[nodiscard]] float FirmwareSensors::getBatteryLevel(bool isInMission) const {
+  constexpr float kToPercentage = 10.0F;
   const float modifier = isInMission ? 0.6F : 0.0F;
   logVarId_t id = logGetVarId("pm", "vbat");
   float voltage = logGetFloat(id);
-  return (
+  return static_cast<float>(
       std::count_if(kBatLevels.begin(), kBatLevels.end(),
                     [=](float level) { return voltage > level - modifier; }) *
-      10);
+      kToPercentage);
 }

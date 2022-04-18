@@ -49,7 +49,6 @@ void Drone::step() {
       bodyReference = !returnToBase();
       analyzeShortcuts();
       break;
-    case State::kIdle:  // Fallthrough
     default:
       return;
   }
@@ -159,7 +158,7 @@ void Drone::changeDirection() {
   // Only add the point if we are not in returnToBase or if we had a
   // collision This is because we disable wallCollision when returning to
   // base Otherwise the drone gets stuck and we have -nan values as speed
-  if (m_controller->m_state != State::kReturningToBase || m_peerCollision) {
+  if (m_controller->m_state == State::kExploring || m_peerCollision) {
     m_returnPath.push_back(m_controller->getCurrentLocation());
   }
 
@@ -171,8 +170,8 @@ void Drone::changeDirection() {
 
 bool Drone::returnToBase() {
   if (m_controller->isNearBase()) {
-    m_controller->land();
     m_data.m_direction = Vector3D::z(-1.0F);
+    m_controller->land();
     return false;
   }
 
@@ -181,7 +180,9 @@ bool Drone::returnToBase() {
     return false;
   }
 
-  m_controller->m_targetPosition = m_returnPath[m_returnPath.size() - 1];
+  if (!m_returnPath.empty()) {
+    m_controller->m_targetPosition = m_returnPath[m_returnPath.size() - 1];
+  }
 
   if (m_controller->hasReachedCheckpoint()) {
     if (!m_returnPath.empty()) {
@@ -309,12 +310,11 @@ void Drone::validatePotentialShortCuts(
         m_potentialShortCuts.clear();
 
         // Once a shortcut is found leave the loop
-        potentialShortcutIterator = m_potentialShortCuts.end();
-      } else {
-        // If we can't use the shortcut anymore delete it
-        potentialShortcutIterator =
-            m_potentialShortCuts.erase(potentialShortcutIterator);
+        break;
       }
+      // If we can't use the shortcut anymore delete it
+      potentialShortcutIterator =
+          m_potentialShortCuts.erase(potentialShortcutIterator);
     } else {
       ++potentialShortcutIterator;
     }
