@@ -57,7 +57,6 @@ TEST(validateSimulationController, takeOffShouldDoSomethingIfValidHeight) {
   crazyflie.m_pcPropellers = &propellers;
   crazyflie.m_pcPos = &positionSensor;
 
-  EXPECT_CALL(propellers, SetLinearVelocity(_)).Times(1);
-
   controller.takeOff(1.0f);
+  EXPECT_TRUE(controller.m_state == State::kTakingOff);
 }

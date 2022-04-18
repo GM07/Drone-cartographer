@@ -104,11 +104,12 @@ TEST(ValidateEmbeddedFirmware, takeoff) {
   constexpr point_t kPointRef{0, 0, 1, 0};
   constexpr float kHeight = 1.0F;
   EXPECT_CALL(*mock, estimatorKalmanGetEstimatedPos)
-      .Times(1)
+      .Times(AtLeast(1))
       .WillRepeatedly([&](point_t* point) { *point = kPointRef; });
   EXPECT_CALL(*mock, commanderSetSetpoint(_, 3)).Times(1);
 
   Drone::getEmbeddedDrone().getController()->takeOff(kHeight);
+  Drone::getEmbeddedDrone().step();
 
   delete mock;
 }
@@ -119,11 +120,12 @@ TEST(ValidateEmbeddedFirmware, land) {
   constexpr point_t kPointRef{0, 0, 1, 1};
 
   EXPECT_CALL(*mock, estimatorKalmanGetEstimatedPos)
-      .Times(1)
+      .Times(AtLeast(1))
       .WillRepeatedly([&](point_t* point) { *point = kPointRef; });
   EXPECT_CALL(*mock, commanderSetSetpoint(_, 3)).Times(1);
 
   Drone::getEmbeddedDrone().getController()->land();
+  Drone::getEmbeddedDrone().step();
   delete mock;
 }
 
