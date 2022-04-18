@@ -131,7 +131,7 @@ class CommCrazyflie(AbstractComm):
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         # print(f'{timestamp}{logconf.id}:{data}')
         self.mission_manager.update_position(drone_data)
-        self.send_log(f'{logconf.id}{data} ')
+        self.send_log(f'{drone_data.name} {data} ')
         self.send_drone_status([drone_data.to_dict()])
         self.set_drone_data(drone_data)
 
