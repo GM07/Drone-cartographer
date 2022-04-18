@@ -14,6 +14,9 @@ services:
       - /dev:/dev
       - /tmp/socket:/tmp/socket
       - /var/run/docker.sock:/var/run/docker.sock
+      - ../embedded:/embedded
+    devices:
+      - /dev/bus/usb/:/dev/bus/usb/
     network_mode: host
 
     
