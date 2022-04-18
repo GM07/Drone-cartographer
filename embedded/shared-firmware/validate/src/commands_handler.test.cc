@@ -38,6 +38,35 @@ TEST(ValidateCommandsHandler, handleCommandLand) {
   EXPECT_EQ(drone.getController()->m_state, State::kLanding);
 }
 
+TEST(ValidateCommandsHandler, handleCommandStartP2P) {
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  Drone drone(controller);
+  drone.getController()->m_state = State::kExploring;
+  EXPECT_TRUE(drone.handleCommand(Command::kStartP2PGradient));
+  EXPECT_TRUE(drone.m_p2pColorGradientIsActive);
+}
+
+TEST(ValidateCommandsHandler, handleCommandEndP2P) {
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  Drone drone(controller);
+  drone.getController()->m_state = State::kExploring;
+  drone.m_p2pColorGradientIsActive = true;
+  EXPECT_TRUE(drone.handleCommand(Command::kEndP2PGradient));
+  EXPECT_FALSE(drone.m_p2pColorGradientIsActive);
+}
+
+TEST(ValidateCommandsHandler, handleCommandReturnToBase) {
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+  Drone drone(controller);
+  drone.getController()->m_state = State::kExploring;
+  drone.m_p2pColorGradientIsActive = true;
+  EXPECT_TRUE(drone.handleCommand(Command::kReturnToBase));
+  EXPECT_EQ(drone.getController()->m_state, State::kReturningToBase);
+}
+
 TEST(ValidateCOmmandsHandler, shouldNotHandleCommandsIfCrashed) {
   std::shared_ptr<StubController> controller =
       std::make_shared<StubController>();

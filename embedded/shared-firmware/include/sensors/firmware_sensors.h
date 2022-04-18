@@ -20,7 +20,7 @@ class FirmwareSensors : public AbstractSensors {
   [[nodiscard]] float getPosX() const override;
   [[nodiscard]] float getPosY() const override;
   [[nodiscard]] float getPosZ() const override;
-  [[nodiscard]] float getBatteryLevel() const override;
+  [[nodiscard]] float getBatteryLevel(bool isInMission) const override;
 };
 
 #endif

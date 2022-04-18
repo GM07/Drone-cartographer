@@ -147,8 +147,10 @@
     </div>
 
     <DroneMenu
+      :currentDroneList="droneList"
       :droneList="droneList"
       :isDroneMenuOpen="isDroneMenuOpen"
+      :isMissionSimulated="accessStatus.isMissionSimulated"
       @addDrone="addDrone"
       @setDroneMenuOpen="setDroneMenuOpen"
     />
@@ -272,18 +274,17 @@ export default class Mission extends Vue {
 
   constructor() {
     super();
+
+    window.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === '=') {
+        event.preventDefault();
+        this.setDroneMenuOpen(true);
+      }
+    });
   }
 
   public getMissionStatus(): boolean {
     return ACCESSOR.missionStatus.isMissionStarted;
-  }
-
-  public recompile(): void {
-    if (this.accessStatus.isUserControlling) ServerCommunication.recompile();
-  }
-
-  public flash(): void {
-    if (this.accessStatus.isUserControlling) ServerCommunication.flash();
   }
 
   public deleteDrone(index: number): void {

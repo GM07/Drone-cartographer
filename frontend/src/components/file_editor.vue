@@ -45,12 +45,11 @@ export default class FileEditor extends Vue {
 
   @Watch('fileContent', {immediate: true})
   public update(): void {
-    console.log('fileContent changed');
-    console.log(this.fileContent);
+    //
   }
 
   public save(): void {
-    console.log(this.fileContent);
+    //
   }
 }
 </script>

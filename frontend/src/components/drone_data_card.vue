@@ -155,10 +155,6 @@ export default class DroneDataCard extends Vue {
   @Prop() selected;
   @Prop() userControlling;
 
-  constructor() {
-    super();
-  }
-
   @Watch('droneData.batteryLevel')
   public computeBatteryIconOutput(): string {
     const ICON = 'mdi-battery';
@@ -173,11 +169,8 @@ export default class DroneDataCard extends Vue {
     if (BATTERY < STEP) {
       return 'mdi-battery-outline';
     }
-
-    console.log('fixed : ', +Math.floor(BATTERY / STEP).toFixed(0) * STEP);
     const UPDATED_ICON =
-      ICON + '-' + +Math.floor(BATTERY / STEP).toFixed(0) * STEP;
-    console.log(UPDATED_ICON);
+      ICON + '-' + Math.round(Math.floor(BATTERY / STEP)) * STEP;
     return UPDATED_ICON;
   }
 

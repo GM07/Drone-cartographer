@@ -5,6 +5,7 @@
 #include "stub_firmware_controller.h"
 
 using ::testing::_;
+using ::testing::AtLeast;
 using ::testing::Return;
 
 TEST(ValidateNavigationSystem, stepTakingOff) {
@@ -85,6 +86,16 @@ TEST(ValidateNavigationSystem, stateExploring) {
   EXPECT_EQ(drone.getController()->m_state, State::kExploring);
 }
 
+TEST(ValidateNavigationSystem, stateReturningToBase) {
+  std::shared_ptr<StubController> controller =
+      std::make_shared<StubController>();
+
+  EXPECT_CALL(*controller, setVelocity(_, _, _)).Times(AtLeast(1));
+  controller->m_state = State::kReturningToBase;
+  Drone drone(controller);
+  drone.step();
+}
+
 TEST(ValidateNavigationSystem, takingOffFinished) {
   std::shared_ptr<StubController> controller =
       std::make_shared<StubController>();
@@ -127,4 +138,14 @@ TEST(ValidateNavigationSystem, landingFinished) {
   drone.step();
 
   EXPECT_EQ(drone.getController()->m_state, State::kIdle);
+}
+
+TEST(ValidateNavigationSystem, getRealSensorsDistance) {
+  float sensor1 = 10;
+  float sensor2 = -2;
+  float sensor3 = -20;
+  constexpr float kMastDist = 1500;
+  EXPECT_EQ(Drone::getRealSensorDistance(sensor1), sensor1);
+  EXPECT_EQ(Drone::getRealSensorDistance(sensor2), 0);
+  EXPECT_EQ(Drone::getRealSensorDistance(sensor3), kMastDist);
 }

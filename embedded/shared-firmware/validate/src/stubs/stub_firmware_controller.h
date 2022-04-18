@@ -25,4 +25,6 @@ class StubController : public FirmwareController {
   MOCK_CONST_METHOD0(getId, size_t());
   MOCK_CONST_METHOD0(getMinCollisionAvoidanceDistance, float());
   MOCK_CONST_METHOD0(getMaxCollisionAvoidanceDistance, float());
+  MOCK_CONST_METHOD0(hasLowBattery, bool());
+  MOCK_METHOD3(setVelocity, void(const Vector3D&, float, bool));
 };

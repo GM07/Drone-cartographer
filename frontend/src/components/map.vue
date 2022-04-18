@@ -1,28 +1,29 @@
 <template>
   <div style="display: flex; flex-direction: column; align-items: center">
     <h2 style="padding-top: 20px">Carte {{ this.mapName }}</h2>
-    <canvas
-      ref="canvas"
-      style="
-        width: 65vh;
-        height: 65vh;
-        border: 2px solid gray;
-        margin: 20px 10px;
-      "
-    ></canvas>
+    <canvas ref="canvas" class="canvas-style"></canvas>
   </div>
 </template>
 
+<style scoped>
+.canvas-style {
+  width: 65vh;
+  height: 65vh;
+  border: 2px solid gray;
+  margin: 20px 10px;
+}
+</style>
+
 <script lang="ts">
 import {Component, Vue, Prop, Watch} from 'vue-property-decorator';
-import {Vec2d} from '../utils/vec2d';
+import {Vec2d} from '@/utils/vec2d';
 import {
   MapData,
   MM_TO_CM,
   M_TO_CM,
   MAP_SIZE,
   DEGREE_TO_RAD,
-} from '../utils/map_constants';
+} from '@/utils/map_constants';
 
 import {SOCKETIO_MAP_DATA} from '@/communication/server_constants';
 import {DroneData} from '@/communication/drone';

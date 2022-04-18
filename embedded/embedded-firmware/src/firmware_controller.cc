@@ -55,7 +55,8 @@ void FirmwareController::updateSensorsData() {
       .right = m_abstractSensors->getRightDistance(),
       .posX = m_abstractSensors->getPosX(),
       .posY = m_abstractSensors->getPosY(),
-      .batteryLevel = m_abstractSensors->getBatteryLevel(),
+      .batteryLevel =
+          m_abstractSensors->getBatteryLevel(m_state != State::kIdle),
       .state = m_state,
   };
 }

@@ -91,3 +91,42 @@ TEST(validateVector3D, reflect) {
   Vector3D output = vec2.reflect(vec1);
   EXPECT_TRUE(Math::areAlmostEqual(output, result));
 }
+
+TEST(ValidateVector3D, distanceXY) {
+  Vector3D vec1(0, 0, 0);
+  Vector3D vec2(3, 4, 25);
+  EXPECT_FLOAT_EQ(vec2.distanceToXY(vec1), 5);
+}
+
+TEST(ValidateVector3D, operatorMinusEqual) {
+  Vector3D vec1(5, 5, 5);
+  Vector3D vec2(1, 3, 4);
+  Vector3D copy(vec1);
+  vec1 -= vec2;
+  EXPECT_EQ(vec1, copy - vec2);
+}
+
+TEST(ValidateVector3D, toString) {
+  Vector3D vec1(23, 32, 33);
+  EXPECT_NE(vec1.toString().find("23"), std::string::npos);
+  EXPECT_NE(vec1.toString().find("32"), std::string::npos);
+  EXPECT_NE(vec1.toString().find("33"), std::string::npos);
+}
+
+TEST(ValidateVector3D, areSameDirection) {
+  Vector3D vec1(1, 2, 0);
+  Vector3D vec2(-1, 2, 0);
+  EXPECT_TRUE(Vector3D::areSameDirection(vec1, vec2));
+}
+
+TEST(ValidateVector3D, constructorX) {
+  EXPECT_EQ(Vector3D::x(1), Vector3D(1, 0, 0));
+}
+
+TEST(ValidateVector3D, constructorY) {
+  EXPECT_EQ(Vector3D::y(1), Vector3D(0, 1, 0));
+}
+
+TEST(ValidateVector3D, constructorZ) {
+  EXPECT_EQ(Vector3D::z(1), Vector3D(0, 0, 1));
+}

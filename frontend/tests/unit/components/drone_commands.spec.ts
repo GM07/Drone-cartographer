@@ -3,7 +3,7 @@ import {DefaultProps} from 'vue/types/options';
 import DroneCommands from '@/components/drone_commands.vue';
 import {ServerCommunication} from '@/communication/server_communication';
 
-describe('drone_menu.vue', () => {
+describe('drone_commands.vue', () => {
   let wrapper: Wrapper<DefaultProps & DroneCommands, Element>;
   let identifyStub: jasmine.Spy;
 

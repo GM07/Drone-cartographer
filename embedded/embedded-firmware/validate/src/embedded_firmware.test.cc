@@ -148,7 +148,7 @@ TEST(ValidateEmbeddedFirmware, updateSensorsData) {
 
   EXPECT_CALL(*sensor, getPosX()).Times(2);
   EXPECT_CALL(*sensor, getPosY()).Times(2);
-  EXPECT_CALL(*sensor, getBatteryLevel()).Times(2);
+  EXPECT_CALL(*sensor, getBatteryLevel(_)).Times(2);
 
   controller.m_abstractSensors = std::move(sensor);
 

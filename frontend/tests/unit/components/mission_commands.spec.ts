@@ -4,15 +4,41 @@ import MissionCommands from '@/components/mission_commands.vue';
 import {ServerCommunication} from '@/communication/server_communication';
 import {STORE} from '@/store';
 import {STORE_STUB} from '../stubs/store_stub';
+import * as SERVER_CONSTANTS from '@/communication/server_constants';
+import SocketIO from 'socket.io-client';
+import {Server} from 'socket.io';
+import {createServer} from 'http';
 
 describe('mission_commands.vue', () => {
   let wrapper: Wrapper<DefaultProps & MissionCommands, Element>;
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  let io: any, serverSocket: any, clientSocket: any;
+  beforeAll(done => {
+    const HTTP = createServer();
+    io = new Server(HTTP);
+    HTTP.listen(() => {
+      const PORT = (HTTP.address() as any).port;
+      clientSocket = SocketIO(`http://localhost:${PORT}`);
+      io.on('connection', (socket: any) => {
+        serverSocket = socket;
+      });
+      clientSocket.on('connect', done);
+    });
+  });
+
+  afterAll(() => {
+    io.close();
+    clientSocket.close();
+  });
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   beforeEach(() => {
     wrapper = shallowMount<MissionCommands>(MissionCommands, {
       store: STORE_STUB,
       propsData: {
-        droneList: ['a'],
         accessStatus: {
           isMissionSimulated: false,
           isUserControlling: false,
@@ -96,9 +122,29 @@ describe('mission_commands.vue', () => {
     expect(wrapper.vm.isReturnToBaseSelected).toBe(false);
   });
 
-  /*it('should terminate the mission', () => {
+  it('should send p2p gradient to base', () => {
+    const P2P_SPY = spyOn(ServerCommunication, 'setP2PGradient');
+    STORE.commit('setMissionStatus', {
+      isMissionStarted: false,
+      isSomeoneControlling: false,
+    });
+    wrapper.vm.setP2PGradient(true);
+    expect(P2P_SPY).not.toHaveBeenCalled();
+
+    STORE.commit('setMissionStatus', {
+      isMissionStarted: true,
+      isSomeoneControlling: true,
+    });
+    wrapper.vm.setP2PGradient(true);
+    expect(P2P_SPY).toHaveBeenCalled();
+  });
+
+  it('should terminate the mission', () => {
     const COMMUNICATION_SPY = spyOn(ServerCommunication, 'terminateMission');
-    const CANVAS_SPY = spyOn(HTMLCanvasElement.prototype, 'toDataURL');
+    wrapper.vm['maps'][0] = document.createElement(
+      'canvas'
+    ) as HTMLCanvasElement;
+    const CANVAS_SPY = spyOn(wrapper.vm['maps'][0], 'toDataURL');
     STORE.commit('setMissionStatus', {
       isMissionStarted: false,
       isSomeoneControlling: false,
@@ -116,11 +162,44 @@ describe('mission_commands.vue', () => {
     expect(COMMUNICATION_SPY).toHaveBeenCalled();
     expect(CANVAS_SPY).toHaveBeenCalled();
 
-    COMMUNICATION_SPY.and.callFake(callback => {
+    COMMUNICATION_SPY.and.callFake((a, callback) => {
       callback();
       return true;
     });
     wrapper.vm.terminateMission();
     expect(wrapper.vm.isTerminateMissionSelected).toBe(false);
-  });*/
+  });
+
+  it('should destroy', () => {
+    const SPY = spyOn(
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS,
+      'removeListener'
+    );
+
+    wrapper.destroy();
+    expect(SPY).toHaveBeenCalled();
+  });
+
+  it('should update p2p gradient', done => {
+    Object.defineProperty(SERVER_CONSTANTS, 'SOCKETIO_LIMITED_ACCESS', {
+      value: clientSocket,
+    });
+
+    const TEST_WRAPPER = shallowMount<MissionCommands>(MissionCommands, {
+      store: STORE_STUB,
+      propsData: {
+        accessStatus: {
+          isMissionSimulated: false,
+          isUserControlling: false,
+        },
+      },
+    });
+
+    TEST_WRAPPER.vm.isP2PGradientRunning = false;
+    serverSocket.emit(SERVER_CONSTANTS.UPDATE_P2P_GRADIENT, true);
+    setTimeout(() => {
+      expect(TEST_WRAPPER.vm.isP2PGradientRunning).toBe(true);
+      done();
+    }, 100);
+  });
 });

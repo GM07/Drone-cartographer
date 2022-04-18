@@ -70,9 +70,9 @@ class Drone {
 
   // Navigation Manager
   void step();
-  void wallAvoidance();
-  void collisionAvoidance();
-  void analyzeShortcuts();
+  virtual void wallAvoidance();
+  virtual void collisionAvoidance();
+  virtual void analyzeShortcuts();
   void changeDirection();
   bool returnToBase();
 
@@ -91,6 +91,7 @@ class Drone {
 
   // Initialisation
   inline void initDrone() { m_data.m_id = m_controller->getId(); };
+  [[nodiscard]] static float getRealSensorDistance(float sensor);
 
   static Drone& getEmbeddedDrone();
   std::unordered_map<size_t, DroneData> m_peerData;
@@ -98,12 +99,8 @@ class Drone {
   bool m_p2pColorGradientIsActive{false};
 
  protected:
-  [[nodiscard]] static float getRealSensorDistance(float sensor);
-
   std::vector<Vector3D> m_returnPath;
   std::unordered_set<PotentialShortcut> m_potentialShortCuts;
-
-  bool m_hadDroneCollision{false};
 
   Vector3D m_normal;
   Vector3D m_initialDirection;

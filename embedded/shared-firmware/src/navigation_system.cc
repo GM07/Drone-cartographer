@@ -7,10 +7,11 @@ void Drone::step() {
   updateCrashStatus();
   m_data.m_distanceFromTakeoff = m_controller->getCurrentLocation().length();
   m_controller->updateSensorsData();
-  updateStatusFromBattery();
+  // updateStatusFromBattery();
 
   m_controller->receiveP2PMessage(&m_peerData);
 
+  // Reset the avoidance normal and bodyReference boolean at each step
   m_normal = Vector3D();
   bool bodyReference = true;
 
@@ -42,14 +43,13 @@ void Drone::step() {
       analyzeShortcuts();
       break;
     case State::kReturningToBase:
-      m_normal = Vector3D();
       wallAvoidance();
       collisionAvoidance();
       changeDirection();
       bodyReference = !returnToBase();
       analyzeShortcuts();
       break;
-    case State::kIdle:
+    case State::kIdle:  // Fallthrough
     default:
       return;
   }
@@ -146,25 +146,27 @@ void Drone::collisionAvoidance() {
 }
 
 void Drone::changeDirection() {
-  if (!Math::areAlmostEqual(m_normal, Vector3D())) {
-    Vector3D newDirection = m_data.m_direction.reflect(m_normal);
-
-    if (!Math::areAlmostEqual<Vector3D>(m_data.m_direction, newDirection)) {
-      // Add point to the return path
-      // Only add the point if we are not in returnToBase or if we had a
-      // collision This is because we disable wallCollision when returning to
-      // base Otherwise the drone gets stuck and we have -nan values as speed
-      if (m_controller->m_state != State::kReturningToBase ||
-          m_hadDroneCollision) {
-        m_returnPath.push_back(m_controller->getCurrentLocation());
-      }
-
-      // Invalidate pending shortcuts since we had a chage of direction
-      m_potentialShortCuts.clear();
-
-      m_data.m_direction = newDirection;
-    }
+  if (Math::areAlmostEqual(m_normal, Vector3D())) {
+    return;
   }
+
+  Vector3D newDirection = m_data.m_direction.reflect(m_normal);
+  if (Math::areAlmostEqual(m_data.m_direction, newDirection)) {
+    return;
+  }
+
+  // Add point to the return path
+  // Only add the point if we are not in returnToBase or if we had a
+  // collision This is because we disable wallCollision when returning to
+  // base Otherwise the drone gets stuck and we have -nan values as speed
+  if (m_controller->m_state != State::kReturningToBase || m_peerCollision) {
+    m_returnPath.push_back(m_controller->getCurrentLocation());
+  }
+
+  // Invalidate pending shortcuts since we had a chage of direction
+  m_potentialShortCuts.clear();
+
+  m_data.m_direction = newDirection;
 }
 
 bool Drone::returnToBase() {
@@ -174,8 +176,8 @@ bool Drone::returnToBase() {
     return false;
   }
 
-  // If we are in collision avoidance or if we are in a drone collision
-  if (m_hadDroneCollision) {
+  // If we are in a drone collision
+  if (m_peerCollision) {
     return false;
   }
 
