@@ -110,8 +110,7 @@ class CommCrazyflie(AbstractComm):
         sending_links = drone_list_name if len(links) == 0 else links
 
         if command == COMMANDS.LAUNCH.value:
-            self.mission_manager.start_current_mission(len(self.drone_list),
-                                                       False)
+            self.mission_manager.start_current_mission(self.drone_list, False)
             self.logs = []
 
         for link in sending_links:
@@ -131,7 +130,7 @@ class CommCrazyflie(AbstractComm):
         Map().add_data(MapData(logconf.name, drone_data), self.SOCKETIO)
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         # print(f'{timestamp}{logconf.id}:{data}')
-        self.mission_manager.update_position(drone_data, logconf.id - 1)
+        self.mission_manager.update_position(drone_data)
         self.send_log(f'{logconf.id}{data} ')
         self.send_drone_status([drone_data.to_dict()])
         self.set_drone_data(drone_data)
