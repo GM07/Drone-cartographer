@@ -33,12 +33,58 @@ describe('Communication.ts', () => {
     expect(RESPONSE.status).toEqual(SERVER_CONSTANTS.HTTP_OK);
   });
 
+  it('Should send files', async () => {
+    const MESSAGE = new Map();
+    MESSAGE.set('file.txt', 'content');
+
+    fetchMock.mockResponse(JSON.stringify(MESSAGE), {
+      status: SERVER_CONSTANTS.HTTP_OK,
+    });
+    await ServerCommunication.sendFiles(MESSAGE);
+    expect(fetchMock).toHaveBeenCalledWith(
+      SERVER_CONSTANTS.SET_FILES_ADDRESS,
+      expect.objectContaining({
+        method: 'POST',
+      })
+    );
+  });
+
+  it('Should get files', async () => {
+    const MESSAGE = 'file.txt';
+
+    fetchMock.mockResponse(JSON.stringify(MESSAGE), {
+      status: SERVER_CONSTANTS.HTTP_OK,
+    });
+    const RESPONSE = await ServerCommunication.getFiles();
+    expect(RESPONSE).toEqual(MESSAGE);
+  });
+
   it('should identify', () => {
     let response = ServerCommunication.identifyDrone('');
     expect(response).toBe(false);
     expect(limitedAccessEmitSpy).not.toHaveBeenCalled();
     SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected = true;
     response = ServerCommunication.identifyDrone('');
+    expect(response).toBe(true);
+    expect(limitedAccessEmitSpy).toHaveBeenCalled();
+  });
+
+  it('should recompile', () => {
+    let response = ServerCommunication.recompile();
+    expect(response).toBe(true);
+    expect(limitedAccessEmitSpy).not.toHaveBeenCalled();
+    SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected = true;
+    response = ServerCommunication.recompile();
+    expect(response).toBe(true);
+    expect(limitedAccessEmitSpy).toHaveBeenCalled();
+  });
+
+  it('should flash', () => {
+    let response = ServerCommunication.flash();
+    expect(response).toBe(true);
+    expect(limitedAccessEmitSpy).not.toHaveBeenCalled();
+    SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected = true;
+    response = ServerCommunication.flash();
     expect(response).toBe(true);
     expect(limitedAccessEmitSpy).toHaveBeenCalled();
   });
@@ -93,6 +139,16 @@ describe('Communication.ts', () => {
     expect(limitedAccessEmitSpy).toHaveBeenCalled();
   });
 
+  it('should send p2p gradient', () => {
+    let response = ServerCommunication.setP2PGradient(false);
+    expect(response).toBe(false);
+    expect(limitedAccessEmitSpy).not.toHaveBeenCalled();
+    SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.connected = true;
+    response = ServerCommunication.setP2PGradient(false);
+    expect(response).toBe(true);
+    expect(limitedAccessEmitSpy).toHaveBeenCalled();
+  });
+
   it('should return to base', () => {
     let response = ServerCommunication.returnToBase(() => {});
     expect(response).toBe(false);
@@ -138,6 +194,16 @@ describe('Communication.ts', () => {
     await ServerCommunication.getSpecificMissionLogs('id');
     expect(fetchMock).toHaveBeenCalledWith(
       SERVER_CONSTANTS.GET_SPECIFIC_MISSION_LOGS + '/' + 'id'
+    );
+  });
+
+  it('should get specific mission maps', async () => {
+    fetchMock.mockResponse(JSON.stringify(''), {
+      status: SERVER_CONSTANTS.HTTP_OK,
+    });
+    await ServerCommunication.getSpecificMissionMaps('id');
+    expect(fetchMock).toHaveBeenCalledWith(
+      SERVER_CONSTANTS.GET_SPECIFIC_MISSION_MAPS + '/' + 'id'
     );
   });
 });

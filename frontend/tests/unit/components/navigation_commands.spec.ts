@@ -34,11 +34,11 @@ describe('navigation_commands.vue', () => {
     expect(wrapper.vm['attemptedLimitedConnection']).toBe(true);
   });
 
-  it('tells if the user can revoke the control', () => {
+  it('should tell if the user can revoke the control', () => {
     expect(wrapper.vm.canRevokeControl()).toBe(false);
   });
 
-  it('returns to main menu', () => {
+  it('should return to main menu', () => {
     const ROUTER_SPY = spyOn(ROUTER, 'push');
     wrapper.vm.returnToMainMenu();
     expect(ROUTER_SPY).toHaveBeenCalled();
