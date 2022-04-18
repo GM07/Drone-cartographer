@@ -46,14 +46,12 @@ class AbstractController {
     m_takeOffPosition += getCurrentLocation();
     m_targetPosition = Vector3D::z(height);
     m_state = State::kTakingOff;
-    setVelocity(Vector3D::z(1.0F), kSpeed);
   };
 
   inline virtual void land() {
     m_targetPosition = getCurrentLocation();
     m_targetPosition.m_z = 0;
     m_state = State::kLanding;
-    setVelocity(Vector3D::z(-1.0F), kSpeed);
   };
 
   virtual void stopMotors() const = 0;

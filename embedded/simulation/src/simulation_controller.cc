@@ -161,6 +161,13 @@ void SimulationController::sendP2PMessage(void* message, size_t size) {
   m_ccrazyflieSensing->m_pcRABA->SetData(data);
 }
 
+/////////////////////////////////////////////////////////////////////////
+[[nodiscard]] bool isValidP2PPacket(DroneData& data) {
+  std::array<char, kHeaderSize> m_magicHeader{{'D', 'R', 'E', 'A', 'M'}};
+  return std::equal(data.m_magicHeader.begin(), data.m_magicHeader.end(),
+                    m_magicHeader.begin());
+}
+
 ///////////////////////////////////////////////////
 void SimulationController::receiveP2PMessage(
     std::unordered_map<size_t, DroneData>* p2pData) {
@@ -170,6 +177,10 @@ void SimulationController::receiveP2PMessage(
   for (auto reading : readings) {
     DroneData data((*reinterpret_cast<DroneData*>(reading.Data.ToCArray()))
                        .transformReference(-m_orientation));
+
+    if (!isValidP2PPacket(data)) {
+      return;
+    }
 
     data.m_range = reading.Range;
     p2pData->insert_or_assign(data.m_id, data);

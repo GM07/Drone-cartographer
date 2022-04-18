@@ -94,19 +94,21 @@ class Drone {
   [[nodiscard]] static float getRealSensorDistance(float sensor);
 
   static Drone& getEmbeddedDrone();
-  std::unordered_map<size_t, DroneData> m_peerData;
-  DroneData m_data;
   bool m_p2pColorGradientIsActive{false};
 
+  std::unordered_map<size_t, DroneData> m_peerData;
+  std::unordered_map<size_t, DroneData> m_usedPeerData;
+  DroneData m_data;
+
  protected:
+  Vector3D m_normal;
+  Vector3D m_initialDirection;
+
   std::vector<Vector3D> m_returnPath;
   std::unordered_set<PotentialShortcut> m_potentialShortCuts;
 
-  Vector3D m_normal;
-  Vector3D m_initialDirection;
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
-  std::unordered_map<size_t, DroneData> m_usedPeerData;
   bool m_peerCollision{false};
 };
 #endif
