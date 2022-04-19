@@ -9,7 +9,7 @@ database.upload_mission_info(mission_info)
 from dataclasses import dataclass
 import threading
 
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from mongomock import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
@@ -60,7 +60,11 @@ class Database:
 
     def __init__(self) -> None:
         try:
-            self.client = MongoClient('mongodb://127.0.0.1:27017/')
+
+            self.client = MongoClient('mongodb://127.0.0.1:27017/',
+                                      connectTimeoutMS=2000,
+                                      socketTimeoutMS=2000,
+                                      serverSelectionTimeoutMS=2000)
             self.db = self.client['admin']
         except:
             print("Couldn't connect to database please relaunch")
@@ -109,7 +113,7 @@ class Database:
             mission['_id'] = str(mission['_id'])
         return mission
 
-    def get_mission_maps_from_id(self, identifier: str):
+    def get_mission_map_from_id(self, identifier: str):
         try:
             mission = self.db.missions.find_one({'_id': ObjectId(identifier)},
                                                 {"map": 1})
@@ -119,25 +123,6 @@ class Database:
         if mission is not None:
             mission['_id'] = str(mission['_id'])
         return mission
-
-    def remove_mission_from_id(self, identifier: str) -> bool:
-        try:
-            return self.db.missions.delete_one({
-                '_id': ObjectId(identifier)
-            }).deleted_count != 0
-        except:
-            print('Database error')
-            return False
-
-    def update_mission_info_from_id(self, mission: Mission,
-                                    identifier: str) -> bool:
-        try:
-            return self.db.missions.replace_one({
-                '_id': ObjectId(identifier)
-            }, mission.__dict__).matched_count != 0
-        except:
-            print('Database error')
-            return False
 
 
 def serialize_objectid_from_result(result: list):
@@ -149,27 +134,31 @@ def serialize_objectid_from_result(result: list):
 class MissionManager:
     current_mission: Mission = {}
     current_mission_start_time: float
-    last_known_positions: List[Point2D] = []
+    last_known_positions: Dict[str, Point2D] = {}
     lock = threading.Lock()
     is_mission_started = False
 
-    def start_current_mission(self, drone_count: int, is_simulated: bool):
+    def start_current_mission(self, drone_list: List[DroneData],
+                              is_simulated: bool):
         self.lock.acquire()
-        self.current_mission = Mission(0, drone_count, is_simulated, 0, [[]])
+        self.current_mission = Mission(0, len(drone_list), is_simulated, 0,
+                                       [[]])
         self.mission_start_time = perf_counter()
-        self.last_known_positions = [Point2D(0, 0)] * drone_count
+        for drone in drone_list:
+            self.last_known_positions[drone.name] = Point2D(0, 0)
         self.is_mission_started = True
         self.lock.release()
 
     def end_current_mission(self, logs: List[Tuple[str, str]]):
         self.lock.acquire()
 
+        if not self.is_mission_started:
+            self.lock.release()
+            return
         self.current_mission.flight_duration = perf_counter(
         ) - self.mission_start_time
         self.current_mission.logs = logs
 
-        self.last_known_positions = [Point2D(0, 0)
-                                    ] * self.current_mission.number_of_drones
         self.is_mission_started = False
         Map.raw_data.clear()
         Map.filtered_data.clear()
@@ -177,15 +166,16 @@ class MissionManager:
         database.upload_mission_info(self.current_mission)
         self.lock.release()
 
-    def update_position(self, data: DroneData, index):
+    def update_position(self, data: DroneData):
 
         self.lock.acquire()
         if not self.is_mission_started:
             self.lock.release()
             return
-        self.current_mission.total_distance += math.hypot(
-            data.position.x - self.last_known_positions[index].x,
-            data.position.y - self.last_known_positions[index].y)
 
-        self.last_known_positions[index] = data.position
+        self.current_mission.total_distance += math.hypot(
+            data.position.x - self.last_known_positions[data.name].x,
+            data.position.y - self.last_known_positions[data.name].y)
+
+        self.last_known_positions[data.name] = data.position
         self.lock.release()

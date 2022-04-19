@@ -14,10 +14,8 @@ size_t FirmwareController::receiveMessage(void* message, size_t size) const {
 void FirmwareController::sendMessage(void* message, size_t size) const {}
 void Time::delayMs(uint32_t delayMS) {}
 Vector3D FirmwareController::getCurrentLocation() const {}
-bool FirmwareController::isTrajectoryFinished() const {}
-void FirmwareController::takeOff(float height) {}
-void FirmwareController::land() {}
 void FirmwareController::updateSensorsData() {}
+void FirmwareController::stopMotors() const {}
 bool FirmwareController::isDroneCrashed() const { return false; }
 void FirmwareController::setVelocity(const Vector3D& direction, float speed,
                                      bool bodyReference) {}

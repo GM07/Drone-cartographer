@@ -41,6 +41,7 @@ def terminate_mission(socket_io: SocketIO):
     global is_p2p_gradient_running
     is_mission_started = False
     is_p2p_gradient_running = False
+    update_p2p_gradient_value(socket_io)
     update_all_clients(socket_io)
 
 

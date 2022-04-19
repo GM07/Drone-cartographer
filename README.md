@@ -1,10 +1,37 @@
 # Demonstration of the requirements
-R.F.1 : https://youtu.be/jW5N3KHpleM  
-R.F.2 : https://youtu.be/exyVJGXXqWs and https://youtu.be/910Vv9pmuNg  
-R.F.3 : https://youtu.be/zdT6yJBZk_A and https://youtu.be/r0D-aA17_5Q  
-R.F.4-R.F.5 : https://youtu.be/xhmPRty4eb4 and https://youtu.be/Kp2DKjgZOGI  
-R.F.10 : https://youtu.be/eavHEMG_ItM  
-R.C.1 : https://youtu.be/0A95FmTyeaU  
+
+## SIMULATION
+#### R.C.3 : https://youtu.be/ZTsq-fo1JRo
+#### R.C.5 : https://youtu.be/MNa5B4uPBEc
+#### 
+#### R.F.2 : https://youtu.be/exyVJGXXqWs 
+#### R.F.3 : https://youtu.be/r0D-aA17_5Q
+#### R.F.4-R.F.5 :  https://youtu.be/Kp2DKjgZOGI
+#### R.F.6 : https://youtu.be/hazaTemEUx8
+#### R.F.7 : https://youtu.be/lQY7RHeyr5o
+#### R.F.8-R.F.9 : https://youtu.be/OxlJ8gVUlok
+#### R.F.11 : https://youtu.be/UEtxdsRyZWE
+#### R.F.12 : https://youtu.be/nQvFE3vZH98
+#### R.F.16 : https://youtu.be/NkFpbyQ3oqQ
+
+## PHYSIQUE
+#### R.F.1 : https://youtu.be/jW5N3KHpleM
+#### R.F.2 : https://youtu.be/910Vv9pmuNg
+#### R.F.3 : https://youtu.be/zdT6yJBZk_A
+#### R.F.4-R.F.5 : https://youtu.be/xhmPRty4eb4
+#### R.F.6-8-9-11-12 : https://youtu.be/B7L6vY_rDgE
+#### R.F.7 : https://youtube.com/shorts/DulzTUlVoj8?feature=share
+#### R.F.7 - Retour à la base : https://youtu.be/qT0P7P8uJD8
+#### R.F.13 : https://youtu.be/Dh6XQaVc9tI
+#### R.F.14-R.F.16 : https://youtu.be/wPQ9SxHwMvI
+#### R.F.19 : https://youtu.be/PuRP_JvzIHs
+
+## AUTRES
+#### R.C.1 : https://youtu.be/0A95FmTyeaU
+#### R.C.2 : https://youtu.be/qLaY50ZoRwc
+#### R.F.10 : https://youtu.be/eavHEMG_ItM  
+#### R.F.17-18 : https://youtu.be/P06RN5cEd_0
+
 # Project Configuration for Ubuntu
 
 ## Cloning project
@@ -152,3 +179,13 @@ On the client, do not check the `Simulation Toggle` button and press the `Démar
 
 You should be able to select drone radio addresses in the top bar of the UI on the client. Selecting a Drone will allow you to send the identify command which will make its LED blink.
 
+## Coding style
+The main coding style follows the Google coding style. https://google.github.io/styleguide/?fbclid=IwAR2KlL02zVoscso_aX_n-sn4-7QVHfnk01A4TJjdtIatdC5YVyx6PAKSUPw
+
+To apply the coding style, we used:
+
+For the frontend: eslint
+
+For the backend: yapf
+
+For the embedded: clang-format and clang-tidy

@@ -7,6 +7,7 @@ LOGS_TASK_QUEUE_LOCK = threading.Lock()
 DRONE_STATUS_QUEUE_LOCK = threading.Lock()
 LOGS_QUEUE = gevent.queue.Queue(-1)
 logs_task_should_run = True
+drone_task_should_run = True
 should_log = True
 DRONE_STATUS_QUEUE = gevent.queue.Queue(-1)
 
@@ -38,7 +39,7 @@ def __logs_task(SOCKETIO: SocketIO):
 
 
 def __drone_status_task(SOCKETIO: SocketIO):
-    while True:
+    while drone_task_should_run:
         status = DRONE_STATUS_QUEUE.get()
         SOCKETIO.emit('update_drone_status',
                       status,

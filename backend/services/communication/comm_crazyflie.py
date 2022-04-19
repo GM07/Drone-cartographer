@@ -9,7 +9,7 @@ from cflib.crazyflie.log import LogConfig
 from flask_socketio import SocketIO
 
 from constants import COMMANDS
-from services.data.drone_data import log_data_to_drone_data
+from services.data.drone_data import log_data_to_drone_data, DroneState
 from services.communication.abstract_comm import AbstractComm
 
 from services.data.map import Map, MapData
@@ -83,7 +83,7 @@ class CommCrazyflie(AbstractComm):
             log_config.add_variable('kalman.stateX', 'float')
             log_config.add_variable('kalman.stateY', 'float')
             log_config.add_variable('kalman.stateZ', 'float')
-            log_config.add_variable('pm.batteryLevel', 'uint8_t')
+            log_config.add_variable('custom.batteryLevel', 'uint8_t')
             log_config.add_variable('custom.droneCustomState', 'uint8_t')
             self.log_configs.append(log_config)
 
@@ -110,8 +110,7 @@ class CommCrazyflie(AbstractComm):
         sending_links = drone_list_name if len(links) == 0 else links
 
         if command == COMMANDS.LAUNCH.value:
-            self.mission_manager.start_current_mission(len(self.drone_list),
-                                                       False)
+            self.mission_manager.start_current_mission(self.drone_list, False)
             self.logs = []
 
         for link in sending_links:
@@ -128,11 +127,12 @@ class CommCrazyflie(AbstractComm):
 
     def __retrieve_log(self, timestamp, data, logconf: LogConfig):
         drone_data = log_data_to_drone_data(logconf.name, data)
-        Map().add_data(MapData(logconf.name, drone_data), self.SOCKETIO)
+        if drone_data.state is DroneState.EXPLORING or drone_data.state is DroneState.RETURNING_TO_BASE:
+            Map().add_data(MapData(logconf.name, drone_data), self.SOCKETIO)
         # print('[%d][%s]: %s' % (timestamp, logconf.id, data))
         # print(f'{timestamp}{logconf.id}:{data}')
-        self.mission_manager.update_position(drone_data, logconf.id)
-        self.send_log(f'{logconf.id}{data} ')
+        self.mission_manager.update_position(drone_data)
+        self.send_log(f'{drone_data.name} {data} ')
         self.send_drone_status([drone_data.to_dict()])
         self.set_drone_data(drone_data)
 

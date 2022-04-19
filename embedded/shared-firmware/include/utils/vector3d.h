@@ -57,19 +57,20 @@ class Vector3D {
 } __attribute__((packed));
 
 namespace std {
+
 ///////////////////////////////////////////////
 template <class T>
-inline void hash_combine(std::size_t& seed, const T& v) {
+inline size_t hash_combine(const std::size_t& seed, const T& v) {
   std::hash<T> hasher;
-  seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+  return seed ^ (hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2));  // NOLINT
 }
 
 template <>
 struct hash<Vector3D> {
   size_t operator()(const Vector3D& vec) const {
-    size_t seed = hash<long>()(std::lround(vec.m_x * 100.0F));
-    std::hash_combine<long>(seed, std::lround(vec.m_y * 100.0F));
-    std::hash_combine<long>(seed, std::lround(vec.m_z * 100.0F));
+    size_t seed = hash<uint64_t>()(std::lround(vec.m_x * 100.0F));
+    seed = std::hash_combine<uint64_t>(seed, std::lround(vec.m_y * 100.0F));
+    seed = std::hash_combine<uint64_t>(seed, std::lround(vec.m_z * 100.0F));
     return seed;
   }
 };

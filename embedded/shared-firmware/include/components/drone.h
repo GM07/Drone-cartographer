@@ -19,16 +19,10 @@ constexpr size_t kMessageMaxSize = 30;
 constexpr size_t kNbStartingDirection = 8;
 constexpr size_t kNbLateralSensors = 4;
 
-// Meters and seconds
-constexpr float kDroneSpeed = 0.25F;
-constexpr float kTakeOffSpeed = 1.0F;
-constexpr float kLandingSpeed = 0.25F;
-constexpr float kHeight = 0.3F;
-
 constexpr float kSimulationCollisionAvoidanceRange = 20.0F;
 constexpr float kRealMinCollisionAvoidanceRange = 55.0F;
 constexpr float kRealMaxCollisionAvoidanceRange = 55.0F;
-constexpr float kDistanceForSafeShortcut = 0.1F;
+constexpr float kDistanceForSafeShortcut = 0.15F;
 
 class Drone {
  public:
@@ -53,7 +47,7 @@ class Drone {
     std::uniform_int_distribution<int> distribution(
         0, startingDirection.size() - 1);
 
-    m_data.m_direction = startingDirection.at(distribution(generator));
+    m_initialDirection = startingDirection.at(distribution(generator));
   }
 
   Drone(const Drone& other) = delete;
@@ -100,18 +94,21 @@ class Drone {
   [[nodiscard]] static float getRealSensorDistance(float sensor);
 
   static Drone& getEmbeddedDrone();
-  std::unordered_map<size_t, DroneData> m_peerData;
-  DroneData m_data;
   bool m_p2pColorGradientIsActive{false};
-  Vector3D m_normal;
+
+  std::unordered_map<size_t, DroneData> m_peerData;
+  std::unordered_map<size_t, DroneData> m_usedPeerData;
+  DroneData m_data;
 
  protected:
+  Vector3D m_normal;
+  Vector3D m_initialDirection;
+
   std::vector<Vector3D> m_returnPath;
   std::unordered_set<PotentialShortcut> m_potentialShortCuts;
-  bool m_hadDroneCollision{false};
 
   std::array<uint8_t, kMessageMaxSize> m_messageRX;
   std::shared_ptr<AbstractController> m_controller;
-  std::unordered_map<size_t, DroneData> m_usedPeerData;
+  bool m_peerCollision{false};
 };
 #endif

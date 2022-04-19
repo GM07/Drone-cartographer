@@ -23,7 +23,7 @@
 	"runArgs": [
 	  "--privileged",
 		"--net=host",
-		"--device=/dev/",
+		"--device=/dev/bus/usb/",
 		"--name=embedded",
 		// "--gpus=all", //Uncomment to use NVDIA GPU
 		"-e",

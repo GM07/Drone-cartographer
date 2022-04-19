@@ -70,11 +70,8 @@ struct FunctionsMock {
   MOCK_METHOD0(supervisorIsTumbled, bool());
   MOCK_METHOD3(appchannelReceiveDataPacket, size_t(void*, size_t, int));
   MOCK_METHOD2(appchannelSendDataPacket, int(void*, size_t));
-  MOCK_METHOD0(crtpCommanderHighLevelIsTrajectoryFinished, bool());
   MOCK_METHOD1(estimatorKalmanGetEstimatedPos, void(point_t*));
   MOCK_METHOD2(commanderSetSetpoint, void(setpoint_t*, int));
-  MOCK_METHOD2(crtpCommanderHighLevelTakeoff, int(const float, const float));
-  MOCK_METHOD2(crtpCommanderHighLevelLand, int(const float, const float));
   MOCK_METHOD2(paramGetVarId, paramVarId_t(const char*, const char*));
   MOCK_METHOD2(paramSetInt, void(paramVarId_t, int));
   MOCK_METHOD2(logGetVarId, logVarId_t(const char*, const char*));

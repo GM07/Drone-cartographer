@@ -47,8 +47,10 @@ SimulationSensors::SimulationSensors(CCrazyflieSensing* ccrazyflieSensing)
   return m_ccrazyflieSensing->m_pcPos->GetReading().Position.GetZ();
 }
 
-[[nodiscard]] float SimulationSensors::getBatteryLevel() const {
+[[nodiscard]] float SimulationSensors::getBatteryLevel(
+    bool /*isInMission*/) const {
   constexpr float kToPercent = 100;
-  return m_ccrazyflieSensing->m_pcBattery->GetReading().AvailableCharge *
+  return static_cast<float>(
+             m_ccrazyflieSensing->m_pcBattery->GetReading().AvailableCharge) *
          kToPercent;
 }

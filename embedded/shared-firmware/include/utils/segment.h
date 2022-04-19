@@ -30,7 +30,7 @@ template <>
 struct hash<Segment> {
   size_t operator()(const Segment& segment) const {
     size_t seed = hash<Vector3D>()(segment.m_start);
-    std::hash_combine<Vector3D>(seed, segment.m_end);
+    seed = std::hash_combine<Vector3D>(seed, segment.m_end);
     return seed;
   }
 };

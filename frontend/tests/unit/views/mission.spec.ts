@@ -19,6 +19,17 @@ describe('mission.vue', () => {
   let limitedAccessEmitSpy: jasmine.Spy;
   let routerSpy: jasmine.Spy;
   let wrapper: Wrapper<DefaultProps & Mission, Element>;
+  const STUBS = [
+    'DroneCommands',
+    'MissionCommands',
+    'NavigationCommands',
+    'DroneMenu',
+    'Map',
+    'LogsInterface',
+    'DroneDataCard',
+    'RemoteCommandOutput',
+    'Editor',
+  ];
   const VUETIFY = new Vuetify();
   const DEFAULT_DRONE_STATUS = {...DEFAULT_DRONE_DATA} as DroneData;
   DEFAULT_DRONE_STATUS.name = 'a';
@@ -59,16 +70,11 @@ describe('mission.vue', () => {
     wrapper = shallowMount<Mission>(Mission, {
       store: STORE_STUB,
       vuetify: VUETIFY,
-      stubs: [
-        'NavigationCommands',
-        'DroneCommands',
-        'MissionCommands',
-        'Editor',
-        'Map',
-        'Editor',
-      ],
+      stubs: STUBS,
     });
   });
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   it('should create', () => {
     expect(wrapper).toBeTruthy();
@@ -131,6 +137,12 @@ describe('mission.vue', () => {
     expect(wrapper.vm.isConnected()).toBe(true);
   });
 
+  it('should switch editor status', () => {
+    wrapper.vm.editorMode = false;
+    wrapper.vm.switchEditorStatus();
+    expect(wrapper.vm.editorMode).toBe(true);
+  });
+
   it('should update status', done => {
     SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.removeAllListeners().close();
 
@@ -141,12 +153,7 @@ describe('mission.vue', () => {
     const TEST_WRAPPER = shallowMount<Mission>(Mission, {
       store: STORE_STUB,
       vuetify: VUETIFY,
-      stubs: [
-        'NavigationCommands',
-        'DroneCommands',
-        'MissionCommands',
-        'Editor',
-      ],
+      stubs: STUBS,
     });
 
     serverSocket.emit('droneList', [DEFAULT_DRONE_STATUS]);
@@ -164,6 +171,47 @@ describe('mission.vue', () => {
     );
   });
 
+  it('should update drone status', done => {
+    const FAKE_DRONE_DATA = {
+      name: 'fakeName',
+      xPos: 0,
+    } as DroneData;
+    SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.removeAllListeners().close();
+
+    Object.defineProperty(SERVER_CONSTANTS, 'SOCKETIO_DRONE_STATUS', {
+      value: clientSocket,
+    });
+
+    const TEST_WRAPPER = shallowMount<Mission>(Mission, {
+      store: STORE_STUB,
+      vuetify: VUETIFY,
+      stubs: STUBS,
+    });
+
+    TEST_WRAPPER.vm.droneList = [FAKE_DRONE_DATA];
+    serverSocket.emit('update_drone_status', [
+      {
+        ...FAKE_DRONE_DATA,
+        name: 'wrongName',
+      },
+    ]);
+    setTimeout(() => {
+      expect(TEST_WRAPPER.vm.droneList[0].name).toEqual(FAKE_DRONE_DATA.name);
+      serverSocket.emit('update_drone_status', [{...FAKE_DRONE_DATA, xPos: 1}]);
+      setTimeout(() => {
+        expect(TEST_WRAPPER.vm.droneList[0].xPos).toEqual(1);
+        done();
+      }, 500);
+    }, 500);
+  });
+
+  it('should disconnect', () => {
+    const LISTENER =
+      SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS.listeners('disconnect')[0];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    LISTENER({} as any);
+  });
+
   it('should destroy', () => {
     const SPY = spyOn(SERVER_CONSTANTS.SOCKETIO_LIMITED_ACCESS, 'close');
 
@@ -174,12 +222,7 @@ describe('mission.vue', () => {
     const TEST_WRAPPER = shallowMount<Mission>(Mission, {
       store: STORE_STUB,
       vuetify: VUETIFY,
-      stubs: [
-        'NavigationCommands',
-        'DroneCommands',
-        'MissionCommands',
-        'Editor',
-      ],
+      stubs: STUBS,
     });
 
     serverSocket.disconnect();

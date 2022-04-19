@@ -53,24 +53,27 @@ describe('logs_interface.vue', () => {
     });
 
     const TEST_WRAPPER = shallowMount<LogsInterface>(LogsInterface);
-    const PUSH_SPY = spyOn(TEST_WRAPPER.vm['logs'], 'push').and.callThrough();
+    const UNSHIFT_SPY = spyOn(
+      TEST_WRAPPER.vm['logs'],
+      'unshift'
+    ).and.callThrough();
     const SCROLL_SPY = spyOn(document, 'getElementById').and.returnValue(null);
 
     serverSocket.emit('get_logs', [['a', 'b']]);
     setTimeout(() => {
-      expect(PUSH_SPY).toHaveBeenCalled();
+      expect(UNSHIFT_SPY).toHaveBeenCalled();
       expect(nextTickSpy).not.toHaveBeenCalled();
       SCROLL_SPY.and.returnValue({
         scrollTop: 1,
         scrollHeight: 1,
       });
-      serverSocket.emit('get_logs', [['a', 'b']]);
+      serverSocket.emit('get_logs', [['c', 'b']]);
       setTimeout(() => {
         SCROLL_SPY.and.returnValue({
           scrollTop: 1,
           scrollHeight: 10000,
         });
-        serverSocket.emit('get_logs', [['a', 'b']]);
+        serverSocket.emit('get_logs', [['d', 'b']]);
         setTimeout(() => {
           done();
         }, 100);

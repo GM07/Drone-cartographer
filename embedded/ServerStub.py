@@ -34,7 +34,7 @@ nConnections = 1
 identifier = "s"
 
 # CHANGE TO FALSE TO CONTROL REAL DRONE
-is_simulation = False
+is_simulation = True
 
 servers = []
 clients = []
@@ -62,8 +62,9 @@ if is_simulation:
 
 
 def takeOff():
-  orientation = 180
+  orientation = 33
   data = [Commands.kTakeOff]
+  data += b'\x00\x00\x00'
   for byte in orientation.to_bytes(4, byteorder = 'little'):
     data.append(byte)
   send_command(data)

@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 
+#include "controllers/abstract_controller.h"
 #include "controllers/firmware_controller.h"
 
 class StubController : public FirmwareController {
@@ -17,6 +18,7 @@ class StubController : public FirmwareController {
   MOCK_CONST_METHOD0(isDroneCrashed, bool());
   MOCK_METHOD2(setVelocity, void(const Vector3D&, float));
   MOCK_CONST_METHOD0(isTrajectoryFinished, bool());
+  MOCK_CONST_METHOD0(isAltitudeReached, bool());
   MOCK_CONST_METHOD2(sendP2PMessage, void(void*, size_t));
   MOCK_CONST_METHOD1(receiveP2PMessage,
                      void(std::unordered_map<size_t, DroneData>&));

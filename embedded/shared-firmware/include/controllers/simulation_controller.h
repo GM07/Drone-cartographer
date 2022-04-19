@@ -38,13 +38,17 @@ class SimulationController : public AbstractController {
   SimulationController(const SimulationController& other) = delete;
   SimulationController& operator=(const SimulationController& other) = delete;
 
-  void setVelocity(const Vector3D& direction, float speed,
-                   bool bodyReference = true) override;
-  void takeOff(float height) override;
-  void land() override;
+  inline void stopMotors() const override{/**/};
+  void setVelocity(const Vector3D& direction, float speed,  // NOLINT
+                   bool bodyReference = true) override;     // NOLINT
 
   [[nodiscard]] Vector3D getCurrentLocation() const override;
-  [[nodiscard]] bool isTrajectoryFinished() const override;
+  [[nodiscard]] inline bool isTrajectoryFinished() const override {
+    return Math::areAlmostEqual(getCurrentLocation(), m_targetPosition);
+  }
+  [[nodiscard]] inline bool isAltitudeReached() const override {
+    return Math::areAlmostEqual(getCurrentLocation().m_z, m_targetPosition.m_z);
+  };
 
   void initCommunicationManager() override;
 

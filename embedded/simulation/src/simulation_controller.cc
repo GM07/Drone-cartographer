@@ -41,7 +41,7 @@ void SimulationController::updateSensorsData() {
       m_abstractSensors->getRightDistance() * kCmToMmFactor,
       getCurrentLocation().rotate(-m_orientation).m_x,
       getCurrentLocation().rotate(-m_orientation).m_y,
-      m_abstractSensors->getBatteryLevel(),
+      m_abstractSensors->getBatteryLevel(m_state != State::kIdle),
       m_state,
   };
 
@@ -133,24 +133,6 @@ void SimulationController::log(const std::string& message) {
   logBuffer << message << std::endl;
 }
 
-///////////////////////////////////////////////////
-void SimulationController::takeOff(float height) {
-  // Since getCurrentLocation() is relative to the old m_takeOffPosition
-  // We need to add the old m_takeOffPosition to get the new one.
-  m_takeOffPosition += getCurrentLocation();
-
-  m_targetPosition = getCurrentLocation() + Vector3D::z(height);
-
-  setVelocity(Vector3D::z(height), kTakeOffSpeed);
-}
-
-///////////////////////////////////////////////////
-void SimulationController::land() {
-  Vector3D pos = getCurrentLocation();
-  m_targetPosition = Vector3D(pos.m_x, pos.m_y, 0.0);
-  setVelocity(Vector3D::z(-pos.m_z), kLandingSpeed);
-}
-
 // All positions are relative to takeOff position
 ///////////////////////////////////////////////////
 [[nodiscard]] Vector3D SimulationController::getCurrentLocation() const {
@@ -160,13 +142,9 @@ void SimulationController::land() {
 }
 
 ///////////////////////////////////////////////////
-[[nodiscard]] bool SimulationController::isTrajectoryFinished() const {
-  return areAlmostEqual(getCurrentLocation(), m_targetPosition);
-}
-
-///////////////////////////////////////////////////
-void SimulationController::setVelocity(const Vector3D& direction, float speed,
-                                       bool bodyReference) {
+void SimulationController::setVelocity(const Vector3D& direction,  // NOLINT
+                                       float speed,                // NOLINT
+                                       bool bodyReference) {       // NOLINT
   Vector3D speedVector = (direction.toUnitVector() * speed);
 
   if (bodyReference) {

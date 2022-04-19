@@ -1,8 +1,28 @@
 #include "sensors/firmware_sensors.h"
 
+#include <algorithm>
+#include <array>
+#include <iterator>
+
 extern "C" {
 #include "log.h"
 }
+
+namespace {
+constexpr std::size_t kNbLevel = 10;
+std::array<float, kNbLevel> kBatLevels{{
+    4.10,  // 90% // NOLINT
+    4.04,  // 80% // NOLINT
+    4.00,  // 70% // NOLINT
+    3.96,  // 60% // NOLINT
+    3.92,  // 50% // NOLINT
+    3.89,  // 40% // NOLINT
+    3.87,  // 30% // NOLINT
+    3.83,  // 20% // NOLINT
+    3.78,  // 10% // NOLINT
+    3.00   // 00% // NOLINT
+}};
+}  // namespace
 
 ///////////////////////////////////////
 [[nodiscard]] float FirmwareSensors::getFrontDistance() const {
@@ -47,7 +67,13 @@ extern "C" {
 }
 
 ///////////////////////////////////////
-[[nodiscard]] float FirmwareSensors::getBatteryLevel() const {
-  logVarId_t vbatid = logGetVarId("pm", "batteryLevel");
-  return static_cast<float>(logGetUint(vbatid));
+[[nodiscard]] float FirmwareSensors::getBatteryLevel(bool isInMission) const {
+  constexpr float kToPercentage = 10.0F;
+  const float modifier = isInMission ? 0.6F : 0.0F;
+  logVarId_t id = logGetVarId("pm", "vbat");
+  float voltage = logGetFloat(id);
+  return static_cast<float>(
+      std::count_if(kBatLevels.begin(), kBatLevels.end(),
+                    [=](float level) { return voltage > level - modifier; }) *
+      kToPercentage);
 }

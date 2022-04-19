@@ -143,6 +143,7 @@ class CommSimulation(AbstractComm):
                     conn, _ = drone_simulation_socket.server.accept()
                     drone_simulation_socket.conn = conn
                 except socket.error as socket_error:
+
                     if socket_error.errno == EINVAL or socket_error.errno == EBADF:
                         return
                     else:
@@ -210,7 +211,7 @@ class CommSimulation(AbstractComm):
                         self.send_drone_status([data.to_dict()])
                         self.set_drone_data(data)
 
-                        self.mission_manager.update_position(data, count)
+                        self.mission_manager.update_position(data)
 
                     if is_socket_broken:
                         self.send_log(f'Broken Socket no {count}')
@@ -243,7 +244,7 @@ class CommSimulation(AbstractComm):
 
             if command_wrapper.command == COMMANDS.LAUNCH.value:
                 self.mission_manager.start_current_mission(
-                    self.nb_connections, True)
+                    self.drone_list, True)
                 self.logs = []
 
             print('Sending command ', full_command, ' to simulation')

@@ -18,7 +18,7 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /tmp/socket:/tmp/socket
-
     devices:
       - /dev/dri:/dev/dri
+      - /dev/bus/usb/:/dev/bus/usb/
     network_mode: host

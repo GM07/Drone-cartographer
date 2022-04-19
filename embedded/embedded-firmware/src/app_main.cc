@@ -24,7 +24,7 @@ bool commIsInit = false;
 
 }  // namespace
 
-static_assert(kDroneSpeed == 0.25,  // NOLINT
+static_assert(kSpeed == 0.25,  // NOLINT
               "You changed the drone speed! Was that really intended ? ");
 
 /////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ void communicationManagerTaskWrapper(void* /*parameter*/) {
 /////////////////////////////////////////////////////////////////////////
 void communicationManagerInit() {
   xTaskCreate(communicationManagerTaskWrapper, "COMMUNICATION_MANAGER_NAME",
-              configMINIMAL_STACK_SIZE, nullptr, 0, nullptr);
+              configMINIMAL_STACK_SIZE * 2, nullptr, 0, nullptr);
   commIsInit = true;
 }
 
@@ -56,24 +56,26 @@ void updateCrashStatus() {
 }
 
 /////////////////////////////////////////////////////////////////////////
-void enableCrtpHighLevelCommander() {
-  paramVarId_t paramIdCommanderEnHighLevel =
-      paramGetVarId("commander", "enHighLevel");
-  paramSetInt(paramIdCommanderEnHighLevel, 1);
-}
-
-/////////////////////////////////////////////////////////////////////////
 uint8_t logDroneState(uint32_t /*timestamp*/, void* /*data*/) {
   return static_cast<uint8_t>(
       Drone::getEmbeddedDrone().getController()->m_state);
+}
+
+uint8_t logDroneBattery(uint32_t /*timestamp*/, void* /*data*/) {
+  return static_cast<uint8_t>(
+      Drone::getEmbeddedDrone().getController()->m_data.batteryLevel);
 }
 
 /////////////////////////////////////////////////////////////////////////
 void addCustomLoggingVariables() {
   static logByFunction_t droneStateLogger = {.acquireUInt8 = logDroneState,
                                              .data = nullptr};
+  static logByFunction_t droneBatteryLogger = {.acquireUInt8 = logDroneBattery,
+                                               .data = nullptr};
   LOG_GROUP_START(custom)                                              // NOLINT
   LOG_ADD_BY_FUNCTION(LOG_UINT8, droneCustomState, &droneStateLogger)  // NOLINT
+  LOG_ADD_BY_FUNCTION(LOG_UINT8, batteryLevel,
+                      &droneBatteryLogger)  // NOLINT
   LOG_GROUP_STOP(custom)
 }
 
@@ -81,7 +83,6 @@ void addCustomLoggingVariables() {
 extern "C" void appMain() {
   ledClearAll();
   addCustomLoggingVariables();
-  enableCrtpHighLevelCommander();
   Drone::getEmbeddedDrone().initDrone();
 
   while (true) {

@@ -106,7 +106,8 @@ def recompile():
 # Reflash firmware
 @SOCKETIO.on('flash', namespace='/limitedAccess')
 def flash():
-    if not AccessStatus.is_request_valid(request):
+    if not AccessStatus.is_request_valid(
+            request) or MissionStatus.get_mission_started():
         return ''
 
     if AccessStatus.get_mission_simulated():
@@ -121,9 +122,9 @@ def flash():
     for drone in drone_list:
         flashDrone.append("make cload radio=" + drone.name)
 
-    bashCommand = f"docker exec embedded sh -c 'cd workspaces/INF3995-106/embedded/embedded-firmware" + " && " + " && ".join(
-        flashDrone) + "'"
-    FLASH_ALL_DRONES.changeCommand(bashCommand)
+    bashCommand = f"docker exec embedded sh -c 'cd /embedded-firmware || cd workspaces/INF3995-106/embedded/embedded-firmware" + " && " + " && ".join(
+        flashDrone) + " && sleep 1'"
+    FLASH_ALL_DRONES.change_command(bashCommand)
     FLASH_ALL_DRONES.start(COMM.start_logs)
 
     return 'Flashing'
@@ -150,6 +151,13 @@ def launch(is_simulated: bool):
         COMM = CommSimulation(SOCKETIO, drone_list)
     else:
         COMM = CommCrazyflie(SOCKETIO, drone_list)
+
+    SOCKETIO.emit('droneList',
+                  COMM.get_full_drone_data(),
+                  namespace='/limitedAccess',
+                  broadcast=True,
+                  include_self=False,
+                  skip_sid=True)
 
     for drone in drone_list:
         COMM.send_command(
@@ -199,6 +207,14 @@ def set_mission_type(is_simulated: bool):
         COMM = CommSimulation(SOCKETIO, drone_list)
     else:
         COMM = CommCrazyflie(SOCKETIO, drone_list)
+
+    SOCKETIO.emit('droneList',
+                  COMM.get_full_drone_data(),
+                  namespace='/limitedAccess',
+                  broadcast=True,
+                  include_self=False,
+                  skip_sid=True)
+
     return ''
 
 
@@ -212,7 +228,8 @@ def terminate(map: str):
     COMM.send_command(COMMANDS.LAND.value)
 
     MissionStatus.terminate_mission(SOCKETIO)
-    COMM.mission_manager.current_mission.map = map
+    if (hasattr(COMM.mission_manager.current_mission, 'map')):
+        COMM.mission_manager.current_mission.map = map
     COMM.mission_manager.end_current_mission(COMM.logs)
 
     SOCKETIO.emit('clear_all_maps',
@@ -256,7 +273,7 @@ def retrieve_specific_mission_logs(id: str):
 @APP.route('/getSpecificMissionMaps/<id>')
 def retrieve_specific_mission_map(id: str):
     database_connection = Database()
-    return jsonify(database_connection.get_mission_maps_from_id(id))
+    return jsonify(database_connection.get_mission_map_from_id(id))
 
 
 @SOCKETIO.on('revoke_control', namespace='/limitedAccess')

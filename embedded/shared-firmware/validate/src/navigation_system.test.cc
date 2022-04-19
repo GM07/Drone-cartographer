@@ -13,7 +13,7 @@ TEST(ValidateNavigationSystem, stepTakingOff) {
       std::make_shared<StubController>()));
   drone.getController()->m_state = State::kTakingOff;
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              isTrajectoryFinished())
+              isAltitudeReached())
       .Times(1);
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
               isDroneCrashed())
@@ -29,7 +29,7 @@ TEST(ValidateNavigationSystem, stepLanding) {
       std::make_shared<StubController>()));
   drone.getController()->m_state = State::kLanding;
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
-              isTrajectoryFinished())
+              isAltitudeReached())
       .Times(1);
   EXPECT_CALL(*std::dynamic_pointer_cast<StubController>(drone.getController()),
               isDroneCrashed())
@@ -102,7 +102,7 @@ TEST(ValidateNavigationSystem, takingOffFinished) {
   EXPECT_CALL(*controller, takeOff(_)).Times(0);
   EXPECT_CALL(*controller, land()).Times(0);
   EXPECT_CALL(*controller, identify()).Times(0);
-  EXPECT_CALL(*controller, isTrajectoryFinished())
+  EXPECT_CALL(*controller, isAltitudeReached())
       .Times(2)
       .WillOnce(Return(false))
       .WillRepeatedly(Return(true));
@@ -124,7 +124,7 @@ TEST(ValidateNavigationSystem, landingFinished) {
   EXPECT_CALL(*controller, takeOff(_)).Times(0);
   EXPECT_CALL(*controller, land()).Times(0);
   EXPECT_CALL(*controller, identify()).Times(0);
-  EXPECT_CALL(*controller, isTrajectoryFinished())
+  EXPECT_CALL(*controller, isAltitudeReached())
       .Times(2)
       .WillOnce(Return(false))
       .WillRepeatedly(Return(true));
@@ -138,45 +138,6 @@ TEST(ValidateNavigationSystem, landingFinished) {
   drone.step();
 
   EXPECT_EQ(drone.getController()->m_state, State::kIdle);
-}
-
-TEST(ValidateNavigationSystem, wallAvoidanceWithSensorsEverywhere) {
-  std::shared_ptr<StubController> controller =
-      std::make_shared<StubController>();
-
-  controller->m_data.front = 25;
-  controller->m_data.back = 25;
-  controller->m_data.left = 25;
-  controller->m_data.right = 25;
-
-  Drone drone(controller);
-
-  drone.m_normal = Vector3D(0, 0, 0);
-  drone.wallAvoidance();
-
-  EXPECT_FLOAT_EQ(drone.m_normal.m_x, 0);
-  EXPECT_FLOAT_EQ(drone.m_normal.m_y, 0);
-  EXPECT_FLOAT_EQ(drone.m_normal.m_z, 0);
-}
-
-TEST(ValidateNavigationSystem, wallAvoidanceWithSensors) {
-  std::shared_ptr<StubController> controller =
-      std::make_shared<StubController>();
-
-  controller->m_data.front = 25;
-  controller->m_data.back = 0;
-  controller->m_data.left = 25;
-  controller->m_data.right = 0;
-
-  Drone drone(controller);
-
-  drone.m_normal = Vector3D(-1, -1, 0);
-
-  drone.wallAvoidance();
-
-  EXPECT_FLOAT_EQ(drone.m_normal.m_x, 0);
-  EXPECT_FLOAT_EQ(drone.m_normal.m_y, 0);
-  EXPECT_FLOAT_EQ(drone.m_normal.m_z, 0);
 }
 
 TEST(ValidateNavigationSystem, getRealSensorsDistance) {

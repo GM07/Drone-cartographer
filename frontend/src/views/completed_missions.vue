@@ -68,15 +68,17 @@
         </div>
 
         <template v-slot:extension>
-          <v-tabs v-model="currentTab">
-            <v-tab @click="changeFilterMode(filter.all)">Tous</v-tab>
-            <v-tab @click="changeFilterMode(filter.simulated)"
-              >Simulation</v-tab
-            >
-            <v-tab @click="changeFilterMode(filter.physical)">Embarqué</v-tab>
-            <v-tab @click="changeFilterMode(filter.date)">Date</v-tab>
-            <v-spacer></v-spacer>
-          </v-tabs>
+          <div id="tabs">
+            <v-tabs v-model="currentTab">
+              <v-tab @click="changeFilterMode(filter.all)">Tous</v-tab>
+              <v-tab @click="changeFilterMode(filter.simulated)"
+                >Simulation</v-tab
+              >
+              <v-tab @click="changeFilterMode(filter.physical)">Embarqué</v-tab>
+              <v-tab @click="changeFilterMode(filter.date)">Date</v-tab>
+              <v-spacer></v-spacer>
+            </v-tabs>
+          </div>
         </template>
       </v-app-bar>
 
@@ -166,14 +168,6 @@
                 Fermer carte
               </v-btn>
               <div v-if="openMapId == item._id">
-                <v-btn
-                  v-for="(map, index) in item.maps"
-                  :key="map"
-                  @click="indexDrone = index"
-                >
-                  <p v-if="index == 0">Carte générale</p>
-                  <p v-else>Carte du drone no {{ index }}</p>
-                </v-btn>
                 <div
                   class="ma-10"
                   style="
@@ -182,7 +176,7 @@
                     align-items: center;
                   "
                 >
-                  <h2 style="color: DimGray">Carte Générale</h2>
+                  <h2 style="color: DimGray">Carte générale</h2>
 
                   <img class="Map" :src="item.map" />
                 </div>
@@ -276,6 +270,11 @@
 }
 .Map {
   border: 1px solid black;
+}
+
+#tabs {
+  filter: invert(100%) sepia(85%) saturate(78%) hue-rotate(203deg)
+    brightness(112%) contrast(92%);
 }
 </style>
 
