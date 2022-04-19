@@ -34,6 +34,7 @@ void Drone::step() {
       if (m_controller->isAltitudeReached()) {
         m_controller->m_state = State::kIdle;
         m_controller->stopMotors();
+        m_p2pColorGradientIsActive = false;
       }
       break;
     case State::kExploring:
