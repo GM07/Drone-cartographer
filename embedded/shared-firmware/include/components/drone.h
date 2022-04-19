@@ -22,7 +22,7 @@ constexpr size_t kNbLateralSensors = 4;
 constexpr float kSimulationCollisionAvoidanceRange = 20.0F;
 constexpr float kRealMinCollisionAvoidanceRange = 55.0F;
 constexpr float kRealMaxCollisionAvoidanceRange = 55.0F;
-constexpr float kDistanceForSafeShortcut = 0.1F;
+constexpr float kDistanceForSafeShortcut = 0.15F;
 
 class Drone {
  public:
