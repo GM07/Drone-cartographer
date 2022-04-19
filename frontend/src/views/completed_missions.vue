@@ -168,14 +168,6 @@
                 Fermer carte
               </v-btn>
               <div v-if="openMapId == item._id">
-                <v-btn
-                  v-for="(map, index) in item.maps"
-                  :key="map"
-                  @click="indexDrone = index"
-                >
-                  <p v-if="index == 0">Carte générale</p>
-                  <p v-else>Carte du drone no {{ index }}</p>
-                </v-btn>
                 <div
                   class="ma-10"
                   style="
@@ -184,7 +176,7 @@
                     align-items: center;
                   "
                 >
-                  <h2 style="color: DimGray">Carte Générale</h2>
+                  <h2 style="color: DimGray">Carte générale</h2>
 
                   <img class="Map" :src="item.map" />
                 </div>
