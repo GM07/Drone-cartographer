@@ -61,6 +61,21 @@ class TestApplication(unittest.TestCase):
                                             skip_sid=['test'])
         get_mission_status_mock.assert_called_once_with()
 
+    @mock.patch('services.status.mission_status.SocketIO')
+    def test_update_p2p_gradient_value(
+        self,
+        socket: mock.Mock,
+    ):
+
+        MissionStatus.update_p2p_gradient_value(socket)
+
+        socket.emit.assert_called_once_with(
+            'updateP2PGradient',
+            False,
+            namespace='/limitedAccess',
+            broadcast=True,
+        )
+
     @mock.patch('services.status.mission_status.get_mission_status')
     @mock.patch('services.status.mission_status.SocketIO')
     def test_update_specific_client(self, socket: mock.Mock,

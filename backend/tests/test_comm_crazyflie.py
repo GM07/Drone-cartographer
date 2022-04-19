@@ -4,12 +4,17 @@ import cflib
 import unittest
 
 from unittest.mock import MagicMock, patch
+
 from services.communication.comm_crazyflie import CommCrazyflie
 from services.communication.abstract_comm import AbstractComm
 from constants import COMMANDS, URI
 from flask_socketio import SocketIO
 from cflib.crazyflie import Crazyflie
+from cflib.crazyflie.log import LogConfig
+
 from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
+
+from services.data.starting_drone_data import StartingDroneData
 
 
 class TestCommCrazyflie(unittest.TestCase):
@@ -46,11 +51,45 @@ class TestCommCrazyflie(unittest.TestCase):
         comm_cf._CommCrazyflie__init_drivers()
         cflib.crtp.init_drivers.assert_called()
 
-    # TODO
-    def test_setup_log(self):
+    @patch('services.communication.comm_crazyflie.CommCrazyflie.init_comm',
+           MagicMock())
+    @patch('services.communication.comm_crazyflie.CommCrazyflie.__del__',
+           MagicMock())
+    def test_start_logs(self):
         comm_cf = CommCrazyflie(MagicMock(), [])
+        comm_cf.start_logs()
+        CommCrazyflie.init_comm.assert_called()
+
+    @patch('services.communication.comm_crazyflie.CommCrazyflie.shutdown',
+           MagicMock())
+    @patch('services.communication.comm_crazyflie.CommCrazyflie.__del__',
+           MagicMock())
+    def test_stop_logs(self):
+        comm_cf = CommCrazyflie(MagicMock(), [])
+        comm_cf.stop_logs()
+        CommCrazyflie.shutdown.assert_called()
+
+    @patch('cflib.crtp.init_drivers', MagicMock)
+    @patch('cflib.crazyflie.Crazyflie', MagicMock)
+    @patch('services.communication.comm_crazyflie.CommCrazyflie.__del__',
+           MagicMock())
+    @patch('cflib.crazyflie.syncCrazyflie.SyncCrazyflie.open_link', MagicMock())
+    @patch('cflib.crazyflie.syncCrazyflie.SyncCrazyflie.close_link',
+           MagicMock())
+    @patch('cflib.crazyflie.log.LogConfig.start', MagicMock())
+    def test_setup_log(self):
+        comm_cf = CommCrazyflie(MagicMock(), [
+            StartingDroneData({
+                'name': 'test',
+                'startingXPos': 1,
+                'startingYPos': 1,
+                'startingOrientation': 0
+            })
+        ])
         #comm_cf.crazyflies.append(Crazyflie(rw_cache='./cache'))
         comm_cf.setup_log()
+        assert len(comm_cf.log_configs) == 1
+        cflib.crazyflie.log.LogConfig.start.assert_called()
 
     @patch('cflib.crazyflie.Crazyflie.open_link', MagicMock())
     @patch('cflib.crazyflie.appchannel.Appchannel.send_packet', MagicMock())

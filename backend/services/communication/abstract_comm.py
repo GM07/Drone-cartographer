@@ -69,7 +69,7 @@ class AbstractComm(metaclass=ABCMeta):
             if drone_data.name in self.drone_data_list:
                 self.drone_data_list[drone_data.name] = drone_data
 
-    def get_full_drone_data(self) -> Dict[str, Any]:
+    def get_full_drone_data(self) -> List[Dict[str, Any]]:
         with self.drone_data_lock:
             returned_dict_list: List[Dict[str, Any]] = []
             for i in range(len(self.drone_list)):

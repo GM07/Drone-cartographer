@@ -1,22 +1,27 @@
 """Test module for the server.py file """
+from math import fabs
+from typing import Dict
+from typing_extensions import Literal
 import unittest
 from unittest import mock
 
 from flask import Flask, session, request, json as flask_json
 from flask_socketio import SocketIO, send, emit, join_room, leave_room, \
     Namespace, disconnect
+from constants import COMMANDS
 
 import server
 from services.data.starting_drone_data import StartingDroneData
 
 
+class StartingDroneDataStub:
+
+    def __init__(self, name):
+        self.name = name
+        return None
+
+
 class TestApplication(unittest.TestCase):
-
-    class StartingDroneDataStub:
-
-        def __init__(self, name):
-            self.name = name
-            return None
 
     class CrazyflieStub:
 
@@ -65,6 +70,151 @@ class TestApplication(unittest.TestCase):
 
         server.COMM.send_command.assert_not_called()
         is_request_mock.assert_called_once()
+
+    @mock.patch('server.FileHelper.update_files')
+    def test_set_files(self, update_file_mock: mock.MagicMock):
+        response = server.APP.test_client().post('/setFiles',
+                                                 json={
+                                                     'keys': 'test',
+                                                     'values': 'otherTest'
+                                                 })
+        self.assertEqual(response.json, {'output': 'File updated'})
+        update_file_mock.assert_called_once_with('test', 'otherTest')
+
+    @mock.patch('server.FileHelper.get_files')
+    @mock.patch('server.FileHelper.get_files_content')
+    def test_get_files(
+        self,
+        get_content_mock: mock.MagicMock,
+        get_files_mock: mock.MagicMock,
+    ):
+
+        get_content_mock.return_value = {
+            '/workspaces/INF3995-106/tests': 'value'
+        }
+
+        response = server.APP.test_client().get('/getFiles')
+        self.assertEqual(response.json, {
+            'keys': ['tests'],
+            'values': ['value']
+        })
+        get_content_mock.assert_called_once()
+        get_files_mock.assert_called_once()
+
+    @mock.patch('server.AbstractComm.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
+    @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
+    @mock.patch('server.RECOMPILE_EMBEDDED')
+    @mock.patch('server.RECOMPILE_SIMULATION')
+    def test_recompile(self, recompile_sim: mock.MagicMock,
+                       recompile_embedded: mock.MagicMock):
+        client = server.SOCKETIO.test_client(server.APP,
+                                             namespace='/limitedAccess')
+        self.assertTrue(client.is_connected('/limitedAccess'))
+        client.emit('recompile', namespace='/limitedAccess')
+        recompile_sim.start.assert_called_once()
+        recompile_embedded.start.assert_called_once()
+
+    @mock.patch('server.AbstractComm.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
+    @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
+    @mock.patch('server.AccessStatus.is_request_valid')
+    @mock.patch('server.AccessStatus.get_mission_simulated')
+    @mock.patch('server.COMM.get_drones')
+    @mock.patch('server.COMM.start_logs')
+    @mock.patch('server.COMM.stop_logs')
+    @mock.patch('server.FLASH_ALL_DRONES.change_command')
+    @mock.patch('server.FLASH_ALL_DRONES.start')
+    def test_flash_successful(
+        self,
+        flash_start_mock: mock.MagicMock,
+        change_command_mock: mock.MagicMock,
+        stop_logs_mock: mock.MagicMock,
+        start_logs_mock: mock.MagicMock,
+        get_drones_mock: mock.MagicMock,
+        get_mission_simulated_mock: mock.MagicMock,
+        is_request_valid_mock: mock.MagicMock,
+    ):
+        is_request_valid_mock.return_value = True
+        get_mission_simulated_mock.return_value = False
+        get_drones_mock.return_value = [StartingDroneDataStub('test')]
+        client = server.SOCKETIO.test_client(server.APP,
+                                             namespace='/limitedAccess')
+        self.assertTrue(client.is_connected('/limitedAccess'))
+        client.emit('flash', namespace='/limitedAccess')
+        is_request_valid_mock.assert_called_once()
+        get_mission_simulated_mock.assert_called_once()
+        change_command_mock.assert_called_once_with(
+            "docker exec embedded sh -c 'cd /embedded-firmware || cd workspaces/INF3995-106/embedded/embedded-firmware && make cload radio=test'"
+        )
+        flash_start_mock.assert_called_once()
+        stop_logs_mock.assert_called_once()
+
+    @mock.patch('server.AbstractComm.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
+    @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
+    @mock.patch('server.AccessStatus.is_request_valid')
+    @mock.patch('server.AccessStatus.get_mission_simulated')
+    @mock.patch('server.COMM.get_drones')
+    @mock.patch('server.COMM.start_logs')
+    @mock.patch('server.COMM.stop_logs')
+    @mock.patch('server.FLASH_ALL_DRONES.change_command')
+    @mock.patch('server.FLASH_ALL_DRONES.start')
+    def test_flash_request_not_valid(
+        self,
+        flash_start_mock: mock.MagicMock,
+        change_command_mock: mock.MagicMock,
+        stop_logs_mock: mock.MagicMock,
+        start_logs_mock: mock.MagicMock,
+        get_drones_mock: mock.MagicMock,
+        get_mission_simulated_mock: mock.MagicMock,
+        is_request_valid_mock: mock.MagicMock,
+    ):
+        is_request_valid_mock.return_value = False
+        get_mission_simulated_mock.return_value = False
+        get_drones_mock.return_value = [StartingDroneDataStub('test')]
+        client = server.SOCKETIO.test_client(server.APP,
+                                             namespace='/limitedAccess')
+        self.assertTrue(client.is_connected('/limitedAccess'))
+        client.emit('flash', namespace='/limitedAccess')
+        is_request_valid_mock.assert_called_once()
+        get_mission_simulated_mock.assert_not_called()
+        change_command_mock.assert_not_called()
+        flash_start_mock.assert_not_called()
+        stop_logs_mock.assert_not_called()
+
+    @mock.patch('server.AbstractComm.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
+    @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
+    @mock.patch('server.AccessStatus.is_request_valid')
+    @mock.patch('server.AccessStatus.get_mission_simulated')
+    @mock.patch('server.COMM.get_drones')
+    @mock.patch('server.COMM.start_logs')
+    @mock.patch('server.COMM.stop_logs')
+    @mock.patch('server.FLASH_ALL_DRONES.change_command')
+    @mock.patch('server.FLASH_ALL_DRONES.start')
+    def test_flash_mission_simulated(
+        self,
+        flash_start_mock: mock.MagicMock,
+        change_command_mock: mock.MagicMock,
+        stop_logs_mock: mock.MagicMock,
+        start_logs_mock: mock.MagicMock,
+        get_drones_mock: mock.MagicMock,
+        get_mission_simulated_mock: mock.MagicMock,
+        is_request_valid_mock: mock.MagicMock,
+    ):
+        is_request_valid_mock.return_value = True
+        get_mission_simulated_mock.return_value = True
+        get_drones_mock.return_value = [StartingDroneDataStub('test')]
+        client = server.SOCKETIO.test_client(server.APP,
+                                             namespace='/limitedAccess')
+        self.assertTrue(client.is_connected('/limitedAccess'))
+        client.emit('flash', namespace='/limitedAccess')
+        is_request_valid_mock.assert_not_called
+        get_mission_simulated_mock.assert_called_once()
+        change_command_mock.assert_not_called()
+        flash_start_mock.assert_not_called()
+        stop_logs_mock.assert_not_called()
 
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.SimulationConfiguration.launch')
@@ -360,6 +510,47 @@ class TestApplication(unittest.TestCase):
         terminate_mission_mock.assert_not_called()
         server.COMM.send_command.assert_not_called()
 
+    @mock.patch('server.MissionStatus.get_mission_started')
+    @mock.patch('server.AccessStatus.is_request_valid')
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
+    def test_return_to_base_successful(
+            self, is_request_valid_mock: mock.MagicMock,
+            get_mission_started_mock: mock.MagicMock):
+        server.COMM.send_command = mock.MagicMock()
+        is_request_valid_mock.return_value = True
+        get_mission_started_mock.return_value = True
+        client = server.SOCKETIO.test_client(server.APP,
+                                             namespace='/limitedAccess')
+
+        self.assertTrue(client.is_connected('/limitedAccess'))
+
+        client.emit('return_to_base', namespace='/limitedAccess')
+        server.COMM.send_command.assert_called_once_with(
+            COMMANDS.RETURN_TO_BASE.value)
+        get_mission_started_mock.assert_called_once()
+        is_request_valid_mock.assert_called_once()
+
+    @mock.patch('server.MissionStatus.get_mission_started')
+    @mock.patch('server.AccessStatus.is_request_valid')
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
+    def test_return_to_base_unsuccessful(
+            self, is_request_valid_mock: mock.MagicMock,
+            get_mission_started_mock: mock.MagicMock):
+        server.COMM.send_command = mock.MagicMock()
+        is_request_valid_mock.return_value = False
+        get_mission_started_mock.return_value = True
+        client = server.SOCKETIO.test_client(server.APP,
+                                             namespace='/limitedAccess')
+
+        self.assertTrue(client.is_connected('/limitedAccess'))
+
+        client.emit('return_to_base', namespace='/limitedAccess')
+        server.COMM.send_command.assert_not_called()
+        get_mission_started_mock.assert_called_once()
+        is_request_valid_mock.assert_called_once()
+
     @mock.patch('server.COMM.get_full_drone_data',
                 mock.MagicMock(return_value='test'))
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
@@ -407,12 +598,25 @@ class TestApplication(unittest.TestCase):
     @mock.patch('server.Database.__init__', mock.MagicMock(return_value=None))
     @mock.patch('server.jsonify')
     @mock.patch('server.Database.get_mission_logs_from_id')
-    def test_retrieve_specific_mission(self,
-                                       get_mission_from_id_mock: mock.MagicMock,
-                                       jsonify_mock: mock.MagicMock):
+    def test_retrieve_specific_mission_logs(
+            self, get_mission_from_id_mock: mock.MagicMock,
+            jsonify_mock: mock.MagicMock):
         get_mission_from_id_mock.return_value = []
         jsonify_mock.return_value = 'test'
         response = server.APP.test_client().get('/getSpecificMissionLogs/1')
+        self.assertEqual(response.get_data(as_text=True), 'test')
+        get_mission_from_id_mock.assert_called_once_with('1')
+        jsonify_mock.assert_called_once_with([])
+
+    @mock.patch('server.Database.__init__', mock.MagicMock(return_value=None))
+    @mock.patch('server.jsonify')
+    @mock.patch('server.Database.get_mission_map_from_id')
+    def test_retrieve_specific_mission_map(
+            self, get_mission_from_id_mock: mock.MagicMock,
+            jsonify_mock: mock.MagicMock):
+        get_mission_from_id_mock.return_value = []
+        jsonify_mock.return_value = 'test'
+        response = server.APP.test_client().get('/getSpecificMissionMaps/1')
         self.assertEqual(response.get_data(as_text=True), 'test')
         get_mission_from_id_mock.assert_called_once_with('1')
         jsonify_mock.assert_called_once_with([])
@@ -521,6 +725,15 @@ class TestApplication(unittest.TestCase):
         self.assertTrue(client.is_connected('/getDroneStatus'))
         start_drone_mock.assert_called_once_with(server.SOCKETIO)
 
+    @mock.patch('server.Map.get_all_filtered_data')
+    def test_send_all_map_data(self, filtered_data_mock: mock.MagicMock):
+        filtered_data_mock.return_value = 'test'
+        client = server.SOCKETIO.test_client(server.APP,
+                                             namespace='/getAllMapData')
+        self.assertTrue(client.is_connected('/getAllMapData'))
+        self.assertEqual(
+            client.get_received('/getAllMapData')[0]['args'], ['test'])
+
     def test_send_logs(self):
         server.COMM.logs = 'test'
 
@@ -530,3 +743,67 @@ class TestApplication(unittest.TestCase):
             'args': ['test'],
             'namespace': '/getLogs'
         }])
+
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
+    @mock.patch('server.MissionStatus.update_p2p_gradient_value')
+    @mock.patch('server.MissionStatus.get_mission_started')
+    @mock.patch('server.AccessStatus.is_request_valid')
+    def test_set_p2p_true_successful(self,
+                                     get_mission_started_mock: mock.MagicMock,
+                                     is_request_mock: mock.MagicMock,
+                                     update_p2p_mock: mock.MagicMock):
+        get_mission_started_mock.return_value = True
+        is_request_mock.return_value = True
+
+        server.COMM.send_command = mock.MagicMock()
+
+        client = server.SOCKETIO.test_client(server.APP,
+                                             namespace='/limitedAccess')
+
+        client.emit('setP2PGradient', True, namespace='/limitedAccess')
+        server.COMM.send_command.assert_called_once_with(
+            COMMANDS.START_P2P.value)
+        update_p2p_mock.assert_called()
+
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
+    @mock.patch('server.MissionStatus.update_p2p_gradient_value')
+    @mock.patch('server.MissionStatus.get_mission_started')
+    @mock.patch('server.AccessStatus.is_request_valid')
+    def test_set_p2p_false_successful(self,
+                                      get_mission_started_mock: mock.MagicMock,
+                                      is_request_mock: mock.MagicMock,
+                                      update_p2p_mock: mock.MagicMock):
+        get_mission_started_mock.return_value = True
+        is_request_mock.return_value = True
+
+        server.COMM.send_command = mock.MagicMock()
+
+        client = server.SOCKETIO.test_client(server.APP,
+                                             namespace='/limitedAccess')
+
+        client.emit('setP2PGradient', False, namespace='/limitedAccess')
+        server.COMM.send_command.assert_called_once_with(COMMANDS.END_P2P.value)
+        update_p2p_mock.assert_called()
+
+    @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value='test'))
+    @mock.patch('server.MissionStatus.update_p2p_gradient_value')
+    @mock.patch('server.MissionStatus.get_mission_started')
+    @mock.patch('server.AccessStatus.is_request_valid')
+    def test_set_p2p_unsuccessful(self,
+                                  get_mission_started_mock: mock.MagicMock,
+                                  is_request_mock: mock.MagicMock,
+                                  update_p2p_mock: mock.MagicMock):
+        get_mission_started_mock.return_value = False
+        is_request_mock.return_value = True
+
+        server.COMM.send_command = mock.MagicMock()
+
+        client = server.SOCKETIO.test_client(server.APP,
+                                             namespace='/limitedAccess')
+
+        client.emit('setP2PGradient', True, namespace='/limitedAccess')
+        server.COMM.send_command.assert_not_called()
+        update_p2p_mock.assert_called_once()

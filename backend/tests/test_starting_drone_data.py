@@ -18,7 +18,7 @@ class TestStartingDroneData(unittest.TestCase):
             'startingYPos': 0
         }
         starting_drone_data = StartingDroneData(drone_data)
-        assert starting_drone_data.name is 'test'
+        assert starting_drone_data.name == 'test'
 
     def test_to_string(self):
         drone_data = {
