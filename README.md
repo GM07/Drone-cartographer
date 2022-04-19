@@ -179,7 +179,11 @@ You should be able to select drone radio addresses in the top bar of the UI on t
 
 ## Coding style
 The main coding style follows the Google coding style. 
+
 To apply the coding style, we used:
+
 For the frontend: eslint
+
 For the backend: yapf
+
 For the embedded: clang-format and clang-tidy
