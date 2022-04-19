@@ -152,6 +152,13 @@ def launch(is_simulated: bool):
     else:
         COMM = CommCrazyflie(SOCKETIO, drone_list)
 
+    SOCKETIO.emit('droneList',
+                  COMM.get_full_drone_data(),
+                  namespace='/limitedAccess',
+                  broadcast=True,
+                  include_self=False,
+                  skip_sid=True)
+
     for drone in drone_list:
         COMM.send_command(
             COMMANDS.LAUNCH.value, [drone.name],
@@ -200,6 +207,14 @@ def set_mission_type(is_simulated: bool):
         COMM = CommSimulation(SOCKETIO, drone_list)
     else:
         COMM = CommCrazyflie(SOCKETIO, drone_list)
+
+    SOCKETIO.emit('droneList',
+                  COMM.get_full_drone_data(),
+                  namespace='/limitedAccess',
+                  broadcast=True,
+                  include_self=False,
+                  skip_sid=True)
+
     return ''
 
 
