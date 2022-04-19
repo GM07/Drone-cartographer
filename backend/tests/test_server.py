@@ -145,7 +145,7 @@ class TestApplication(unittest.TestCase):
         is_request_valid_mock.assert_called_once()
         get_mission_simulated_mock.assert_called_once()
         change_command_mock.assert_called_once_with(
-            "docker exec embedded sh -c 'cd /embedded-firmware || cd workspaces/INF3995-106/embedded/embedded-firmware && make cload radio=test'"
+            "docker exec embedded sh -c 'cd /embedded-firmware || cd workspaces/INF3995-106/embedded/embedded-firmware && make cload radio=test && sleep 1'"
         )
         flash_start_mock.assert_called_once()
         stop_logs_mock.assert_called_once()
