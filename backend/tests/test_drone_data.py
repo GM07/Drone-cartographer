@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from typing import Any
 import unittest
 from unittest import mock
 
@@ -41,10 +43,41 @@ class TestApplication(unittest.TestCase):
                          Drone.DroneState.RETURNING_TO_BASE)
         self.assertEqual(Drone.DroneState(6), Drone.DroneState.CRASHED)
 
+    def test_log_to_drone_data(self):
+        log_data = {
+            'kalman.stateX': 'x',
+            'kalman.stateY': 'y',
+            'kalman.stateZ': 'z',
+            'range.front': 'front',
+            'range.back': 'back',
+            'range.left': 'left',
+            'range.right': 'right',
+            'custom.batteryLevel': 'low',
+            'custom.droneCustomState': 0
+        }
+        drone_data = Drone.log_data_to_drone_data('test', log_data)
+
+        self.assertEqual(drone_data.battery_level, 'low')
+        self.assertEqual(drone_data.state, Drone.DroneState(0))
+
     @mock.patch('services.data.drone_data.DroneData._DroneData__from_bytes')
     def test_drone_data(self, byte: mock.MagicMock):
         Drone.DroneData('', {})
         byte.assert_called()
+
+    @mock.patch('services.data.drone_data.DroneData._DroneData__from_bytes',
+                mock.MagicMock())
+    def test_drone_data_update_sensors(self):
+        drone = Drone.DroneData('test', {})
+        self.assertNotEqual(drone.sensors, {})
+        drone.update_sensors({})
+        self.assertEqual(drone.sensors, {})
+
+    @mock.patch('services.data.drone_data.DroneData._DroneData__from_bytes',
+                mock.MagicMock())
+    def test_to_dict(self):
+        drone = Drone.DroneData('test', {})
+        self.assertEqual(drone.to_dict()['name'], 'test')
 
     @mock.patch('services.data.drone_data.DroneState', mock.MagicMock)
     @mock.patch('services.data.drone_data.Point2D', mock.MagicMock)

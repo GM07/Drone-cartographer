@@ -143,6 +143,7 @@ class CommSimulation(AbstractComm):
                     conn, _ = drone_simulation_socket.server.accept()
                     drone_simulation_socket.conn = conn
                 except socket.error as socket_error:
+
                     if socket_error.errno == EINVAL or socket_error.errno == EBADF:
                         return
                     else:

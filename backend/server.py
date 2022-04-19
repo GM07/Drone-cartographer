@@ -124,7 +124,7 @@ def flash():
 
     bashCommand = f"docker exec embedded sh -c 'cd /embedded-firmware || cd workspaces/INF3995-106/embedded/embedded-firmware" + " && " + " && ".join(
         flashDrone) + "'"
-    FLASH_ALL_DRONES.changeCommand(bashCommand)
+    FLASH_ALL_DRONES.change_command(bashCommand)
     FLASH_ALL_DRONES.start(COMM.start_logs)
 
     return 'Flashing'
@@ -258,7 +258,7 @@ def retrieve_specific_mission_logs(id: str):
 @APP.route('/getSpecificMissionMaps/<id>')
 def retrieve_specific_mission_map(id: str):
     database_connection = Database()
-    return jsonify(database_connection.get_mission_maps_from_id(id))
+    return jsonify(database_connection.get_mission_map_from_id(id))
 
 
 @SOCKETIO.on('revoke_control', namespace='/limitedAccess')

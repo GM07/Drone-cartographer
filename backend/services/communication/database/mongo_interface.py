@@ -113,7 +113,7 @@ class Database:
             mission['_id'] = str(mission['_id'])
         return mission
 
-    def get_mission_maps_from_id(self, identifier: str):
+    def get_mission_map_from_id(self, identifier: str):
         try:
             mission = self.db.missions.find_one({'_id': ObjectId(identifier)},
                                                 {"map": 1})
@@ -123,25 +123,6 @@ class Database:
         if mission is not None:
             mission['_id'] = str(mission['_id'])
         return mission
-
-    def remove_mission_from_id(self, identifier: str) -> bool:
-        try:
-            return self.db.missions.delete_one({
-                '_id': ObjectId(identifier)
-            }).deleted_count != 0
-        except:
-            print('Database error')
-            return False
-
-    def update_mission_info_from_id(self, mission: Mission,
-                                    identifier: str) -> bool:
-        try:
-            return self.db.missions.replace_one({
-                '_id': ObjectId(identifier)
-            }, mission.__dict__).matched_count != 0
-        except:
-            print('Database error')
-            return False
 
 
 def serialize_objectid_from_result(result: list):
