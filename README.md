@@ -21,12 +21,14 @@
 #### R.F.4-R.F.5 : https://youtu.be/xhmPRty4eb4
 #### R.F.6-8-9-11-12 : https://youtu.be/B7L6vY_rDgE
 #### R.F.7 : https://youtube.com/shorts/DulzTUlVoj8?feature=share
+#### R.F.7 - Retour à la base : https://youtu.be/qT0P7P8uJD8
 #### R.F.13 : https://youtu.be/Dh6XQaVc9tI
 #### R.F.14-R.F.16 : https://youtu.be/wPQ9SxHwMvI
 #### R.F.19 : https://youtu.be/PuRP_JvzIHs
 
 ## AUTRES
 #### R.C.1 : https://youtu.be/0A95FmTyeaU
+#### R.C.2 : https://youtu.be/qLaY50ZoRwc
 #### R.F.10 : https://youtu.be/eavHEMG_ItM  
 
 
