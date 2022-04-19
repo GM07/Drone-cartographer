@@ -28,6 +28,9 @@ class TestApplication(unittest.TestCase):
         def __init__(self, socket_io, drone_list):
             return None
 
+        def get_full_drone_data(self):
+            return None
+
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
     @mock.patch('server.AccessStatus.is_request_valid')
     def test_identity_drone(
@@ -249,6 +252,8 @@ class TestApplication(unittest.TestCase):
         add_obstacles.assert_not_called()
         launch_mock.assert_not_called()
 
+    @mock.patch('server.CommSimulation.get_full_drone_data',
+                mock.MagicMock(return_value=None))
     @mock.patch('server.CommSimulation.__init__',
                 mock.MagicMock(return_value=None))
     @mock.patch('server.CommSimulation.send_command',
@@ -292,7 +297,9 @@ class TestApplication(unittest.TestCase):
         add_obstacles.assert_called_once()
         launch_mock.assert_called_once()
 
-    @mock.patch('server.COMM.get_full_drone_data',
+    @mock.patch('server.CommSimulation.get_full_drone_data',
+                mock.MagicMock(return_value=None))
+    @mock.patch('server.CommCrazyflie.get_full_drone_data',
                 mock.MagicMock(return_value=None))
     @mock.patch('server.SimulationConfiguration.__init__',
                 mock.MagicMock(return_value=None))
@@ -413,6 +420,10 @@ class TestApplication(unittest.TestCase):
         comm_mock.shutdown.assert_not_called()
 
     @mock.patch('server.COMM.get_full_drone_data',
+                mock.MagicMock(return_value=None))
+    @mock.patch('server.CommSimulation.get_full_drone_data',
+                mock.MagicMock(return_value=None))
+    @mock.patch('server.CommCrazyflie.get_full_drone_data',
                 mock.MagicMock(return_value=None))
     @mock.patch('server.CommSimulation.__init__')
     @mock.patch('server.AccessStatus.update_specific_client', mock.MagicMock)
