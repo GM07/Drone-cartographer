@@ -33,7 +33,9 @@ class BashExecutor:
 
     def start(self, on_end=None):
         # Make sure we are not running the same process twice
-        self.stop()
+        if self.process is not None and self.process.poll() is None:
+            return
+
         self.on_end = on_end
         self.nb_output_finished = 0
 
@@ -80,7 +82,7 @@ class BashExecutor:
             self.stop()
 
     def __transmit_stderr(self):
-        while (self.process.poll() is None):
+        while self.process.poll() is None:
             stderr = self.process.stderr.read(1).decode()
             if stderr != "":
                 self.SOCKETIO.emit('stderr',
