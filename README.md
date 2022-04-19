@@ -177,7 +177,7 @@ On the client, do not check the `Simulation Toggle` button and press the `Démar
 
 You should be able to select drone radio addresses in the top bar of the UI on the client. Selecting a Drone will allow you to send the identify command which will make its LED blink.
 
-### Coding style
+## Coding style
 The main coding style follows the Google coding style. 
 To apply the coding style, we used:
 For the frontend: eslint
